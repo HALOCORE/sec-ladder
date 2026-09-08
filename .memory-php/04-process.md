@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings F1–F34 live in `RECAP_PHP.md`.
+> The narrative, the open items and findings F1–F41 live in `RECAP_PHP.md`.
 
 ---
 

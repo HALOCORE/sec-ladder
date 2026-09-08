@@ -1,0 +1,388 @@
+{
+  "row": "ph07-strcut-cursor",
+  "runs": [
+    {
+      "row": "ph07-strcut-cursor",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph07-strcut-cursor: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph07-strcut-cursor: ext/mbstring/libmbfl/mbfl/mbfilter.c is in the manifest (da3f5f9ef501)",
+        "  ph07-strcut-cursor: OK  ext/mbstring/libmbfl/mbfl/mbfilter.c:1179-1259  1489 bytes  sha256 5edc6c04b7ff5f64  tier=narrowed",
+        "  ph07-strcut-cursor: kernel overlap 75% (39/52 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph07-strcut-cursor: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph07-strcut-cursor: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH07_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 356,
+          "prefix_words": 356,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "db3fb55aa0b98c5bd66597c244b2c40db5d4e877ff2f77dcd3910034469e415a",
+        "provenance.py": "2cc5dd09b2bcd007be0fa3c31e03ce09cbe80706c8f487c8125475e794e0f8b8",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "build",
+      "gate_argv": [
+        "--tool",
+        "build",
+        "ph07-strcut-cursor",
+        "--all"
+      ],
+      "tool_argv": [
+        "ph07-strcut-cursor",
+        "--all"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph07-strcut-cursor",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph07-strcut-cursor: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph07-strcut-cursor: ext/mbstring/libmbfl/mbfl/mbfilter.c is in the manifest (da3f5f9ef501)",
+        "  ph07-strcut-cursor: OK  ext/mbstring/libmbfl/mbfl/mbfilter.c:1179-1259  1489 bytes  sha256 5edc6c04b7ff5f64  tier=narrowed",
+        "  ph07-strcut-cursor: kernel overlap 75% (39/52 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph07-strcut-cursor: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph07-strcut-cursor: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH07_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 356,
+          "prefix_words": 356,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "db3fb55aa0b98c5bd66597c244b2c40db5d4e877ff2f77dcd3910034469e415a",
+        "provenance.py": "2cc5dd09b2bcd007be0fa3c31e03ce09cbe80706c8f487c8125475e794e0f8b8",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "ph07-strcut-cursor"
+      ],
+      "tool_argv": [
+        "ph07-strcut-cursor"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph07-strcut-cursor",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph07-strcut-cursor: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph07-strcut-cursor: ext/mbstring/libmbfl/mbfl/mbfilter.c is in the manifest (da3f5f9ef501)",
+        "  ph07-strcut-cursor: OK  ext/mbstring/libmbfl/mbfl/mbfilter.c:1179-1259  1489 bytes  sha256 5edc6c04b7ff5f64  tier=narrowed",
+        "  ph07-strcut-cursor: kernel overlap 75% (39/52 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph07-strcut-cursor: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph07-strcut-cursor: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH07_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 356,
+          "prefix_words": 356,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "db3fb55aa0b98c5bd66597c244b2c40db5d4e877ff2f77dcd3910034469e415a",
+        "provenance.py": "2cc5dd09b2bcd007be0fa3c31e03ce09cbe80706c8f487c8125475e794e0f8b8",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph07-strcut-cursor"
+      ],
+      "tool_argv": [
+        "ph07-strcut-cursor"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 1
+    },
+    {
+      "row": "ph07-strcut-cursor",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph07-strcut-cursor: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph07-strcut-cursor: ext/mbstring/libmbfl/mbfl/mbfilter.c is in the manifest (da3f5f9ef501)",
+        "  ph07-strcut-cursor: OK  ext/mbstring/libmbfl/mbfl/mbfilter.c:1179-1259  1489 bytes  sha256 5edc6c04b7ff5f64  tier=narrowed",
+        "  ph07-strcut-cursor: kernel overlap 75% (39/52 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph07-strcut-cursor: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph07-strcut-cursor: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH07_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 356,
+          "prefix_words": 356,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "db3fb55aa0b98c5bd66597c244b2c40db5d4e877ff2f77dcd3910034469e415a",
+        "provenance.py": "2cc5dd09b2bcd007be0fa3c31e03ce09cbe80706c8f487c8125475e794e0f8b8",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "report",
+      "gate_argv": [
+        "--tool",
+        "report",
+        "ph07-strcut-cursor"
+      ],
+      "tool_argv": [
+        "ph07-strcut-cursor"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph07-strcut-cursor",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph07-strcut-cursor: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph07-strcut-cursor: ext/mbstring/libmbfl/mbfl/mbfilter.c is in the manifest (da3f5f9ef501)",
+        "  ph07-strcut-cursor: OK  ext/mbstring/libmbfl/mbfl/mbfilter.c:1179-1259  1489 bytes  sha256 5edc6c04b7ff5f64  tier=narrowed",
+        "  ph07-strcut-cursor: kernel overlap 75% (39/52 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph07-strcut-cursor: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph07-strcut-cursor: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH07_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 356,
+          "prefix_words": 356,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "db3fb55aa0b98c5bd66597c244b2c40db5d4e877ff2f77dcd3910034469e415a",
+        "provenance.py": "2cc5dd09b2bcd007be0fa3c31e03ce09cbe80706c8f487c8125475e794e0f8b8",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph07-strcut-cursor"
+      ],
+      "tool_argv": [
+        "ph07-strcut-cursor"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    }
+  ]
+}

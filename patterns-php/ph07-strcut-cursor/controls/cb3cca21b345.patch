@@ -1,0 +1,27 @@
+From cb3cca21b34518caf45852ed90597052e99294c3 Mon Sep 17 00:00:00 2001
+From: Ilia Alshanetsky <iliaa@php.net>
+Date: Thu, 15 Dec 2005 03:36:53 +0000
+Subject: [PATCH] Fixed possible memory corruption inside mb_strcut().
+
+---
+ ext/mbstring/mbstring.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/ext/mbstring/mbstring.c b/ext/mbstring/mbstring.c
+index 1f7a1c98ca6c..7e665c37d4fc 100644
+--- a/ext/mbstring/mbstring.c
++++ b/ext/mbstring/mbstring.c
+@@ -1844,6 +1844,13 @@ PHP_FUNCTION(mb_strcut)
+ 		}
+ 	}
+ 
++	if (from > Z_STRLEN_PP(arg1)) {
++		RETURN_FALSE;
++	}
++	if (((unsigned) from + (unsigned) len) > Z_STRLEN_PP(arg1)) {
++		len = Z_STRLEN_PP(arg1) - from;
++	}
++
+ 	ret = mbfl_strcut(&string, &result, from, len);
+ 	if (ret != NULL) {
+ 		RETVAL_STRINGL(ret->val, ret->len, 0);		/* the string is already strdup()'ed */

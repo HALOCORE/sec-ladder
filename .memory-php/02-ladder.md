@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings F1–F34 live in `RECAP_PHP.md`.
+> The narrative, the open items and findings F1–F41 live in `RECAP_PHP.md`.
 
 ---
 
@@ -46,18 +46,34 @@
   calling no libm function the re-measured numbers must be byte-identical —
   the re-measure is self-verifying. (F31.)
 
-- ⭐ **WHERE TO LOOK FOR THE FIX: a missing bound is often restored in the
-  PROLOGUE, not at the site.** `ph07`'s `mbfl_strcut` was characterised — by the
-  catalogue *and* by an engineer — **by its loop**, so both checked the loop in
-  the fixed version, found it still expressed in terms of `from`, and concluded
-  no fix existed. ✅ 5.4.0's **prologue** carries the guard:
-  `if (from >= string->len) { from = string->len; }`. **The guard moved; it did
-  not vanish.** This is `01-extraction.md`'s three-frames problem arriving in the
-  **repair** instead of the defect. (F34.)
+- ⭐⭐ **WHERE TO LOOK FOR THE FIX: a missing bound is often restored IN A
+  DIFFERENT FRAME — and possibly MORE THAN ONCE.** `ph07`'s `mbfl_strcut` was
+  characterised — by the catalogue *and* by an engineer — **by its loop**, so
+  both checked the loop in the fixed version, found it still expressed in terms
+  of `from`, and concluded no fix existed. **Both the conclusion and the first
+  correction to it were wrong:**
+
+  | | |
+  |---|---|
+  | **the fix**, 2005-12-15 | **`cb3cca21b345`**, *"Fixed possible memory corruption inside `mb_strcut()`"* — **in the CALLER, `ext/mbstring/mbstring.c`**, one function up and one file away |
+  | 5.4.0's prologue clamp | `d9dda48f8a7e`, 2010, a **64-file libmbfl re-sync** with no bug number and no security label — **a second, later restoration of the same bound** |
+
+  ⚠ **This entry previously said *"restored in the PROLOGUE"* and named the 2010
+  clamp as the fix. That is the 2010 story, not the repair.** ⭐ **The lesson is
+  one level up: `01-extraction.md`'s three frames need a FOURTH — the REPAIR
+  SITE — and a search keyed on the defect's function cannot find a fix whose
+  subject names the caller.** (F34, corrected by F38 and `TASK_PHP_016` §2.)
 - ⚠ **A fix can ship inside an unlabelled rewrite.** `ph07`'s vulnerable code went
-  out **byte-identical from 5.0.0 through 5.3.x** and was repaired by a 5.4.0
+  out **byte-identical from 5.0.0 through 5.3.2** (⚠ **this said `5.3.x`; 5.3.3
+  carries the rewrite** — `TASK_PHP_016` §4.1) and was re-clamped by a 5.4.0
   rewrite carrying no security label — so *"no CVE, no security commit"* is **not**
   evidence that a defect was never fixed. Check the code at later tags.
+- ⚠⚠ **AND THE CORPUS INDEX HAS A `fix_commit` COLUMN — LOOK THERE FIRST.**
+  `index.csv` carries a sha for **all 166 rows**, and every catalogued row's fix
+  is surveyed in `.tasks-php/FIXSURVEY_001.md`. ⚠ **It names *a* fix for the
+  row's function, NOT necessarily the one that removes the 5.0.0 defect** —
+  `ph12`, `ph21` and `ph22` all name a later hardening. **Read the column, fetch
+  the patch, then confirm against the tags.** (F38, F40.)
 
 ## The ladder, as row 1 actually measured it
 
@@ -78,5 +94,16 @@
   as such**: `c-clang` beats `c-gcc` by **15.4 %** (larger than every safety
   effect on the row), and **both C compilers vectorise while no Rust rung does** —
   the latter is a property of *how the translation is written*, not of Rust.
-- ⚠ **No ratio here is *the* cost of safety.** `controls/spellings.py` was not
-  built, so each figure is the cost of *these spellings* of these rungs.
+- ⚠⚠⚠ **NO RATIO HERE IS *THE* COST OF SAFETY, AND THESE ARE `fixed-R4 bound`s
+  — PAT's term, and PAT's rule is that a bound ships LABELLED, beside a
+  cheapest-found counterpart.** `controls/spellings.py` was not built, so each
+  figure is the cost of *these spellings* of these rungs. **The debt is now on
+  BOTH built rows** (`TASK_PHP_016` §7.1).
+  ⚠ **The obligation is inside `ph03`'s own hashed `why`**: *"Every pattern owes
+  an in-contract spread beside its headline."* Undischarged, not unforeseen.
+  ⚠⚠ **And the missing number's direction is not a coin flip.** On the four PAT
+  rows where anyone searched the R4 side, **three moved out of their buckets and
+  every one moved against safe Rust** — `p22` by **510×** on the large band,
+  `p12` and `p13` sign-flipping (`results/SYNTHESIS.md` §2, Result 1: *the safety
+  tax is a property of a pair of spellings*). **So *"tuning recovers 86.4 %"* is
+  the single most likely claim on row 1 to move.** (F39.)

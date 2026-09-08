@@ -758,6 +758,40 @@ A checklist, not a restatement of the definition of done:
 3. Reachability settled **in writing, before any rung**.
 4. Fidelity evidence against the corpus's recorded crash category.
 5. `kernel_hardened.c` = the real `fix_commit`, sha-pinned.
+   ⭐⭐ **AND HERE IS WHERE TO GET IT, WHICH NOTHING USED TO SAY.** The corpus
+   index — `paper/evaluation/security/vuln-corpus-5.0/index.csv` — has a
+   **`fix_commit` column carrying a sha for all 166 rows**, and every catalogued
+   row is already surveyed in **`.tasks-php/FIXSURVEY_001.md`**
+   (`python3 .tasks-php/fixsurvey.py`). **Two tasks were spent on archaeology
+   that one lookup answers** (`RECAP_PHP.md` F38).
+   ⚠⚠ **BUT THE COLUMN NAMES *A* FIX, NOT NECESSARILY THE ONE THAT REMOVES THE
+   5.0.0 DEFECT.** Of the commits checked by hand, **`ph12`, `ph21` and `ph22`
+   all name a LATER hardening**, and **31 % of rows carry a fix dated 2010 or
+   later**. **So the step is three-part and none of it is optional:**
+   **(i)** read the column; **(ii)** fetch
+   `https://github.com/php/php-src/commit/<sha>.patch` (a bare-SHA `git fetch`
+   is refused); **(iii)** ⚠ **confirm against the release tags that this commit
+   removes YOUR defect — if it does not, cite both and say which is which.**
+   ⚠ **Check `history_status` too** (`fixed-by-rewrite` on 17 rows) **but never
+   as a substitute for (iii): every batch row is `historical-known` with
+   `confidence: high`, including the two whose commits are wrong.**
+   ⚠ **8 rows' fixes are in a DIFFERENT FILE from the defect** and 1 (`ph36`)
+   **has no sha at all** — `(bison-regeneration; no single commit)`, the one
+   documented exception to this item.
+6. ⚠⚠⚠ **SEARCHING THE CORPUS: ALWAYS `grep -a`.** `grep` in a `Bash` call is a
+   shell function dispatching to `ugrep`, and on a file containing **one**
+   non-UTF-8 byte it exits **1 with no stdout and no stderr** — which reads
+   exactly like *"not present"*. **41 of the corpus's 1 170 `.c`/`.h` files are
+   such files**, including **`ext/standard/string.c`**, which **13 catalogued
+   rows cite**. `grep -a`, `/usr/bin/grep` and `rg`/the `Grep` tool are all fine.
+   ⚠⚠ **A probe script does NOT reproduce the failure** — shell functions are not
+   exported to `sh` — **so "I wrapped it in a script and it worked" proves
+   nothing.** (`RECAP_PHP.md` F35.)
+   ⭐ **And ask about a FUNCTION, not about text**: `TASK_PHP_016` built a
+   history table by grepping for a *guard* and got it wrong in both directions —
+   a renamed guard read as absent, an unanchored pattern matching a *different
+   function* read as present — **and neither error is visible from its own
+   output.**
 6. **`c/emalloc_shim.h` symlinked — ALWAYS, allocating or not** (§B2), **and
    `uses_allocator` declared** in the `provenance` block with a reason.
 7. `echoes: [pNN]` where a PAT row shares the mechanism.

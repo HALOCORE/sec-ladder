@@ -80,14 +80,14 @@ argument, and the measurement behind it, is `TASK_PHP_011_REPORT.md` §6.
 | ph02 | spatial | blind fixed `+2` advance of the caller's cursor | narrowed | I1/O1 | CRASH-120 | p16 | catalogued |
 | ph03 | spatial | loop bound computed from a length byte inside the data | verbatim | I1/O2 | CRASH-115, V5C-116 | p16 | catalogued |
 | ph04 | spatial | fixed forward peeks; then a length counter desynced from its cursor | narrowed | I1/O1, I11/O2 | CRASH-110, CRASH-073 | p16, p24 | catalogued |
-| ph05 | spatial | end-pointer built from a clamp evaluated at 32 bits | verbatim | I11/O2 | CRASH-102 | p24 | catalogued |
+| ph05 | spatial | end-pointer built from a clamp evaluated at 32 bits | narrowed | I11/O2 | CRASH-102 | p24 | catalogued |
 | ph06 | spatial | the bound is not a parameter, so no bound is in scope | narrowed | I1/O1 | CRASH-091 | — | catalogued |
 | ph07 | spatial | an `mblen_table` cursor loop whose only exit is `n > from` | narrowed | I1/O1 | CRASH-124 | p16 | catalogued |
 | ph08 | spatial | lookahead consumes the NUL terminator as data | verbatim | I1/O3 | CRASH-016 | p16 | catalogued |
 | ph09 | spatial | leading NUL is an in-band tag; the empty string collides | verbatim | I1/O1 | CRASH-033 | p35 | catalogued |
 | ph10 | spatial | one bounds check serves two branches of different widths | narrowed | I1/O1 | CRASH-094 | p16 | catalogued |
-| ph11 | spatial | one-sided compare on a signed index, no lower bound | verbatim | I1/O1 | CRASH-145, V5C-173 | p02 | catalogued |
-| ph12 | spatial | guard short-circuited by an unrelated optional argument | verbatim | I1/O1 | CRASH-108 | p02 | catalogued |
+| ph11 | spatial | one-sided compare on a signed index, no lower bound | narrowed | I1/O1 | CRASH-145, V5C-173 | p02 | catalogued |
+| ph12 | spatial | guard short-circuited by an unrelated optional argument | narrowed | I1/O1 | CRASH-108 | p02 | catalogued |
 | ph13 | spatial | base + attacker 32-bit offset, lower-bounded only | narrowed | I1/O1 | CRASH-136 | — | catalogued |
 | ph14 | spatial | the overflowed product is used in its own bound check | narrowed | I11/O1 | CRASH-134 | p13 | catalogued |
 | ph15 | spatial | ⚠ **MECHANISM REFUTED — see below. Do not build.** | — | I1/O1 | CRASH-096 | p24 | **unresolved** |
@@ -96,10 +96,10 @@ argument, and the measurement behind it, is `TASK_PHP_011_REPORT.md` §6.
 | ph18 | spatial | sizing sum wraps; the pad loop that follows has no bound | verbatim | I11/O1, I11/O2 | CRASH-001, CRASH-011 | p13 | catalogued |
 | ph19 | spatial | `count*(width-1)+base` wraps in `int`, emit pass unbounded | verbatim | I11/O1 | CRASH-006 | p13 | catalogued |
 | ph20 | spatial | the wrap happens inside `safe_emalloc`'s own first argument | verbatim | I11/O1 | CRASH-007 | p13 | catalogued |
-| ph21 | spatial | a 64-bit product narrowed by the store; guard's 2nd disjunct dead | verbatim | I11/O2 | CRASH-107 | p13 | catalogued |
-| ph22 | spatial | two passes over one format string apply different clamps | verbatim | I11/O1 | CRASH-014, V5C-015 | p13 | catalogued |
+| ph21 | spatial | a 64-bit product narrowed by the store; guard's 2nd disjunct dead | narrowed | I11/O2 | CRASH-107 | p13 | catalogued |
+| ph22 | spatial | two passes over one format string apply different clamps | narrowed | I11/O1 | CRASH-014, V5C-015 | p13 | catalogued |
 | ph23 | spatial | the budget reserves 2 of the format's 4 literal characters | verbatim | I11/O3 | CRASH-157 | — | catalogued |
-| ph24 | spatial | a constant reserve too small for what the emit pass formats | verbatim | I11/O3 | CRASH-008 | — | catalogued |
+| ph24 | spatial | a constant reserve too small for what the emit pass formats | narrowed | I11/O3 | CRASH-008 | — | catalogued |
 | ph25 | spatial | the +1 slack is lost in the grow path, terminator skips the check | verbatim | I11/O3 | CRASH-095 | p25 | catalogued |
 | ph26 | spatial | negative `memmove` length into a fixed 80-byte static buffer | verbatim | I11/O2 | CRASH-149 | p13 | catalogued |
 | ph27 | spatial | `1 + buf_len + 2*new_l` wraps; emit walks a bare output cursor | modelled | I11/O1 | CRASH-009 | p13 | catalogued |
@@ -110,7 +110,7 @@ argument, and the measurement behind it, is `TASK_PHP_011_REPORT.md` §6.
 | ph32 | spatial | a range declared in one place, a table literal sized in another | verbatim | I1/O2 | CRASH-089, CRASH-090 | p27 | catalogued |
 | ph33 | spatial | a 2-byte buffer holding a lead byte that declares a longer one | verbatim | I1/O1 | CRASH-128 | p27 | catalogued |
 | ph34 | spatial | an unvalidated user `long` used directly as a table index | narrowed | I1/O1 | CRASH-122 | p02 | catalogued |
-| ph35 | spatial | `0xff *` where `0x100 *` was meant, over a signed `char` | verbatim | I11/O1 | CRASH-130 | p13 | catalogued |
+| ph35 | spatial | `0xff *` where `0x100 *` was meant, over a signed `char` | narrowed | I11/O1 | CRASH-130 | p13 | catalogued |
 | ph36 | spatial | a generated table indexed by an unbounded state + token sum | narrowed | I1/O2 | CRASH-005 | p19 | catalogued |
 | ph37 | spatial | validate and execute passes compute one index differently | narrowed | I1/O1, I11/O1 | CRASH-018, CRASH-019 | p23 | catalogued |
 | ph38 | spatial | in-place increment of an operand that aliases a shared literal | narrowed | I1/O4 | CRASH-077 | p49 | catalogued |
@@ -130,16 +130,16 @@ argument, and the measurement behind it, is `TASK_PHP_011_REPORT.md` §6.
 | ph47 | type | in-place retype through a value the separator refuses to separate | narrowed | I4/O2 | CRASH-104, CRASH-058 | p49 | catalogued |
 | ph48 | type | the same helper used to FORCE the shared flag ON | narrowed | I4/O2 | LOGIC-017 | p49 | catalogued |
 | ph49 | type | count decremented after the destructor, outside the blocked window | narrowed | I3/O3 | CRASH-153 | p34 | catalogued |
-| ph50 | type | a discarded status code leaves an out-parameter unwritten | verbatim | I3/O1 | CRASH-153 | p42 | catalogued |
+| ph50 | type | a discarded status code leaves an out-parameter unwritten | narrowed | I3/O1 | CRASH-153 | p42 | catalogued |
 | ph51 | type | uninitialised struct fields consumed as function pointers | modelled | I3/O2 | CRASH-087 | p36 | catalogued |
 | ph52 | type | an unconstructed caller slot destructed on an early-exit path | narrowed | I3/O1 | LOGIC-007 | p42 | catalogued |
 | ph53 | type | storage grown to the COUNT; the tail is never written | verbatim | I19/O2 | CRASH-158 | p27 | catalogued |
 | ph54 | type | guard at the wrong pointer depth — `!p` where `!*p` was meant | narrowed | I16 | CRASH-143 | — | catalogued |
-| ph55 | type | early exit strides 1 over a two-word instruction | verbatim | I18, I12 | CRASH-023 | p19 | catalogued |
+| ph55 | type | early exit strides 1 over a two-word instruction | narrowed | I18, I12 | CRASH-023 | p19 | catalogued |
 | ph56 | type | opcode selected by arithmetic; the guard is replicated on some arms | narrowed | I18, I12 | CRASH-041 | p19 | catalogued |
 | ph57 | type | the same switch, a LOCK not taken on the string-offset arm | narrowed | I18/O2 | CRASH-028 | p19 | catalogued |
 | ph58 | type | the emitter returns 0 without emitting the free the executor expects | narrowed | I18/O2 | CRASH-055 | p19 | catalogued |
-| ph59 | type | `!f(x) == SUCCESS` — precedence makes the guard test the opposite | verbatim | I12/O1 | CRASH-082 | — | catalogued |
+| ph59 | type | `!f(x) == SUCCESS` — precedence makes the guard test the opposite | narrowed | I12/O1 | CRASH-082 | — | catalogued |
 | ph60 | type | a fallible call's failure not tested before its result is used | verbatim | I12/O1, I16 | CRASH-088, CRASH-061, CRASH-126, CRASH-163 | — | catalogued |
 
 ### Temporal (31)
@@ -161,11 +161,11 @@ argument, and the measurement behind it, is `TASK_PHP_011_REPORT.md` §6.
 | ph73 | temporal | automatic storage published where user code can retain it | narrowed | I14/O1 | CRASH-052, CRASH-051, CRASH-027, CRASH-032, CRASH-100 | p34 | catalogued |
 | ph74 | temporal | a non-owned literal adopted as an owned member, then freed | narrowed | I14/O4, I5/O4 | CRASH-139 | p49 | catalogued |
 | ph75 | temporal | ownership taken, then a fallible commit that can be skipped entirely | narrowed | I9/O3, I6/O3 | CRASH-161, LOGIC-026, LOGIC-027, LOGIC-004 | p42 | catalogued |
-| ph76 | temporal | engine-owned, non-allocator storage handed to the deallocator | verbatim | I14/O3, I5/O4 | CRASH-012, CRASH-148, CRASH-026, CRASH-078 | p32 | catalogued |
+| ph76 | temporal | engine-owned, non-allocator storage handed to the deallocator | narrowed | I14/O3, I5/O4 | CRASH-012, CRASH-148, CRASH-026, CRASH-078 | p32 | catalogued |
 | ph77 | temporal | resurrect-and-queue into a fixed two-slot array, unchecked bump | narrowed | I7/O2, I7/O5 | CRASH-151, CRASH-057, CRASH-050, LOGIC-011, LOGIC-022 | p34 | catalogued |
 | ph78 | temporal | a raw pointer latched across a call that can run user code | narrowed | I17/O1, I7/O4 | CRASH-042, CRASH-159, CRASH-035, CRASH-064, CRASH-010, CRASH-132, CRASH-113 | p28 | catalogued |
 | ph79 | temporal | a cache that cannot tell a borrowed handler from a per-call one | narrowed | I20/O1, I20/O3 | CRASH-038, CRASH-069, CRASH-031, CRASH-072, LOGIC-025 | p27 | catalogued |
-| ph80 | temporal | two subsystems disagree about who owns the block's lifetime | verbatim | I5/O3, I5/O2 | CRASH-084, CRASH-092, CRASH-114, CRASH-141 | p32 | catalogued |
+| ph80 | temporal | two subsystems disagree about who owns the block's lifetime | narrowed | I5/O3, I5/O2 | CRASH-084, CRASH-092, CRASH-114, CRASH-141 | p32 | catalogued |
 | ph81 | temporal | the slot is released and left as a presence flag for what it held | verbatim | I5/O2, I5/O1 | CRASH-142, CRASH-140 | p32 | catalogued |
 | ph82 | temporal | a loop temp acquired at use, released only at the textual loop end | modelled | I6/O1 | LOGIC-002, LOGIC-023, LOGIC-009, LOGIC-019, LOGIC-024, LOGIC-010, LOGIC-012, LOGIC-016, LOGIC-021 | p42 | catalogued |
 | ph83 | temporal | a lock taken unconditionally, ignoring that the result is unused | narrowed | I6/O2, I17/O1 | LOGIC-011, LOGIC-022 | p34 | catalogued |
@@ -177,6 +177,8 @@ argument, and the measurement behind it, is `TASK_PHP_011_REPORT.md` §6.
 | ph89 | temporal | a by-ref parameter separates the very table a live alias names | narrowed | I2/O2 | CRASH-034 | p28 | catalogued |
 | ph90 | temporal | the destructor is called on an out-parameter the failing call left NULL | verbatim | I12/O1 | CRASH-029 | — | catalogued |
 | ph91 | temporal | ⚠ label and citation disagree — see the block | — | I5 | CRASH-071 | — | **unresolved** |
+| ph92 | spatial | `base + count*CONST` in `int`: one attacker degree of freedom | narrowed | I11/O2 | CRASH-106 | p13 | catalogued |
+| ph93 | spatial | buffer regrown mid-emit; the growth arithmetic is unchecked `int` | narrowed | I11/O2 | CRASH-109 | — | catalogued |
 
 ---
 
@@ -219,7 +221,7 @@ The output is sized `emalloc(ceil(src_len*0.75)+1)` at `:131` and the input's tr
 ▸ blob: the URL bytes.
 ⚠ risk: **do not split this into two rows** — one extraction, two triggers; two rows double-count a ladder cost paid once.
 
-**ph05 · `php_strspn` end pointer from a 32-bit clamp** — `ext/standard/string.c:240` · CRASH-102 · `verbatim` · I11/O2 · echoes p24
+**ph05 · `php_strspn` end pointer from a 32-bit clamp** — `ext/standard/string.c:240` · CRASH-102 · `narrowed` · I11/O2 · echoes p24
 `start` and `len` are `long`, but the clamp at `:240` evaluates them as `(unsigned)`: `if (((unsigned) start + (unsigned) len) > len1) { len = len1 - start; }`. A `len` of 2^32 becomes 0 under the cast, the clamp is false, and `len` keeps its full 64-bit value. The unclamped value builds the end pointer at `:245-248`, and `php_strspn` (`:1330-1336`) terminates on pointer **equality**, so a wrong end is not merely wrong but steppable past.
 ▸ trigger: `strspn($s, $mask, 0, 4294967296)`.
 ▸ benign: ordinary spans; `u64` = the span length.
@@ -271,14 +273,14 @@ The tag loop performs one bounds check, `if ((inx + 4) >= length) break;`, then 
 ▸ blob: the IPTC segment bytes.
 ⚠ risk: `:327`'s find-first-tag loop carries a **third** over-read the corpus does not record (`buffer[inx+1]` with only `inx < length` in scope). An extraction of the scan loop imports it silently and would misattribute it.
 
-**ph11 · `isset`/`empty` string offset, one-sided compare** — `Zend/zend_execute.c:4033` · CRASH-145, V5C-173 · `verbatim` · I1/O1 · echoes p02
+**ph11 · `isset`/`empty` string offset, one-sided compare** — `Zend/zend_execute.c:4033` · CRASH-145, V5C-173 · `narrowed` · I1/O1 · echoes p02
 `if (offset->value.lval <= Z_STRLEN_PP(container) && Z_STRVAL_PP(container)[offset->value.lval] != '0')` — `lval` is a `long` carrying the user's subscript, so **any negative subscript passes trivially** and is then used directly as a byte index. Sibling at `:4028`.
 ▸ trigger: `empty($s[-4096])`.
 ▸ benign: in-range offsets answer correctly; `u64` = fold of the boolean answers.
 ▸ blob: a string + a list of `long` offsets.
 ⚠ risk: the `<=` (rather than `<`) is a *second*, one-past-the-end defect in the same line. Report both or the row understates itself.
 
-**ph12 · `substr_compare`: the guard disabled by another argument** — `ext/standard/string.c:4786` · CRASH-108 · `verbatim` · I1/O1 · echoes p02
+**ph12 · `substr_compare`: the guard disabled by another argument** — `ext/standard/string.c:4786` · CRASH-108 · `narrowed` · I1/O1 · echoes p02
 The only bound on `offset` is `if (len && offset >= s1_len)`, and its **first conjunct disables it**: when the optional `length` is absent or zero, `len == 0` and the check is skipped for both directions. `offset` is a `long`, never clamped, so `s1 + offset` at `:4794` is arbitrary.
 ▸ trigger: `substr_compare($a, $b, -1000000)` with `$length` omitted.
 ▸ benign: ordinary comparisons; `u64` = fold of the comparison results.
@@ -358,19 +360,33 @@ A textbook two-pass size-then-emit. The counting pass (`:2935-2939`) walks `sour
 ▸ blob: the source string + chunklen + end string.
 ⚠ risk: the reproducer comment cites 4.0.2's plain `emalloc` (`SOURCES.md` §3). Pristine 5.0.0 is `safe_emalloc` and **that changes the analysis** — the row is about the wrapper being bypassed, not absent.
 
-**ph21 · `str_repeat`: narrowed by the store, guard's second disjunct dead** — `ext/standard/string.c:4120`, `:4144-4145` · CRASH-107 · `verbatim` · I11/O2 · echoes p13
+**ph21 · `str_repeat`: narrowed by the store, guard's second disjunct dead** — `ext/standard/string.c:4120`, `:4144-4145` · CRASH-107 · `narrowed` · I11/O2 · echoes p13
 `int result_len;` (`:4120`) takes an `int × long` product computed in **64-bit** and narrowed **by the store** (`:4144`). The guard at `:4145`, `if (result_len < 1 || result_len > 2147483647)`, then has a **provably dead second disjunct** — an `int` can never exceed `INT_MAX`. *A guard killed by the type of the variable it tests*, which is not ph19's wrap-in-an-expression.
 ▸ trigger: `str_repeat($s, 2^32/strlen($s))`.
 ▸ benign: ordinary repeats; `u64` = the result checksum.
 ▸ blob: the source string + a `long` multiplier.
 ⚠ risk: **cite `:4120` / `:4144` / `:4145`.** `ADJUDICATION_001.md` §0 gives `:4119` / `:4143` / `:4144` — off by one on all three (report §2.3).
 
-**ph22 · `pack`: two passes, different clamps** — `ext/standard/pack.c:247`, `:304` · CRASH-014, V5C-015 · `verbatim` · I11/O1 · echoes p13
+**ph22 · `pack`: two passes, different clamps** — `ext/standard/pack.c:247`, `:304` · CRASH-014, V5C-015 · `narrowed` · I11/O1 · echoes p13
 `outputpos += (arg + 1) / 2;` in the sizing pass wraps `int`; `output = emalloc(outputsize + 1);` at `:304` then allocates the wrapped amount and the emit loop from `:309` writes the unwrapped one. The corpus's cleanest **two-pass** sizing mismatch, with the two passes 60 lines apart in one function.
 ▸ trigger: `pack("H2147483647", …)`.
 ▸ benign: ordinary pack formats; `u64` = the packed bytes' checksum.
 ▸ blob: the format codes + arguments.
 ⚠ risk: the `root_cause_id` says `line218`; the defect is at `:247`, and the CSV is right (spatial `NOTES.md` §5.2). Grep `c_file_line`, never the id.
+
+**ph92 · `nl2br`: `base + count*CONST`, one attacker degree of freedom** — `ext/standard/string.c:3593` · CRASH-106 · `narrowed` · I11/O2 · echoes p13
+`int new_length` (`:3558`) and `int repl_cnt` (`:3560`); `new_length = Z_STRLEN_PP(zstr) + repl_cnt * (sizeof("<br />") - 1)` at `:3593`, then `emalloc(new_length + 1)` at `:3594`. ⭐ **The multiplier is a compile-time constant and `repl_cnt <= strlen`, so the attacker has exactly ONE free value** — every other member of the family (`ph19` attacker×attacker, `ph20` collapsed into `safe_emalloc`'s first argument, `ph21` narrowed by the store, `ph22` accumulated across two passes) gives two or more. ✅ The sizing is otherwise **exact**: `\r\n` costs 8 emitted bytes and is budgeted 2 + 6; a lone `\n` costs 7 and is budgeted 1 + 6. **The `int` overflow is the whole defect**, which makes it a clean kernel rather than a muddy one.
+▸ trigger: a document whose length forces `len + 6*repl_cnt >= 2^31` — **`len >= 2^31/7 ~ 307 MB`, and that size is a CONSEQUENCE of the constant multiplier**, not of our harness.
+▸ benign: ordinary newline conversion; `u64` = the emitted bytes' checksum.
+▸ blob: the source string.
+⚠ risk: the emit loop is unbounded, so the adversarial cell needs **≥ 307 MB resident**. A cost, never a filter (`PLAN_PHP.md` §3). ⚠ **Re-adjudicated from `C.1`** — see `.tasks-php/ADJUDICATION_002.md` §2.
+
+**ph93 · `wordwrap`: a buffer RESIZED MID-EMIT, growth arithmetic unchecked** — `ext/standard/string.c:682`, `:692-694` · CRASH-109 · `narrowed` · I11/O2 · echoes —
+`int textlen, breakcharlen, newtextlen, alloced, chk` (`:635`). Two sizing arms: `linelength > 0` gives `chk = textlen/linelength + 1; alloced = textlen + chk*breakcharlen + 1` (`:678-679`), else `chk = textlen; alloced = textlen*(breakcharlen + 1) + 1` (`:681-682`); `emalloc(alloced)` at `:684`. ⭐⭐ **The distinctness is NOT the sizing expression — it is `:692-694`**: inside the emit loop, `alloced += (int)(((textlen - current + 1)/linelength + 1)*breakcharlen) + 1; newtext = erealloc(newtext, alloced);`. **No other row in the catalogue grows a buffer DURING the emit pass by arithmetic that is itself unchecked `int`** — `ph19`–`ph22` all size once and then write. A realloc-in-loop is a different C shape and a different proof obligation.
+▸ trigger: a `textlen × breakcharlen` product wrapping `int`.
+▸ benign: ordinary wrapping; `u64` = the wrapped text's checksum.
+▸ blob: the text + linelength + the break string.
+⚠ risk: **the row must say which sizing arm it lifts.** ⚠ `:692` divides by `linelength`, which the else-arm reaches with `linelength <= 0` — **a possible second defect (SIGFPE) that is NOT this row's claim** (`PLAN_PHP.md` §4.2). ⚠ **Re-adjudicated from `C.1`** — `.tasks-php/ADJUDICATION_002.md` §2.
 
 **ph23 · `_build_trace_string`: 2 of 4 literal characters budgeted** — `Zend/zend_exceptions.c:310-311` · CRASH-157 · `verbatim` · I11/O3 · echoes —
 `s_tmp = emalloc(Z_STRLEN_PP(file) + MAX_LENGTH_OF_LONG + 2 + 1);` then `sprintf(s_tmp, "%s(%ld): ", …)`. The format's literals are `(`, `)`, `:`, ` ` = **four**; the budget reserves **two**. A string, a long, an emalloc and a sprintf — **the backtrace is the CALLER**, not the kernel.
@@ -379,7 +395,7 @@ A textbook two-pass size-then-emit. The counting pass (`:2935-2939`) walks `sour
 ▸ blob: a file-name string + a `long`.
 ⚠ risk: this row was killed with *"the blob would have to encode a backtrace"*. It does not — `TRACE_APPEND_*` and `zend_hash_apply_with_arguments` are one frame up.
 
-**ph24 · `date()`: a constant reserve too small for the emit pass** — `ext/standard/datetime.c:358-359` · CRASH-008 · `verbatim` · I11/O3 · echoes —
+**ph24 · `date()`: a constant reserve too small for the emit pass** — `ext/standard/datetime.c:358-359` · CRASH-008 · `narrowed` · I11/O3 · echoes —
 The sizing pass is a `switch` over the format string adding a **hard-coded constant per conversion character**; `case 'U': size += 10;` reserves ten bytes for a value the emit pass then `sprintf`s as the `%ld` of a 64-bit `time_t`. **No arithmetic overflow at all**, which is what makes it distinct from every other sizing row here.
 ▸ trigger: `date("UUUU…", 99999999999)`.
 ▸ benign: ordinary date formats; `u64` = the formatted string's checksum.
@@ -412,7 +428,7 @@ The sizing expression wraps in `int` at `:338` and the emit pass at `:349-359` w
 ▸ trigger: `$a .= $b` twice, with `strlen($a)+strlen($b) == 2^31`.
 ▸ benign: ordinary concatenation; `u64` = the result checksum + length.
 ▸ blob: **two lengths and a fill byte** — the kernel materialises the strings; the blob is ~9 bytes.
-⚠⚠ risk: **~2 GiB resident, twice over (the `erealloc` doubles it).** That is a resource cost, not a shape failure — but a row built from this needs a memory budget stated up front, and it is the only row in the catalogue that does.
+⚠⚠ risk: **~2 GiB resident, twice over (the `erealloc` doubles it).** That is a resource cost, not a shape failure — but a row built from this needs a memory budget stated up front, and it is the only row in the catalogue needing that much **RESIDENT**. ⚠ **Narrowed from *"the only row that does"*** (`TASK_PHP_012` rider m5): `ph19`, `ph21`, `ph22` and now `ph92` all have emit loops that ATTEMPT ≥ 2 GiB of sequential writes and are cheap only because they fault early under a detector. **Those four carry a one-line note instead: the emit loop is unbounded; run the adversarial cell under a detector.**
 
 **ph29 · `stream_socket_recvfrom`: `emalloc(to_read+1)`** — `ext/standard/streamsfuncs.c:321` · CRASH-097 · `narrowed` · I11/O2 · echoes —
 `long to_read` comes from `zend_parse_parameters(…, "rl|lz", …)` at `:309` — i.e. **from userland, not from the socket**. `emalloc(to_read + 1)` at `:321` with `to_read` near `LONG_MAX` wraps to `LONG_MIN`, which as `size_t` is 2^63; `REAL_SIZE(2^63)` truncates to `unsigned int` = **0**, a header-sized block succeeds, and the receive writes into it. FAULT: `:332`.
@@ -458,7 +474,7 @@ The `CTYPE` macro's `IS_STRING` arm (`:101-111`) is careful — it casts each by
 ▸ blob: a list of `long`s + a string.
 ⚠ risk: whether this over-reads at all depends on the **host libc's** table layout, not on PHP. State the libc and the measured table bounds, or the row is unreproducible.
 
-**ph35 · pcre named-subpattern index: `0xff *` for `0x100 *`** — `ext/pcre/php_pcre.c:448-449` · CRASH-130 · `verbatim` · I11/O1 · echoes p13
+**ph35 · pcre named-subpattern index: `0xff *` for `0x100 *`** — `ext/pcre/php_pcre.c:448-449` · CRASH-130 · `narrowed` · I11/O1 · echoes p13
 `name_idx = 0xff * name_table[0] + name_table[1];` then `subpat_names[name_idx] = name_table + 2;` — the multiplier should be `0x100`, and `name_table[]` is `char`, so on a signed-char platform a high byte contributes a negative term. **The name table is exactly what a blob supplies.**
 ▸ trigger: a pattern with ≥ 256 named subpatterns, or a name-table byte ≥ 0x80.
 ▸ benign: ordinary named captures resolve; `u64` = fold of `(name_idx, offset)`.
@@ -580,7 +596,7 @@ It **stamps `is_ref` ON** a caller's by-value slot, where ph47 fails to separate
 ▸ blob: an operation stream; the destructor is a function pointer the kernel supplies.
 ⚠ risk: **no userland and no objects are needed** — the blob decides which callback the destructor pointer names. An extraction that reaches for the executor has built a different row.
 
-**ph50 · a discarded status code leaves an out-parameter unwritten** — `ext/standard/array.c:1893-1894` · CRASH-153 · `verbatim` · I3/O1 · echoes p42
+**ph50 · a discarded status code leaves an out-parameter unwritten** — `ext/standard/array.c:1893-1894` · CRASH-153 · `narrowed` · I3/O1 · echoes p42
 `_phpi_pop` gates on `zend_hash_num_elements(...) == 0` at `:1884`, positions the internal pointer, then calls `zend_hash_get_current_data(…, (void **)&val)` at `:1893` **without storing or testing its SUCCESS/FAILURE result**, and dereferences the never-assigned automatic at `:1894 *return_value = **val;`.
 ▸ trigger: any path where the emptiness gate and the real emptiness disagree — ph49 supplies one.
 ▸ benign: ordinary pops; `u64` = fold of the popped values.
@@ -619,7 +635,7 @@ It **stamps `is_ref` ON** a caller's by-value slot, where ph47 fails to separate
 
 ### T5 — the emitted program is not the one the executor implements
 
-**ph55 · an early exit strides 1 over a two-word instruction** — `Zend/zend_execute.c:1761-1770` · CRASH-023 · `verbatim` · I18 + I12 · echoes p19
+**ph55 · an early exit strides 1 over a two-word instruction** — `Zend/zend_execute.c:1761-1770` · CRASH-023 · `narrowed` · I18 + I12 · echoes p19
 Compound assignment to an array dimension is a **two-word** instruction: the opcode word plus a trailing `ZEND_OP_DATA` word carrying the extra operands (`zend_op *op_data = opline+1`, `:1742`); the handler sets `increment_opline = 1` at `:1749`. The error path exits via `NEXT_OPCODE()` (stride 1) at `:1761-1770` while the normal exit at `:1792-1795` correctly strides 2 — so the trailing **data** word is decoded as an instruction, and `zend_opcode_handlers[ZEND_OP_DATA] = NULL` (`:4427`) is then indirect-called.
 ▸ trigger: `$x = 1; $x[0] += 1;`
 ▸ benign: ordinary compound assignments; `u64` = fold of the executed opcodes.
@@ -649,7 +665,7 @@ Opcode families are laid out at fixed strides and the compiler selects a variant
 
 ### T6 — a fallible call whose failure is not tested
 
-**ph59 · precedence makes the guard test the opposite** — `ext/standard/array.c:4085` · CRASH-082 · `verbatim` · I12/O1 · echoes —
+**ph59 · precedence makes the guard test the opposite** — `ext/standard/array.c:4085` · CRASH-082 · `narrowed` · I12/O1 · echoes —
 ```c
 4085  if (!zend_call_function(&fci, &fci_cache TSRMLS_CC) == SUCCESS && result) {
 ```
@@ -790,7 +806,7 @@ The `dup = 0` argument makes `property.value.str.val` **alias a caller-owned lit
 ▸ blob: a record stream with per-step failure bits.
 ⚠ risk: the failure injection is the row. Without a way to fail mid-copy from the blob, the kernel is correct and measures nothing.
 
-**ph76 · engine-owned, non-allocator storage handed to the deallocator** — `ext/standard/array.c:2058-2061` · CRASH-012, CRASH-148, CRASH-026, CRASH-078 · `verbatim` · I14/O3 + I5/O4 · echoes p32
+**ph76 · engine-owned, non-allocator storage handed to the deallocator** — `ext/standard/array.c:2058-2061` · CRASH-012, CRASH-148, CRASH-026, CRASH-078 · `narrowed` · I14/O3 + I5/O4 · echoes p32
 `EG(symbol_table)` is a `HashTable` **embedded in the executor-globals struct** — not an allocator return — and `$GLOBALS` is a zval whose `value.ht` is its address. `array_splice` destroys and `efree`s `Z_ARRVAL_P(array)` unconditionally at `:2059-2060`. Siblings: `zend_operators.c:661` adopts it as object properties; `array.c:3272-3274`'s `zval_copy_ctor` no-ops for it so the "copy" aliases it.
 ▸ trigger: `array_splice($GLOBALS, 0, 1);`
 ▸ benign: ordinary arrays splice; `u64` = fold of the surviving elements + `(allocs, frees)`.
@@ -820,7 +836,7 @@ A caller latches a raw pointer to a heap object it holds **no reference to**, ca
 ▸ blob: a call stream + a per-call "is trampoline" bit.
 ⚠ risk: **the whole defect is that the two kinds are the same C type.** An extraction that tags them has fixed it.
 
-**ph80 · two subsystems disagree about the block's lifetime** — `ext/standard/basic_functions.c:1325-1385` · CRASH-084, CRASH-092, CRASH-114, CRASH-141 · `verbatim` · I5/O3 + I5/O2 · echoes p32
+**ph80 · two subsystems disagree about the block's lifetime** — `ext/standard/basic_functions.c:1325-1385` · CRASH-084, CRASH-092, CRASH-114, CRASH-141 · `narrowed` · I5/O3 + I5/O2 · echoes p32
 `putenv()` hands its `pe.putenv_string` to libc `putenv()`, which **does not copy** — `environ[]` now aliases PHP's `emalloc`'d buffer. The next `putenv()` for the same key does `zend_hash_del(&BG(putenv_ht), …)` at `:1376`, whose destructor `efree`s that buffer, while `environ` still points at it and `:1380-1382` scans it. GUARD: `:1333`, a guard that never fires.
 ▸ trigger: `putenv("A=1"); putenv("A=2"); getenv("A");`
 ▸ benign: ordinary env sets and gets; `u64` = fold of the read values + `(allocs, frees)`.
@@ -935,8 +951,8 @@ is in the bar. Nothing about Rust, Verus, Miri or cost gradients may kill a row.
 
 | row | duplicate of | evidence |
 |---|---|---|
-| CRASH-106 nl2br `string.c:3593` | **ph19** | `base + count*const` in `int`, same wrap-down-then-unbounded-`*target++`; distinct only in needing a ~358 MB input, which is a *worse* kernel, not a different mechanism |
-| CRASH-109 wordwrap `string.c:682` | **ph19/ph20** | `textlen * (breakcharlen + 1) + 1` in `int`; the second `alloced` growth path at `:692` muddies the extraction without changing the mechanism |
+| ~~CRASH-106 nl2br `string.c:3593`~~ | ⚠ **KILL WITHDRAWN → `ph92`** | the note read *"distinct only in needing a ~358 MB input, **which is a worse kernel**"* — **a COST judgement, which `PLAN_PHP.md` §3 forbids**, under a heading that says `exact`. Re-adjudicated at `ADJUDICATION_002.md` §2 |
+| ~~CRASH-109 wordwrap `string.c:682`~~ | ⚠ **KILL WITHDRAWN → `ph93`** | the note read *"the growth path at `:692` **muddies the extraction**"* — **also a cost judgement**, and the growth path is the row's distinguishing mechanism. Re-adjudicated at `ADJUDICATION_002.md` §2 |
 | CRASH-090 `html.c:155/:401` | **ph32** | literally the same defect on a different table; folded into ph32's `corpus rows` |
 | V5C-116 | **ph03** | same loop, same bound, merged by the corpus itself |
 | V5C-173 | **ph11** | same one-sided compare, merged by the corpus itself |

@@ -45,26 +45,26 @@ between them read `CLAUDE.md`'s top table.
 ## ▶ START HERE — the next action, in ≤ 20 lines
 
 ```
-STATE   ROWS BUILT 1 (ph03, reviewed) · CATALOGUED 91 · Phase 0 CLOSED.
-        .memory-php/ EXISTS (00-corpus 01-extraction 02-ladder 03-numbers
-        04-process) and is AUTHORITATIVE -- read it before any task report.
-NEXT    TASK_PHP_016 RUNNING: build ph07 (mbfl_strcut). Review it next; then
-        the batch ph21 -> ph16 -> ph12 -> ph29, pre-briefed in
-        .tasks-php/UPSTREAM_001.md -- 4 fixes located AND pinned (F36/F38).
-        Every OTHER row's fix is surveyed in FIXSURVEY_001.md (F40).
-⚠ FIX   `fix_commit` is a COLUMN in the corpus index.csv (142/145 rows) -- but
-        it names *a* fix, not always THE one; 2 of 4 were later. Check. (F38)
-⚠ GREP  ALWAYS `grep -a` ON THE CORPUS. `grep` in a Bash call is a wrapper ->
-        ugrep: on string.c + 40 files it exits 1 SILENTLY = "absent". 13 rows
-        cite one. rg, /usr/bin/grep and `sh` scripts all succeed. (F35)
-ROW 1   ph03 gate PASS. PHP's real 2004 fix is BOTH DEAD AND INCOMPLETE (F29);
-        the measured ladder is in .memory-php/02-ladder.md. (F33)
+STATE   ROWS BUILT 2 (ph03 reviewed · ph07 gate PASS, UNREVIEWED)
+        CATALOGUED 93 · .memory-php/ is AUTHORITATIVE -- read it first.
+NEXT    REVIEW ph07 -- TASK_PHP_017 is WRITTEN and unstarted. Launch it.
+        Then the batch ph21 -> ph16 -> ph12 -> ph29, pre-briefed in
+        UPSTREAM_001.md; every other row's fix is in FIXSURVEY_001.md.
+⚠ TRAPS `grep -a` ALWAYS -- grep here is silently blind to 41 corpus files;
+        and index.csv's fix_commit names *a* fix, not always THE one. Both
+        are now PROTOCOL_PHP.md §F items 5-6, with the evidence. (F35, F38)
+ROWS    ph03: the real 2004 fix is BOTH DEAD AND INCOMPLETE (F29/F33).
+        ph07: R3's walks are BYTE-FOR-BYTE R2's -- the cost sits where safe
+        Rust cannot reach it; the fix costs a CONSTANT, not a rate (F41).
+⚠ COST  Both rows' ladders are UNLABELLED fixed-R4 bounds with no spellings
+        search, and the PAT record says that number moves against safe
+        Rust. Label before quoting; do not put either in a course. (F39)
 BAR     C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
         patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
 ⚠ OPS   .web/ is edited by a CONCURRENT SESSION -- NEVER `git add -A`.
         Commit with explicit paths or `git add -A -- . ':!.web'`.
 READ    .memory-php/ · PLAN_PHP.md · .tasks/PROTOCOL.md (reused unchanged) ·
-        CATALOGUE.md · then F1-F40 and the open items below.
+        CATALOGUE.md · then F1-F41 and the open items below.
 ```
 
 ---
@@ -73,7 +73,7 @@ READ    .memory-php/ · PLAN_PHP.md · .tasks/PROTOCOL.md (reused unchanged) ·
 
 | | |
 |---|---|
-| **rows built** | ⭐ **1 — `ph03-uudecode-bound`**, gate `PASS`, five rungs + R1h, R5 at 25/0. (`ph00-smoke` is a relocated PAT calibration kernel, throwaway, **no PHP provenance**, and prices nothing) |
+| **rows built** | ⭐ **2 — `ph03-uudecode-bound`** (reviewed) and **`ph07-strcut-cursor`** (gate `PASS`, contract `be5f5818ffa625c7`, R5 **21/0**, ⚠ **UNREVIEWED**), each five rungs + R1h. (`ph00-smoke` is a relocated PAT calibration kernel, throwaway, **no PHP provenance**, and prices nothing) |
 | **tasks** | `_001` mining wave DONE · `_002` Phase 0 built · `_003` reviewed it · `_004` landed the fixes · `_005` reviewed **those** — **1 blocker open (F-1)**. `_006` = land `_005`'s corrections |
 | **infrastructure** | **built and reviewed TWICE**: `harness-php/{root,gate,provenance}.py` · `common-php/` · `patterns-php/{SOURCES.md,php-5.0.0.manifest}` (1170 files, 109 KB) · `.tasks-php/PROTOCOL_PHP.md` · `results-php/`. ⚠ **Reviewed is not the same as correct — the second review found a blocker in the first review's own fix.** ⚠ There used to be a SECOND row in this table also labelled `infrastructure` saying *"not yet built — Phase 0"* (`TASK_PHP_003` m1); it is gone |
 | **candidates** | **54** delivered across three axes. ⚠ **`.tasks-php/ADJUDICATION_001.md` takes that to ≈ 80**: +6 splits, −2 merges, **+17 kills reversed**, +1 dropped with no reason recorded, +4 that fell between axes. Evidence in `.tasks-php/TASK_PHP_001_MINE/` |
@@ -136,7 +136,8 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > survived the audit are the ones written down as settled** · **F38 ⚠⚠ the
 > `fix_commit` was a column in the corpus index, and it is not always THE fix** ·
 > **F39 ⚠⚠ ph03's ladder is a pair of spellings and its own contract says so** ·
-> **F40 the fix hunt is done for the whole catalogue, once**
+> **F40 the fix hunt is done for the whole catalogue, once** · **F41 row 2, and
+> the two rows disagree about what safety costs**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -1058,6 +1059,82 @@ That is the row engineer's job, and the window is the expensive half.
 mis-catalogued — a C-side question, so it can decide admission.** Settle it at
 source before building.
 
+### F41 — ⭐⭐ ROW 2 IS BUILT, AND THE TWO ROWS DISAGREE ABOUT WHAT SAFETY COSTS
+
+`ph07-strcut-cursor` — `mbfl_strcut`'s `mblen_table` arm, `mbfilter.c:1179-1259`,
+CRASH-124, tier `narrowed`. **Gate `PASS`**, contract `be5f5818ffa625c7`, R5
+**21/0**, 2 justified `loud`. ⚠ **UNREVIEWED** — nothing here is in
+`.memory-php/` yet (rule 9). `-O3 isolated`, `Ir`/window byte, **within-row
+only**:
+
+| `c-gcc` | `c-gcc-h` | `c-clang` | `safe_naive` | `safe_tuned` | `unsafe` | `verus` |
+|---:|---:|---:|---:|---:|---:|---:|
+| +27.31 % | **+27.31 %** | +4.81 % | **+57.68 %** | **+13.50 %** | — | **0.00 %** |
+
+⭐⭐ **THE RESULT: `R3`'s TWO WALKS ARE BYTE-FOR-BYTE `R2`'s.** A variable-stride
+cursor is not an iterator — `n` advances by a value read *out of the byte it is
+standing on* — so **no safe spelling the engineer found removes that check.**
+Per character, off `objdump`: start walk **9 insns + 1 bounds branch** in both
+R2 and R3, **7 + 0** in R4/R5. **R3's entire gain over R2 is the copy and the
+fold; R4's entire gain over R3 is the two walks.** ⭐ **The row's cost sits
+exactly where safe Rust cannot reach it** — and the mechanism predicts the
+measurement to **2 %** with no fitting.
+
+⚠⚠ **SO THE TWO BUILT ROWS ANSWER THE SAME QUESTION WITH OPPOSITE SHAPES, AND
+THAT IS THE PROGRAMME'S FIRST REAL COMPARATIVE RESULT:**
+
+| | `ph03` | `ph07` |
+|---|---|---|
+| what tuning recovers | **86.4 %** of the naive gap | **76.6 %** — but **none of it from the pattern's own loop** |
+| the upstream fix costs | a **RATE**: ∓3.0 `Ir`/line, **sign depends on the compiler** | a **CONSTANT**: +7.3 `Ir`/call gcc, +9.2 clang — both guards sit **outside both loops** |
+| the fix is | **dead in one hunk, incomplete in the other** | ✅ **complete** — 15 333 over-reads → **0**, no residue |
+| `R2`–`R5` vs `R1h` | must diverge (a rung built to the fix would panic) | **are ports of it** — because the fix is complete |
+
+⭐ **`.memory-php/02`'s rule *"R2–R5 are NOT ports of R1h"* held by its
+conditional, not its conclusion** — here they *are* ports, and the reason is a
+measurement rather than a preference.
+
+**Three more results, each measured rather than argued:**
+
+1. ⭐⭐ **THE OVER-READ DOES NOT CHANGE THE ANSWER, AND THE CLAMP THAT ARRIVES
+   TOO LATE TO PREVENT IT IS EXACTLY THE CLAMP THAT HIDES IT.** 15 333
+   over-reading calls re-run under **seven** different out-of-bounds fillers:
+   **0 answers move.** Must-fire control (delete `mbfilter.c:1227`'s
+   `start > len`): **13 293 of 15 333 move.** ⚠ **That is why this shipped
+   byte-identical in six releases and why no test suite could have seen it** —
+   and it is a sharper statement of the same shape as `ph03`'s dead hunk.
+2. ⭐ **THE 2010 WALK REWRITE IS NOT THE FIX.** `d9dda48f8a7e` made the walk test
+   before it reads; **that rewrite alone still over-reads on 13 293 of the same
+   calls.** **The loop shape is not the fix; the bound on `from` is.**
+3. ⭐⭐ **ONE FUNCTION, ONE GUARDED WALK AND ONE UNGUARDED ONE** — and the
+   asymmetry is **three asymmetries at three scales**, with **the correct code
+   ADJACENT to the incorrect code at every scale**: the end walk is bounded three
+   lines below an unbounded start walk; the sibling entry point `mb_strimwidth`
+   **already clamped `from` from above in the pinned 5.0.0 tarball**; and the fix
+   arrived in the caller. ⚠ **It is not "the author forgot"** — the start search
+   *is* compared against `from`, and **a comparison against an attacker-controlled
+   scalar reads as a bounds check.**
+
+**Two convergences with manager findings, reached independently:**
+
+- ⭐ **F35's family, at row scale.** The engineer's history table was **wrong in
+  both directions** — one spelling reported absence where the guard had been
+  *renamed*, one unanchored pattern reported presence where the hit was in a
+  *different function* — **and neither error is visible from its own output. The
+  first version passed a green gate.** ✅ Caught, corrected, re-gated, and kept
+  in `NOTES.md`. **Ask about a FUNCTION, not about text.**
+- ⚠ **F39, confirmed from the other side**: `ph07` also ships **no
+  `controls/spellings.py`**, so *"no ratio is the cost of safety"* — **the debt
+  is now on both built rows**, and the engineer flagged it unprompted.
+
+⚠ **Three caveats the row states rather than hides:** `memcpy` is outside
+`kernel_exclusive_ir` and **three rungs call it and three do not** — measured, the
+hidden term is **~2 %** (R2-vs-R4 is +55.4 % total `Ir` against +57.7 %
+kernel-exclusive); **the wall clock can decide nothing here** — R4 and R5 are the
+same 255 instructions and their medians differ **5.4 %**, more than any
+difference in the table; and `provenance.c_lines` **pins one span while this row
+lifts two**, a schema gap now wanted by a second row.
+
 ### F40 — the fix hunt is now done for the WHOLE catalogue, once — `.tasks-php/FIXSURVEY_001.md`
 
 `ph07` cost a task to *"where is the upstream fix?"*. **That question is now
@@ -1299,6 +1376,9 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 | ~~19~~ | ✅ **CLOSED: THERE IS NO SIZE RULE. The 200-word rule is withdrawn — it was calibrated on n = 1 and is broken by 30 of 33 PAT rows** | `TASK_PHP_005` F-5: up to **2 533** words, and **`p01` — the template every row clones, and the row `PROTOCOL_PHP.md` cites as complying — is 201.** The 200 was simply the measurement of the one row that had been measured. ⚠⚠ **This is the THIRD version of this rule and the second that could not be met**; `RECAP_PHP.md` itself warns that *"a size rule that cannot be met is worse than none"*. **The manager must not invent a fourth number** — `TASK_PHP_006` measures the corpus distribution and proposes a limit, or proposes a structural rule instead, **and whatever lands must be enforced by a check or dropped** |
 | ~~20~~ | ✅ **CLOSED at `TASK_PHP_006`** (was: `gate.py <row> --preflight` silently forwarded the flag and ran the tool) | `argparse.REMAINDER` collects from the first positional (`TASK_PHP_005` F-7). ⚠⚠ **The manager's own 06:55 `ph00.preflight.json` — cited as manager-verified evidence for the gitignore decision — is an instance: a FAILED `check.py` launch (`tool_returncode 2`) recorded as a preflight.** Part of the evidence for a manager decision was an artefact of a CLI bug |
 | 15 | ⚠ **The php staleness check is `gate.py --tool measure --check-stale`** and the mandated PAT `66/0` one does **not** examine `results-php/` at all | Both are now in `PROTOCOL_PHP.md` §E1 (`TASK_PHP_004`); today the php side is **2 records** |
-| 21 | ⚠⚠ **`TASK_PHP_012` M4 — 12 rows declare `verbatim` whose defect site is inside a `PHP_FUNCTION` / VM-handler / arg-parsing frame, i.e. **`narrowed`** — and NONE has been corrected in `CATALOGUE.md`** | ✅ **Re-run and reproduced by the manager** (`.temp/mgr/batch/tier_recheck.log`): `ph05 ph11 ph12 ph21 ph22 ph24 ph35 ph50 ph55 ph59 ph76 ph80`. ⚠ **A cost statement, never a filter — no row's admission moves.** But `provenance.py` reports overlap **against the declared tier's expectation** (50 % / 25 %) and `TASK_PHP_008` made that a report rather than a floor, so **a mis-declared `verbatim` row hands its reviewer a scary number that is indistinguishable from a bad extraction.** `TASK_PHP_012` said *fix before the first row*; `ph03` was unaffected, **but `ph12` and `ph21` are in the NEXT BATCH.** ✅ **Landing is staged and mechanical**: `python3 .tasks-php/land_m4.py --check\|--apply` edits Part A + Part B for all 12 and **refuses unless every row has exactly two occurrences** (dry-run: 24 edits, 2 each). **Blocked only by `PROTOCOL.md` rule 11** — `TASK_PHP_016` is reading `CATALOGUE.md`. **Land it the moment that task reports** |
-| 22 | ⚠ **The rest of `TASK_PHP_012`'s catalogue corrections are still owed** — M1 (6 of 12 "merges" are silent drops), M2 (the four-`LOGIC` set kill), M3 (CRASH-021 reverses → a `ph60` merge, not a kill), M5 (CRASH-061/126 in the wrong family), and the minors m1/m5/m8 | Batch them with item 21's landing (`PROTOCOL.md` rule 6) — they are all `CATALOGUE.md` edits and share its rule-11 block. ✅ **m8 is ADJUDICATED** (`ADJUDICATION_002.md` §2, F37): `CRASH-106` → **`ph92`**, `CRASH-109` → **`ph93`**, both admitted, mechanisms and citations verified at source, §4 gives the exact Part A / Part B / Part C edits. **What is owed is the LANDING, not the judgement** — and the catalogue goes **91 → 93** |
-| 23 | ⚠⚠ **FIVE doc edits are BLOCKED ONLY by `PROTOCOL.md` rule 11** — `TASK_PHP_016` is reading `CATALOGUE.md`, `.memory-php/` and `PROTOCOL_PHP.md`. **Land all five in ONE pass the moment it reports** (rule 6) | **(a)** `python3 .tasks-php/land_m4.py --apply` — the 12 mis-tiered rows (item 21). **(b)** `ADJUDICATION_002.md` §4 — add `ph92`/`ph93`, delete their `C.1` kills **and record the re-adjudication in place** (a kill that vanishes is worse than a kill that was wrong — M1), narrow `ph28`'s uniqueness claim to *resident*. Catalogue **91 → 93**. **(c)** `.memory-php/02-ladder.md` — F34's *"the guard moved to the PROLOGUE"* is **superseded**: it moved to the **CALLER, in another file** (F38), and the entry names `ph07`'s R1h, which is now `cb3cca21b345`. **(d)** `.memory-php/00-corpus.md` — its header says findings run *"F1–F34"* (rule 13: headers rot), and it should carry the **`fix_commit` column** and the **`grep -a`** hazard. **(e)** `PROTOCOL_PHP.md` — the `grep -a` rule (F35) and the pre-build item `TASK_PHP_015` asked for, in F38's stronger form: *read the CSV's `fix_commit`, fetch the patch, **and confirm against the tags that it removes the 5.0.0 defect**; if not, cite both*. **(f)** `.memory-php/02-ladder.md` again — **label row 1's table `fixed-R4 bound`** and carry F39's direction prior; the caveat there is the engineer's and is weaker than the situation |
+| ~~21~~ | ✅ **LANDED** — `TASK_PHP_012` M4 — 12 rows declare `verbatim` whose defect site is inside a `PHP_FUNCTION` / VM-handler / arg-parsing frame, i.e. **`narrowed`** — and NONE has been corrected in `CATALOGUE.md`** | ✅ **Re-run and reproduced by the manager** (`.temp/mgr/batch/tier_recheck.log`): `ph05 ph11 ph12 ph21 ph22 ph24 ph35 ph50 ph55 ph59 ph76 ph80`. ⚠ **A cost statement, never a filter — no row's admission moves.** But `provenance.py` reports overlap **against the declared tier's expectation** (50 % / 25 %) and `TASK_PHP_008` made that a report rather than a floor, so **a mis-declared `verbatim` row hands its reviewer a scary number that is indistinguishable from a bad extraction.** `TASK_PHP_012` said *fix before the first row*; `ph03` was unaffected, **but `ph12` and `ph21` are in the NEXT BATCH.** ✅ **Landing is staged and mechanical**: `python3 .tasks-php/land_m4.py --check\|--apply` edits Part A + Part B for all 12 and **refuses unless every row has exactly two occurrences** (dry-run: 24 edits, 2 each). **Blocked only by `PROTOCOL.md` rule 11** — `TASK_PHP_016` is reading `CATALOGUE.md`. **Land it the moment that task reports** |
+| ~~22~~ | ✅ **m8 LANDED (`ph92`/`ph93`, kills withdrawn IN PLACE, `ph28` narrowed). ⚠ M1/M2/M3/M5 and m1 STILL OWED** — was: the rest of `TASK_PHP_012`'s catalogue corrections — M1 (6 of 12 "merges" are silent drops), M2 (the four-`LOGIC` set kill), M3 (CRASH-021 reverses → a `ph60` merge, not a kill), M5 (CRASH-061/126 in the wrong family), and the minors m1/m5/m8 | Batch them with item 21's landing (`PROTOCOL.md` rule 6) — they are all `CATALOGUE.md` edits and share its rule-11 block. ✅ **m8 is ADJUDICATED** (`ADJUDICATION_002.md` §2, F37): `CRASH-106` → **`ph92`**, `CRASH-109` → **`ph93`**, both admitted, mechanisms and citations verified at source, §4 gives the exact Part A / Part B / Part C edits. **What is owed is the LANDING, not the judgement** — and the catalogue goes **91 → 93** |
+| ~~23~~ | ✅ **ALL SIX LANDED** the moment `TASK_PHP_016` reported — was: blocked by `PROTOCOL.md` rule 11 — `TASK_PHP_016` is reading `CATALOGUE.md`, `.memory-php/` and `PROTOCOL_PHP.md`. **Land all five in ONE pass the moment it reports** (rule 6) | **(a)** `python3 .tasks-php/land_m4.py --apply` — the 12 mis-tiered rows (item 21). **(b)** `ADJUDICATION_002.md` §4 — add `ph92`/`ph93`, delete their `C.1` kills **and record the re-adjudication in place** (a kill that vanishes is worse than a kill that was wrong — M1), narrow `ph28`'s uniqueness claim to *resident*. Catalogue **91 → 93**. **(c)** `.memory-php/02-ladder.md` — F34's *"the guard moved to the PROLOGUE"* is **superseded**: it moved to the **CALLER, in another file** (F38), and the entry names `ph07`'s R1h, which is now `cb3cca21b345`. **(d)** `.memory-php/00-corpus.md` — its header says findings run *"F1–F34"* (rule 13: headers rot), and it should carry the **`fix_commit` column** and the **`grep -a`** hazard. **(e)** `PROTOCOL_PHP.md` — the `grep -a` rule (F35) and the pre-build item `TASK_PHP_015` asked for, in F38's stronger form: *read the CSV's `fix_commit`, fetch the patch, **and confirm against the tags that it removes the 5.0.0 defect**; if not, cite both*. **(f)** `.memory-php/02-ladder.md` again — **label row 1's table `fixed-R4 bound`** and carry F39's direction prior; the caveat there is the engineer's and is weaker than the situation |
+| 24 | ⚠⚠ **`ph07` is BUILT AND UNREVIEWED, and its report proposes a `PROTOCOL_PHP.md` §A2a addition that was LOAD-BEARING for the row** | The row gates green only because `inputs/gen.py` keeps the upstream fix's guards **dead** on the measured corpus: `cb3cca21b345` hunk (b) **changes benign output on 15 870 of 117 612 non-crashing calls**, and `check.py` stage 7h requires R1h ≡ R1 on every non-adversarial input. **Proposed clause**: *where the upstream fix changes benign behaviour, the measured corpus must leave its guards dead, `gen.py` must assert it, and the behaviour change is measured in `controls/` where it cannot contaminate the ladder.* ⚠ **NOT LANDED — rule 9.** The manager landed only its own verified items (§F 5–6). **`TASK_PHP_017` must attack this clause specifically**: it is a rule invented to make one row gateable, which is exactly the shape that needs a second row before it becomes protocol |
+| 25 | ⚠ **`provenance.c_lines` pins ONE span; `ph07` lifts TWO** | `TASK_PHP_015` §2.5 deferred the schema change; a second row now wants it. ⚠ **It is a `harness-php/` edit, so it costs no PAT re-gate** — but it moves the php preflight record. Decide at the review |
+| 26 | ⚠⚠ **THE SPELLINGS DEBT IS NOW ON BOTH BUILT ROWS** (F39) | `controls/spellings.py` exists and works on **four PAT rows** (`p13 p34 p42 p49`); neither php row has one. **Two actions, and the first is cheap**: (a) ✅ **DONE** — both ladders are now labelled `fixed-R4 bound` in `.memory-php/02` and F33/F41; (b) **a task that ports the control to `ph03` and `ph07`.** ⚠ **Do (b) before any number reaches the crash course** — the PAT record is that the missing number moves **against safe Rust**, three times out of four |
