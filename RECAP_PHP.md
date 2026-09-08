@@ -1082,11 +1082,36 @@ Only what changes a decision:
   *the named commit is a later hardening* — **which is what `ph21`'s 2015 commit
   turned out to be** (F38). ⚠ **This is the measurement that makes the per-row
   tag check mandatory rather than cautious: it is live on a third of the corpus.**
-- ⭐ **The standout: `ph22` (`pack`) — `865739e5b196`, 2025**, *"pack with h or H
-  format string overflow"*. **If it is the same defect, PHP shipped it for 21
-  years.** ⚠ **Unverified, and the most valuable single row in the corpus to
-  settle** — it is either the programme's best headline or its cleanest example
-  of a mis-attributed fix.
+- ⭐⭐ **The standout was `ph22` (`pack`), whose fix is dated 2025. ✅ SETTLED —
+  AND IT CAME OUT THE OTHER WAY.** This finding first said *"if it is the same
+  defect, PHP shipped it for 21 years"*, flagged unverified. **It is not, and
+  the 21 years is withdrawn.** Traced across eight tags:
+
+  ```
+  5.0.0   outputpos += (arg + 1) / 2;                  <-- ph22's defect, NO CHECK
+  5.1.0   INC_OUTPUTPOS((arg + 1) / 2, 1)              <-- the checking macro ARRIVES
+  5.2.0   INC_OUTPUTPOS((arg + (arg % 2)) / 2, 1)      <-- +1 over-counted for even arg
+  5.3.0 … 8.4.0   unchanged, ~15 years
+  2025-06-29  INC_OUTPUTPOS((arg / 2) + (arg % 2), 1)  <-- 865739e5b196, the CSV's cell
+  ```
+
+  **`ph22`'s R1h is the 5.1.0 arrival of `INC_OUTPUTPOS`** — whose body is
+  `if ((a) < 0 || ((INT_MAX - outputpos)/(b)) < (a)) { … RETURN_FALSE; }` —
+  **not the 2025 commit. That is the THIRD confirmed instance of F38 half 2**,
+  after `ph12` and `ph21`, and it landed on the row this finding singled out as
+  most likely to be the exception. **The rule earned its keep on its own test
+  case.**
+
+  ⭐ **But the 2025 commit is a finding in its own right, and a better one than
+  the headline it replaces.** What survived 5.1.0 → 2025 is signed-overflow UB
+  **in the macro's ARGUMENT**: `(arg + (arg % 2))` overflows at `arg == INT_MAX`
+  *before* `INC_OUTPUTPOS`'s guard ever runs, so **an explicitly
+  overflow-checking macro is handed an already-wrapped value.** ⚠⚠ **That is
+  exactly `ph20`'s catalogued shape** — *"the wrap collapsed inside
+  `safe_emalloc`'s first argument, so the wrapper is present and bypassed"* —
+  **in a second function, and there it survived nineteen years inside the guard
+  meant to prevent it.** *A guard passed an already-wrapped value is not a
+  guard*, and this corpus now has two independent instances.
 - ⚠ `ph49` and `ph50` resolve to **one** corpus id and commit (CRASH-153).
   Two rows from one report is legitimate — the catalogue splits by mechanism —
   **but nobody has checked these two are distinct.** Flagged, not judged.

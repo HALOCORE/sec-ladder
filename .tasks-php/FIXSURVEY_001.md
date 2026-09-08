@@ -79,10 +79,32 @@ this survey cannot tell them apart:**
 
 **Only the tag comparison distinguishes them, and it must be run per row.**
 
-⭐ **The standout candidate: `ph22` (`pack`, `pack.c:247`) — `865739e5b196`,
-2025**, *"Fix GH-18976: pack with h or H format string overflow"*. **If that is
-the same defect, PHP shipped it for 21 years.** ⚠ **Unverified — it is exactly
-case (a)-or-(b), and it is the most valuable one in the corpus to settle.**
+### ✅ `ph22` was the standout, and settling it produced case (b)
+
+This file first said: *"`ph22` (`pack`, `pack.c:247`) — `865739e5b196`, 2025 …
+if that is the same defect, PHP shipped it for 21 years"*, flagged unverified.
+**Settled across eight tags. It is case (b), and the 21 years is withdrawn:**
+
+```
+5.0.0   outputpos += (arg + 1) / 2;                  <-- ph22's defect, NO CHECK
+5.1.0   INC_OUTPUTPOS((arg + 1) / 2, 1)              <-- the checking macro ARRIVES
+5.2.0   INC_OUTPUTPOS((arg + (arg % 2)) / 2, 1)      <-- +1 over-counted for even arg
+5.3.0 … 8.4.0   unchanged, ~15 years
+2025    INC_OUTPUTPOS((arg / 2) + (arg % 2), 1)      <-- 865739e5b196, the CSV's cell
+```
+
+**R1h for `ph22` is the 5.1.0 arrival of `INC_OUTPUTPOS`**, whose body is
+`if ((a) < 0 || ((INT_MAX - outputpos)/(b)) < (a)) { … RETURN_FALSE; }`.
+**The third confirmed instance of F38 half 2** — on the row picked as most
+likely to be the exception.
+
+⭐ **The 2025 commit is still a finding, and a better one.** What survived
+5.1.0 → 2025 is signed-overflow UB **in the macro's ARGUMENT**:
+`(arg + (arg % 2))` overflows at `arg == INT_MAX` *before* the guard runs, so an
+explicitly overflow-checking macro receives an already-wrapped value. ⚠⚠ **That
+is `ph20`'s catalogued shape in a second function** — *"the wrap collapsed inside
+`safe_emalloc`'s first argument, so the wrapper is present and bypassed"* — and
+here it lasted nineteen years **inside the guard meant to prevent it.**
 
 ⚠ **`ph49` and `ph50` resolve to the SAME corpus id and the same commit**
 (CRASH-153 / `86434be9462c`). Two catalogue rows from one corpus row is not
