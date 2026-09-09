@@ -144,6 +144,39 @@ REQUIRED = ["php_version", "tarball_sha256", "c_file", "c_lines",
             "extract_cmd", "extract_sha256", "tier"]
 TIERS = ("verbatim", "narrowed", "modelled")
 
+#: ⚠⚠⚠ A ROW MAY LIFT MORE THAN ONE SPAN, AND UNTIL `TASK_PHP_018` IT COULD
+#: ONLY CITE ONE. `ph07` lifts THREE -- `mbfilter.c:1179-1259` (the walk),
+#: `mbfilter_utf8.c:39-56` (the table) and `mbstring.c:1774-1812` (the caller
+#: frame, which is where R1h lives) -- and pinned the first. So its overlap
+#: report was computed against a span containing **neither the fix nor the
+#: frame the fix goes in** (`TASK_PHP_017` M1, `RECAP_PHP.md` open item 25).
+#:
+#: OPTIONAL, and a list of objects with the SAME four fields as the primary
+#: span plus a `why`:
+#:
+#:     "extra_spans": [
+#:       {"c_file": "ext/mbstring/mbstring.c", "c_lines": [1774, 1812],
+#:        "extract_cmd": "...", "extract_sha256": "...",
+#:        "why": "PHP_FUNCTION(mb_strcut), the caller frame; R1h lands here"}
+#:     ]
+#:
+#: ⚠ **THE PRIMARY FOUR FIELDS DO NOT MOVE.** That is the whole design: a
+#: single-span row is byte-identical, so `ph03` and `ph00-smoke` keep their
+#: `contract_sha256` and no other row owes a re-gate for this schema change.
+#: The alternative -- making `c_lines` a list of lists -- would have forced
+#: `extract_cmd` and `extract_sha256` into lists too, moved every row, and
+#: still not expressed `ph07`'s real shape, which is three spans in THREE
+#: DIFFERENT FILES.
+#:
+#: Each entry is checked exactly as the primary is: in the manifest, in range,
+#: `extract_cmd` canonical for its own `c_file`/`c_lines`, and
+#: `extract_sha256` the hash of the bytes `sed` would print. ⚠ The kernel
+#: overlap is then computed over the UNION of every cited span, which is the
+#: point: it is the only check that asks whether the row's C resembles what it
+#: cites, and it was asking about a third of it.
+EXTRA_SPANS_KEY = "extra_spans"
+_SPAN_FIELDS = ("c_file", "c_lines", "extract_cmd", "extract_sha256")
+
 
 def sha256_bytes(b):
     return hashlib.sha256(b).hexdigest()
@@ -709,33 +742,58 @@ def check_row(pdir, tarball, use_tarball=True, show=False):
                        f"(patterns-php/SOURCES.md)"]
     if prov["tier"] not in TIERS:
         return False, [f"{row}: tier {prov['tier']!r} not in {TIERS}"]
-    lines = prov["c_lines"]
-    if not (isinstance(lines, list) and len(lines) == 2
-            and all(isinstance(x, int) for x in lines)):
-        return False, [f"{row}: c_lines must be [a, b] integers, got {lines!r}"]
-    a, b = lines
+    # (1) EVERY cited span -- the primary one, then any `extra_spans`. The
+    # primary is `spans[0]` and its four keys are read from the top level, so a
+    # single-span row is byte-identical to what it was before TASK_PHP_018.
+    spans = [{k: prov[k] for k in _SPAN_FIELDS}]
+    spans[0]["why"] = "the primary span"
+    extra = prov.get(EXTRA_SPANS_KEY, [])
+    if not isinstance(extra, list):
+        return False, [f"{row}: {EXTRA_SPANS_KEY} must be a list of span "
+                       f"objects, got {type(extra).__name__}"]
+    for i, sp in enumerate(extra):
+        if not isinstance(sp, dict):
+            return False, [f"{row}: {EXTRA_SPANS_KEY}[{i}] is not an object"]
+        miss = [k for k in _SPAN_FIELDS if k not in sp]
+        if miss:
+            return False, [f"{row}: {EXTRA_SPANS_KEY}[{i}] is missing {miss}"]
+        if not sp.get("why"):
+            return False, [f"{row}: {EXTRA_SPANS_KEY}[{i}] has no `why`. A "
+                           f"second span is a second claim; say what it is."]
+        spans.append(sp)
 
-    # (2) the recorded command must be the canonical spelling of the fields
-    want_cmd = canonical_cmd(prov["c_file"], a, b)
-    if prov["extract_cmd"] != want_cmd:
-        return False, [f"{row}: extract_cmd does not describe c_file/c_lines\n"
-                       f"       recorded: {prov['extract_cmd']}\n"
-                       f"       canonical: {want_cmd}"]
+    for i, sp in enumerate(spans):
+        lines = sp["c_lines"]
+        if not (isinstance(lines, list) and len(lines) == 2
+                and all(isinstance(x, int) for x in lines)):
+            return False, [f"{row}: span {i} c_lines must be [a, b] integers, "
+                           f"got {lines!r}"]
+        # (2) the recorded command must be the canonical spelling of the fields
+        want = canonical_cmd(sp["c_file"], lines[0], lines[1])
+        if sp["extract_cmd"] != want:
+            return False, [f"{row}: span {i} extract_cmd does not describe "
+                           f"c_file/c_lines\n"
+                           f"       recorded: {sp['extract_cmd']}\n"
+                           f"       canonical: {want}"]
+    a, b = spans[0]["c_lines"]
+    want_cmd = spans[0]["extract_cmd"]
 
     # the manifest half -- works with no tarball at all
     mm = manifest_map()
     if mm:
-        if prov["c_file"] not in mm:
-            return False, [f"{row}: {prov['c_file']} is not in "
-                           f"patterns-php/php-5.0.0.manifest"]
-        msgs.append(f"{row}: {prov['c_file']} is in the manifest "
-                    f"({mm[prov['c_file']][:12]})")
+        for i, sp in enumerate(spans):
+            if sp["c_file"] not in mm:
+                return False, [f"{row}: span {i}: {sp['c_file']} is not in "
+                               f"patterns-php/php-5.0.0.manifest"]
+        msgs.append(f"{row}: {', '.join(sp['c_file'] for sp in spans)} "
+                    f"{'is' if len(spans) == 1 else 'are'} in the manifest "
+                    f"({', '.join(mm[sp['c_file']][:12] for sp in spans)})")
     else:
         msgs.append(f"{row}: ⚠ no manifest at {MANIFEST}; file-level check skipped")
 
     if not use_tarball:
-        msgs.append(f"{row}: ⚠ --no-tarball: extract_sha256 was NOT verified. "
-                    f"This is a PARTIAL check.")
+        msgs.append(f"{row}: ⚠ --no-tarball: extract_sha256 was NOT verified "
+                    f"for any of {len(spans)} span(s). This is a PARTIAL check.")
         return True, msgs
 
     if not os.path.exists(tarball):
@@ -746,26 +804,47 @@ def check_row(pdir, tarball, use_tarball=True, show=False):
     if got_tar != TARBALL_SHA256:
         return False, [f"{row}: the tarball at {tarball} hashes "
                        f"{got_tar[:12]}, not {TARBALL_SHA256[:12]}"]
-    try:
-        ex = excerpt(tarball, prov["c_file"], a, b)
-    except ValueError as e:
-        return False, [f"{row}: {e}"]
-    got = sha256_bytes(ex)
-    if show:
-        sys.stdout.write(ex.decode("utf-8", "replace"))
-    if got != prov["extract_sha256"]:
-        return False, [f"{row}: EXTRACT MISMATCH for "
-                       f"{prov['c_file']}:{a}-{b}\n"
-                       f"       recorded  {prov['extract_sha256']}\n"
-                       f"       actual    {got}   ({len(ex)} bytes, "
-                       f"{ex.count(chr(10).encode())} newlines)\n"
-                       f"       run: {want_cmd} | sha256sum"]
-    msgs.append(f"{row}: OK  {prov['c_file']}:{a}-{b}  {len(ex)} bytes  "
-                f"sha256 {got[:16]}  tier={prov['tier']}")
+    texts = []
+    for i, sp in enumerate(spans):
+        sa, sb = sp["c_lines"]
+        try:
+            ex = excerpt(tarball, sp["c_file"], sa, sb)
+        except ValueError as e:
+            return False, [f"{row}: span {i}: {e}"]
+        got = sha256_bytes(ex)
+        if show:
+            sys.stdout.write(ex.decode("utf-8", "replace"))
+        if got != sp["extract_sha256"]:
+            return False, [f"{row}: EXTRACT MISMATCH for span {i}, "
+                           f"{sp['c_file']}:{sa}-{sb}\n"
+                           f"       recorded  {sp['extract_sha256']}\n"
+                           f"       actual    {got}   ({len(ex)} bytes, "
+                           f"{ex.count(chr(10).encode())} newlines)\n"
+                           f"       run: {sp['extract_cmd']} | sha256sum"]
+        texts.append(ex.decode("utf-8", "replace"))
+        tag = "OK " if i == 0 else f"OK+{i}"
+        msgs.append(f"{row}: {tag} {sp['c_file']}:{sa}-{sb}  {len(ex)} bytes  "
+                    f"sha256 {got[:16]}"
+                    + (f"  tier={prov['tier']}" if i == 0
+                       else f"  -- {sp['why'][:70]}"))
+    ex = texts[0]
 
     # the kernel half -- does the row's C actually look like what it cites?
-    frac, nwant, nhit, kfiles = kernel_overlap(
-        pdir, ex.decode("utf-8", "replace"))
+    # ⚠⚠ OVER THE UNION OF EVERY CITED SPAN SINCE TASK_PHP_018. `ph07` lifted
+    # three and pinned one, so this number was computed against a span
+    # containing neither its fix nor the frame the fix goes in. A row that
+    # cites more now has MORE to resemble, which is the direction this check
+    # should err in: adding a span cannot make the number go up for free.
+    if len(spans) > 1:
+        per = []
+        for i, t in enumerate(texts):
+            f_i, w_i, h_i, _ = kernel_overlap(pdir, t)
+            per.append(f"span{i} {f_i:.0%} ({h_i}/{w_i})"
+                       if f_i is not None else f"span{i} n/a")
+        msgs.append(f"{row}: per-span overlap: " + ", ".join(per)
+                    + f"  -- the UNION is what is reported below, and it is "
+                      f"what {len(spans)} cited spans oblige the row to")
+    frac, nwant, nhit, kfiles = kernel_overlap(pdir, "\n".join(texts))
     if frac is None:
         if not kfiles:
             return False, msgs + [

@@ -259,6 +259,15 @@ pub open spec fn tally_of(cap: int) -> u64 {
 }
 
 /// What the kernel must return. `model.py::strcut_fold` re-derives it.
+///
+/// ⚠⚠⚠ **THIS SPEC CARRIED `cb3cca21b345` HUNK (b) UNTIL `TASK_PHP_018`**, as
+/// `let length = if f0 + l0 > slen { slen - f0 } else { l0 };`. That is the line
+/// that made the POSTCONDITION assert a wrong function: upstream removed hunk
+/// (b) in `c2471b495009` (2009-09-23) as **bug #49354**, with a regression test
+/// that `controls/bug49354.py` replays. ⭐ The whole point of a value
+/// postcondition is that it says which function the rung computes, so when R1h
+/// changed, this line had to change with it -- a memory-safety-only `ensures`
+/// would have been silent here, and that is the argument for this one.
 pub open spec fn strcut_fold(buf: Seq<u8>, off: int, len: int) -> u64 {
     let fw = head_u32(buf, off);
     let lw = head_u32(buf, off + 4);
@@ -269,7 +278,7 @@ pub open spec fn strcut_fold(buf: Seq<u8>, off: int, len: int) -> u64 {
     if f0 > slen {
         0xFFFF_FFFFu64
     } else {
-        let length = if f0 + l0 > slen { slen - f0 } else { l0 };
+        let length = l0;
         let w = walk_start(s, f0, mbtab_of(s[0]), 0);
         let k = w.1 + length;
         let end0 = if k >= slen { slen } else { walk_end(s, k, w.0, w.1) };
@@ -515,18 +524,14 @@ pub fn kernel(buf: &[u8], off: usize, len: usize) -> (r: u64)
     assert(length as int == guard_len(slq, frm as int, lw));
     let ghost f0: int = frm as int;
     let ghost l0: int = length as int;
-    // cb3cca21b345 hunk (a) -- the line every `get_unchecked` below rests on.
+    // R1h -- `cb3cca21b345` hunk (a), the line every `get_unchecked` below
+    // rests on, and the WHOLE of R1h since `TASK_PHP_018`. Hunk (b) used to
+    // follow it here and is gone: `c2471b495009` removed it as bug #49354.
     if frm > slen {
         assert(strcut_fold(buf@, off as int, len as int) == 0xFFFF_FFFFu64);
         return 0xFFFF_FFFFu64;
     }
-    // cb3cca21b345 hunk (b).
-    let length: usize = if frm.saturating_add(length) > slen {
-        slen - frm
-    } else {
-        length
-    };
-    assert(length as int == (if f0 + l0 > slq { slq - f0 } else { l0 }));
+    assert(length as int == l0);
 
     // mbfilter.c:1202-1210, rotated: the C reads once before its first test.
     let mut n: usize = mbtab(get_unchecked(s, 0)) as usize;
@@ -550,9 +555,28 @@ pub fn kernel(buf: &[u8], off: usize, len: usize) -> (r: u64)
     assert(w == (n as int, start as int));
 
     // mbfilter.c:1212-1223 -- the end walk, which IS bounded.
+    //
+    // ⚠⚠ **THIS IS THE ONE PLACE THE PROOF GOT HARDER WHEN HUNK (b) WENT.**
+    // While hunk (b) was here it had just established `length <= slen - frm`,
+    // and with `start <= frm` that gave `start + length <= slen <= usize::MAX`
+    // -- so `saturating_add` provably never saturated and `k as int == ks` was
+    // one step. Without it `length` is only bounded by `guard_len`, i.e. by
+    // `0x7FFF_FFFF`, and Verus does not fix `usize::BITS` at 64, so saturation
+    // is reachable in the model and the equality is FALSE in general.
+    //
+    // ⭐ What replaces it is three lines and NO new trusted item, because
+    // saturation is exactly the case the shortcut already covers:
+    //   * `saturating_add` only ever caps at `usize::MAX`, and `slen: usize`,
+    //     so a saturated `k` satisfies `k >= slen` -- the `end = slen` arm;
+    //   * therefore `k < slen` implies no saturation, hence `k as int == ks`;
+    //   * and `k as int <= ks` always, so `k >= slen` implies `ks >= slen`.
+    // The two arms of `if k >= slen` line up with the two arms of the spec's
+    // `if k >= slq` under exactly those facts. NOTES.md §10.
     let k: usize = start.saturating_add(length);
     let ghost ks: int = w.1 + length as int;
-    assert(k as int == ks);
+    assert(k as int <= ks);
+    assert(k < slen ==> k as int == ks);
+    assert(k >= slen ==> ks >= slq);
     let ghost end0: int = if ks >= slq {
         slq
     } else {

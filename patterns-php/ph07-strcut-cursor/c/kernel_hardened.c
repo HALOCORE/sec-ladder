@@ -1,22 +1,59 @@
-/* ph07 rung R1h -- c/kernel.c plus the REAL upstream fix, and nothing else.
+/* ph07 rung R1h -- c/kernel.c plus the guard configuration UPSTREAM CONVERGED
+ * ON, and nothing else.
  *
  * ============================================================================
- * THE FIX COMMIT
+ * ⚠⚠⚠ R1h IS A TAGGED CONFIGURATION, NOT A COMMIT, AND THAT IS DELIBERATE
  * ============================================================================
- *   cb3cca21b34518caf45852ed90597052e99294c3
- *   Ilia Alshanetsky, 2005-12-15
- *   "Fixed possible memory corruption inside mb_strcut()."
- *   ext/mbstring/mbstring.c, +7 lines, ONE hunk, two guards.
- *   First shipped in php-5.1.2 (2006-01-12); php-5.0.x never received it.
- *   Patch bytes at controls/cb3cca21b345.patch, 829 B,
- *   sha256 14dbafc9a3b970d048e0a24347c503b436c51d15e5fb382427be2bece5353b64.
- *   The corpus's own `index.csv` names this commit in its `fix_commit` column.
+ *   pinned as   php-5.2.12 .. php-5.2.17   (five tags, byte-for-byte)
+ *   function    PHP_FUNCTION(mb_strcut), ext/mbstring/mbstring.c
+ *   body sha256 26e2099e33433c74            (brace-matched body, 1823 B)
+ *   guard       `if (from > Z_STRLEN_PP(arg1)) { RETURN_FALSE; }`   -- and
+ *               NOTHING else.
+ *
+ *   TWO commits produce it, and the row cites BOTH:
+ *     cb3cca21b34518caf45852ed90597052e99294c3   Ilia Alshanetsky, 2005-12-15
+ *       "Fixed possible memory corruption inside mb_strcut()." +7 lines, ONE
+ *       hunk, TWO guards. First shipped php-5.1.2 (2006-01-12); php-5.0.x
+ *       never received it. controls/cb3cca21b345.patch, 829 B, sha256
+ *       14dbafc9a3b970d048e0a24347c503b436c51d15e5fb382427be2bece5353b64.
+ *       The corpus's `index.csv` names this commit in its `fix_commit` column.
+ *     c2471b4950091c71da5e3f686d6d455e8e3092ea   Moriyoshi Koizumi, 2009-09-23
+ *       "Fixed bug #49354 (mb_strcut() cuts wrong length when offset is within
+ *       a multibyte character)." -3 lines: it REMOVES hunk (b) and ADDS
+ *       ext/mbstring/tests/bug49354.phpt, a regression test.
+ *       controls/c2471b495009.patch.
+ *
+ * ⚠⚠⚠ **THIS RUNG SHIPPED HUNK (b) UNTIL `TASK_PHP_018`, AND THE ROW'S OWN
+ * GATE HAD ALREADY SAID WHY IT SHOULD NOT.** `check.py` stage 7h refuses an
+ * R1h that changes benign output; the row read that as a harness limitation and
+ * worked round it by keeping hunk (b)'s firing condition out of
+ * `inputs/gen.py`. controls/fix_scope.py had the numbers all along: hunk (b)
+ * removes **NONE** of the 15 333 out-of-bounds reads and changes the answer on
+ * **15 870 of 117 612** benign calls (13.5 %). ⭐ **Upstream reached the same
+ * verdict from a bug report and deleted it, four years later.** The gate was
+ * right; the workaround was the defect.
+ * ⭐ controls/bug49354.py replays upstream's own six expectations: this
+ * configuration agrees on all six, and hunk (a)+(b) is wrong on one.
+ *
+ * ⚠ **WHY A CONFIGURATION AND NOT A COMMIT** -- stated because it is a
+ * departure from `PROTOCOL_PHP.md` §C, which says R1h is *"the real upstream
+ * `fix_commit`"*. A tag range is a stronger citation than a commit here, not a
+ * weaker one: it is what upstream SHIPPED AND KEPT, it is pinnable by
+ * `(tag range, function, body sha256)`, five tags carry it byte-for-byte, and
+ * `php-5.3.2 .. php-5.3.29` carry the same configuration respelled
+ * (`(unsigned int)from > string.len`, body sha256 49ad3ab2796d63e4). The
+ * alternative -- ship the whole 2005 commit and disclose the 13.5 % -- is what
+ * this row did until `TASK_PHP_018`, and it required a restricted corpus to be
+ * measurable at all. ../spec.md `idiom.required[4]` states the choice and the
+ * alternative; NOTES.md §4 has the tag sweep.
  *
  * ⚠⚠⚠ **THE FIX IS IN THE CALLER, IN ANOTHER FILE.** It is in
  * `PHP_FUNCTION(mb_strcut)` in `ext/mbstring/mbstring.c`, not in `mbfl_strcut`
  * in `mbfilter.c` -- which is why `mbfl_strcut`'s body is BYTE-FOR-BYTE
- * IDENTICAL from php-5.0.0 to php-5.3.2 (sha256 613648930a3d2551... at six
- * release tags). **The bound was restored one function up and one file away.**
+ * IDENTICAL from php-5.0.0 to php-5.3.2 (sha256 613648930a3d2551... at NINE
+ * release tags -- 5.0.0, 5.0.5, 5.1.0, 5.1.1, 5.1.2, 5.2.17, 5.3.0, 5.3.1,
+ * 5.3.2; the row said six until TASK_PHP_017 m3 measured nine).
+ * **The bound was restored one function up and one file away.**
  * `.memory-php/01-extraction.md` F1 says the defect site, the guard site and
  * the faulting site can be three different places; this row adds the fourth:
  * ⭐ **THE REPAIR SITE IS A FOURTH FRAME, AND IT IS THE GUARD SITE.**
@@ -25,21 +62,25 @@
  * OVER.** This row's kernel is two frames, not one: `ph07_strcut` is
  * `mbfl_strcut`'s mblen_table arm and the `kernel()` wrapper below **is**
  * `PHP_FUNCTION(mb_strcut)` -- it already carries that function's two negative
- * clamps (mbstring.c:1787-1805) because they decide the kernel's domain. The
- * fix's seven lines therefore land in the wrapper at exactly the position
- * upstream put them: after the two negative clamps and immediately before
+ * clamps (mbstring.c:1787-1805) because they decide the kernel's domain, and
+ * SINCE TASK_PHP_018 that whole frame is pinned in `provenance.extra_spans[1]`
+ * (`mbstring.c:1774-1812`) rather than merely lifted. The guard therefore lands
+ * in the wrapper at exactly the position upstream put it: after the two
+ * negative clamps and immediately before
  * `ret = mbfl_strcut(&string, &result, from, len);` (mbstring.c:1807). **The
  * diff below is upstream's diff, in upstream's place, against upstream's
- * neighbouring lines.** NOTES.md §4 states the residual question -- an R1h
- * whose citation is a different function from the extracted one -- rather than
+ * neighbouring lines** -- `TASK_PHP_017` §3 verified that by function diff and
+ * turned it into the R1h TRANSPLANT RULE. NOTES.md §4 states the residual
+ * question -- an R1h whose citation is a different function from the extracted
+ * one, and which is now a SUBSET of a labelled security fix -- rather than
  * hiding it.
  *
  * ============================================================================
- * THE TWO GUARDS, AND WHAT EACH ONE DOES
+ * THE TWO GUARDS THE 2005 COMMIT ADDED, AND WHY ONLY ONE IS HERE
  * ============================================================================
- *   hunk a  `if (from > Z_STRLEN_PP(arg1)) { RETURN_FALSE; }`
+ *   hunk a  `if (from > Z_STRLEN_PP(arg1)) { RETURN_FALSE; }`   <- SHIPPED
  *   hunk b  `if (((unsigned) from + (unsigned) len) > Z_STRLEN_PP(arg1)) {
- *               len = Z_STRLEN_PP(arg1) - from; }`
+ *               len = Z_STRLEN_PP(arg1) - from; }`              <- WITHDRAWN
  *
  * **(a) is the memory-safety half and (b) is not.** With `from <= string->len`
  * the start walk reads only at `n <= from <= len`, and `string->val[len]` is
@@ -47,26 +88,29 @@
  * Measured: (a) alone removes **all 15 333** out-of-bounds reads over the
  * 133 932 interpreted calls in controls/fix_scope.py, and (b) removes none.
  *
- * ⚠ **(b) CHANGES BENIGN OUTPUT**, and this row's corpus is built so that it
- * cannot: `inputs/gen.py::_check_span` refuses to write a window with
- * `from + length > string->len`, so neither guard fires on `small.bin` or
- * `large.bin` and R1h is byte-identical to R1 there. Where (b) does fire it
- * shortens `length`, which moves `k = start + length` from the
- * `k >= string->len` shortcut into the BOUNDED end walk and can therefore
- * return a shorter cut than 5.0.0 does -- on an input that never crashed.
- * controls/fix_scope.py counts it.
- * ⭐ **Upstream itself dropped (b) later**: php-5.2.17 carries (a) and not (b),
- * and php-5.3.29 carries `(unsigned int)from > string.len` alone. So the half
- * that changed benign behaviour did not survive and the half that closed the
- * read did.
+ * ⚠ **(b) CHANGES BENIGN OUTPUT -- on 15 870 of 117 612 calls (13.5 %) that
+ * never crashed.** Where it fires it shortens `length`, which moves
+ * `k = start + length` out of the `k >= string->len` shortcut into the BOUNDED
+ * end walk and returns a SHORTER cut than 5.0.0 does. ⭐ **That is bug #49354,
+ * and `c2471b495009` removed it with a regression test whose `--EXPECT--`
+ * block pins six answers.** controls/bug49354.py runs those six against R1,
+ * against this rung, and against the hunk-(a)+(b) variant.
  *
- * ⚠ **THE `(unsigned)` CASTS IN (b) ARE THE FIX'S OWN OVERFLOW HANDLING AND
- * THEY ARE NOT OBVIOUSLY RIGHT.** `from` and `len` are `long`s cast to a
+ * ⚠ Because (b) is gone, the corpus no longer has to avoid the region it fired
+ * in: `inputs/gen.py` now REQUIRES windows with `from + length > string->len`
+ * and asserts that some of them are windows where (b) would have moved the
+ * answer. The one guard that must stay dead on a MEASURED input is (a), and
+ * that is because a window (a) refuses is a window R1 over-reads on -- i.e. an
+ * adversarial one. `inputs/adversarial-*.bin` is where those live.
+ *
+ * ⚠ **THE `(unsigned)` CASTS IN (b) WERE THE FIX'S OWN OVERFLOW HANDLING AND
+ * THEY WERE NOT OBVIOUSLY RIGHT** -- recorded because it is a second, separate
+ * defect in the same three lines. `from` and `len` are `long`s cast to a
  * 32-bit `unsigned`, so the sum wraps mod 2^32 and a large `len` can wrap under
- * `Z_STRLEN_PP(arg1)` and skip the clamp entirely. It does not matter for
- * memory safety, because (a) has already bounded `from` and `mbfl_strcut`'s
- * end walk is guarded; it matters for what (b) claims to do. Kept verbatim,
- * not repaired -- `PROTOCOL_PHP.md` §C: report it, do not repair it.
+ * `Z_STRLEN_PP(arg1)` and skip the clamp entirely. It never mattered for memory
+ * safety, because (a) has already bounded `from` and `mbfl_strcut`'s end walk
+ * is guarded. controls/ keeps the two-hunk variant, so the observation stays
+ * checkable.
  *
  * ⚠ **THIS IS NOT THE ONLY TIME THE BOUND WAS RESTORED.** `d9dda48f8a7e`
  * (2010-03-12, "Update the bundled libmbfl to the latest on upstream", 64
@@ -75,19 +119,20 @@
  * -- first shipped in php-5.3.3. So `mbfl_strcut` remained unsafe FOR ANY
  * OTHER CALLER for four years and three months after `mb_strcut` was fixed.
  * That patch's mbfilter.c half is at controls/d9dda48f8a7e-mbfilter.patch and
- * controls/fix_scope.py measures it as an alternative R1h. NOTES.md §4.
+ * controls/fix_scope.py measures it as an alternative R1h (`R1_2010`).
+ * NOTES.md §4.
  *
- * ⚠ **THE `> str_len` COMPARISON WARNS AND IS KEPT.** `-Wall -Wextra` reports
- * `comparison of integer expressions of different signedness: unsigned int and
- * int32_t` on hunk (b), because upstream compares an `unsigned` sum against an
- * `int` `Z_STRLEN_PP(arg1)`. Casting it away would be a divergence from the
- * shipped fix for a cosmetic gain; the warning is upstream's own and it stays.
- * `str_len >= 0` here, so the promotion is value-preserving and the two
- * spellings compute the same predicate on this kernel's domain.
+ * ⚠ **AND THE SIGNEDNESS WARNING WENT WITH IT.** While hunk (b) was here,
+ * `-Wall -Wextra` reported `comparison of integer expressions of different
+ * signedness: unsigned int and int32_t` on it -- upstream's own warning, kept
+ * rather than cast away. Hunk (a) is `int > int` and warns about nothing, so
+ * this rung is now warning-clean. That is a consequence of the change, not a
+ * reason for it: `PROTOCOL_PHP.md` §C says report an upstream defect, do not
+ * repair it, and what removed this one is upstream's own later commit.
  *
  * Everything below this comment is byte-identical to c/kernel.c except for the
- * lines marked `<-- cb3cca21b345` and this header. `diff` proves it; NOTES.md
- * §4 records the diff.
+ * lines marked `<-- R1h` and this header. `diff` proves it; NOTES.md §4
+ * records the diff.
  */
 #include <stdint.h>
 #include <stddef.h>
@@ -296,23 +341,24 @@ SLB_NOINLINE uint64_t kernel(const uint8_t *buf, size_t off, size_t len)
         }
     }
     /* ⚠ mbstring.c:1807 IS THE NEXT LINE, AND THAT IS THE ROW.
-     * `c/kernel_hardened.c` has, between here and the call, the two lines of
-     * cb3cca21b34518caf45852ed90597052e99294c3 (Ilia Alshanetsky, 2005-12-15,
-     * "Fixed possible memory corruption inside mb_strcut()"). This rung is
-     * PHP 5.0.0 and does not. */
+     * `c/kernel_hardened.c` has, between here and the call, the ONE guard
+     * php-5.2.12 .. php-5.2.17 carries. This rung is PHP 5.0.0 and does not. */
 
-    /* ---- cb3cca21b345, backported verbatim, in upstream's own position ---- */
+    /* ---- R1h: php-5.2.12 .. php-5.2.17, in upstream's own position -------- */
     if (from > str_len) {
-        return 0xFFFFFFFFu ^ php_shim_tally();   /* <-- cb3cca21b345 hunk (a)
-                                                  * RETURN_FALSE. No allocation
-                                                  * was made, so the tally is
-                                                  * the post-reset zero and this
-                                                  * is the same value the NULL
-                                                  * arm below produces. */
+        return 0xFFFFFFFFu ^ php_shim_tally();   /* <-- R1h, cb3cca21b345
+                                                  * hunk (a). RETURN_FALSE. No
+                                                  * allocation was made, so the
+                                                  * tally is the post-reset zero
+                                                  * and this is the same value
+                                                  * the NULL arm below
+                                                  * produces. */
     }
-    if (((unsigned)from + (unsigned)length) > str_len) {
-        length = str_len - from;                 /* <-- cb3cca21b345 hunk (b) */
-    }
+    /* ⚠ cb3cca21b345 hunk (b) WAS HERE and is not any more -- c2471b495009,
+     * bug #49354. It stays MEASURABLE in three places under controls/:
+     * fix_scope.py's `R1h_ab` variant (Q1/Q2, 133 932 calls), guard_equiv.c's
+     * `length_ab` column (5 122 triples against a build of the C), and
+     * bug49354.py (upstream's own six expectations). */
 
     if (ph07_strcut(&string, &result, from, length) != NULL) {
         for (i = 0; i < result.len; i++)

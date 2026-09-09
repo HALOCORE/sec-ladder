@@ -5,6 +5,129 @@ evidence. Everything here was run; the logs are named per claim.
 
 ---
 
+## §00 ⚠⚠⚠ READ THIS FIRST — `TASK_PHP_018` REBUILT THE ROW, AND EVERY NUMBER MOVED
+
+**R1h changed, the corpus changed, and therefore every measured figure in this
+file was re-derived.** What follows is what changed, why, and which sections of
+this file are superseded. Nothing below §00 has been silently updated: where a
+figure moved, the old one is quoted beside it.
+
+### What R1h was, and what it is
+
+| | |
+|---|---|
+| **was** | `cb3cca21b345` **entire** — both hunks — the 2005 security commit, cited as the `fix_commit` |
+| **is** | the guard configuration **upstream converged on**: `php-5.2.12 … php-5.2.17`, `PHP_FUNCTION(mb_strcut)` body sha256 `26e2099e33433c74`, which is that commit's hunk **(a)** and nothing else |
+
+**Why.** `c2471b495009` (Moriyoshi Koizumi, 2009-09-23) **removed hunk (b)** as
+**bug #49354** — *"mb_strcut() cuts wrong length when offset is within a
+multibyte character"* — and shipped `ext/mbstring/tests/bug49354.phpt` with it.
+⭐ The removal was committed **three times in the same second**
+(`c2471b495009`, `0c974164e248`, `ce3c028803aa`), one per live branch, so it is
+not one branch's local decision. `controls/c2471b495009.patch` has the bytes.
+
+### ⭐⭐ AND THE ROW'S OWN GATE HAD ALREADY SAID SO, IN THE FIRST HOUR IT EXISTED
+
+`check.py` **stage 7h** requires R1h to be byte-identical to R1 on every
+non-adversarial input. Hunk (b) is not: it changes the answer on **15 870 of
+117 612** benign calls (13.5 %) while removing **none** of the 15 333
+out-of-bounds reads (`controls/fix_scope.py` Q1/Q2 — those two numbers are
+unchanged and re-run at `TASK_PHP_018`). The row read that refusal as a
+**harness limitation** and worked around it by restricting `inputs/gen.py` so
+the guard could never fire.
+
+⚠⚠⚠ **The refusal was correct.** The gate detected the same defect PHP's own
+maintainers detected four years later, from a bug report. **The workaround was
+the defect, and it lived in the fixture rather than in any rung, which is why
+row-level review did not see it for two tasks.**
+
+`controls/bug49354.py` is the decisive control and it is upstream's own test:
+
+```
+call                      --EXPECT--                R1                      R1h_ab                  R1h
+mb_strcut($crap,2,100)    string(11) "åBäCöDü"      string(11) "åBäCöDü"    string(9) "åBäCöD" ✗    string(11) "åBäCöDü"
+mb_strcut($crap,13,100)   bool(false)               <<OOB READ>> ✗          bool(false)             bool(false)
+
+R1     : 1 of 6 wrong  -- the over-read, CRASH-124
+R1h_ab : 1 of 6 wrong  -- bug #49354, and it is a DIFFERENT row of the table
+R1h    : AGREES with upstream on all 6
+```
+
+⭐ **Case 3 and case 6 are two different defects in two different
+configurations, and hunk (a) alone fixes one while leaving the other correct.**
+That is the whole argument for this row's R1h, in six lines of upstream's own
+regression test.
+
+### What moved, mechanically
+
+1. `c/kernel_hardened.c` — hunk (b) deleted.
+2. **All four Rust rungs, and `verus.rs`'s SPEC as well as its exec code.** F41
+   says R2–R5 are ports of R1h, and they were: every one of them carried
+   `frm.saturating_add(length) > slen { slen - frm }`, and `strcut_fold` — the
+   *postcondition* — carried `if f0 + l0 > slen { slen - f0 } else { l0 }`.
+   ⭐ **That is the strongest argument this row has for a VALUE postcondition
+   over a memory-safety-only one**: when R1h changed function, the `ensures`
+   had to change with it. A safety-only `ensures` would have stayed green.
+3. `model.py` — all **three** implementations (`_window`, `strcut_fold`,
+   `_dumb`), plus `selfcheck` check 2, which is **reversed**: it used to refuse
+   a corpus containing `from + length > string->len` and now refuses one
+   without it.
+4. `inputs/gen.py` — the restriction is gone and its inverse is asserted. See
+   §00a.
+5. `spec.md` — `idiom.required[4]`, a new `forbidden[3]`, `provenance`'s two
+   new `extra_spans`, `fix_commit_removal`, `r1h_configuration`. **`contract_sha256`
+   moved; §0 records it.**
+6. `controls/` — `c2471b495009.patch` and `bug49354.py` added, `fix_scope.py`
+   relabelled (`R1h` now means the shipped configuration and `R1h_ab` the
+   withdrawn one — ⚠ the labels **swapped meaning**, so `.temp/php16/` and
+   `.temp/php17/` logs read the other way round), `guard_equiv.{c,py}` extended
+   to compare both configurations, `negatives.py`'s `noguard` anchor updated,
+   and `spellings.py` added (§12).
+
+### §00a The corpus — the restriction is gone and its INVERSE is asserted
+
+`inputs/gen.py::_check_span` used to refuse a window on which *either* guard
+fires. It now refuses one on which **hunk (a)** fires — that is the
+**adversarial** case, and keeping it out is what "benign" means here — and
+**requires** windows with `from + length > string->len`, with a second, sharper
+assertion that some of them are windows where hunk (b) **would have changed the
+answer**.
+
+```
+span ok: small.bin   windows=32    steps=[1,2,3,4,5,6] k>=len=10  k<len=22
+                     start==from=14 start<from=18 from==len=3
+                     hunk(a)-fires=0 from+len>len=6   hunk(b)-would-move=4
+span ok: large.bin   windows=2050  steps=[1,2,3,4,5,6] k>=len=662 k<len=1388
+                     start==from=885 start<from=1165 from==len=205
+                     hunk(a)-fires=0 from+len>len=410 hunk(b)-would-move=297
+```
+
+- **20.0 %** of windows are in the newly admitted region; **14.5 %** are windows
+  where hunk (b) would have moved the answer. ⭐ Against `fix_scope.py` Q2's
+  independent **13.5 %** over a uniform sweep — which is the cross-check that
+  the fixture is neither over- nor under-weighting the region it re-admitted.
+- ⚠ **Measured before deleting it**: over the eight shipped `FRACTIONS` entries
+  the `min(..., slen - frm)` clamp in `window()` **never once fired** — clamped
+  and unclamped produced byte-identical corpora (`.temp/php18/fractions.log`).
+  The restriction was carried by the `FRACTIONS` table alone. The dead clamp was
+  deleted anyway, because a clamp that would silently re-impose the old domain
+  the moment somebody added a fraction pair is the failure mode this task exists
+  to remove.
+- ⚠ **The two new assertions have must-fire controls**
+  (`.temp/php18/gen-negatives.log`, five cases, all as declared): the
+  pre-`TASK_PHP_018` table is REFUSED on `from+len>len`; a table with over-sum
+  windows that can never move the answer is REFUSED on the sharper one; a
+  hand-edited byte setting `from = slen + 1` is REFUSED on hunk (a); the shipped
+  table PASSES; and `_cut` is shown separating the two configurations on
+  `bug49354.phpt`'s own case 3.
+- ⚠ `_check_residues()` did **not** depend on the restriction and is unchanged.
+  It is the only other `_check_*` in the file.
+- ⚠ The hunk-(a) branch of `_check_span` cannot be reached through `FRACTIONS`:
+  `window()`'s own `assert 0 <= frm <= slen` refuses `ff > 1.00` first. That is
+  defence in depth and the right layering; the control exercises it on bytes.
+
+---
+
 ## §0 `PROTOCOL.md` rule 6 — the `contract_sha256` disclosure
 
 ```
@@ -41,6 +164,38 @@ The `why` is written from the record, and `spec.md` is **not** in
 `measure.py::measurement_sources`, so no re-measure was owed and none was
 taken.
 
+**IT MOVED A SECOND TIME AT `TASK_PHP_018`, AND THAT MOVE IS A REBUILD:**
+
+```
+be5f5818ffa625c72af87eea036735219de01b8d61e05ce3b8271805d241359c   BEFORE
+1f1508531bd41975927e07f0bca9d592a65a9b6f0620ce4d8a2ca7b3d0e00c0c   AFTER
+```
+
+Both taken with `check.py::read_contract`'s exact regex — the capture keeps the
+newline before the closing fence — and the second one is what
+`results-php/gate/ph07-strcut-cursor.json` carries, so the disclosure is
+checkable against the record rather than against a re-derivation.
+
+⚠ Four edits inside the fence, every one of them forced by §00: `idiom.required[4]`
+(R1h is now a tagged configuration, and the entry states the alternative it was
+chosen against), a new `idiom.forbidden[3]` (hunk (b)'s two spellings, pinned
+ABSENT), `provenance.extra_spans` (§1), and
+`provenance.fix_commit_removal` / `r1h_configuration`. ⚠ A re-gate AND a
+re-measure were owed and both were taken — `spec.md` is not in
+`measure.py::measurement_sources`, but `c/kernel_hardened.c`, the four `.rs`
+rungs and every `.bin` are.
+
+⚠⚠ **AND ONE SCHEMA FACT, MEASURED THE HARD WAY**: `check.py` stage 0
+hard-fails on ANY key inside `idiom` other than `required`, `forbidden` and
+`why` — *"a mistyped key is silently empty"*. A first draft carried a
+`forbidden_note` sibling and the gate refused it; the note is inside the entry,
+which is where the named-spelling standard says an entry's English belongs.
+⚠⚠ **And every backtick inside a `forbidden` entry is a PINNED SPELLING that
+hard-fails if any rung contains it.** The same draft wrote `` `length` `` in
+that entry's prose — a token every rung contains. Caught before the gate ran,
+by extracting the tokens the way `check.py` does; the prose is now backtick-free
+except for the one spelling the entry exists to pin.
+
 ⚠ **Any later move is disclosed here with its reason**, per rule 6.
 
 Also per rule 6's addendum: the hashed `idiom.why` and every rung-source doc
@@ -57,12 +212,25 @@ extraction is line-for-line identical to the tarball except for what
 WCS arms, the filter-chain `else` arm, two struct fields, the allocator
 substitution, and the Rust rungs' `usize` spelling of the caller's clamps.
 
+⚠⚠⚠ **THE ROW LIFTS THREE SPANS AND PINNED ONE UNTIL `TASK_PHP_018`**
+(`TASK_PHP_017` M1, `RECAP_PHP.md` open item 25). `provenance.c_lines` named the
+walk; the row also lifts the step table (disclosed as `divergences[6]`, pinned
+nowhere) and **`mbstring.c:1774-1812`, the caller frame, which was disclosed
+nowhere at all — and which is exactly the frame R1h occupies.** So the overlap
+number this row published certified a span containing **neither the fix nor the
+frame the fix goes in**. Closed by `provenance.extra_spans`, an ADDITIVE schema
+key in `harness-php/provenance.py`: the primary four fields do not move, so
+`ph03` and `ph00-smoke` are byte-identical and owe nothing.
+
 `harness-php/provenance.py ph07-strcut-cursor`:
 
 ```
-OK  ext/mbstring/libmbfl/mbfl/mbfilter.c:1179-1259  1489 bytes
-    sha256 5edc6c04b7ff5f64  tier=narrowed
-kernel overlap 75% (39/52 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)
+mbfilter.c, mbfilter_utf8.c, mbstring.c are in the manifest
+OK   ext/mbstring/libmbfl/mbfl/mbfilter.c:1179-1259          1489 B  5edc6c04b7ff5f64  tier=narrowed
+OK+1 ext/mbstring/libmbfl/filters/mbfilter_utf8.c:39-56       852 B  716ba3fb219d4fb4  -- the step table
+OK+2 ext/mbstring/mbstring.c:1774-1812                        845 B  4ef738b3546c31c1  -- the caller frame, where R1h lives
+per-span overlap: span0 75% (39/52), span1 100% (5/5), span2 15% (3/20)
+kernel overlap 61% (46/76 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)
     tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED
 1 preprocessor condition this heuristic cannot evaluate: ['#ifndef PH07_KERNEL_H']
 1 row(s) checked, 0 FAILED
@@ -70,10 +238,30 @@ kernel overlap 75% (39/52 excerpt lines in kernel.c, kernel.h, kernel_hardened.c
 
 ### §1a ⚠ `PROTOCOL_PHP.md` §F item 9 asks what I think of that number
 
-**75 % is higher than I expected for a `narrowed` row and the 13 missing lines
-are exactly the declared ones**: the `mbfl_no2encoding` call and its NULL test,
-the twelve lines of the two WCS arms, and the `} else if (encoding->mblen_table
-!= NULL) {` line itself. Nothing is missing that I did not itemise.
+⚠⚠ **THE HEADLINE FELL FROM 75 % TO 61 % AND THAT IS THE POINT.** The
+denominator went from 52 lines to 76 because the row now cites what it lifts.
+**The interesting number is not 61 % — it is `span2` at 15 % (3/20).**
+
+**Why the caller frame scores 15 %, and it is not a fidelity problem.** The
+kernel's wrapper *is* `PHP_FUNCTION(mb_strcut)` semantically —
+`TASK_PHP_017` §3 verified that by function diff — but almost none of it is the
+same TEXT. Where PHP writes `zend_parse_parameters`, `Z_STRVAL_PP(arg1)` and
+`RETVAL_STRINGL`, the benchmark writes a little-endian unpack out of the window,
+`str_len`, and a Horner fold. The three lines that DO match are the two negative
+clamps and the call. ⭐ **So the overlap heuristic measures exactly what its own
+warning says it measures — TEXT IN A FILE, not code in the benchmark — and on
+this span it is measuring a re-expression rather than a lift.** A reader should
+take `span2`'s 15 % as *"the caller frame is `modelled`, inside a `narrowed`
+row"*, and the row should be read as citing three spans at three different
+fidelities. **The load-bearing artefact is still the divergence ledger, and
+nothing checks it.**
+
+**`span0` is unchanged at 75 %, and the 13 missing lines are exactly the
+declared ones**: the `mbfl_no2encoding` call and its NULL test, the twelve lines
+of the two WCS arms, and the `} else if (encoding->mblen_table != NULL) {` line
+itself. Nothing is missing that I did not itemise. **`span1`, the step table, is
+100 % (5/5)** — it is lifted byte-for-byte, and that is what a real `verbatim`
+lift scores.
 
 ⚠ **And the number is not evidence that the cited lines are compiled.**
 `provenance.py` reads `c/kernel*.{c,h}` and never `main.c`, the driver loop or
@@ -485,26 +673,86 @@ evidence that any Rust rung ran PHP's allocator. `ph03` says the same thing and
 (`.temp/php16/22-irtable.log`). `small` = 25 000 calls over a 553-byte window;
 `large` = 12 000 over 4 074. The two strides differ mod 4, 8 and 16.
 
-| cell | `Ir`/call small | `Ir`/call large | **`Ir` / window byte** | fixed `Ir`/call |
-|---|--:|--:|--:|--:|
-| `c-gcc` (R1) | 2 376.5 | 15 982.7 | **3.8643** | 239.5 |
-| `c-gcc-h` (R1h) | 2 383.8 | 15 989.9 | **3.8643** | 246.8 |
-| `c-clang` (R1) | 2 026.6 | 13 228.2 | **3.1814** | 267.3 |
-| `c-clang-h` (R1h) | 2 035.8 | 13 237.3 | **3.1813** | 276.5 |
-| `safe_naive` (R2) | 2 818.3 | 19 669.9 | **4.7860** | 171.6 |
-| `safe_tuned` (R3) | 2 029.4 | 14 159.6 | **3.4451** | 124.3 |
-| `unsafe` (R4) | 1 796.2 | 12 483.8 | **3.0354** | 117.7 |
-| `verus` (R5) | 1 796.2 | 12 483.8 | **3.0354** | 117.7 |
+⚠⚠ **EVERY FIGURE BELOW IS THE `TASK_PHP_018` RE-MEASURE.** The pre-rebuild
+column is kept beside it, because the two are about different corpora and the
+comparison is a result in its own right (§00).
+
+| cell | `Ir`/call small | `Ir`/call large | **`Ir` / window byte** | fixed `Ir`/call | vs R4 | *was, pre-018* |
+|---|--:|--:|--:|--:|--:|--:|
+| `c-gcc` (R1) | 2 482.4 | 17 023.0 | **4.1297** | 198.7 | +28.72 % | *3.8643* |
+| `c-gcc-h` (R1h) | 2 485.2 | 17 026.1 | **4.1298** | 201.4 | +28.72 % | *3.8643* |
+| `c-clang` (R1) | 2 078.5 | 13 862.3 | **3.3467** | 227.7 | +4.32 % | *3.1814* |
+| `c-clang-h` (R1h) | 2 084.7 | 13 868.4 | **3.3467** | 233.9 | +4.31 % | *3.1813* |
+| `safe_naive` (R2) | 2 966.3 | 21 014.3 | **5.1258** | 131.7 | **+59.77 %** | *4.7860, +57.67 %* |
+| `safe_tuned` (R3) | 2 061.3 | 14 711.1 | **3.5926** | 74.6 | **+11.98 %** | *3.4451, +13.50 %* |
+| `unsafe` (R4) | 1 850.5 | 13 146.8 | **3.2083** | 76.3 | 0.00 % | *3.0354* |
+| `verus` (R5) | 1 850.5 | 13 146.8 | **3.2083** | 76.3 | 0.00 % | *3.0354* |
+
+⭐ **R4 and R5 are still byte-identical**, and the `identity` pin is unmoved.
+
+⚠ **Every rate went UP and every ratio moved.** The new corpus admits windows
+with `from + length > string->len`, which take the `k >= string->len` shortcut
+more often (**16 % → 32 %** of windows), so a larger share of each call is start
+walk and copy rather than end walk. **That is a property of the domain, not of
+any rung** — the point of §00 is that the row is now measured over the whole
+benign domain instead of the 86.5 % of it the withdrawn guard happened to agree
+with 5.0.0 on.
 
 ⚠ **`RECAP_PHP.md` open item 9 / F14 respected: no number here is put beside a
 `pNN` number, in a table or in prose.**
 
-### 8a ⭐ THE UPSTREAM FIX COSTS A CONSTANT, NOT A RATE
+### 8a ⭐ THE UPSTREAM FIX COSTS A CONSTANT, NOT A RATE — and it is now ONE guard
 
-`c-gcc` and `c-gcc-h` have the **same marginal to four decimal places**
-(3.8643 both); on clang they differ by 0.0001, which is the last digit.
-`cb3cca21b345` is **two branches per call, outside both loops**, and it shows
-up entirely in the fixed term: **+7.3 `Ir`/call on gcc, +9.2 on clang**.
+**The claim survives and gets stronger; the WORDING that carried it does not.**
+
+R1h is now **one** branch per call, outside both loops, where it used to be two.
+The measured cost:
+
+| | gcc | clang |
+|---|--:|--:|
+| `Ir`/call delta on `small` (553 B window) | **+2.8164** | **+6.1863** |
+| `Ir`/call delta on `large` (4 074 B window) | **+3.0734** | **+6.1046** |
+| fixed-term delta | **+2.7761** | **+6.1991** |
+| *pre-018 fixed-term delta, TWO guards* | *+7.3022* | *+9.2685* |
+
+⭐ **A 7.4× change in window size moves the R1h cost by 0.26 `Ir` on gcc and
+0.08 on clang.** That is a constant, and it is measured across the widest lever
+the fixture has.
+
+⚠⚠ **DID IT GET CLEANER? IT GOT SMALLER ON BOTH COMPILERS AND CLEANER ON ONLY
+ONE — SAID PLAINLY BECAUSE THE TASK THAT COMMISSIONED THIS PREDICTED IT WOULD DO
+BOTH.** Measuring one guard instead of two halved the number, as expected. The
+*dispersion* went two different ways:
+
+```
+                    marginal delta   4-dp equal?   small -> large delta   spread
+pre-018  gcc        -3.504e-05       YES           7.2828 -> 7.1594       0.1234
+pre-018  clang      -3.518e-05       no            9.2490 -> 9.1252       0.1238
+TASK_018 gcc        +7.298e-05       no            2.8164 -> 3.0734       0.2570   2.1x WORSE
+TASK_018 clang      -2.320e-05       YES           6.1863 -> 6.1046       0.0817   1.5x better
+```
+
+⚠ **And the "same marginal to four decimal places" test SWAPPED WHICH COMPILER
+IT HOLDS FOR.** ⭐ Before the rebuild the two compilers' marginal residuals were
+`-3.504e-05` and `-3.518e-05` — *identical to three significant figures*, which
+`TASK_PHP_017` §5c read as the cross-check that the residual is a decomposition
+artefact rather than an effect. **After the rebuild they are `+7.3e-05` and
+`-2.3e-05`: different magnitudes AND opposite signs.** That agreement was
+therefore a coincidence of one corpus, not a property of the decomposition.
+
+**So the four-decimal-place phrasing is retired here**, and what replaces it is a
+bound that does not sit on a rounding boundary: **the marginal moves by at most
+7.3e-05 on a rate of 3.3–4.1, i.e. within 0.002 % on both compilers**, while the
+delta is **2.82–3.07 `Ir`/call (gcc) and 6.10–6.19 (clang) across a 7.4× range of
+window size**. That is a statement about a constant, supported by two points per
+compiler, and it does not depend on a digit.
+
+⚠ **Contrast ph03**, where the 2004 fix moved the marginal by ∓3.0 `Ir`/line
+and the sign was compiler-dependent — because *that* fix is a test inside the
+outer loop and hands the optimiser a trip-count fact. **The same question,
+"what does the upstream fix cost?", has a different SHAPE on the two rows, and
+the shape is decided by where in the loop nest the guard sits.** That contrast
+is untouched by the rebuild.
 
 ⚠ **Contrast ph03**, where the 2004 fix moved the marginal by ∓3.0 `Ir`/line
 and the sign was compiler-dependent — because *that* fix is a test inside the
@@ -539,22 +787,75 @@ jbe    <top>
 
 R4's is the same seven instructions with the `cmp`/`jae` pair deleted.
 
-⭐⭐ **R3's two walks are BYTE-FOR-BYTE R2's — 9 and 8 instructions, one bounds
-branch each.** That is `safe_tuned.rs`'s header claim, measured: **a
-variable-stride cursor is not an iterator**, `n` advances by a value read out of
-the byte it is standing on, and no reslice lets LLVM discharge `n < s.len()`.
-**R3's entire gain over R2 is the copy and the fold**; **R4's entire gain over
-R3 is the two walks.** The row's cost sits exactly where safe Rust cannot reach
-it.
+⚠⚠⚠ **THE PARAGRAPH THAT STOOD HERE IS RETRACTED, AND IT WAS THIS ROW'S
+HEADLINE.** It read:
 
-**Arithmetic check on the R3 → R4 delta.** The measured difference is
-**0.4097 `Ir`/window byte**. Predicted from the mechanism with no fitting: the
-start walk runs `from` bytes and the end walk up to `length`, and
-`inputs/gen.py` draws them as fractions with means 0.441 and 0.291 of the
-window; `make_body` emits characters of mean width ≈ 3.5 bytes, so
-`(0.441 + 0.291)/3.5 = 0.209` walk steps per window byte × 2 deleted
-instructions = **0.418**. ✅ **Within 2 % of the measurement, from the
-disassembly and the generator alone.**
+> *"R3's two walks are BYTE-FOR-BYTE R2's — 9 and 8 instructions, one bounds
+> branch each. That is `safe_tuned.rs`'s header claim, measured: a
+> variable-stride cursor is not an iterator, `n` advances by a value read out of
+> the byte it is standing on, and **no reslice lets LLVM discharge
+> `n < s.len()`**. R3's entire gain over R2 is the copy and the fold; **R4's
+> entire gain over R3 is the two walks. The row's cost sits exactly where safe
+> Rust cannot reach it.**"*
+
+**`TASK_PHP_017` B1 refuted it by construction, in three characters of Rust**,
+and `controls/spellings.py` now re-derives that refutation on this row's own
+corpus rather than inheriting it. What survives and what falls:
+
+- ✅ **KEEPS STANDING:** *a variable-stride cursor is not an iterator.* There is
+  no `Iterator` whose `next()` is this step, and none of the variants is one.
+- ❌ **RETRACTED:** *no reslice lets LLVM discharge the check*, and therefore
+  *the row's cost sits exactly where safe Rust cannot reach it*. The false step
+  is the inference from *"not an iterator"* to *"no safe spelling"*.
+  **Re-slicing is not iteration; it is telling the compiler the invariant the
+  guard has already proved** — after R1h the kernel knows `frm <= slen`, and the
+  end walk is entered only when `k < slen`, so `&s[..=frm]` and `&s[..=k]` are
+  facts, not new checks, and their panic branches are unreachable.
+- ⚠ **`forbidden[1]` is NOT violated by it.** That entry excludes
+  `p - string->val < (int)string->len`, *"the in-loop bound a reader adds on
+  sight"*. The re-slice adds no in-loop bound: it re-expresses, ONCE and OUTSIDE
+  the loop, something two lines above already established. The row's finding —
+  that `mbfl_strcut` computes a bound and does not consult it — is untouched;
+  what falls is the claim about safe Rust. Audited by
+  `harness/check.py::spelling_matches` itself, in `controls/spellings.py` stage 0.
+- ⚠ **DO NOT RE-SHIP R3.** `.memory/02-bench-rules.md` forbids re-shipping a
+  rung because a cheaper in-contract spelling was found. §12 publishes BOTH,
+  labelled.
+
+⭐ **THE LOOP CENSUS ITSELF DID NOT MOVE AT `TASK_PHP_018`**
+(`.temp/php18/loops-new.log`): 9/1 and 8/1 on R2 and R3, 7/0 and 6/0 on R4 and
+R5, 13/1 copy and 10/1 fold on R2, 8/0 fold on R3 and R4. **Only the RATES
+moved, because the corpus did.** That is the cleanest evidence that §00's rebuild
+changed the domain and not the code generation.
+
+**Arithmetic check on the R3 → R4 delta, re-derived on the new corpus.**
+`.temp/php18/steps.py` replays the DRIVER's own window selection — not a uniform
+average over windows, which is what the pre-`TASK_PHP_018` estimate used — and
+counts walk iterations per call:
+
+```
+             start-walk steps/call   end-walk steps/call
+small.bin           67.3276                35.4800        (553 B window)
+large.bin          522.2337               257.4870        (4 074 B window)
+
+marginal steps per window byte, slope through the two:
+  start walk   (522.2337 - 67.3276)/3521 = 0.129198
+  end walk     (257.4870 - 35.4800)/3521 = 0.063052
+```
+
+R4 deletes **2** instructions from the start walk (9 → 7) and **2** from the end
+walk (8 → 6), so with no fitting at all:
+
+```
+predicted   2 x 0.129198 + 2 x 0.063052 = 0.384500 Ir/window byte
+measured    3.592647 - 3.208273         = 0.384374
+agreement                                  0.03 %
+```
+
+✅ **Within 0.03 %** — from the disassembly and the corpus alone, and **an order
+of magnitude tighter than the pre-`TASK_PHP_018` version of this check (2 %)**,
+because the step rate is now measured over the calls the driver makes instead of
+estimated from `FRACTIONS` means and a mean character width.
 
 ### 8c ⚠⚠ THE CAVEAT THAT MATTERS: `memcpy` IS OUTSIDE `kernel_exclusive_ir`
 
@@ -564,44 +865,83 @@ R5 carry `bulk_calls: ['memcpy@GLIBC_2.14']` and R2 and the C rungs do not.
 So the table above charges R2 for a byte-at-a-time copy it performs inline and
 does **not** charge R3/R4/R5 for the copy they delegate.
 
-**Measured, hand-run, with the pinned valgrind** (`.temp/php16/25-totalir.log`,
-`--tool=callgrind`, TOTAL process `Ir`, which includes the `memcpy`):
+**Measured, hand-run, with the pinned valgrind** (`.temp/php18/totalir.py`,
+re-derived on the `TASK_PHP_018` corpus; `--tool=callgrind`, TOTAL process `Ir`,
+which includes the `memcpy`):
 
-| rung | total `Ir`/window byte | kernel-exclusive | difference |
-|---|--:|--:|--:|
-| `safe_naive` | 4.8237 | 4.7860 | +0.0377 |
-| `safe_tuned` | 3.5147 | 3.4451 | +0.0696 |
-| `unsafe` | 3.1050 | 3.0354 | +0.0696 |
+| rung | total `Ir`/window byte | kernel-exclusive | difference | *pre-018 difference* |
+|---|--:|--:|--:|--:|
+| `safe_naive` | 5.2578 | 5.1258 | +0.1319 | *+0.0377* |
+| `safe_tuned` | 3.7605 | 3.5926 | +0.1679 | *+0.0696* |
+| `unsafe` | 3.3761 | 3.2083 | +0.1679 | *+0.0696* |
+| `verus` | 3.3711 | 3.2083 | +0.1629 | — |
 
-**R2 vs R4 is +55.4 % on total `Ir` against +57.7 % kernel-exclusive; R3 vs R4
-is +13.2 % against +13.5 %.** ✅ **The ordering and the magnitudes survive**, and
-the hidden term is ~2 % of the total. The caveat is real, it is bounded, and it
-is bounded by a measurement rather than by an argument.
+**R2 vs R4 is +55.73 % on total `Ir` against +59.77 % kernel-exclusive; R3 vs R4
+is +11.39 % against +11.98 %.** ✅ **The ordering and the magnitudes survive.**
+
+⚠⚠ **BUT THE HIDDEN TERM GREW, AND THE OLD "~2 %" IS RETIRED.** It is now
+**4.5–5.0 %** of total `Ir` on R3/R4 and 2.5 % on R2, where before it was ~2 %
+across the board. The cause is §00's corpus: with `from + length > string->len`
+admitted, more windows take the `k >= string->len` shortcut, `end` lands at
+`string->len` and the **copy is longer relative to the walks**. So the term the
+kernel-exclusive figure does not see is a larger share of the work than it was.
+
+⚠ **`safe_naive`'s +0.1319 against R3/R4's +0.1679 is the bound on the
+`memcpy`-specific part.** R2 calls no `memcpy` and still shows +0.1319 (its own
+`_ecalloc`-shaped work and the driver), so the `memcpy` term is at most
+`0.1679 − 0.1319 = 0.0360`, i.e. **≈ 1.0 % of R3's total** — the same
+conclusion `TASK_PHP_017` §6 reached before the rebuild, and it survives at the
+new magnitude. ⚠ `verus`'s +0.1629 against `unsafe`'s +0.1679 on
+**byte-identical machine code** is a 0.15 % difference in TOTAL `Ir` and is the
+size of the run-to-run residue in this measurement; read the third column to two
+decimal places, not four.
+
+**The caveat is real, it is bounded, and it is bounded by a measurement rather
+than by an argument** — and the bound moved when the domain did, which is
+exactly why it is re-derived here instead of carried forward.
 
 ### 8d ⚠ The wall clock says NOTHING here, and I am not going to pretend it does
 
-`.temp/php16/24-wall.log`, `-O3 isolated`, 30 reps, `taskset -c 3`:
+`results-php/ph07-strcut-cursor.json`, `-O3 isolated`, 30 reps, `taskset -c 3`,
+re-measured at `TASK_PHP_018` (`.temp/php18/wall-new.txt`):
 
 ```
-cell         ns/window-byte   vs unsafe   worst spread
-safe_naive       1.1542        +5.04%       12.2 %
-safe_tuned       1.1725        +6.71%       13.7 %
-unsafe           1.0987         0.00%        8.0 %
-verus            1.0391        -5.43%        3.0 %
+cell         ns/win-byte small   ns/win-byte large   marginal   vs unsafe   worst spread
+safe_naive          1.2430              1.0601        1.0314      -5.83%       6.9 %
+safe_tuned          1.2339              1.0651        1.0386      -5.18%       8.1 %
+unsafe              1.2055              1.1102        1.0953       0.00%       8.1 %
+verus               1.2109              1.1368        1.1252      +2.73%       9.0 %
 ```
 
-⚠ **R4 and R5 are the same machine code** (§`identity`, `md5_fn_norel`
-identical, 255 instructions both) **and their wall medians differ by 5.4 %.**
-That is the noise floor of this box on this workload, and it is larger than
-every difference the table contains. **The wall numbers are reported and are
-not evidence for anything on this row** — `.memory/03-measurement.md` rule 6's
-spirit, one step further: report ns, and then say when ns cannot decide.
+⚠⚠ **R4 and R5 are the same machine code** (§`identity`, `md5_fn_norel`
+identical, 255 instructions in both) **and their wall marginals differ by
+2.73 %, with `verus` the SLOWER of the two.** ⚠ And on this corpus the wall
+clock says **safe Rust is 5–6 % FASTER than unsafe Rust**, in flat contradiction
+to the `Ir` table above, which says it is 12 % slower **with the safe rung
+executing measurably more instructions**.
+
+⭐ **That contradiction is the finding, and it is a stronger one than the
+pre-`TASK_PHP_018` version of this section carried.** Then, the argument was
+*"the R4-vs-R5 gap (5.4 %) is larger than every difference in the table"*, and
+`TASK_PHP_017` m2 correctly objected that one cell exceeded it. Now the point
+does not depend on any comparison of magnitudes: **two byte-identical binaries
+disagree by 2.7 %, and the sign of the safe-vs-unsafe difference is OPPOSITE to
+the sign of an instruction count that is not in dispute.** A measurement that
+reverses a fact you can count is measuring the box, not the program. **The wall
+numbers are reported and are evidence for nothing on this row** —
+`.memory/03-measurement.md` rule 6's spirit, one step further: report ns, and
+then say when ns cannot decide.
 
 ### 8e What these numbers are NOT
 
-- ⚠ **Not a searched comparison.** This row owes a `controls/spellings.py`
-  (`PLAN_PHP.md` §5.3, the trap that has fired seven times). Each figure is the
-  cost of *these* spellings of these rungs.
+- ✅ **This IS now a searched comparison — on both sides.** `controls/spellings.py`
+  (§12) was written at `TASK_PHP_018` and it is the first one in
+  `patterns-php/`. Read §12 before quoting any figure in §8: the `+11.98 %`
+  above is a **`fixed-R4 bound`**, not "the cost of safe Rust", and its
+  cheapest-found in-contract counterpart is beside it.
+- ⚠ **Not a bounds-check tax in aggregate.** A ph07 call walks, walks again,
+  allocates, copies and folds; only the two walks and (in R2) the copy carry a
+  check R4 removes. §8b separates them.
 - ⚠ **Not a bounds-check tax in aggregate.** A ph07 call walks, walks again,
   allocates, copies and folds; only the two walks and (in R2) the copy carry a
   check R4 removes. §8b separates them.
@@ -609,13 +949,19 @@ spirit, one step further: report ns, and then say when ns cannot decide.
   made too**: `vec![0u8; cap]` ZEROES the destination and `mbfl_malloc` does
   not, so every Rust rung pays `cap` bytes of zeroing the C never pays. It
   cancels in every safe-vs-unsafe delta and does **not** cancel in
-  C-vs-Rust — which is one reason `c-clang` (3.1814) lands so close to
-  `unsafe` (3.0354) while `c-gcc` (3.8643) does not.
-- ⚠ **`c-clang` beats `c-gcc` by 17.7 %** on the marginal, which is larger than
+  C-vs-Rust — which is one reason `c-clang` (3.3467) lands so close to
+  `unsafe` (3.2083) while `c-gcc` (4.1297) does not. ⭐ **And `TASK_PHP_018`
+  put a number on what that zeroing costs, by accident**: `r4_nozero` (§12b)
+  deletes it and measures IDENTICALLY to the shipped R4 — because the zeroing is
+  a `memset` CALL and therefore outside `kernel_exclusive_ir` altogether. So the
+  confound is real but it is invisible to the column it confounds, and §8c is
+  where it shows.
+- ⚠ **`c-clang` beats `c-gcc` by 19.0 %** on the marginal, which is larger than
   the R3→R4 safety effect and is **not a safety effect at all**. The C rungs
   vectorise their copy (`vector_regs: ['xmm']`, 22–25 backward branches); the
   Rust rungs either call `memcpy` or emit a scalar loop. `.memory/03-measurement.md`
-  rule 2 is why both C columns are here.
+  rule 2 is why both C columns are here. ⚠ It was 17.7 % before `TASK_PHP_018`;
+  it moved with the corpus, like everything else in §8.
 
 ---
 
@@ -682,15 +1028,42 @@ scoped to the three items that need it instead of being module-level. **Same
 kernel, same postcondition: from "does not verify at rlimit 100" to "verifies
 at the default in five seconds."**
 
-⚠ **`#[verifier::rlimit(30)]` is still on the kernel, and here is the honest
-reason.** Measured after the reduction: the kernel needs ~10–12 plain and
-**15 under `--cfg slb_twin`**, where the three verified twins add to the
-module's context. At the default 10 it verified plain and **failed twin**; with
-two `assert`s removed it verified twin and **failed plain**. A proof that passes
-on one side of a coin flip is not a proof, so the budget is 30 — twice the worst
-measured requirement — and `harness/check.py::_verus` passes no `--rlimit`, so
-it has to be an attribute. **It is 30 and not 300 because the cost was attacked
-first.**
+⚠ **`#[verifier::rlimit(30)]` is still on the kernel, and its JUSTIFICATION
+CHANGED AT `TASK_PHP_018`.** It used to be load-bearing. Measured after the
+reduction and BEFORE the rebuild: the kernel needed ~10–12 plain and **15 under
+`--cfg slb_twin`**, where the three verified twins add to the module's context.
+At the default 10 it verified plain and **failed twin**; with two `assert`s
+removed it verified twin and **failed plain**.
+
+⭐ **Removing `cb3cca21b345` hunk (b) made the proof CHEAPER on both sides** —
+one fewer branch on `length` in `strcut_fold` and one fewer in the kernel — and
+the requirement is now **9 on BOTH**. Bisected at `TASK_PHP_018`
+(`.temp/php18/rlimit-sweep.log`):
+
+```
+rlimit   PLAIN                          TWIN
+   7     20 verified, 1 errors          23 verified, 1 errors
+   8     20 verified, 1 errors          24 verified, 0 errors   <- twin's floor is 8
+   9     21 verified, 0 errors          24 verified, 0 errors   <- plain's floor is 9
+  10     21 verified, 0 errors          24 verified, 0 errors   <- the DEFAULT
+```
+
+⚠ **So both sides now pass at the default, with a margin of ONE.** The override
+stays, and it stays for a different reason than it went on: not *"twin fails at
+the default"* but *"the requirement is 9 against a default of 10, which is the
+width of a coin flip"*. 30 is 3.3× the measured requirement. A proof that passes
+on one side of a coin flip is not a proof, and one that passes by a single
+rlimit unit is on the same coin. ⚠ `harness/check.py::_verus` passes no
+`--rlimit`, so this has to be an attribute rather than a flag.
+**It is 30 and not 300 because the cost was attacked first.**
+
+⚠⚠ **AND THE DIRECTION OF THE PLAIN/TWIN ASYMMETRY REVERSED.** Before, twin
+needed MORE than plain (15 vs 10–12); now plain needs more than twin (9 vs 8).
+Nothing was done to cause that and I do not have a mechanism for it. **It is
+reported because a disclosure that only survives while its number is convenient
+is not a disclosure** — and because it is a second, independent sign that
+rlimit-adjacent measurements on this kernel sit close to a threshold rather than
+on a plateau.
 
 ⚠ **The reusable lesson, and it is not about this row**: *a module-level
 `broadcast use` is a cost every function in the file pays.* Scoping the groups
@@ -840,10 +1213,36 @@ noconsume  expect PASS got PASS   21 verified, 0 errors   ok
 verus.rs sha256 unchanged: 28811d6d6f45c3b2
 ```
 
-⚠ `noguard` deletes **both** `cb3cca21b345` hunks and not just (a), because
-hunk (b)'s `slen - frm` needs `frm <= slen` too — a hunk-(a)-only mutant fails
-on an arithmetic underflow one line later and never reaches the walk. Measured:
-`.temp/php16/13-noguard.log`.
+⭐⭐ **`noguard` NOW ISOLATES ONE GUARD, AND IT DID NOT BEFORE.** It used to have
+to delete **both** `cb3cca21b345` hunks, because hunk (b)'s `slen - frm` needs
+`frm <= slen` too — so a hunk-(a)-only mutant died on an ARITHMETIC UNDERFLOW
+one line later and never reached the walk (`.temp/php16/13-noguard.log`). With
+hunk (b) withdrawn (§00) there is nothing between the guard and the walk, and
+the mutant now fails **at the walk's own loop invariant**
+(`.temp/php18/noguard-site.log`):
+
+```
+error: invariant not satisfied before loop
+   |  frm <= slen,
+verification results:: 20 verified, 1 errors
+```
+
+**That is the obligation the control exists to demonstrate.** A control that
+could only ever fire for a confounded reason now fires for the right one —
+which is a second, independent thing the rebuild bought and which nobody asked
+for.
+
+⚠⚠ **`nopos` DOES NOT TEST TERMINATION AND ITS DOCSTRING SAID IT DID**
+(`TASK_PHP_017` m1, fixed in `controls/negatives.py` at `TASK_PHP_018`). Setting
+`mbtab_of` to 0 for a lead-byte class also breaks `mbtab_matches_upto`, so the
+mutant dies at `p.rs:159`'s `compute_only` assert — the **same error site as
+`notable`**. Two controls, one failure mode. ⭐ The termination premise IS
+load-bearing and IS provable separately: zeroing `mbtab_of` **and** the matching
+`MBTAB` entries together keeps the table lemma true and dies at `mbtab()`'s
+`r >= 1` postcondition instead (`.temp/php17/mut/`). ⚠ **No shipped control
+isolates it, and that is a stated gap rather than a repaired one** — adding a
+fifth mutant is a task, not an edit, and it would move `contract_sha256`
+again.
 
 ⚠ `noconsume` is a **must-PASS** control and is therefore weaker than the other
 three: it shows the postcondition is unconsumed decoration unless `main` reads
@@ -853,25 +1252,152 @@ anything would be caught there.
 
 ---
 
+## §12 ⭐ THE SPELLING SPAN — `controls/spellings.py`, BOTH SIDES SEARCHED
+
+**The first `controls/spellings.py` in `patterns-php/`.** `.memory-php/02`
+records the debt on both built php rows — *"NO RATIO HERE IS THE COST OF SAFETY,
+AND THESE ARE `fixed-R4 bound`s"* — and `ph03`'s own hashed `why` has demanded
+one since that row was built. `ph07` is the first php row to discharge it.
+
+⚠⚠ **The pipeline reproduces the shipped record to 0.000 % on all four cells
+before any variant is quoted**, because it computes the row's own statistic —
+`kernel_exclusive_ir / n_iters` on the shipped inputs — and not `check.py`'s
+100-vs-200 marginal. ⚠ A first draft used the marginal and came out **1 %** from
+the record; those are different statistics (200 iterations visit a different
+sample of the 32 or 2 050 windows) and a control quoted beside the headline has
+to compute the headline. The 1 % near-miss is recorded because it is exactly the
+size of error that gets absorbed as noise.
+
+⚠⚠⚠ **`TASK_PHP_017` B1's `+2.62 %` IS NOT CARRIED OVER AND MUST NOT BE
+QUOTED.** It was measured against the corpus §00 deleted.
+
+### 12a The R3 side — the headline moves, and the mechanism predicts it
+
+```
+cell                Ir/call small  Ir/call large  Ir/win-byte  fixed/call  vs R4ship
+R3 v0_shipped              2061.3        14711.1       3.5926        74.6   +11.98%
+R3 r3_reslice              1892.6        13410.5       3.2712        83.6    +1.96%
+R3 r3_reslice_st           1926.7        13666.6       3.3343        82.8    +3.93%
+R3 r3_reslice_en           2027.2        14454.9       3.5296        75.4   +10.02%
+R3 r3_get_unwrap           2163.6        15490.2       3.7849        70.6   +17.97%
+R4 v0_shipped              1850.5        13146.8       3.2083        76.3    +0.00%
+```
+
+**Loop census of the variants** (`.temp/php18/loops-variants.log`):
+
+| | start walk | end walk |
+|---|--:|--:|
+| R3 shipped | 9 insns, 1 cond-exit | 8, 1 |
+| `r3_reslice` | **7, 0** | **7, 0** |
+| R4 shipped | 7, 0 | **6, 0** |
+
+⭐ **`r3_reslice`'s start walk is instruction-for-instruction R4's, in safe Rust
+with zero `unsafe`**, and the entire residue between them is **one instruction
+in the end walk**.
+
+**Predicted from the mechanism with no fitting**, using §8b's measured step
+rates (0.129198 start-walk steps and 0.063052 end-walk steps per window byte):
+
+```
+R3 -> r3_reslice   2 x 0.129198 + 1 x 0.063052 = 0.32145   measured 0.32137   0.02%
+r3_reslice -> R4   1 x 0.063052               = 0.06305   measured 0.06290   0.24%
+```
+
+✅ **`r3_reslice` captures 83.6 % of the R3 → R4 gap in safe Rust**, and the
+remainder is one `mov`.
+
+⚠ **`r3_get_unwrap` is the calibrating negative**: `s.get(n).unwrap_or(&0)` is
+safe, total, and the spelling most people reach for — and it is **6 % WORSE than
+the shipped R3**. A search with no losing entry is a search nobody can calibrate.
+
+### 12b The R4 side — **DEGENERATE, and that is a clean negative**
+
+`SYNTHESIS.md:271-277`: *the headline moves toward whichever side you did not
+search*, and on 19 searched PAT rows **eleven found no cheaper R4**. `ph07`
+makes it twelve.
+
+```
+r4_fused      3.2082 Ir/window byte   -0.004%   fixed/call 88.3   TIE (< 0.05%)
+v0_shipped    3.2083                  +0.000%   fixed/call 76.3   SHIPPED
+r4_index0     3.2083                  +0.000%   fixed/call 76.3   TIE (< 0.05%)
+r4_nozero     INADMISSIBLE -- no verifying twin
+```
+
+- **`r4_index0` is FREE and STRICTLY BETTER on the trusted side.** Spelling the
+  first table read `s[0]` instead of `*s.get_unchecked(0)` compiles to **the
+  same bytes at the same addresses** (`.temp/php18/loops-variants.log`: every
+  loop at an identical offset), its twin verifies at **21/0**, and it removes
+  one of `get_unchecked`'s four call sites. ⚠ **It is not shipped** —
+  `.memory/02-bench-rules.md` forbids re-shipping a rung for a cheaper in-contract
+  spelling, and this one is not even cheaper; it is a *smaller trusted surface at
+  the same price*, which is a finding for a future row and not a licence to edit
+  this one.
+- **`r4_fused` is a TIE, not a win.** Merging the copy and fold loops moves the
+  marginal by **0.004 %** and makes the fixed term **12 `Ir`/call WORSE**.
+  ⚠ Its twin verifies (`20 verified, 0 errors`) but at a DIFFERENT obligation
+  count from the pinned 21 — `lemma_fold_shift` becomes unnecessary — so
+  shipping it would move `verus.obligations` as well. Reading −0.004 % as "the
+  R4 endpoint moves" is exactly the over-reading this file exists to prevent,
+  and `spellings.py` carries a `TIE_PCT` threshold so that it cannot.
+- **`r4_nozero` is the refusal, and it has a reason.** `Vec::with_capacity` +
+  `set_len` instead of `vec![0u8; cap]` is `set_len` over uninitialised memory;
+  the pinned vstd has no spec that makes it sound and the twin does not verify.
+  ⭐ **It would also have bought nothing**: it measures identically to the
+  shipped R4, because `vec![0u8; cap]`'s zeroing is a `memset` call and
+  therefore **outside `kernel_exclusive_ir`** — the same blind spot §8c prices.
+  A refusal with a reason is a result (`p42`'s `endptr` precedent).
+
+### 12c ⚠⚠ THE TWO NUMBERS THE CRASH COURSE MAY QUOTE, AND ONLY THESE
+
+```
+fixed-R4 bound              R3ship - R4ship          +11.98 %
+cheapest-found in-contract  inf(R3 found) - R4ship    +1.96 %   spelling `r3_reslice`
+```
+
+⚠⚠ **NO PAIR INTERVAL.** `min(R3 found) - min(R4 found)` differences two upper
+bounds and bounds nothing in either direction; `ph03`'s hashed `why` retracts
+that construction in terms and this row does not resurrect it. ⭐ Here the R4
+side is **degenerate** — no admissible R4 moved by more than 0.004 % — so the
+`fixed-R4 bound` is a bound over a *searched* endpoint, which is a materially
+stronger thing to publish than the same number was before `TASK_PHP_018`.
+
+---
+
 ## §11 What I did NOT do, and what I am unsure about
 
-1. ⚠ **No `controls/spellings.py`.** `PLAN_PHP.md` §5.3 asks for a re-derivable
-   search of both endpoints before a rung difference is published. This row
-   ships one spelling per rung by construction. **No ratio in §8 is *the* cost
-   of safety on this kernel** — each is the cost of *these* spellings. ph03 owes
-   the same thing and the debt is now on two rows.
+1. ✅ **`controls/spellings.py` EXISTS as of `TASK_PHP_018`** — §12, both sides
+   searched, the R4 side degenerate. ⚠ **The search is not exhaustive**: five R3
+   spellings and four R4 spellings were tried, over roughly one working session.
+   `r3_reslice` leaves **one instruction** between safe Rust and R4 and I did not
+   find a spelling that closes it; I do not claim none exists. ⚠ `ph03` still
+   owes its own, and the debt there is untouched.
 2. ⚠ **No `sweep-*` band.** `work_per_call` moves between `small` and `large`
    (553 vs 4074, different residues mod 4/8/16), which is what
    `check_marginal_ir` needs, but two points and a line is not a curve.
-3. ⚠ **`provenance.c_lines` pins one span and this row lifts two** (the walk,
-   and `mblen_table_utf8` at `mbfilter_utf8.c:39-56`). `TASK_PHP_015` §2.5
-   deferred the multi-span schema change with a design attached; this row is the
-   second to want it and also does not take it. §3 lists the three other ways
-   the table's bytes are pinned.
-4. ⚠ **R1h is cited to a different function from the extracted one** — §4d. I
-   argue it is faithful and I have written down what to attack.
-5. ⚠ **`#[verifier::rlimit(30)]`** — §10b. A reviewer should ask whether the
-   budget hides a proof that is one edit from not closing.
+3. ✅ **`provenance` now pins all THREE lifted spans** (`extra_spans`, added to
+   `harness-php/provenance.py` at `TASK_PHP_018` — §1). ⚠ **What it exposed is
+   worse than what it fixed**: the caller frame scores **15 % overlap**, so the
+   row cites three spans at three different fidelities and the tier is a single
+   word. §1a says what I think of that.
+4. ⚠ **R1h is cited to a different function from the extracted one** — §4d —
+   **and it is now also a SUBSET of the commit that fix is labelled with.** §00
+   argues the tagged configuration is the stronger citation and `spec.md`
+   `idiom.required[4]` states the alternative it was chosen against. **This is
+   the thing to attack.**
+5. ⚠ **`#[verifier::rlimit(30)]`** — §10b. Both sides now verify at the default
+   with a margin of one, and the plain/twin asymmetry reversed for no reason I
+   can give.
+6. ⚠ **`r202895` is UNRESOLVED.** `c2471b495009`'s message blames *"the commit
+   by r202895"* for introducing hunk (b). `TASK_PHP_018` could not map that SVN
+   revision to a git sha: php-src's converted history carries **no `git-svn-id`
+   trailer** (checked on the commits either side), `svn.php.net` no longer
+   resolves, and a harvest of self-referencing revision numbers from php-src
+   commit messages in four windows around 2005-12, 2006-06, 2008-01 and 2009-09
+   returned **only the three copies of this very commit**
+   (`.temp/php18/svnprobe.py`). **The attribution is not relied on anywhere.**
+   What is measured is the code: the three lines removed in 2009 are
+   byte-identical to three of the seven added in 2005, and the function carries
+   them continuously at every tag from php-5.1.2 to php-5.2.11.
 6. **Unsure: whether `adversarial-silent.bin` earns its measurement slot.** It
    costs eight iterations over a 105-byte window and it is the only cell that
    shows the over-read's *effect* is invisible while its *trajectory* is not.

@@ -127,34 +127,46 @@ pub fn kernel(buf: &[u8], off: usize, len: usize) -> u64 {
         slen.saturating_sub(frm)
             .saturating_sub((0u32.wrapping_sub(lw)) as usize)
     };
-    // ⚠⚠ cb3cca21b345 -- THE REAL UPSTREAM FIX, and it lives HERE, in the
-    // caller, not in `mbfl_strcut`. Ilia Alshanetsky, 2005-12-15, "Fixed
-    // possible memory corruption inside mb_strcut()", first in php-5.1.2.
+    // ⚠⚠ R1h -- THE GUARD CONFIGURATION UPSTREAM CONVERGED ON, and it lives
+    // HERE, in the caller, not in `mbfl_strcut`. Pinned as
+    // `php-5.2.12 .. php-5.2.17`, `PHP_FUNCTION(mb_strcut)` body sha256
+    // 26e2099e33433c74. TWO commits produce it:
+    //   cb3cca21b345  Ilia Alshanetsky, 2005-12-15, "Fixed possible memory
+    //                 corruption inside mb_strcut()", first in php-5.1.2. TWO
+    //                 guards:
     //     hunk (a)  if (from > Z_STRLEN_PP(arg1)) { RETURN_FALSE; }
     //     hunk (b)  if (((unsigned) from + (unsigned) len) > Z_STRLEN_PP(arg1))
     //                   { len = Z_STRLEN_PP(arg1) - from; }
-    // (a) is the memory-safety half: with `from <= slen` the start walk reads
-    // only at `n <= from <= slen`, and `s` is `slen + 1` bytes. Every index in
-    // this rung is in bounds BECAUSE OF (a). c/kernel_hardened.c has the same
-    // two lines in the same place; c/kernel.c has neither.
+    //   c2471b495009  Moriyoshi Koizumi, 2009-09-23, "Fixed bug #49354
+    //                 (mb_strcut() cuts wrong length when offset is within a
+    //                 multibyte character)" -- REMOVES hunk (b), and ships
+    //                 ext/mbstring/tests/bug49354.phpt with it.
+    // (a) is the memory-safety half and (b) is not: with `from <= slen` the
+    // start walk reads only at `n <= from <= slen`, and `s` is `slen + 1`
+    // bytes, so every index in this rung is in bounds BECAUSE OF (a). Hunk (b)
+    // removes no out-of-bounds read at all and changes the answer on 13.5 % of
+    // benign calls (controls/fix_scope.py Q1/Q2, controls/bug49354.py).
+    // ⚠⚠⚠ **THIS RUNG CARRIED HUNK (b) UNTIL `TASK_PHP_018`.** It is gone from
+    // all four Rust rungs, from `verus.rs`'s SPEC as well as its exec code,
+    // from `model.py`'s three implementations and from `c/kernel_hardened.c` --
+    // because R2-R5 are ports of R1h and R1h no longer has it.
+    // c/kernel_hardened.c has this same guard in the same place; c/kernel.c has
+    // neither. controls/guard_equiv.py compares BOTH configurations.
     if frm > slen {
         // RETVAL_FALSE (mbstring.c:1812). Nothing was allocated, so the tally
         // the C xors in is the post-reset zero and this is the same u64 the
         // `mbfl_malloc` NULL arm produces.
         return 0xFFFF_FFFFu64;
     }
-    // ⚠ `saturating_add` where the C writes `(unsigned) from + (unsigned) len`.
-    // The C's sum is 32-bit and wraps; this one saturates. The two agree on
-    // every (slen, from, length) this kernel's domain can hold -- demonstrated
-    // exhaustively against a build of the C itself, with a must-fire control,
-    // in controls/guard_equiv.py -- and saturation is what makes the predicate
-    // `> slen` exactly `from + length > slen` with no truncation for verus.rs
-    // to reason about. NOTES.md §10.
-    let length: usize = if frm.saturating_add(length) > slen {
-        slen - frm
-    } else {
-        length
-    };
+    // ⚠ **HUNK (b) WAS HERE.** It read
+    //     `let length = if frm.saturating_add(length) > slen { slen - frm }
+    //      else { length };`
+    // -- `saturating_add` where the C writes `(unsigned) from + (unsigned)
+    // len`. `c2471b495009` removed it upstream as bug #49354 and
+    // `TASK_PHP_018` removed it here. `controls/guard_equiv.py` still compares
+    // that spelling against a build of the C, so the equivalence claim it
+    // carried is not lost with it -- and it now also reports how far the two
+    // configurations are apart (1 134 of 5 122 triples).
 
     // mbfilter.c:1202-1210 -- the start walk, ROTATED.
     // ⚠ The C is `for (;;) { m = mbtab[*p]; n += m; p += m; if (n > from)

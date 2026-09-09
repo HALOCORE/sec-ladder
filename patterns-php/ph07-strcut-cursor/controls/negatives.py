@@ -10,22 +10,40 @@ postcondition nothing consumes, a `requires` nothing can satisfy and a lemma
 nobody needs all verify perfectly. These four mutants are what stops that
 being true here.
 
-    noguard   MUST FAIL   delete BOTH `cb3cca21b345` hunks -- i.e. turn R5
-                          back into `c/kernel.c`.
+    noguard   MUST FAIL   delete R1h -- `cb3cca21b345` hunk (a) -- i.e. turn
+                          R5 back into `c/kernel.c`.
                           ⭐ This is the whole row: with `from > string->len`
                           admitted, `get_unchecked(s, n)`'s `i < v@.len()` is
                           unprovable, which is exactly the over-read ASan
                           reports at c/kernel.c:171. **The proof refuses the
-                          program PHP shipped for six releases.**
-                          ⚠ It deletes both hunks and not just (a) because
-                          hunk (b)'s `slen - frm` needs `frm <= slen` too, so a
-                          hunk-(a)-only mutant fails on an ARITHMETIC
-                          underflow one line later and never reaches the walk.
-                          Measured: `.temp/php16/13-noguard.log`.
+                          program PHP shipped for nine releases.**
+                          ⭐⭐ **AND SINCE `TASK_PHP_018` IT ISOLATES ONE
+                          GUARD.** It used to have to delete BOTH hunks,
+                          because hunk (b)'s `slen - frm` needed `frm <= slen`
+                          too -- so a hunk-(a)-only mutant died on an
+                          ARITHMETIC underflow one line later and never reached
+                          the walk (`.temp/php16/13-noguard.log`). With hunk (b)
+                          withdrawn upstream (c2471b495009, bug #49354) there is
+                          nothing between the guard and the walk, so the mutant
+                          now fails **at the walk**, for the reason the control
+                          exists to demonstrate. A control that could only fire
+                          for a confounded reason now fires for the right one.
     nopos     MUST FAIL   make `mbtab_of` return 0 for one lead-byte class.
-                          The start walk's `decreases` stops decreasing --
-                          `mbfl_strcut` is not provably terminating without
-                          "every table entry is >= 1".
+                          ⚠⚠ **IT DOES NOT TEST TERMINATION, AND THIS ENTRY
+                          SAID IT DID UNTIL `TASK_PHP_018`** (`TASK_PHP_017`
+                          m1). Setting `mbtab_of` to 0 for a class also breaks
+                          `mbtab_matches_upto`, so the mutant dies at
+                          `p.rs:159`'s `assert(mbtab_matches_upto(256)) by
+                          (compute_only)` -- the SAME error site as `notable`.
+                          What it really tests is that the closed form still
+                          agrees with the literal table. ⭐ The termination
+                          premise IS load-bearing and IS provable separately:
+                          zeroing `mbtab_of` AND the matching `MBTAB` entries
+                          together keeps the table lemma true and dies at
+                          `mbtab()`'s `r >= 1` postcondition instead
+                          (`.temp/php17/mut/`). **No shipped control isolates
+                          it**, and that is a stated gap rather than a repaired
+                          one: adding a fifth mutant is a task, not an edit.
     notable   MUST FAIL   change ONE entry of the literal `MBTAB`.
                           `lemma_mbtab_matches` is what ties the closed-form
                           spec to the 256 bytes lifted from
@@ -59,20 +77,16 @@ TMP = os.path.join(REPO, ".temp", "php16")
 
 MUTANTS = {
     "noguard": ("FAIL", [(
-        """    // cb3cca21b345 hunk (a) -- the line every `get_unchecked` below rests on.
+        """    // R1h -- `cb3cca21b345` hunk (a), the line every `get_unchecked` below
+    // rests on, and the WHOLE of R1h since `TASK_PHP_018`. Hunk (b) used to
+    // follow it here and is gone: `c2471b495009` removed it as bug #49354.
     if frm > slen {
         assert(strcut_fold(buf@, off as int, len as int) == 0xFFFF_FFFFu64);
         return 0xFFFF_FFFFu64;
     }
-    // cb3cca21b345 hunk (b).
-    let length: usize = if frm.saturating_add(length) > slen {
-        slen - frm
-    } else {
-        length
-    };
-    assert(length as int == (if f0 + l0 > slq { slq - f0 } else { l0 }));""",
-        """    // MUTANT noguard: BOTH cb3cca21b345 hunks DELETED -- this is
-    // c/kernel.c, and it is the whole of what R1h adds.""")]),
+    assert(length as int == l0);""",
+        """    // MUTANT noguard: R1h DELETED -- this is c/kernel.c, and it is
+    // the whole of what R1h adds.""")]),
     "nopos": ("FAIL", [(
         """    } else if b < 0xFE {
         6

@@ -1,0 +1,69 @@
+From c2471b4950091c71da5e3f686d6d455e8e3092ea Mon Sep 17 00:00:00 2001
+From: Moriyoshi Koizumi <moriyoshi@php.net>
+Date: Wed, 23 Sep 2009 15:22:47 +0000
+Subject: [PATCH] - Fixed bug #49354 (mb_strcut() cuts wrong length when offset
+ is within a   multibyte character).
+
+(This bug was introduced by the commit by r202895. Please double-check the
+ specification of the function you are going to *fix*.)
+---
+ NEWS                             |  2 ++
+ ext/mbstring/mbstring.c          |  3 ---
+ ext/mbstring/tests/bug49354.phpt | 21 +++++++++++++++++++++
+ 3 files changed, 23 insertions(+), 3 deletions(-)
+ create mode 100644 ext/mbstring/tests/bug49354.phpt
+
+diff --git a/NEWS b/NEWS
+index 7f1a7b351548..dfa65b7afbe2 100644
+--- a/NEWS
++++ b/NEWS
+@@ -7,6 +7,8 @@ PHP                                                                        NEWS
+   mbstring.strict_mode is turned on). (Moriyoshi)
+ - Fixed bug #49531 (CURLOPT_INFILESIZE sometimes causes warning "CURLPROTO_FILE
+   cannot be set"). (Felipe)
++- Fixed bug #49354 (mb_strcut() cuts wrong length when offset is in the middle
++  of a multibyte character). (Moriyoshi)
+ - Fixed bug #49528 (UTF-16 strings prefixed by BOMs wrondly converted).
+   (Moriyoshi)
+ 
+diff --git a/ext/mbstring/mbstring.c b/ext/mbstring/mbstring.c
+index 6dae29cee633..02badf9ff622 100644
+--- a/ext/mbstring/mbstring.c
++++ b/ext/mbstring/mbstring.c
+@@ -2272,9 +2272,6 @@ PHP_FUNCTION(mb_strcut)
+ 	if (from > Z_STRLEN_PP(arg1)) {
+ 		RETURN_FALSE;
+ 	}
+-	if (((unsigned) from + (unsigned) len) > Z_STRLEN_PP(arg1)) {
+-		len = Z_STRLEN_PP(arg1) - from;
+-	}
+ 
+ 	ret = mbfl_strcut(&string, &result, from, len);
+ 	if (ret != NULL) {
+diff --git a/ext/mbstring/tests/bug49354.phpt b/ext/mbstring/tests/bug49354.phpt
+new file mode 100644
+index 000000000000..c25b405d8203
+--- /dev/null
++++ b/ext/mbstring/tests/bug49354.phpt
+@@ -0,0 +1,21 @@
++--TEST--
++Bug #49354 (mb_strcut() cuts wrong length when offset is in the middle of a multibyte character)
++--SKIPIF--
++<?php extension_loaded('mbstring') or die('skip mbstring not available'); ?>
++--FILE--
++<?php
++$crap = 'AåBäCöDü';
++var_dump(mb_strcut($crap, 0, 100, 'UTF-8'));
++var_dump(mb_strcut($crap, 1, 100, 'UTF-8'));
++var_dump(mb_strcut($crap, 2, 100, 'UTF-8'));
++var_dump(mb_strcut($crap, 3, 100, 'UTF-8'));
++var_dump(mb_strcut($crap, 12, 100, 'UTF-8'));
++var_dump(mb_strcut($crap, 13, 100, 'UTF-8'));
++?>
++--EXPECT--
++string(12) "AåBäCöDü"
++string(11) "åBäCöDü"
++string(11) "åBäCöDü"
++string(9) "BäCöDü"
++string(0) ""
++bool(false)

@@ -1,0 +1,285 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns-php/ph07-strcut-cursor/controls/spellings.py --verus",
+    "note": "The pin covers the two rung sources the variants are derived from, verus.rs (the R4 admissibility half), spec.md (the declaration the audit runs against), inputs/gen.py (the corpus every number is measured over) and this script. It does NOT cover results-php/ph07-strcut-cursor.json: stage 3 compares against that record at run time and prints the delta, which is a stronger check than a hash of it."
+  },
+  "measured_utc": "2026-09-09T05:29:57Z",
+  "derived_from_sha256": {
+    "patterns/ph07-strcut-cursor/safe_tuned.rs": "d7c484b87152d531980befcb538c17b76ce9236f075900f04cb8a91100fd214c",
+    "patterns/ph07-strcut-cursor/unsafe.rs": "fce732a31d10db616f6931bbf076986e17a06cb8c7830d8cd50c5c1f23dfa6b4",
+    "patterns/ph07-strcut-cursor/verus.rs": "d1c61785e44185f88a5f0eb8ab6e87f29e7d1bd64b4e94b85d80b1232d0326bf",
+    "patterns/ph07-strcut-cursor/spec.md": "6a47087e3400975a6bdacacf11f61923d7f042e34c55b6c18e33ae69a725e75c",
+    "patterns/ph07-strcut-cursor/inputs/gen.py": "304b878730f091cbff54a151239c83fc82864f5617bb60982f1b908e8c6c09b4",
+    "patterns/ph07-strcut-cursor/controls/spellings.py": "cf00b81a7c117052b74209c8eca2a53af6b133b43c17d9793437f39779715fcd"
+  },
+  "probes": [
+    {
+      "input": "small.bin",
+      "stride": 553,
+      "n_iters": 25000
+    },
+    {
+      "input": "large.bin",
+      "stride": 4074,
+      "n_iters": 12000
+    }
+  ],
+  "tie_pct": 0.05,
+  "statistic": "kernel_exclusive_ir / n_iters on the SHIPPED inputs -- harness/measure.py's own, so stage 3 above compares against results-php/ph07-strcut-cursor.json directly",
+  "reproduces_shipped_record": true,
+  "variants": [
+    {
+      "side": "R3",
+      "name": "v0_shipped",
+      "why": "the shipped R3, unmodified",
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `static const unsigned char`",
+        "required[5] `static [u8; 256]`",
+        "required[5] `pub const [u8; 256]`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "answers": {
+        "adversarial-empty.bin": "11424172624523374464",
+        "adversarial-nowin.bin": "0",
+        "adversarial-offbyone.bin": "11424172624523374464",
+        "adversarial-silent.bin": "11424172624523374464",
+        "adversarial-wild.bin": "11424172624523374464",
+        "large.bin": "2579958070518048867",
+        "small.bin": "11803788199505851357"
+      },
+      "ir_small": 2061.34348,
+      "ir_large": 14711.055416666666,
+      "ir_per_window_byte": 3.592647525324245,
+      "fixed_per_call": 74.60939849569263,
+      "pct_vs_r4ship": 11.980743728143112
+    },
+    {
+      "side": "R3",
+      "name": "r3_reslice",
+      "why": "TASK_PHP_017 B1's v1 -- `&s[..=frm]` and `&s[..=k]`, one hoisted check per walk instead of one per iteration",
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `static const unsigned char`",
+        "required[5] `static [u8; 256]`",
+        "required[5] `pub const [u8; 256]`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "answers": {
+        "adversarial-empty.bin": "11424172624523374464",
+        "adversarial-nowin.bin": "0",
+        "adversarial-offbyone.bin": "11424172624523374464",
+        "adversarial-silent.bin": "11424172624523374464",
+        "adversarial-wild.bin": "11424172624523374464",
+        "large.bin": "2579958070518048867",
+        "small.bin": "11803788199505851357"
+      },
+      "ir_small": 1892.58868,
+      "ir_large": 13410.45175,
+      "ir_per_window_byte": 3.271190874751491,
+      "fixed_per_call": 83.6201262624254,
+      "pct_vs_r4ship": 1.9611260078531192
+    },
+    {
+      "side": "R3",
+      "name": "r3_reslice_st",
+      "why": "the START walk re-sliced, the end walk untouched",
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `static const unsigned char`",
+        "required[5] `static [u8; 256]`",
+        "required[5] `pub const [u8; 256]`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "answers": {
+        "adversarial-empty.bin": "11424172624523374464",
+        "adversarial-nowin.bin": "0",
+        "adversarial-offbyone.bin": "11424172624523374464",
+        "adversarial-silent.bin": "11424172624523374464",
+        "adversarial-wild.bin": "11424172624523374464",
+        "large.bin": "2579958070518048867",
+        "small.bin": "11803788199505851357"
+      },
+      "ir_small": 1926.68828,
+      "ir_large": 13666.587916666667,
+      "ir_per_window_byte": 3.334251529868409,
+      "fixed_per_call": 82.84718398277005,
+      "pct_vs_r4ship": 3.926690124622146
+    },
+    {
+      "side": "R3",
+      "name": "r3_reslice_en",
+      "why": "the END walk re-sliced, the start walk untouched",
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `static const unsigned char`",
+        "required[5] `static [u8; 256]`",
+        "required[5] `pub const [u8; 256]`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "answers": {
+        "adversarial-empty.bin": "11424172624523374464",
+        "adversarial-nowin.bin": "0",
+        "adversarial-offbyone.bin": "11424172624523374464",
+        "adversarial-silent.bin": "11424172624523374464",
+        "adversarial-wild.bin": "11424172624523374464",
+        "large.bin": "2579958070518048867",
+        "small.bin": "11803788199505851357"
+      },
+      "ir_small": 2027.24388,
+      "ir_large": 14454.91925,
+      "ir_per_window_byte": 3.5295868702073276,
+      "fixed_per_call": 75.38234077534776,
+      "pct_vs_r4ship": 10.0151796113741
+    },
+    {
+      "side": "R3",
+      "name": "r3_get_unwrap",
+      "why": "`s.get(n).unwrap_or(&0)` -- safe, total, plausible, and MEASURED WORSE than the shipped R3 at TASK_PHP_017",
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `static const unsigned char`",
+        "required[5] `static [u8; 256]`",
+        "required[5] `pub const [u8; 256]`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "answers": {
+        "adversarial-empty.bin": "11424172624523374464",
+        "adversarial-nowin.bin": "0",
+        "adversarial-offbyone.bin": "11424172624523374464",
+        "adversarial-silent.bin": "11424172624523374464",
+        "adversarial-wild.bin": "11424172624523374464",
+        "large.bin": "2579958070518048867",
+        "small.bin": "11803788199505851357"
+      },
+      "ir_small": 2163.62428,
+      "ir_large": 15490.242833333334,
+      "ir_per_window_byte": 3.784895925399981,
+      "fixed_per_call": 70.57683325381049,
+      "pct_vs_r4ship": 17.9730150737947
+    },
+    {
+      "side": "R4",
+      "name": "v0_shipped",
+      "why": "the shipped R4, unmodified",
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `static const unsigned char`",
+        "required[5] `static [u8; 256]`",
+        "required[5] `pub const [u8; 256]`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "answers": {
+        "adversarial-empty.bin": "11424172624523374464",
+        "adversarial-nowin.bin": "0",
+        "adversarial-offbyone.bin": "11424172624523374464",
+        "adversarial-silent.bin": "11424172624523374464",
+        "adversarial-wild.bin": "11424172624523374464",
+        "large.bin": "2579958070518048867",
+        "small.bin": "11803788199505851357"
+      },
+      "ir_small": 1850.45432,
+      "ir_large": 13146.782166666666,
+      "ir_per_window_byte": 3.2082726062671587,
+      "fixed_per_call": 76.27956873426137,
+      "pct_vs_r4ship": 0.0,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 21 verified, 0 errors"
+    },
+    {
+      "side": "R4",
+      "name": "r4_index0",
+      "why": "the first table read spelled `s[0]`; the index is a literal into a slice already known to be `slen + 1` long, so if this is free it is a strictly better R4 -- same cost, one fewer use of a trusted item",
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `static const unsigned char`",
+        "required[5] `static [u8; 256]`",
+        "required[5] `pub const [u8; 256]`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "answers": {
+        "adversarial-empty.bin": "11424172624523374464",
+        "adversarial-nowin.bin": "0",
+        "adversarial-offbyone.bin": "11424172624523374464",
+        "adversarial-silent.bin": "11424172624523374464",
+        "adversarial-wild.bin": "11424172624523374464",
+        "large.bin": "2579958070518048867",
+        "small.bin": "11803788199505851357"
+      },
+      "ir_small": 1850.45432,
+      "ir_large": 13146.782166666666,
+      "ir_per_window_byte": 3.2082726062671587,
+      "fixed_per_call": 76.27956873426137,
+      "pct_vs_r4ship": 0.0,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 21 verified, 0 errors"
+    },
+    {
+      "side": "R4",
+      "name": "r4_fused",
+      "why": "the copy loop and the fold loop merged into ONE pass over `cnt` bytes. Nothing is deleted -- every byte is still written to `out` and still folded -- what goes is the second traversal",
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `static const unsigned char`",
+        "required[5] `static [u8; 256]`",
+        "required[5] `pub const [u8; 256]`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "answers": {
+        "adversarial-empty.bin": "11424172624523374464",
+        "adversarial-nowin.bin": "0",
+        "adversarial-offbyone.bin": "11424172624523374464",
+        "adversarial-silent.bin": "11424172624523374464",
+        "adversarial-wild.bin": "11424172624523374464",
+        "large.bin": "2579958070518048867",
+        "small.bin": "11803788199505851357"
+      },
+      "ir_small": 1862.3634,
+      "ir_large": 13158.26325,
+      "ir_per_window_byte": 3.20815105083783,
+      "fixed_per_call": 88.25586888667999,
+      "pct_vs_r4ship": -0.003788812368728869,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 20 verified, 0 errors"
+    },
+    {
+      "side": "R4",
+      "name": "r4_nozero",
+      "why": "`Vec::with_capacity(cap)` + `set_len(cap)` instead of `vec![0u8; cap]` -- do not memset `cap` bytes the copy overwrites. Expected INADMISSIBLE: it is `set_len` over uninitialised memory and the pinned vstd has no spec that makes it sound",
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `static const unsigned char`",
+        "required[5] `static [u8; 256]`",
+        "required[5] `pub const [u8; 256]`"
+      ],
+      "in_contract": false,
+      "built": true,
+      "answers": {
+        "adversarial-empty.bin": "11424172624523374464",
+        "adversarial-nowin.bin": "0",
+        "adversarial-offbyone.bin": "11424172624523374464",
+        "adversarial-silent.bin": "11424172624523374464",
+        "adversarial-wild.bin": "11424172624523374464",
+        "large.bin": "2579958070518048867",
+        "small.bin": "11803788199505851357"
+      },
+      "ir_small": 1850.45432,
+      "ir_large": 13146.782166666666,
+      "ir_per_window_byte": 3.2082726062671587,
+      "fixed_per_call": 76.27956873426137,
+      "pct_vs_r4ship": 0.0,
+      "verus_verifies": false,
+      "verus_msg": "/spellings/R4_r4_nozero_verus.rs:622:14\n    |\n622 |     unsafe { out.set_len(cap) };\n    |              ^^^^^^^^^^^^^^^^\n    |\n    = help: The following declaration may resolve this error:\n            pub assume_specification<T, A> [std::vec::Vec::<T, A>::set_len] (_0: &std::vec::Vec<T, A>, _1: usize)\n            where\n            A: std::alloc::Allocator,;\n\nerror: aborting due to 1 previous error"
+    }
+  ],
+  "problems": [],
+  "invariant": "Every variant is in contract by harness/check.py::spelling_matches over EVERY backticked idiom entry, returns the shipped checksum on all seven inputs, and is priced by the harness's own two-point marginal-Ir method on both probe inputs. TWO numbers ship, labelled: the fixed-R4 bound and the cheapest-found in-contract counterpart. NO PAIR INTERVAL."
+}

@@ -9,8 +9,21 @@
  * differential and not a comment"*. This program is the C half of that
  * differential; `guard_equiv.py` is the Rust half and the comparison.
  *
- * Reads `slen from length` triples on stdin, prints `from length` after the
- * clamps, or `FALSE`.
+ * Reads `slen from length` triples on stdin. Prints, per triple, either
+ * `FALSE` or `from length_a length_ab` -- ⚠⚠ **TWO lengths since
+ * `TASK_PHP_018`**, because there are now two configurations to compare
+ * against and only one of them ships:
+ *
+ *   length_a   R1h as SHIPPED: `cb3cca21b345` hunk (a) alone, which is
+ *              php-5.2.12 .. php-5.2.17. Hunk (a) never touches `length`, so
+ *              this is just the mbstring.c clamp's output.
+ *   length_ab  the WITHDRAWN two-hunk configuration, php-5.1.2 .. php-5.2.11.
+ *              `c2471b495009` removed hunk (b) as bug #49354; the row keeps it
+ *              measurable here rather than deleting the evidence.
+ *
+ * ⚠ Hunk (a) is in BOTH, so `FALSE` is a property of the triple and not of the
+ * configuration -- which is itself the reason hunk (a) is the memory-safety
+ * half: it is the only one of the two whose effect is a refusal.
  *
  *   cc -std=c99 -Wall -Wextra -O2 guard_equiv.c -o guard_equiv
  */
@@ -39,16 +52,20 @@ int main(void)
                 length = 0;
             }
         }
-        /* cb3cca21b345 hunk (a) */
+        /* cb3cca21b345 hunk (a) -- in BOTH configurations. */
         if (from > str_len) {
             printf("FALSE\n");
             continue;
         }
-        /* cb3cca21b345 hunk (b) */
+        /* R1h AS SHIPPED stops here: hunk (a) does not touch `length`. */
+        int32_t length_a = length;
+        /* cb3cca21b345 hunk (b) -- WITHDRAWN by c2471b495009 (bug #49354).
+         * Kept here so the row can still measure what it used to ship. */
+        int32_t length_ab = length;
         if (((unsigned)from + (unsigned)length) > str_len) {
-            length = str_len - from;
+            length_ab = str_len - from;
         }
-        printf("%d %d\n", from, length);
+        printf("%d %d %d\n", from, length_a, length_ab);
     }
     return 0;
 }

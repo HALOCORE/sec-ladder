@@ -304,10 +304,12 @@ SLB_NOINLINE uint64_t kernel(const uint8_t *buf, size_t off, size_t len)
         }
     }
     /* ⚠ mbstring.c:1807 IS THE NEXT LINE, AND THAT IS THE ROW.
-     * `c/kernel_hardened.c` has, between here and the call, the two lines of
-     * cb3cca21b34518caf45852ed90597052e99294c3 (Ilia Alshanetsky, 2005-12-15,
-     * "Fixed possible memory corruption inside mb_strcut()"). This rung is
-     * PHP 5.0.0 and does not. */
+     * `c/kernel_hardened.c` has, between here and the call, the ONE guard that
+     * php-5.2.12 .. php-5.2.17 carries -- `if (from > Z_STRLEN_PP(arg1))
+     * RETURN_FALSE`, `cb3cca21b345` (Ilia Alshanetsky, 2005-12-15, "Fixed
+     * possible memory corruption inside mb_strcut()") hunk (a). That commit's
+     * hunk (b) was removed by `c2471b495009` (2009-09-23, bug #49354) and is
+     * not in R1h. This rung is PHP 5.0.0 and has neither. */
 
     if (ph07_strcut(&string, &result, from, length) != NULL) {
         for (i = 0; i < result.len; i++)

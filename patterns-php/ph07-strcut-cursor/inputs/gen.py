@@ -45,10 +45,23 @@ CORPUS THAT DOES NOT** (`PROTOCOL_PHP.md` §A2a rule 1). The defect lives on
     `start < from` (the cursor stepped over `from` and the cut moved left),
     which is the semantic difference the start walk exists to compute;
   * at least one window with `from == string->len` exactly -- the largest
-    `from` `cb3cca21b345` admits (its guard is `from > len`, not `>=`) and the
-    only benign value at which the walk reads the zval terminator;
-  * and NO window on which either `cb3cca21b345` guard fires, so R1h is
-    byte-identical to R1 on every measured input. See `FRACTIONS`.
+    `from` R1h admits (its guard is `from > len`, not `>=`) and the only benign
+    value at which the walk reads the zval terminator;
+  * NO window on which R1h's guard -- `cb3cca21b345` hunk (a), `from > len ->
+    RETURN_FALSE` -- fires. That is the ADVERSARIAL case, and keeping it out of
+    the measured corpus is what "benign" means here; it is not a restriction on
+    the domain. R1h is byte-identical to R1 on every measured input;
+  * ⭐ and, since `TASK_PHP_018`, windows with `from + length > string->len`
+    MUST BE PRESENT -- with a second, sharper assertion that some of them are
+    windows on which the WITHDRAWN hunk (b) would have changed the answer.
+    ⚠⚠ **This requirement is the inverse of the one that stood here until
+    `TASK_PHP_018`**, which read *"NO window on which EITHER guard fires"*.
+    Upstream removed hunk (b) in `c2471b495009` (2009-09-23) as **bug #49354,
+    with a regression test**, and R1h is now the configuration upstream kept --
+    hunk (a) alone, `php-5.2.12 .. php-5.2.17`. So the region hunk (b) used to
+    clamp is ordinary benign input again, and a fixture that still avoided it
+    would be measuring 86.5 % of the domain while claiming the whole of it.
+    `controls/bug49354.py` is upstream's own test for this region.
 
 Four things about the sizes are deliberate.
 
@@ -112,21 +125,37 @@ LARGE_STRIDE, LARGE_WINS = 4074, 2050
 RESIDUE_MODULI = (4, 8, 16)
 
 # (from, length) as fractions of `slen`, cycled by window index. Chosen so that
-# `_check_span`'s six assertions all pass -- see the module docstring.
+# every one of `_check_span`'s assertions passes -- see the module docstring.
 #
-# ⚠⚠ **EVERY PAIR SUMS TO AT MOST 1, AND THAT IS A REQUIREMENT, NOT A TASTE.**
-# `cb3cca21b345` hunk (b) fires exactly when `from + length > string->len`, and
-# it SHORTENS `length`, which can move `k = start + length` out of the
-# `k >= string->len` shortcut and into the bounded end walk -- a DIFFERENT
-# answer, on an input that never crashed. `check.py` stage 7h requires R1h to
-# be byte-identical to R1 on every non-adversarial input, so a measured corpus
-# that fired hunk (b) would be measuring the security fix's semantic change on
-# top of everything else. `_check_span` asserts it; controls/fix_scope.py
-# measures the change where it does happen, which is where it belongs.
+# ⚠⚠⚠ **THE SUMS RUN PAST 1, AND THAT IS THE `TASK_PHP_018` CHANGE.** Until
+# then this table read *"EVERY PAIR SUMS TO AT MOST 1, AND THAT IS A
+# REQUIREMENT, NOT A TASTE"*, because R1h carried `cb3cca21b345` hunk (b) --
+# which fires exactly when `from + length > string->len`, SHORTENS `length`,
+# and can move `k = start + length` out of the `k >= string->len` shortcut into
+# the bounded end walk, returning a shorter cut on an input that never crashed.
+# `check.py` stage 7h refused that, correctly.
 #
-# ⭐ Entry 6 is `from == slen, length == 0`: the largest `from` the fix admits
-# (its guard is `from > len`, not `>=`), the only benign window whose walk reads
-# the zval terminator, and the one that reaches `k >= (int)string->len`.
+# ⭐⭐ **UPSTREAM REACHED THE SAME VERDICT AND ACTED ON IT.** `c2471b495009`
+# (Moriyoshi Koizumi, 2009-09-23) DELETED hunk (b) as **bug #49354** --
+# *"mb_strcut() cuts wrong length when offset is within a multibyte
+# character"* -- and shipped `ext/mbstring/tests/bug49354.phpt` with it. R1h is
+# now the configuration upstream KEPT (hunk (a) alone, `php-5.2.12 ..
+# php-5.2.17`), so the region below the old ceiling and the region above it are
+# both ordinary benign input, and the ceiling goes. `controls/bug49354.py`
+# replays upstream's six expectations against all three configurations.
+#
+# ⭐ Entry 6 is `from == slen, length == 0`: the largest `from` R1h admits (its
+# guard is `from > len`, not `>=`) and the only benign window whose walk reads
+# the zval terminator.
+# ⭐ Entries 8 and 9 are the two `TASK_PHP_018` added: sums 1.15 and 1.30,
+# continuing the spacing of the eight above rather than jumping. Entry 8's
+# `length == slen` is upstream's own regression-test shape -- `bug49354.phpt`
+# calls `mb_strcut($crap, k, 100)` on a 12-byte string, i.e. `length` far past
+# the end. Measured over both shipped corpora, they put **20.0 %** of windows in
+# the newly admitted region and **14.5 %** on windows where hunk (b) would have
+# changed the answer -- against `controls/fix_scope.py` Q2's independent
+# **13.5 %** over a uniform sweep, which is the cross-check that the fixture is
+# not over- or under-weighting the region it just re-admitted.
 FRACTIONS = (
     (0.00, 0.25),
     (0.10, 0.30),
@@ -136,6 +165,8 @@ FRACTIONS = (
     (0.75, 0.10),
     (1.00, 0.00),
     (0.60, 0.40),
+    (0.15, 1.00),          # sum 1.15  <- TASK_PHP_018
+    (0.80, 0.50),          # sum 1.30  <- TASK_PHP_018
 )
 
 
@@ -176,8 +207,19 @@ def window(rng, stride, idx):
     slen = stride - HEAD - 1
     ff, lf = FRACTIONS[idx % len(FRACTIONS)]
     frm = int(round(slen * ff))
-    length = min(int(round(slen * lf)), slen - frm)   # keep hunk (b) dead
-    assert 0 <= frm <= slen and 0 <= length and frm + length <= slen
+    # ⚠⚠ **THE `min(..., slen - frm)` THAT USED TO BE HERE IS GONE**
+    # (`TASK_PHP_018`). It clamped `length` so that `from + length <= slen` and
+    # hunk (b) could never fire. ⚠ Measured before deleting it
+    # (`.temp/php18/fractions.log`): over the eight shipped FRACTIONS entries it
+    # **never once fired** -- clamped and unclamped give byte-identical corpora
+    # -- so the restriction was carried by the FRACTIONS table alone and this
+    # line was belt-and-braces. It is deleted anyway, because a dead clamp that
+    # would silently re-impose the old domain the moment somebody added a
+    # fraction pair is exactly the failure mode this task exists to remove.
+    # `frm <= slen` still holds by construction (no `ff` exceeds 1.00), which is
+    # what keeps R1h's ONE guard dead on the measured corpus.
+    length = int(round(slen * lf))
+    assert 0 <= frm <= slen and 0 <= length
     body = make_string(rng, slen)
     win = (frm.to_bytes(4, "little", signed=True)
            + length.to_bytes(4, "little", signed=True) + body)
@@ -215,6 +257,53 @@ def _walk_stats(win):
             start + length, length)
 
 
+def _cut(win, hunk_b):
+    """`(start, end)` for one window under R1h, with `cb3cca21b345` hunk (b)
+    applied or not -- or `None` if hunk (a) refuses the window or the walk would
+    leave the buffer, which are the two cases where "the cut" is not defined.
+
+    ⭐ `TASK_PHP_018`: this is what turns *"the corpus now contains windows
+    with `from + length > string->len`"* -- true but weak, because most such
+    windows take the `k >= string->len` shortcut under BOTH configurations and
+    answer identically -- into *"the corpus contains windows on which the
+    WITHDRAWN hunk (b) would have returned a different cut"*, which is the arm
+    upstream's own regression test `bug49354.phpt` exercises.
+
+    Deliberately a fourth transcription of the walks, like `_walk_stats`:
+    `gen.py` must be able to assert what it generated without importing
+    `../model.py` (which binds a different `slb`)."""
+    frm = int.from_bytes(win[0:4], "little", signed=True)
+    length = int.from_bytes(win[4:8], "little", signed=True)
+    s = win[HEAD:]
+    slen = len(s) - 1
+    if frm > slen:
+        return None                       # cb3cca21b345 hunk (a): RETURN_FALSE
+    if hunk_b and frm + length > slen:
+        length = slen - frm
+    n = start = 0
+    while True:
+        if n > slen:
+            return None                   # R1's over-read; no defined cut
+        m = MBTAB[s[n]]
+        n += m
+        if n > frm:
+            break
+        start = n
+    k = start + length
+    if k >= slen:
+        end = slen
+    else:
+        end = start
+        while n <= k:
+            end = n
+            if n > slen:
+                return None
+            n += MBTAB[s[n]]
+    start = min(max(start, 0), slen)
+    end = min(max(end, 0), slen)
+    return (min(start, end), end)
+
+
 def _check_residues():
     """The two measured strides must differ modulo every modulus that has
     bitten this project. p01's first draft used 500 and 4096, both == 0 (mod
@@ -240,18 +329,27 @@ def _check_span(name, blob, stride):
       * either arm of `if (k >= (int)string->len)` (mbfilter.c:1213);
       * either of `start == from` / `start < from`;
       * a window with `from == string->len` exactly;
+      * ⭐ (`TASK_PHP_018`) windows with `from + length > string->len`, AND
+        windows in that region on which the WITHDRAWN hunk (b) would have
+        returned a DIFFERENT cut -- the arm `bug49354.phpt` exercises;
 
-    and refuses one that over-reads (a benign input must be clean on R1 too),
-    or whose `start + length` leaves `int` (bug #71906's territory, out of
-    scope -- module docstring).
+    and refuses one on which R1h's guard (hunk (a), `from > len`) fires -- that
+    is the adversarial case, not a measured one -- or one that over-reads (a
+    benign input must be clean on R1 too), or whose `start + length` leaves
+    `int` (bug #71906's territory, out of scope -- module docstring).
     """
     seen, kge, klt, exact, over, atlen, oob, maxk = set(), 0, 0, 0, 0, 0, 0, 0
-    fix_fires = 0
+    hunk_a_fires = over_sum = hunk_b_moves = 0
     for i in range(len(blob) // stride):
-        cls, start, frm, k_ge, is_oob, k, length = _walk_stats(
-            blob[i * stride:(i + 1) * stride])
-        if frm > stride - 9 or frm + length > stride - 9:
-            fix_fires += 1
+        win = blob[i * stride:(i + 1) * stride]
+        cls, start, frm, k_ge, is_oob, k, length = _walk_stats(win)
+        if frm > stride - 9:
+            hunk_a_fires += 1
+        if frm + length > stride - 9:
+            over_sum += 1
+            a, b = _cut(win, False), _cut(win, True)
+            if a is not None and b is not None and a != b:
+                hunk_b_moves += 1
         seen |= cls
         kge += k_ge
         klt += not k_ge
@@ -287,20 +385,37 @@ def _check_span(name, blob, stride):
     if oob:
         bad.append(f"{name}: {oob} window(s) make R1 read past val[slen]; a "
                    f"MEASURED input must be benign on every rung")
-    if fix_fires:
-        bad.append(f"{name}: {fix_fires} window(s) make a cb3cca21b345 guard "
-                   f"fire. Hunk (b) SHORTENS `length` and can change the answer "
-                   f"on an input that never crashed, and check.py stage 7h "
-                   f"requires R1h == R1 on every non-adversarial input -- so a "
-                   f"measured corpus must leave both guards dead. "
-                   f"controls/fix_scope.py is where that change is measured")
+    if hunk_a_fires:
+        bad.append(f"{name}: {hunk_a_fires} window(s) make R1h's guard -- "
+                   f"cb3cca21b345 hunk (a), `from > string->len` -> "
+                   f"RETURN_FALSE -- fire. That is the ADVERSARIAL case; "
+                   f"check.py stage 7h requires R1h == R1 on every "
+                   f"non-adversarial input, and a window R1h refuses is a "
+                   f"window R1 over-reads on. inputs/adversarial-*.bin is "
+                   f"where those live")
+    if not over_sum:
+        bad.append(f"{name}: NO window has `from + length > string->len`. "
+                   f"⭐ TASK_PHP_018 REVERSED THIS ASSERTION: R1h is now hunk "
+                   f"(a) alone -- the configuration upstream converged on after "
+                   f"c2471b495009 removed hunk (b) as bug #49354 -- so that "
+                   f"region is ordinary benign input and a corpus that avoids "
+                   f"it measures 86.5 % of the domain while claiming all of it")
+    if not hunk_b_moves:
+        bad.append(f"{name}: {over_sum} window(s) have `from + length > "
+                   f"string->len` but NONE of them is a window on which the "
+                   f"withdrawn hunk (b) would have returned a different cut. "
+                   f"Most of that region takes the `k >= string->len` shortcut "
+                   f"under both configurations and answers identically, so the "
+                   f"weaker assertion above can pass on a corpus that still "
+                   f"never reaches the arm bug49354.phpt exercises")
     if maxk >= 2 ** 31:
         bad.append(f"{name}: max start+length = {maxk} overflows the `int` at "
                    f"mbfilter.c:1212 -- that is bug #71906 and is out of scope")
     print(f"  span ok: {name:24s} windows={len(blob)//stride:<6d} "
           f"steps={sorted(seen)} k>=len={kge:<5d} k<len={klt:<5d} "
           f"start==from={exact:<5d} start<from={over:<5d} from==len={atlen} "
-          f"cb3cca21b345-fires={fix_fires}")
+          f"hunk(a)-fires={hunk_a_fires} from+len>len={over_sum} "
+          f"hunk(b)-would-move={hunk_b_moves}")
     return bad
 
 

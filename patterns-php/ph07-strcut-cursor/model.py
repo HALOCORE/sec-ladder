@@ -15,22 +15,36 @@ notes only where ph07 differs.
                   read past `string->val[string->len]`.
 
 ⚠⚠ WHICH ALGORITHM THIS MODEL IMPLEMENTS, BECAUSE IT IS NOT R1's. It is
-`mbfl_strcut`'s mblen_table arm **with `cb3cca21b345` applied in the caller**,
-which is exactly `c/kernel_hardened.c` and exactly R2-R5:
+`mbfl_strcut`'s mblen_table arm **with the guard configuration upstream
+CONVERGED on applied in the caller** -- `cb3cca21b345` hunk (a) and NOT hunk
+(b) -- which is exactly `c/kernel_hardened.c` and exactly R2-R5:
 
     R1     mbfilter.c:1179-1259 as shipped 5.0.0 .. 5.3.2 -- CRASH-124
-    R1h    + cb3cca21b345 (2005-12-15, ext/mbstring/mbstring.c), both guards
+    R1h    + `if (from > Z_STRLEN_PP(arg1)) RETURN_FALSE;`  <- php-5.2.12 ..
+           php-5.2.17, PHP_FUNCTION(mb_strcut) body sha256 26e2099e33433c74
     R2-R5  the same function, memory-safe
 
-⭐ Unlike ph03, the upstream fix here is COMPLETE: over 133 932 interpreted
-calls its hunk (a) removes every one of the 15 333 out-of-bounds reads and
-leaves no residue (controls/fix_scope.py). So R1h and R2-R5 implement one
-function and only R1 diverges.
+⚠⚠⚠ **THIS MODEL CARRIED HUNK (b) UNTIL `TASK_PHP_018` AND IT WAS WRONG TO.**
+`cb3cca21b345` added two guards in 2005; `c2471b495009` (Moriyoshi Koizumi,
+2009-09-23) **DELETED hunk (b) as bug #49354**, *"mb_strcut() cuts wrong length
+when offset is within a multibyte character"*, with a regression test
+(`ext/mbstring/tests/bug49354.phpt`). ⭐ **The row's own gate had already said
+so**: `check.py` stage 7h refused an R1h that changes benign output, and
+`controls/fix_scope.py` measured hunk (b) changing the answer on 13.5 % of
+benign calls while removing NONE of the out-of-bounds reads. Both guards were
+read as one fix; they are two, and only one of them is the fix.
+⭐ `controls/bug49354.py` replays upstream's six expectations: hunk (a) alone
+agrees on all six, and hunk (a)+(b) is wrong on one -- which is the bug.
+
+⭐ The fix is COMPLETE: over 133 932 interpreted calls hunk (a) removes every
+one of the 15 333 out-of-bounds reads and leaves no residue
+(controls/fix_scope.py). So R1h and R2-R5 implement one function and only R1
+diverges.
 
 ⚠ **The fix is in the CALLER, in another file** -- `PHP_FUNCTION(mb_strcut)`,
 not `mbfl_strcut` -- which is why `mbfl_strcut`'s body is byte-identical from
-php-5.0.0 to php-5.3.2. This model puts both guards where `guard()` already
-put mbstring.c's other two, because that function is a frame this row lifts.
+php-5.0.0 to php-5.3.2. This model puts the guard where `guard()` already put
+mbstring.c's other two, because that function is a frame this row lifts.
 NOTES.md §4.
 
 Two independent implementations, as p01/p02/p16 and ph03 do:
@@ -167,11 +181,10 @@ class Model:
 
         r1_oob = self._r1_reads_oob(s, slen, frm)
 
-        # ---- cb3cca21b345, mbstring.c, THE REAL UPSTREAM FIX -------------
+        # ---- R1h: cb3cca21b345 hunk (a), mbstring.c, and NOTHING ELSE ----
+        # ⚠ hunk (b) is NOT here: `c2471b495009` removed it as bug #49354.
         if frm > slen:                                   # hunk (a) RETURN_FALSE
             return 0xFFFFFFFF, r1_oob                    # tally is 0: no alloc
-        if frm + length > slen:                          # hunk (b)
-            length = slen - frm
         # ---- mbfilter.c:1196-1223, the two walks ------------------------
         n = 0
         start = 0
@@ -334,10 +347,8 @@ class Model:
         """`strcut_fold` in ../verus.rs: what the kernel must return."""
         frm, length, s, slen = self._unpack(buf[off: off + ln])
         frm, length = guard(slen, frm, length)
-        if frm > slen:
+        if frm > slen:                                   # hunk (a); no hunk (b)
             return 0xFFFFFFFF
-        if frm + length > slen:
-            length = slen - frm
         n, start, _ = self._fix(self._start_step(s, frm), (0, 0, False))
         k = start + length
         if k >= slen:
@@ -485,10 +496,19 @@ class Model:
             both signs of both parameters. `PROTOCOL_PHP.md` §A2a rule 2 --
             1a alone is what let ph03 ship a model that computed a different
             function from its own proof for a whole task;
-        2.  every window's `(from, length)` is non-negative AND satisfies
-            `from + length <= string->len` after the wrapper's mbstring.c
-            clamps, which is what makes `d9dda48f8a7e`'s
-            `from < 0 || length < 0` hunk dead rather than merely unexercised;
+        2.  ⚠⚠ **REVERSED AT `TASK_PHP_018`.** Until then this read *"every
+            window's `(from, length)` is non-negative AND satisfies
+            `from + length <= string->len`"*, and the second conjunct was the
+            corpus restriction that kept `cb3cca21b345` hunk (b) dead. Upstream
+            **removed hunk (b)** in `c2471b495009` as bug #49354, so R1h is hunk
+            (a) alone and that region is ordinary benign input. What is checked
+            now: every window is non-negative in both parameters (which is what
+            makes `d9dda48f8a7e`'s `from < 0 || length < 0` hunk dead rather
+            than merely unexercised) and has `from <= string->len` (which is
+            what keeps R1h's ONE guard dead, i.e. what "benign" means here) --
+            **and, positively, that the `from + length > string->len` region is
+            PRESENT**, because a corpus that silently drifted back to the old
+            shape is the exact defect `TASK_PHP_018` exists to remove;
         3.  every window's result is reproduced by a THIRD, deliberately dumb
             spelling of the answer -- `s[start:end]` recomputed from the walk's
             own definition of `start` -- so a fold that silently changed range
@@ -519,18 +539,29 @@ class Model:
                     f"why this sweep exists (PROTOCOL_PHP.md A2a rule 2)")
                 break
         adversarial = os.path.basename(self.path).startswith("adversarial")
+        over_sum = 0
         for k in range(0 if adversarial else self.nwin):
             frm, length, s, slen = self._unpack(
                 self.buf[k * self.stride:(k + 1) * self.stride])
             frm, length = guard(slen, frm, length)
-            if frm < 0 or length < 0 or frm + length > slen:
+            over_sum += (frm + length > slen)
+            if frm < 0 or length < 0 or frm > slen:
                 problems.append(
                     f"window {k}: from={frm} length={length} slen={slen} makes "
-                    f"a cb3cca21b345 guard FIRE; ../spec.md pins both dead on "
-                    f"the measured corpus, because hunk (b) changes the answer "
-                    f"and check.py stage 7h requires R1h == R1 on every "
-                    f"non-adversarial input")
+                    f"R1h's guard -- cb3cca21b345 hunk (a) -- FIRE; ../spec.md "
+                    f"pins it dead on the measured corpus, because check.py "
+                    f"stage 7h requires R1h == R1 on every non-adversarial "
+                    f"input and a window R1h refuses is one R1 over-reads on")
                 break
+        if not adversarial and self.nwin and not over_sum:
+            problems.append(
+                f"no window of {self.nwin} has `from + length > string->len`. "
+                f"TASK_PHP_018 REVERSED this check: R1h is hunk (a) alone -- "
+                f"the configuration upstream converged on once c2471b495009 "
+                f"removed hunk (b) as bug #49354 -- so that region is benign "
+                f"input and a corpus avoiding it measures 86.5 % of the domain "
+                f"while claiming all of it. inputs/gen.py::_check_span carries "
+                f"the same assertion plus the sharper one it implies")
         for k in range(self.nwin):
             got = self._win[k][0]
             want = self._dumb(self.buf[k * self.stride:(k + 1) * self.stride])
@@ -559,10 +590,8 @@ class Model:
         deliberately NOT sharing `_window`'s or `strcut_fold`'s code."""
         frm, length, s, slen = Model._unpack(win)
         frm, length = guard(slen, frm, length)
-        if frm > slen:
+        if frm > slen:                                   # hunk (a); no hunk (b)
             return 0xFFFFFFFF
-        if frm + length > slen:
-            length = slen - frm
         cur = [0]
         while cur[-1] <= frm:
             cur.append(cur[-1] + MBTAB[s[cur[-1]]])

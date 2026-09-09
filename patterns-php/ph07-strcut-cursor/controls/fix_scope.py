@@ -10,8 +10,10 @@ gate cannot hold live:
 
   * `check.py` stage 7h requires R1h to be clean on every input AND
     byte-identical to R1 on every non-adversarial one, so a corpus on which the
-    fix CHANGES a benign answer cannot be shipped in `inputs/`. Q2 measures that
-    change here instead.
+    fix CHANGES a benign answer cannot be shipped in `inputs/`. ⭐ Until
+    `TASK_PHP_018` that was read as a harness limitation and worked around by
+    restricting `inputs/gen.py`; Q2 is what showed it was not. **Stage 7h was
+    right**: what it refused is the configuration upstream itself withdrew.
   * `inputs/` is five files. Q1 and Q3 range over 133 932 calls.
 
 An OFFSET interpreter of the extracted walk -- it never holds a pointer, so it
@@ -26,13 +28,24 @@ zval string is `emalloc(slen + 1)` with `val[slen] == '\\0'`, so
 The variants, and every one of them is a real historical program:
 
     R1      mbfilter.c:1179-1259 as shipped in php-5.0.0 .. php-5.3.2
-    R1h_a   + cb3cca21b345 hunk (a)   `from > len` -> RETURN_FALSE
-    R1h     + cb3cca21b345 hunks (a) and (b)          <- c/kernel_hardened.c
+    R1h     + cb3cca21b345 hunk (a) ALONE, `from > len` -> RETURN_FALSE
+              = php-5.2.12 .. php-5.2.17          <- c/kernel_hardened.c
+    R1h_ab  + cb3cca21b345 hunks (a) AND (b)
+              = php-5.1.2 .. php-5.2.11           <- WITHDRAWN by c2471b495009
     R1_2010 + d9dda48f8a7e's PROLOGUE `from >= len` -> `from = len`, 5.3.3+
     R1_walk + d9dda48f8a7e's REWRITTEN start walk, prologue NOT applied
 
 ⭐ `R1_walk` is here because it is the variant everybody guesses is the fix.
 It is not.
+
+⚠⚠ **THE LABELS `R1h` AND `R1h_a` SWAPPED MEANING AT `TASK_PHP_018`, AND THAT
+IS THE POINT OF THE TASK.** Until then `R1h` meant both hunks, `R1h_a` meant
+hunk (a) alone, and the row SHIPPED the former. `c2471b495009` (2009-09-23)
+removed hunk (b) upstream as **bug #49354** and this row followed, so `R1h`
+now means what the row ships and `R1h_ab` is the withdrawn configuration kept
+here as evidence. ⚠ Older logs under `.temp/php16/` and `.temp/php17/` use the
+OLD names; read `R1h_a` there as `R1h` here. Q1's and Q2's NUMBERS are
+unchanged -- only which column is called what.
 """
 
 import itertools
@@ -43,7 +56,7 @@ MBTAB = tuple(([1] * 192) + ([2] * 32) + ([3] * 16)
               + ([4] * 8) + ([5] * 4) + ([6] * 2) + ([1] * 2))
 assert len(MBTAB) == 256
 
-VARIANTS = ("R1", "R1h_a", "R1h", "R1_2010", "R1_walk")
+VARIANTS = ("R1", "R1h", "R1h_ab", "R1_2010", "R1_walk")
 
 
 def guard(slen, frm, length):
@@ -72,11 +85,11 @@ def run(s, slen, frm, length, mode, filler=0x00):
             maxread = i
         return s[i] if i < len(s) else filler
 
-    if mode in ("R1h_a", "R1h"):
-        if frm > slen:                       # cb3cca21b345 hunk (a)
+    if mode in ("R1h", "R1h_ab"):
+        if frm > slen:                       # cb3cca21b345 hunk (a) -- SHIPPED
             return "FALSE", maxread
-    if mode == "R1h":
-        if frm + length > slen:              # cb3cca21b345 hunk (b)
+    if mode == "R1h_ab":
+        if frm + length > slen:              # hunk (b) -- WITHDRAWN, c2471b495009
             length = slen - frm
     if mode == "R1_2010":
         if frm >= slen:                      # d9dda48f8a7e prologue
@@ -185,11 +198,11 @@ def q2():
     safe = changed = 0
     example = None
     for label, s, slen, frm, length in calls():
-        a_only, mx = run(s, slen, frm, length, "R1h_a")
+        a_only, mx = run(s, slen, frm, length, "R1h")
         if mx > slen or a_only == "FALSE":
             continue                      # not a benign, non-refused call
         safe += 1
-        both, _ = run(s, slen, frm, length, "R1h")
+        both, _ = run(s, slen, frm, length, "R1h_ab")
         if both != a_only:
             changed += 1
             if example is None:
@@ -202,12 +215,21 @@ def q2():
         print(f"    e.g. {lb} from={fr} length={ln}")
         print(f"         (a) alone -> start={a[0]} end={a[1]} len={a[1]-a[0]}")
         print(f"         (a)+(b)   -> start={b[0]} end={b[1]} len={b[1]-b[0]}")
-    print("    ⚠ This is why inputs/gen.py refuses a measured window with "
-          "`from + length > string->len`:")
-    print("      check.py stage 7h requires R1h == R1 on every "
-          "non-adversarial input.")
-    print("    ⭐ Upstream itself withdrew hunk (b): php-5.2.17 carries (a) "
-          "alone.")
+    print("    ⚠⚠ UNTIL TASK_PHP_018 THIS NUMBER WAS THE REASON "
+          "inputs/gen.py REFUSED a window")
+    print("       with `from + length > string->len`. It is now the reason "
+          "R1h DOES NOT CARRY")
+    print("       hunk (b), and gen.py REQUIRES such windows: the same "
+          "measurement, read the")
+    print("       other way round. check.py stage 7h was detecting a real "
+          "defect, not")
+    print("       obstructing a real fix.")
+    print("    ⭐ Upstream itself withdrew hunk (b): c2471b495009 (2009-09-23, "
+          "bug #49354),")
+    print("       so php-5.2.12 .. php-5.2.17 carry (a) alone. "
+          "controls/bug49354.py runs")
+    print("       upstream's own six expectations against all three "
+          "configurations.")
     return changed
 
 
@@ -286,22 +308,46 @@ def q3():
 HISTORY = """
 Q4  where each guard lives, PER FUNCTION, by release tag (recorded)
 
-    tag         mb_strcut's own guards      mbfilter.c prologue
-    php-5.0.0          -   -                       -            <- THIS ROW
+    tag         mb_strcut's own guards      mbfilter.c prologue   body sha256/16
+    php-5.0.0          -   -                       -            <- THIS ROW (R1)
     php-5.0.5          -   -                       -
     php-5.1.0          -   -                       -
     php-5.1.1          -   -                       -
     php-5.1.2        FROM LEN                      -   <- cb3cca21b345
-    php-5.2.17       FROM  -                       -
-    php-5.3.0        FROM LEN                      -
+      .. php-5.2.6   FROM LEN                      -            a971fe526e8b8803
+    php-5.2.7                                                   ec8b60b77f5d7e8e
+      .. php-5.2.11  FROM LEN                      -
+    php-5.2.12       FROM  -                       -   <- c2471b495009
+      .. php-5.2.17  FROM  -                       -            26e2099e33433c74
+                                                                ^^ THIS ROW (R1h)
+    php-5.3.0        FROM LEN                      -            08719ef48d57d502
     php-5.3.1        FROM LEN                      -
-    php-5.3.2        FROM  -                       -
+    php-5.3.2        FROM  -                       -            49ad3ab2796d63e4
     php-5.3.3        FROM  -                      YES  <- d9dda48f8a7e
-    php-5.3.29       FROM  -                      YES
+    php-5.3.29       FROM  -                      YES           49ad3ab2796d63e4
     php-5.4.0        FROM  -                      YES
 
     FROM = `if (from > <len>) RETURN_FALSE`   -- hunk (a), either spelling
     LEN  = the `(unsigned)` sum clamp         -- hunk (b), either spelling
+    body sha256/16 = brace-matched PHP_FUNCTION(mb_strcut) body, per
+    `.temp/mgr165/REFETCH.sh` over nineteen tags (UPSTREAM_002 §1).
+
+    ⭐⭐ HUNK (b) WENT OUT IN 2005, WAS REMOVED FROM **BOTH** LIVE BRANCHES
+    WITHIN FIVE MONTHS OF EACH OTHER, AND NEVER CAME BACK. It is present
+    continuously php-5.1.2 .. php-5.2.11 and php-5.3.0 .. php-5.3.1, and absent
+    from php-5.2.12 and php-5.3.2 onward. `c2471b495009` was committed THREE
+    TIMES IN THE SAME SECOND -- c2471b495009, 0c974164e248, ce3c028803aa, one
+    per live branch -- with `ext/mbstring/tests/bug49354.phpt`. R1h is pinned to
+    php-5.2.12 .. php-5.2.17 rather than to 5.3.2+ only because 5.3 also carries
+    the surrounding rewrite; the GUARD configuration is the same at both.
+    ⚠ 5.2.6 -> 5.2.7 is `MBSTRG(current_language)` -> `MBSTRG(language)`, one
+    token, unrelated to either guard; the 5.2 -> 5.3 size drop is the
+    surrounding rewrite, not the guards.
+    ⚠ NOT VERIFIED: that `r202895`, which c2471b495009's message blames, is
+    cb3cca21b345. php-src's converted history carries no `git-svn-id` trailer
+    and svn.php.net no longer resolves, so TASK_PHP_018 could not map it. What
+    IS measured is the code: the three lines removed in 2009 are byte-identical
+    to three of the seven added in 2005.
 
     ⚠⚠ THE SPELLING CHANGES AND A GREP FOR ONE OF THEM REPORTS THE WRONG
     ANSWER IN BOTH DIRECTIONS. `if (from > Z_STRLEN_PP(arg1))` is absent from
@@ -311,10 +357,12 @@ Q4  where each guard lives, PER FUNCTION, by release tag (recorded)
     `PHP_FUNCTION(mb_strcut)` out of the file. NOTES.md 4c-bis.
 
     `mbfl_strcut`'s BODY is byte-identical (sha256 613648930a3d2551...) at
-    php-5.0.0, 5.1.0, 5.2.17, 5.3.0, 5.3.1 and 5.3.2 -- six releases, five and
-    a half years -- because the 2005 fix is in the CALLER. The library function
-    itself was unsafe for any other caller until d9dda48f8a7e (2010-03-12),
-    four years and three months later.
+    php-5.0.0, 5.0.5, 5.1.0, 5.1.1, 5.1.2, 5.2.17, 5.3.0, 5.3.1 and 5.3.2 --
+    NINE releases, five and a half years -- because the 2005 fix is in the
+    CALLER. ⚠ This said SIX until TASK_PHP_017 m3 extracted the function at
+    twelve tags and found nine; the claim was UNDERSTATED, not wrong. The
+    library function itself was unsafe for any other caller until d9dda48f8a7e
+    (2010-03-12), four years and three months later.
 
     * AND IN THE PINNED 5.0.0 TARBALL, mbstring.c:1900, PHP_FUNCTION
     (mb_strimwidth) ALREADY HAS `if (from < 0 || from > Z_STRLEN_PP(arg1))` --

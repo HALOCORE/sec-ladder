@@ -9,11 +9,19 @@ DIFFERENTIAL TEST, not a comment"* -- and §B's own worked failure is
 disagreements** away from faithful. This is that test for ph07's one such
 claim.
 
-**The claim.** `c/kernel.c`'s wrapper writes mbstring.c:1787-1805 and
-`cb3cca21b345` in `int32_t`, verbatim. The four Rust rungs write the same
-function in `usize`, with `saturating_sub` for the two negative clamps and
-`saturating_add` for hunk (b)'s sum. They compute the same `(from, length)` --
-or the same refusal -- on every triple this kernel's domain can hold.
+**The claim.** `c/kernel.c`'s wrapper writes mbstring.c:1787-1805 and R1h's
+guard in `int32_t`, verbatim. The four Rust rungs write the same function in
+`usize`, with `saturating_sub` for the two negative clamps. They compute the
+same `(from, length)` -- or the same refusal -- on every triple this kernel's
+domain can hold.
+
+⚠⚠ **TWO CONFIGURATIONS ARE COMPARED SINCE `TASK_PHP_018`, AND ONLY ONE OF THEM
+SHIPS.** R1h used to be `cb3cca21b345` entire, both hunks. `c2471b495009`
+(2009-09-23) removed hunk (b) as **bug #49354**, so R1h is now hunk (a) alone
+(`php-5.2.12 .. php-5.2.17`). The withdrawn two-hunk configuration stays here,
+compared and asserted, because deleting it would delete the evidence for why it
+is not shipped -- and because its `saturating_add` half is where this file's
+two most interesting results live (`c32`, `ord`).
 
 **The domain, and it is the whole of it, not a sample.** `from` and `length`
 reach `mb_strcut` as `long`s and reach `mbfl_strcut` as `int`s, and `string->len`
@@ -28,6 +36,14 @@ spelling, each one line, each a mistake a careful person makes:
     m1  `saturating_sub` -> plain subtraction with a wrap    (negative `from`)
     m2  hunk (a) spelled `>=` instead of `>`                 (off by one)
     m3  hunk (b) clamps `len` to `string->len` instead of to `len - from`
+        (scored against the WITHDRAWN configuration, which is the only one
+        that has a hunk (b) to get wrong)
+
+⭐ **AND ONE MORE, WHICH IS THE `TASK_PHP_018` CHANGE MADE CHECKABLE:** `hb`
+scores the withdrawn two-hunk spelling against the SHIPPED column. It **must
+FIRE**, and the size of its firing is how far apart the two configurations are
+over this domain. If it ever stopped firing, hunk (b) would be a no-op and its
+removal would not have been a bug fix.
 
 ⭐ **And two VARIANTS that are results rather than controls, both must-NOT-fire.**
 
@@ -57,7 +73,7 @@ M32 = (1 << 32) - 1
 M64 = (1 << 64) - 1
 
 
-def rust(slen, fw, lw, mutant=None):
+def rust(slen, fw, lw, mutant=None, hunk_b=False):
     """The four Rust rungs' spelling, transcribed. `fw`/`lw` are the RAW 32-bit
     words the window carries; the rungs branch on the top bit rather than
     converting to a signed type, because `usize` has no negatives."""
@@ -76,9 +92,12 @@ def rust(slen, fw, lw, mutant=None):
         # cb3cca21b345 hunk (a). MUTANT m2 spells it `>=`.
         return frm >= slen if mutant == "m2" else frm > slen
 
-    def hunk_b(ln):
-        # cb3cca21b345 hunk (b). `c32` uses the C's literal 32-bit sum where
-        # the rungs use `saturating_add`.
+    def clamp_b(ln):
+        # cb3cca21b345 hunk (b) -- WITHDRAWN by c2471b495009 and not in any
+        # shipped rung since TASK_PHP_018. `c32` uses the C's literal 32-bit sum
+        # where the rungs used `saturating_add`.
+        if not hunk_b:
+            return ln
         s = ((frm + ln) & M32) if mutant in ("c32", "ord") else min(frm + ln, M64)
         if s <= slen:
             return ln
@@ -86,17 +105,17 @@ def rust(slen, fw, lw, mutant=None):
         return slen if mutant == "m3" else ((slen - frm) & M64)
 
     if mutant == "ord":
-        # VARIANT: the two guards in the OTHER order. Upstream refuses first and
-        # clamps second; this clamps first, so `from` is still unbounded when
+        # VARIANT: the two guards in the OTHER order. Upstream refused first and
+        # clamped second; this clamps first, so `from` is still unbounded when
         # the 32-bit sum is taken.
-        length = hunk_b(length)
+        length = clamp_b(length)
         if hunk_a():
             return "FALSE"
         return (frm, length)
 
     if hunk_a():
         return "FALSE"
-    return (frm, hunk_b(length))
+    return (frm, clamp_b(length))
 
 
 def triples():
@@ -129,35 +148,55 @@ def main():
     stdin = "\n".join(f"{a} {b} {c}" for a, b, c in tri) + "\n"
     r = subprocess.run([exe], input=stdin, capture_output=True, text=True)
     lines = r.stdout.split("\n")
-    got = []
+    got_a, got_ab = [], []       # the C's answer per configuration
     for ln in lines:
         ln = ln.strip()
         if not ln:
             continue
-        got.append("FALSE" if ln == "FALSE" else tuple(int(x) for x in ln.split()))
-    assert len(got) == len(tri), (len(got), len(tri))
+        if ln == "FALSE":
+            got_a.append("FALSE")
+            got_ab.append("FALSE")
+        else:
+            f, la, lab = (int(x) for x in ln.split())
+            got_a.append((f, la))
+            got_ab.append((f, lab))
+    assert len(got_a) == len(tri), (len(got_a), len(tri))
+
+    # (label, mutant, hunk_b in the RUST spelling, C column, must-fire?)
+    CASES = [
+        ("SHIPPED  R1h = hunk (a) alone", None, False, got_a, False),
+        ("HISTORIC hunk (a)+(b)", None, True, got_ab, False),
+        ("VARIANT  c32", "c32", True, got_ab, False),
+        ("VARIANT  ord", "ord", True, got_ab, False),
+        ("MUTANT   m1 sat_sub wraps", "m1", False, got_a, True),
+        ("MUTANT   m2 hunk (a) is >=", "m2", False, got_a, True),
+        ("MUTANT   m3 hunk (b) clamps to slen", "m3", True, got_ab, True),
+        ("CONFIG   hb: two-hunk vs SHIPPED column", None, True, got_a, True),
+    ]
 
     rc = 0
-    for mutant in (None, "c32", "ord", "m1", "m2", "m3"):
+    for tag, mutant, hb, want_col, must_fire in CASES:
         bad = 0
         first = None
-        for (slen, fr, ln), want in zip(tri, got):
-            have = rust(slen, fr & M32, ln & M32, mutant)
+        for (slen, fr, ln), want in zip(tri, want_col):
+            have = rust(slen, fr & M32, ln & M32, mutant, hunk_b=hb)
             if have != want:
                 bad += 1
                 if first is None:
                     first = (slen, fr, ln, want, have)
-        tag = "SHIPPED " if mutant is None else f"VARIANT {mutant}"
-        must_not = mutant in (None, "c32", "ord")
-        expect = "must NOT fire" if must_not else "must FIRE"
-        ok = (bad == 0) if must_not else (bad > 0)
-        print(f"  {tag:9s} {expect:13s} disagreements={bad:<8d} "
+        expect = "must FIRE" if must_fire else "must NOT fire"
+        ok = (bad > 0) if must_fire else (bad == 0)
+        print(f"  {tag:38s} {expect:13s} disagreements={bad:<8d} "
               f"{'ok' if ok else 'FAILED'}"
               + (f"   first: slen={first[0]} from={first[1]} length={first[2]} "
                  f"C={first[3]} rust={first[4]}" if first else ""))
         if not ok:
             rc = 1
     print(f"  triples compared: {len(tri)}")
+    print("  ⭐ `hb` is the TASK_PHP_018 result: the two configurations really "
+          "do differ on this")
+    print("     domain, so removing hunk (b) was a behaviour change and not a "
+          "tidy-up.")
     print("  ⭐ `c32` is a RESULT, not a control: replacing the saturating sum "
           "with the C's own")
     print("     32-bit `(unsigned) from + (unsigned) len` changes NOTHING, "
