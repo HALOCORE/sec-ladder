@@ -52,8 +52,28 @@ trigger does not — the extracted kernel takes a blob of indices, and any index
 deliverable is about the kernel; the PHP-level statement belongs in `NOTES.md`
 as the row's provenance, not as its trigger.
 
-**Tier `verbatim`** — it is a `static` helper, so the lift is the function
-(`UPSTREAM_001.md` §6). ✅ Already tier-checked; do not re-tier it.
+**Tier: the catalogue says `verbatim`, and ⚠ I am no longer sure it survives.**
+`TASK_PHP_012` M4's recheck (re-run by the manager, `UPSTREAM_001.md:240-252`)
+cleared it — but **that test asks one question: is the defect site inside a
+`PHP_FUNCTION` / argument-parsing frame?** `ph16` is a `static` helper, so it
+passes. ⚠⚠ **The test is not the definition.** `PLAN_PHP.md:342-343` says
+`verbatim` is *"the function lifts as-is; only `TSRMLS_*` / macro plumbing is
+removed"* and `narrowed` is *"a wrapper comes off (zval unpacking…); the body is
+unchanged"* — and `stream_array_to_fd_set` iterates a `zend_hash` of `zval **`
+and calls `php_stream_from_zval_no_verify` / `php_stream_cast`. **None of that
+is macro plumbing.** If your kernel drives `FD_SET` from a blob of indices, the
+zval unpacking has come off and the body is unchanged, **which is `narrowed`
+by the book.**
+
+**Decide it yourself, from `PLAN_PHP.md` §4's definitions, and say which test
+you applied.** ⚠ The tier is a **cost statement, never a filter** — no admission
+turns on it — but `provenance.py` reports kernel overlap against the declared
+tier's expectation (`verbatim` 50 %, `narrowed` 25 %), so **a mis-declared
+`verbatim` landing at 30 % hands a reviewer a frightening number with no way to
+tell a wrong tier from a bad extraction** (`UPSTREAM_001.md:255-262`). ⚠ **This
+is the same shape as F44 — a rate that tracks the TEST rather than the rows —
+and it is my error for writing *"already tier-checked, do not re-tier"* into an
+earlier draft of this file.**
 
 ## §2 R1h — the guard, and the finding inside it
 
@@ -186,11 +206,12 @@ does not, **that asymmetry is a headline result — measure it and write it down
    `ph07` needed **11 gate rounds**. If carrying §4.1 turns this into two tasks,
    **say so and stop at a green row with the debt declared** — that is what
    `ph03` did, and the debt is now two rows old, which is why I am asking.
-3. ⚠⚠ **That `verbatim` survives the oracle.** If witnessing the fault requires
-   surrounding the `fd_set` with scaffolding the original does not have, the tier
-   may really be `narrowed`. **Re-tier it if the evidence says so** — the tier is
-   a cost statement, never a filter, and getting it wrong in the safe direction
-   costs nothing.
+3. ⚠⚠ **That `verbatim` is right at all** — see §1. Two independent reasons to
+   doubt it: the hash/stream unpacking (§1), and the oracle, because **if
+   witnessing the fault requires surrounding the `fd_set` with scaffolding the
+   original frame does not have**, that is a second departure. **Re-tier it if
+   the evidence says so** — the tier is a cost statement, never a filter, and
+   getting it wrong in the safe direction costs nothing.
 
 ---
 
