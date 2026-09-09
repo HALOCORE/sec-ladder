@@ -140,7 +140,8 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > refuted by construction, and F39's direction withdrawn** · **F43 ⭐⭐⭐ PHP
 > deleted half its own security fix, and stage 7h had already said why** ·
 > **F44 ⚠⚠⚠ 2 of 13 kills correct as written; the rate tracks the TEST, not the
-> rows; and "merged by the corpus itself" is the weakest evidence there was**
+> rows; and "merged by the corpus itself" is the weakest evidence there was** ·
+> **F45 ⭐⭐⭐ a defect made invisible by the commit that fixed its warning**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -1143,10 +1144,94 @@ independently, but **two of its four cells are wrong.**
    evidence I used to make the point.**
 2. ⭐ **It is FOUR tables, not two.** `.temp/mgr165/count_ent.py`, comment-aware,
    at 5.0.0: `ent_uni_338_402` **63/65**, `ent_uni_spacing` **22/23**,
-   `ent_uni_punct` **66/67**, `ent_uni_8592_9002` **410/411**; the other six
-   mapped tables are exact, and all four are repaired by 5.0.5. ✅ **This
+   `ent_uni_punct` **66/67**, `ent_uni_8592_9002` **410/411**; **the other
+   thirteen are exact**, and all four are repaired by 5.0.5. ✅ **This
    reproduces the report's `nm -S` figures exactly by a different method**, and
-   confirms `ph32`'s own `⚠ risk` line. **The split is being re-run against it.**
+   confirms `ph32`'s own `⚠ risk` line. **→ Settled at F45.**
+
+> ⚠⚠⚠ **AND THE SENTENCE THAT USED TO END THAT PARAGRAPH — *"the other six
+> mapped tables are exact; 7 more are not in entity_map at all"* — WAS FALSE,
+> AND IT WAS MY SCRIPT SAYING IT.** `declared()` matched bounds with `(\d+)`, so
+> it could not read the **15** `entity_map[]` rows whose bounds are hex
+> (`0x80`, `0xff`, …), returned `None` for the **8** tables those rows name —
+> **and then printed *"(not in entity_map — unused?)"*.** ✅ Measured after the
+> fact: **all 17 tables are in `entity_map[]`; 24 rows, 0 unevaluated, 4 short.**
+> ⚠ I pasted that output into `RECAP_PHP.md` **and** into a message to the agent.
+>
+> ⭐⭐ **The defect is not the arithmetic — it is that BOTH failure paths
+> rendered as a POSITIVE CLAIM ABOUT THE C instead of *"I could not evaluate
+> this"*** (the other one printed `ok`). **That is F17's shape — a reassurance
+> that tells the reader not to look — produced by F10/F11's mechanism: I parsed
+> C with a regex to decide a C fact.** `TASK_PHP_019` §10 caught it by
+> **re-deriving every number with the compiler**, which is F11's rule verbatim:
+> *ask the tool that actually decides.* ⚠ **The staircase now has a fourth
+> step, and the fourth is the manager's own probe.** The script is fixed to
+> print `CANNOT EVALUATE` and exit non-zero; ✅ **all four of my figures were
+> right**, which is exactly why the false sentence beside them survived.
+
+### F45 — ⭐⭐⭐ A DEFECT MADE INVISIBLE BY THE COMMIT THAT FIXED ITS WARNING
+
+`TASK_PHP_019` §10, on the split F44 sent back. **The answer is TWO rows, not
+one and not four** — and the archaeology on the way is worth more than the split.
+
+| row | tables | the commit that removes the **5.0.0** shortfall |
+|---|---|---|
+| **`ph32`** (keeps `CRASH-089`) | `ent_uni_338_402` **+ `ent_uni_spacing` + `ent_uni_8592_9002`** | **one** commit — `56adfe1f3cf1`, 2005-03-09, bug #28067 |
+| **`ph102`** (takes `CRASH-090`) | `ent_uni_punct` | `46bc2c5ae2ae`, 2004-07-19, bug #29199 |
+
+**Both disjuncts of the rule fire, in opposite directions**: the three share a
+fix, so they **merge** on the first; `punct`'s fix touches none of them and
+theirs touches not `punct`, so it **splits** on the second. ⭐ **So `CRASH-090`
+reverses after all** — and *not* on the bar question `TASK_PHP_019` §7 raised,
+which now scopes only to three tables that are in **no corpus row** and blocks
+nothing.
+
+⚠⚠⚠ **THE FINDING, AND IT IS A THIRD INSTANCE OF THIS PROGRAMME'S SHARPEST
+SHAPE.** The repair is a **four-commit chain**, and step 3 is
+`bd07142b9128`, 2005-03-10 — *"fix `/*`-within-comment warning"*. It closes the
+comment **after** the swallowed block. **The compiler goes quiet; the 24
+initialisers stay inside the comment; and php-5.0.4 ships `ent_uni_338_402` at
+41 for a declared 65** — ⚠ **twelve times worse than 5.0.0's 63** — **with
+`gcc -Wall` silent** (measured by the agent; ✅ **the 41/65 independently
+reproduced here by the fixed counter**, 5.0.0 **63** → 5.0.4 **41** → 5.0.5
+**65**).
+
+> **A warning was the only thing pointing at the defect, and the fix for the
+> warning is what hid it.**
+
+⭐ **So `ph32`'s R1h is TWO commits, and stopping at the first passes every
+syntactic check and is still wrong** — `ph03`'s two-hunk finding arriving at an
+unrelated site, by an unrelated mechanism. **Three rows now say the same thing
+from three directions**: `ph03` (a fix half dead, half incomplete), `ph07`
+(a fix half *wrong*, deleted by upstream — F43), `ph32` (a fix whose second half
+is invisible because the first half silenced the diagnostic).
+⚠ **And it is the same family as `ph07`'s own headline** — *the clamp that
+arrives too late to prevent the over-read is exactly the clamp that hides it*
+(F41). **The mechanism that suppresses the symptom keeps turning up adjacent to
+the defect**, and that is now a claim with four instances rather than a
+flourish.
+
+⭐ **Three kinds of shortfall, not one, and the kind explains the history.**
+`338_402` and `spacing` are **miscounted NULL runs under explicit range
+comments**; `punct` is the only `cs_utf_8` table with **no run markers at all**,
+missing one placeholder; `8592_9002` is **compensating errors netting to −1**.
+**The 2005 audit commit catches the three *labelled* tables in one pass, while
+the unlabelled one had to be found by a user bug report nine months earlier —
+and its fix adds the missing run markers.** ⚠ **My guess that the kinds differ
+was a guess; it is now measured, and it was the right thing to send back.**
+
+✅ **Three independent methods agree on every localisation** — the corpus's
+`nm -S` control binaries, the agent's compiler-evaluated
+`sizeof/sizeof[0]` walk, and my regex counter — **and each localisation was
+predicted before the patch was read** (*"the omission is immediately before
+`dagger`"* → `46bc2c5ae2ae` inserts a `NULL` there; *"`crarr` is one early"* →
+`56adfe1f3cf1` moves it).
+
+**Restated: 10 of 13 fail, and only `CRASH-037 → ph39` is correct exactly as
+written. Nine new rows `ph94`–`ph102`. Catalogue 93 → 102. 41 of 46 ≈ 89 % of
+everything ever killed in this programme is reversed.**
+
+### F43 — ⭐⭐⭐ PHP DELETED HALF ITS OWN SECURITY FIX, AND OUR GATE HAD ALREADY SAID WHY
 
 ⚠ **The bar question still stands and is mine to settle**: `PLAN_PHP.md` §3.1
 and `CLAUDE.md` rule 6 both say *"its C mechanism"* and **neither says whether a
