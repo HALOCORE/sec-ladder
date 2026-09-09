@@ -34,12 +34,20 @@ almost everything §9 asks:
 | R2–R5 vs R1h | must **diverge** | are **ports** of it |
 | what tuning recovers | 86.4 % of the naive gap | 76.6 % shipped, and an R3-side search then found **+13.50 % → +2.62 %** |
 
-⚠⚠⚠ **So the WITHIN-family variance is large, and the BETWEEN-family variance
-has never been measured at all.** Had the programme built one row per family —
-the obvious plan — **S1's published answer would have been whichever of these
-two we happened to pick, and it would have been wrong on four of six axes half
-the time.** ⭐ **We know this only because we accidentally built two from one
-family.** That accident is the single most informative thing in the programme's
+⚠ **Count that honestly: those are FOUR PROPERTIES, not "four of §9's six
+questions."** They map onto §9 items **2** (*what goes wrong, and the real
+upstream fix*), **3** and **4** (*the naive and tuned translations, and what
+they cost*). ⚠⚠ **Items 1, 5 and 6 — the citation, what `unsafe` buys against
+what the proof costs, and which invariant moved — have NOT been compared across
+the two rows at all**, and item 5 cannot be until a spellings search exists on
+either (F42). **So the disagreement is measured on half the axes and unmeasured
+on the other half; do not report it as six.**
+
+⚠⚠⚠ **Even at three axes the conclusion holds: the WITHIN-family variance is
+large, and the BETWEEN-family variance has never been measured at all.** Had the
+programme built one row per family — the obvious plan — **S1's published answer
+would have been whichever of these two we happened to pick.** ⭐ **We know this
+only because we accidentally built two from one family.** That accident is the single most informative thing in the programme's
 cost record, and it should become the method rather than stay an anomaly.
 
 ## §2 The rate, measured
