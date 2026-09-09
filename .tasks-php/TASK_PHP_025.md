@@ -91,21 +91,45 @@ Glibc `_FORTIFY_SOURCE` *does* catch it
 (`*** bit out of range 0 - FD_SETSIZE on fd_set ***`).
 
 **So the R1 rung cannot be witnessed by the detector every other row uses.**
-Options, in the order I would try them — **but this is yours to decide and
-report, not mine:**
 
-1. **A canary/checksum oracle** — neighbouring objects in the same frame with
-   known contents, checked after the kernel runs. The catalogue block already
-   recommends this. ⚠ It depends on frame layout, so **it must be verified to
-   actually neighbour the `fd_set` at BOTH `-O0` and `-O3`**, and a canary the
-   compiler reorders away is a probe that silently passes.
-2. **`_FORTIFY_SOURCE`** — real, upstream, and it fires. ⚠ But it is a *third*
-   configuration beside the plain and sanitizer builds, and `.memory-php/02`'s
-   rule is that **a sanitizer limb is a claim about YOUR toolchain** — the same
-   caution applies doubled here.
-3. **A heap `fd_set`** so ASan's redzone is in range. ⚠⚠ **This changes the
-   storage class the row is ABOUT** (`ph17` is already catalogued as exactly
-   that variation). **If you do it, it is a control, never the row.**
+⭐ **THE MANAGER RAN IT** rather than citing it (`PROTOCOL.md` rule 14) —
+`.temp/mgr166/asan_reach.c`, one write per process at a chosen distance past a
+128-byte on-stack `fd_set`, with a `volatile` canary array standing in for the
+caller's other locals. **Identical at `-O0`, `-O1` and `-O3`:**
+
+| bytes past the object | ASan | canary |
+|---|---|---|
+| 8, 16 | ✅ **REPORTED** `stack-buffer-overflow` | — |
+| **32 … 512** | ⚠ **SILENT** | ⭐ **CAUGHT IT** |
+| 4096 | ⚠ SILENT | INTACT — past the canary's own 512 bytes |
+
+**Three things this settles, and one it does not:**
+
+1. ✅ **The catalogue's premise HOLDS — and the boundary is 32 bytes, not
+   somewhere near 384.** The redzone on this object is 32 bytes wide. **An
+   engineer who tested only the catalogue's `8` and `384` would place the
+   cliff anywhere in between.**
+2. ⭐⭐ **THE CANARY ORACLE WORKS, ACROSS THE WHOLE RANGE WHERE ASan FAILS, at
+   every `-O` level** — and **it works for exactly the reason ASan fails.**
+   Past the redzone the write lands in a *live neighbouring object*, so the
+   address is legitimate and there is nothing for a sanitizer to report — but
+   it is an object we control and can check. **Build the row on this.**
+3. ⚠ **Reach is bounded by the canary, not by the defect.** At 4096 nothing in
+   the frame sees it. `stream_select` really does have three `fd_set`s and
+   several `int`s in one frame, so **size the canary to the index range your
+   fixture drives, and state the range over which your oracle is complete.**
+4. ⚠ **`volatile` is load-bearing** — it is what stops the compiler eliminating
+   the canary. **A canary the compiler reorders or drops is a probe that
+   silently passes**, so assert its address relative to the `fd_set` at run time
+   rather than assuming the layout.
+
+Two alternatives, **for a control, not the row**: **`_FORTIFY_SOURCE`**, which
+is real and upstream and does fire (`*** bit out of range 0 - FD_SETSIZE on
+fd_set ***`) — ⚠ but it is a *third* configuration and `.memory-php/02`'s rule
+that **a sanitizer limb is a claim about YOUR toolchain** applies doubled; and a
+**heap `fd_set`**, which puts ASan's redzone back in range — ⚠⚠ **but that
+changes the storage class the row is ABOUT**, and `ph17` is already catalogued
+as exactly that variation.
 
 ⚠⚠⚠ **AND WHATEVER YOU FIND HERE, IT CANNOT KILL OR SHRINK THE ROW.** *"The
 sanitizer cannot see it"* is a **FINDING** — `CLAUDE.md` rule 6, `PLAN_PHP.md`
@@ -150,12 +174,14 @@ does not, **that asymmetry is a headline result — measure it and write it down
 
 ## §6 What I am least sure of
 
-1. ⚠⚠ **That §3 has a good answer at all.** It is possible the honest outcome is
-   *"R1's fault is not observable by any oracle we are willing to ship, so the
-   row's R1 rung is witnessed by construction (the index is provably ≥ 1024) and
-   not by a detector."* **That is an acceptable result — say it plainly if it is
-   the true one.** What is not acceptable is a canary that passes because the
-   compiler moved it.
+1. ⚠ **That §3's canary survives contact with a REAL kernel.** I measured it on
+   a probe I wrote, where I controlled the frame. **In the extracted kernel the
+   `fd_set` and the canary are in whatever frame the lifted function has**, and
+   `verbatim` means I do not get to add locals to it freely. **If honouring the
+   tier costs you the oracle, say which you dropped and why** — and note that
+   *"R1's fault is witnessed by construction (the index is provably ≥ 1024) and
+   not by a detector"* is an acceptable result, plainly said. What is not
+   acceptable is a canary that passes because the compiler moved it.
 2. ⚠ **That `spellings.py` belongs in the first task rather than a follow-up.**
    `ph07` needed **11 gate rounds**. If carrying §4.1 turns this into two tasks,
    **say so and stop at a green row with the debt declared** — that is what

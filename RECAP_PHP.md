@@ -1189,6 +1189,35 @@ gets the unguarded spelling and the comment saying so is CORRECT**, because
 Win32's `fd_set` is a counted array of `SOCKET`s. **R1h must state which branch
 it compiles.**
 
+⭐⭐ **AND THE ROW'S ORACLE PROBLEM IS SOLVED, BY MEASUREMENT** (rule 14 —
+`.temp/mgr166/asan_reach.c`, one write per process past a 128-byte on-stack
+`fd_set`, **identical at `-O0`, `-O1`, `-O3`**):
+
+| bytes past the object | ASan | canary |
+|---|---|---|
+| 8, 16 | ✅ **REPORTED** `stack-buffer-overflow` | — |
+| **32 … 512** | ⚠ **SILENT** | ⭐ **CAUGHT IT** |
+| 4096 | ⚠ SILENT | INTACT — past the canary's own 512 B |
+
+✅ **The catalogue's premise holds. But the cliff is at 32 bytes, not near 384**
+— the redzone is 32 B wide, and the block's two data points leave the boundary
+unspecified across a 47× range. ⭐⭐ **The canary oracle works across the whole
+range where ASan fails, and for exactly the reason ASan fails**: past the
+redzone the write lands in a **live neighbouring object**, so the address is
+legitimate and there is nothing for a sanitizer to report — but it is an object
+we control. **`TASK_PHP_025` §3 now carries this as a measurement rather than a
+recommendation**, with the two caveats it earns: reach is bounded by the canary
+and not by the defect, and `volatile` is load-bearing.
+
+⚠⚠ **MY FIRST VERSION OF THAT PROBE PRINTED A CONFIDENT WRONG NEGATIVE.**
+`CANARY_BYTE` was `0xA5`, bit 0 already set, so the kernel's `|= 1` was a
+**no-op** and every distance reported *"canary INTACT — nothing in this frame
+saw it"*. It said the opposite of the truth and looked clean. **Same class as
+`count_ent.py`, and as the `re.sub(r'\D','',…)` V5C check in F51 the same
+afternoon — three in two sessions, every one a broken computation rendering as
+a positive claim.** ⚠ **`.memory-php/00`'s rule already covers it and I keep
+writing probes that violate it; the rule is not the gap, the habit is.**
+
 ### F49 — ⭐⭐⭐ THE STOP CONDITION FIRED, AND THE AUDIT'S OWN FINDING PREDICTED WHICH HALF WOULD FAIL
 
 `TASK_PHP_021` was told to land `_019`+`_020` into `CATALOGUE.md` **and then
