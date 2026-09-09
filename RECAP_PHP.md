@@ -1058,12 +1058,28 @@ fix"* is a choice the row has to make and justify — like `ph03`'s two hunks.
 ⚠ **What is NOT done: none of the four commits is pinned**, only the tag window.
 That is the row engineer's job, and the window is the expensive half.
 
-⚠ **And `ph29`'s catalogued mechanism is not yet verified.** The catalogue says
-*"the allocator truncates n mod 2^32"*; `to_read` is a `long` and 5.0.0's
-`emalloc` takes a `size_t`, which on this 64-bit box truncates nothing.
-**Either the mechanism is 32-bit-only, or it is elsewhere, or the row is
-mis-catalogued — a C-side question, so it can decide admission.** Settle it at
-source before building.
+> ✅✅ **SETTLED AT `TASK_PHP_020` → F46, AND THE CATALOGUE WAS RIGHT WHILE I
+> WAS WRONG. Read that, not this.** This entry said *"`ph29`'s catalogued
+> mechanism is not yet verified — `to_read` is a `long` and 5.0.0's `emalloc`
+> takes a `size_t`, which on this 64-bit box truncates nothing. **Either the
+> mechanism is 32-bit-only, or it is elsewhere, or the row is
+> mis-catalogued.**"* **The measurement matched none of the three.**
+>
+> A probe replicating `zend_alloc.c:129/132/135/182/201` verbatim: `to_read =
+> LONG_MAX` → `size = 2^63` → **`real_size = 0`** → a header-sized `malloc`
+> **succeeds**. ⚠ **The truncation is `REAL_SIZE` at `:129`** — F5's family,
+> already in this file — **and never was at `emalloc`'s signature, which is
+> where I looked.** ⚠⚠ **And the row is 64-bit-ONLY: the exact opposite of the
+> "32-bit-only" limb I offered.** ⭐ Three strengthenings came with it — a
+> **UB-free** trigger (`to_read = 4294967295`, avoiding a `LONG_MAX + 1` gcc
+> may fold), it **zeroes `CHECK_MEMORY_LIMIT`'s accumulator**, and it **reaches
+> the second truncation** (`zend_alloc.h:53`'s `size:31`).
+>
+> ⭐ **The transferable part is not the arithmetic.** I doubted a catalogue row
+> because *a mechanism I could not see at the frame I was looking at* — and F1
+> is this project's oldest finding: **the citation names one frame and the
+> defect lives in another.** **I applied F1 to kills and to fixes and did not
+> apply it to my own doubt.**
 
 ### F46 — ⭐⭐ THE CATALOGUE'S MECHANISM SENTENCES HOLD. ITS `▸ trigger` LINES DO NOT, AND THAT IS THE HALF A BUILD TASK RUNS
 

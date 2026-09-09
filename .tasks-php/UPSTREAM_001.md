@@ -186,15 +186,32 @@ of **a bound that lives in a platform's data structure rather than in the code**
 - ⚠ **So *"the fix"* is a choice the row must make and defend**, exactly as
   `ph03`'s two hunks were.
 
-⚠⚠ **AND `ph29`'s CATALOGUED MECHANISM IS UNVERIFIED — SETTLE IT BEFORE
-BUILDING.** `CATALOGUE.md` says *"`emalloc(n+1)` where the allocator truncates
-n mod 2^32"*. But `to_read` is a `long` and 5.0.0's `emalloc` takes a `size_t`,
-**which on this 64-bit box truncates nothing**. Either the truncation is
-32-bit-only, or it happens somewhere else (`Z_STRLEN` is an `int`; the
-`recvfrom` return is an `int recvd`), or the row is mis-catalogued.
-**This is a C-side question, so unlike a Rust- or Verus-side one it CAN decide
-admission** (`PLAN_PHP.md` §3) — but only after it is answered at source, and
-*"the mechanism is 32-bit-only"* is a **narrowing**, not a kill.
+> ✅✅ **SETTLED AT `TASK_PHP_020` (→ `RECAP_PHP.md` F46). THE CATALOGUE WAS
+> RIGHT AND THIS PARAGRAPH WAS WRONG — kept in place, not deleted, because a
+> doubt that vanishes is worse than a doubt that was mistaken.**
+>
+> It read: *"`ph29`'s catalogued mechanism is UNVERIFIED … `to_read` is a `long`
+> and 5.0.0's `emalloc` takes a `size_t`, **which on this 64-bit box truncates
+> nothing**. Either the truncation is 32-bit-only, or it happens somewhere else
+> (`Z_STRLEN` is an `int`; the `recvfrom` return is an `int recvd`), or the row
+> is mis-catalogued."*
+>
+> **A probe replicating `zend_alloc.c:129/132/135/182/201` verbatim** gives
+> `to_read = LONG_MAX` → `size = 2^63` → **`real_size = 0`** → a header-sized
+> `malloc` that **succeeds**. ⚠ **The truncation is `REAL_SIZE` at `:129`** —
+> and it never was at `emalloc`'s signature, which is the only place I looked.
+> ⚠⚠ **The row is 64-bit-ONLY**, the exact opposite of the *"32-bit-only"* limb
+> offered above, and it is satisfied in our environment. ⭐ Three strengthenings
+> come with it: a **UB-free** trigger (`to_read = 4294967295`), it **zeroes
+> `CHECK_MEMORY_LIMIT`'s accumulator**, and it **reaches the second truncation**
+> (`zend_alloc.h:53`'s `size:31`).
+>
+> ⚠ **The one sentence that survives is the last one**, and it is the one worth
+> keeping: **this is a C-side question, so unlike a Rust- or Verus-side one it
+> CAN decide admission** (`PLAN_PHP.md` §3) — and *"the mechanism is
+> 32-bit-only"* would have been a **narrowing, not a kill.** ✅ Asking it was
+> right; the three answers I proposed were all wrong, which is what a doubt is
+> for.
 
 ## §5 ⚠⚠ BEFORE YOU GREP: two of these rows are in a file `grep` calls empty
 
