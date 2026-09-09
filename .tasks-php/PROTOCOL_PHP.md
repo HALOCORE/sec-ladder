@@ -150,6 +150,28 @@ lead-byte classes (1-, 2-, 3-byte) — an all-ASCII benign corpus takes exactly
 one of them, which is `ph03`'s defect with a different name. The rule applies
 unchanged; only the word *parameter* had to go.
 
+> ⚠⚠⚠ **A THIRD RULE WAS PROPOSED FOR THIS SECTION AND IS NOT HERE ON PURPOSE.
+> DO NOT RE-PROPOSE IT.** `TASK_PHP_016` asked for: *"where the upstream fix
+> changes benign behaviour, the measured corpus must leave its guards dead,
+> `gen.py` must assert it, and the behaviour change is measured in
+> `controls/`."* It was load-bearing for `ph07` as first built.
+>
+> ✅ **It was refused, and then the row that needed it stopped needing it.**
+> `TASK_PHP_017` §4 declined it on three grounds — it makes *"does the fix
+> fire?"* an unbounded corpus-selection criterion; it states as a property of
+> the FIX what is a property of the GATE; and it was invented to rescue an R1h
+> choice the row's own evidence called avoidable. **`TASK_PHP_018` then removed
+> the need entirely**: `ph07`'s R1h became the guard configuration upstream kept
+> (§C), the corpus restriction was deleted, and the row now measures the **whole**
+> benign domain and gates green.
+>
+> ⚠⚠ **The general lesson is worth more than the rule would have been: `check.py`
+> stage 7h was not an obstacle, it was CORRECT.** It refused an R1h that changes
+> benign output, and the reason it changed benign output is that half of it was
+> a bug PHP itself later deleted with a regression test. **A gate stage that
+> refuses your row is a hypothesis about your row before it is a hypothesis
+> about the gate** (`RECAP_PHP.md` F43/F47, open item 24).
+
 ### A3. ⚠ Reachability is deliverable #1, in writing, before any rung exists
 
 A corpus row's `root_cause_id` is a claim about **PHP**, not about the kernel
@@ -452,6 +474,37 @@ hand-written hardening is fair; here we do not.
 measured one that, backported, still left a reachable wild write in the arm it
 does not guard. **That is a result, and one of the strongest a row can carry.
 Report it; do not repair it.**
+
+⚠⚠ **AND IT MAY BE TOO BIG. `ph07`'s R1h IS A SUBSET OF ITS `fix_commit`, AND
+HERE IS THE WHOLE OF WHY.** `cb3cca21b345` (2005) added two guards. Hunk (a)
+closes the memory-safety defect — it removes all **15 333** out-of-bounds reads
+and changes **no** benign answer. Hunk (b) removes **none** of them and changes
+the answer on **13.5 %** of benign calls, and `c2471b495009` (2009-09-23)
+**deleted it as bug #49354, with a regression test** that
+`patterns-php/ph07-strcut-cursor/controls/bug49354.py` replays: **hunk (a) alone
+agrees with upstream on all six cases; the two-hunk fix does not.** So `ph07`'s
+R1h is the configuration `php-5.2.12 … php-5.2.17` shipped and kept,
+`PHP_FUNCTION(mb_strcut)` body sha256 `26e2099e33433c74`. The row states that —
+both commits cited, both patches under `controls/`, what each hunk buys measured
+separately, and the alternative it was chosen against — **inside its hashed
+`spec.md` block** (`idiom.required[4]`).
+⭐ **`check.py` stage 7h refused the two-hunk version in the first hour the row
+existed, and stage 7h was RIGHT**: it detected the same defect PHP's own
+maintainers detected four years later, from a bug report.
+
+⚠⚠ **WHETHER THIS GENERALISES IS OPEN. n = 1, AND NOTHING HERE PERMITS A SECOND
+ROW ANYTHING.** A row that wants to do the same **brings it to the manager as a
+proposal**; the shape `ph07`'s took is above, and the question to ask about a
+second one is whether an **upstream artefact** decides it — a later removal, a
+regression test, a bug number — rather than the row's convenience. **Without
+that, *"cite a tagged configuration"* lets an engineer scan tags until one
+suits**, which is choosing the fix to fit the corpus instead of the corpus to
+fit the fix. ⚠ **Two drafts of this passage were written as a PERMISSION and
+both were refused** — `TASK_PHP_018` §4.1 refused the manager's, `TASK_PHP_022`
+§5.1 refused the manager's re-wording of it. **The asymmetry is the reason: an
+under-stated observation costs one task when a second row needs it; an
+over-stated norm is what has to be un-landed** (`RECAP_PHP.md` F48, open
+item 24).
 
 ---
 

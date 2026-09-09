@@ -30,6 +30,43 @@
   really allocates a zval string (`ALIGN8(len+1)`) — the over-read lands in
   padding. **Say "a detector fires under this allocator", never "PHP faults",
   unless the row models PHP's allocator.**
+- ⭐⭐⭐ **AND AN UPSTREAM FIX CAN BE TOO BIG — PHP DELETED HALF OF ONE, AS A BUG,
+  WITH A REGRESSION TEST.** `ph07`'s `cb3cca21b345` (2005) added two guards;
+  `c2471b495009` (2009-09-23) removed hunk (b) as **bug #49354**. Measured:
+  hunk (b) removes **0 of 396** over-reads and changes the answer on **13.5 %**
+  of benign calls; hunk (a) alone removes **396 of 396** and changes none.
+  ⚠⚠ **So `check.py` stage 7h — which refused the two-hunk rung for differing
+  from R1 on benign inputs — WAS RIGHT, and it detected in the row's first hour
+  what PHP's maintainers took four years and a bug report to find.**
+  ⭐ **A gate stage that refuses your row is a hypothesis about your row before
+  it is a hypothesis about the gate.**
+  ⚠ **This is NOT a general permission to ship a subset of a `fix_commit`** —
+  n = 1, and two drafts written as a permission were refused
+  (`PROTOCOL_PHP.md` §C). ⚠ **Set beside `ph03`: of two shipped security fixes,
+  one was half dead and half incomplete, the other half wrong. NEITHER WAS
+  MINIMAL NOR SUFFICIENT AS SHIPPED.**
+- ⭐⭐⭐ **AND ONLY THE VALUE POSTCONDITION MOVED. A memory-safety-only proof
+  cannot see the difference at ANY strength.** Demonstrated by construction, not
+  asserted (`TASK_PHP_022` §1): a mechanical weakening of `ph07`'s `verus.rs`
+  verifies **17/0 plain and 20/0 twin against BOTH** the two-hunk and the
+  one-hunk exec, and the `diff` between the two proofs is *hunk (b)'s six exec
+  lines and comments* — **not one invariant, assert, ghost binding or
+  `decreases`.**
+  ⭐⭐ **The sharper half is what "memory-safety-only" costs to state here:
+  NOTHING, because there is nothing to state.** The kernel returns a `u64` and
+  writes no caller-visible memory, so the honest memory-safety-only spec is the
+  **empty postcondition**; safety lives in the trusted items' `requires`, the
+  `decreases`, and Verus's built-in checks. **Vacuity measured: the same kernel
+  with its body replaced by `0u64` verifies 13/0.** An explicit ghost *"no read
+  past `slen`"* postcondition also verifies in both configurations — **and even
+  with all four of its instrumentation points deleted.**
+  ⭐⭐⭐ **The number that says it best: the memory-safety-only proof verifies at
+  `rlimit` 1 against the row's 9. Essentially the ENTIRE proof budget is the
+  value postcondition.**
+  ⚠⚠ **What this does NOT say, and the handoff said it for a day: *"only a value
+  postcondition could have noticed."* The GATE would have** — stage 2's identity
+  check moves on 4/32 and 297/2050 windows. **The claim is about PROOFS, not
+  about observers.**
 - **R1h = the real upstream `fix_commit`**, not a hand-written control.
   ⚠ `git fetch` of a bare SHA is refused by the server; **the patch URL works**:
   `https://github.com/php/php-src/commit/<sha>.patch` (~1.4 KB). Keep the patch
@@ -39,6 +76,13 @@
   hand-written PAT control, wrong for a shipped fix that is incomplete. That
   evidence lives in the row's `controls/`. **Standing limitation, not a bug to
   file.** (F31.)
+  ⚠⚠ **DO NOT EXTEND THIS TO `check.py` STAGE 7h — that analogy was drawn at
+  `TASK_PHP_017` §4b, the manager adopted it, and it is WRONG** (`TASK_PHP_018`
+  §4.3). **They are different questions on different axes**: stage 7h asks
+  whether R1h changes **benign output** — *a property of the fix*;
+  `check_sanitizers_hardened` asks whether it still **faults** — *a property of
+  the fix's completeness*. **Stage 7h has no known false refusal; its one
+  refusal to date was correct.**
 - ⚠ **`harness/build.py` links no `-lm`.** `floor()` emits a real call at `-O0`
   and is inlined at `-O3`, and libm was never merged into libc — so a `verbatim`
   libm kernel fails to link in the `-O0` cells. **Batched, not fixed.**
@@ -117,8 +161,30 @@
   > levers are the cheap ones**: on **≥ 9** PAT rows an R3-side respelling moved
   > the headline **TOWARD** safe Rust.
 
-  ⭐⭐ **And `ph07` now confirms that from inside this programme**: an R3-side
-  search found **+13.50 % → +2.62 %**, a move *for* safe Rust larger than three
-  of the four R4-side moves the withdrawn claim rested on. **A row that has
-  searched neither side is unbounded in BOTH directions**, and `ph03` has
-  searched neither. (F39, corrected by `TASK_PHP_017` §2.4.)
+  ⭐⭐⭐ **AND `ph07` HAS NOW SEARCHED BOTH SIDES — the first php row to do so,
+  and the first to discharge the obligation** (`controls/spellings.py`, the
+  first in `patterns-php/`; `TASK_PHP_018` §2, reviewed at `TASK_PHP_022` §3):
+
+  | | |
+  |---|---:|
+  | `fixed-R4 bound` — `R3ship − R4ship` | **+11.98 %** |
+  | cheapest-found in-contract — `inf(R3 found) − R4ship` (`r3_reslice`) | **+1.96 %** |
+
+  ⚠ **Quote both, labelled, or neither.** ⚠ **`TASK_PHP_017` B1's `+2.62 %` is
+  SUPERSEDED** — it was measured on the corpus the R1h rebuild deleted.
+  ⭐⭐ **The R4 side is DEGENERATE**: seven spellings from two agents, none
+  cheaper than a tie, **and the metric objection was tested and failed** (whole
+  -program `Ir` beside kernel-exclusive). **So this bound is over a SEARCHED
+  endpoint**, which is a materially stronger object than an unsearched one — and
+  it makes `ph07` the **12th of 20** rows where an R4-side search found nothing,
+  confirming `SYNTHESIS.md`'s *"degenerate more often than not"* from inside
+  this programme. ⚠ **NO PAIR INTERVAL**: `min(R3 found) − min(R4 found)`
+  differences two upper bounds and bounds nothing.
+  ⭐ **`r4_index0` is a THIRD kind of result the bench rule has no name for**:
+  `s[0]` for `*s.get_unchecked(0)` is **byte-identical machine code** (checked
+  independently), verifies 21/0, and **removes one of four `get_unchecked` call
+  sites** — *a smaller trusted surface at the same price*, which is neither a
+  cheaper spelling nor a re-ship.
+  ⚠⚠ **`ph03` has still searched NEITHER side and is unbounded in BOTH
+  directions.** (F39, corrected by `TASK_PHP_017` §2.4; discharged for `ph07`
+  only.)
