@@ -47,10 +47,10 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ROWS BUILT 2, AND BOTH ARE FAMILY S1 -- one of 20 (item 34).
         CATALOGUED 93, going to 102. .memory-php/ is AUTHORITATIVE.
-NEXT    _021 RUNNING: land _019 + _020 into CATALOGUE.md (93 -> 102) and
-        trigger-test the nine new rows. Then _023 (ph07 carries 4 REFUTED
-        figures in its hashed why + a wrong R1h in kernel.h -- item 36).
-        Then build in ORDER ph16 -> ph29 -> ph12 -> ph21 (F46 §8).
+NEXT    NOTHING IS RUNNING. _021 STOPPED ITSELF: 3 of 9 new rows' triggers
+        failed, so CATALOGUE.md is UNCHANGED at 93 and the nine need a
+        REVIEW CYCLE before land_019_020.py runs (F49). Then _023 (items
+        36+37: ph07's hashed why + 4 provenance defects). Then ph16 first.
 ⚠ NEW   F43/F47 ph07 was shipping a rung PHP ITSELF FILES AS A BUG; only a
         VALUE postcondition could have caught it. F44/F45 10 of 13 C.1 kills
         fail, and a WARNING FIX HID A DEFECT (5.0.4: 41 for a declared 65,
@@ -147,7 +147,8 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > not, and that is the half a build task runs** · **F47 ⭐⭐⭐ row 2 rebuilt: it
 > was shipping a rung PHP itself calls a bug, and only a VALUE postcondition
 > could have noticed** · **F48 ⚠⚠⚠ I accepted a refusal and then landed the
-> same rule with the verbs changed**
+> same rule with the verbs changed** · **F49 ⭐⭐⭐ the stop condition fired: 3 of
+> 9 new rows' triggers failed, and F46 predicted which half would**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -1085,7 +1086,80 @@ That is the row engineer's job, and the window is the expensive half.
 > defect lives in another.** **I applied F1 to kills and to fixes and did not
 > apply it to my own doubt.**
 
+### F49 — ⭐⭐⭐ THE STOP CONDITION FIRED, AND THE AUDIT'S OWN FINDING PREDICTED WHICH HALF WOULD FAIL
+
+`TASK_PHP_021` was told to land `_019`+`_020` into `CATALOGUE.md` **and then
+trigger-test the nine rows the same batch creates**, with the rule *"more than
+two need a correction → STOP the landing."* ⚠⚠ **THREE OF NINE FAILED —
+`ph94`, `ph98`, `ph101` — SO THE CATALOGUE IS BYTE-UNCHANGED AT 93 ROWS.**
+
+⭐ **F46 predicted exactly this half.** It measured *"the defect site was wrong
+in 0 of 19 rows; the `▸ trigger` line would have cost an engineer time in 3"* and
+recommended auditing triggers only. **Applied to the very next batch, the
+trigger test fails on a third of it** — while the tiers were re-derived and **all
+nine confirmed**. The rate is not a property of an adjudicator; **it is a
+property of which half of a row anybody checks.**
+
+| row | what the trigger claimed | what the C does |
+|---|---|---|
+| **`ph94`** | a wild read | ⚠ **reaches the line and produces nothing.** gcc returns the 16-byte `zend_object_value` in `RAX:RDX` and narrows through **`mov %esi,%eax`**, *zeroing the very padding the row is about*, at **`-O0` through `-O3`** — so `lval == handle` and the read lands **inside** the string. ⭐ **The layout claim is exactly right** (4 bytes into an 8-byte slot, confirmed in the disassembly); **the wild read is a codegen accident.** The kernel must take the un-written half from the blob |
+| **`ph98`** | *"a handler that cannot be called"* | ⚠ **`ph21`'s shape** — `set_exception_handler` validates at **registration** (`zend_is_callable`), so such a handler cannot be installed. It must be broken *after* registration, via `zval_copy_ctor` sharing element zvals by refcount |
+| **`ph101`** | a PHP snippet | ⚠ **not runnable as written** — `A::$x` is `protected` (E_ERROR from global scope) and the second clause's `class C` is never declared |
+
+⭐⭐ **AND THE ENGINEER DISCLOSED THAT ITS OWN VERDICT WAS DECISIVE**, which is
+the thing I most want from a stop condition: *"`ph101` is the marginal one;
+scoring it 'additive' would give 2/9 and let the landing proceed — the decision
+turns on this row alone."* ✅ **Verdict UPHELD**: a trigger that raises `E_ERROR`
+and names an undeclared class is a *failed* trigger, not an incomplete one.
+
+**Delivered and ready**: `.tasks-php/land_019_020.py` — **45 anchors, each
+resolving exactly once**, 93 → 102, refuses on re-application, verified against a
+scratch copy, **with the three corrected triggers already in its text.** It is
+one command *after* the nine rows get a review cycle.
+
+⚠⚠ **A MANAGER DECISION THE ROW FORCED, AND IT REACHES MOST OF FAMILY `S3`.**
+`ph95` **passes** — the `pack.c:214` guard is defeated identically at `-O0`,
+`-O3` **and `-O3 -fwrapv`**, with `arg = INT_MAX-1` refused as the control —
+⚠ **but there is no UB-free trigger, because the signed wrap IS the mechanism**,
+and `harness/build.py` is frozen and passes no `-fwrapv`.
+
+> ✅ **DECISION: do NOT add `-fwrapv`** (a `harness/` edit = a 33-pattern
+> re-gate, the same call as F31's `-lm`). **A row whose mechanism is signed
+> overflow measures what the compiler actually did, and must ship a
+> flag-differential control saying so.** ⭐ **`ph95` already supplies the evidence
+> that makes this safe**: the mechanism is *stable across `-fwrapv`*, so the
+> measurement is not an artefact of the flag's absence. **A row where it is not
+> stable is a different row and must say so.**
+
+⚠⚠ **AND A FOURTH *"CHECKER THAT CANNOT SEE ITS OWN BLINDNESS"*.**
+`coverage.py`'s row-count regex is **`ph\d\d`** — blind to `ph100`–`ph102` — and
+its `gaps:` set is built **from its own hit count**, so on a 102-row file it
+prints **`99 … gaps: none`** and *structurally cannot report the blindness*.
+✅ Its `166/166` is unaffected. **That is `TASK_PHP_012` M1's shape
+(*a checker that accepts the artefact it is checking*) and F17's
+(*a reassurance that tells the reader not to look*), for the fourth time.**
+
+✅ **Two small things settled.** Part A's headings summed to 91 because
+**`ph92`/`ph93` are `spatial` rows sitting under the `Temporal` heading** — the
+landing moves them so heading = section = axis. And the two blank `tier` cells
+are **`ph15` and `ph91`, the two `unresolved` rows** — **deliberate, not a
+defect**, and the landing leaves them alone.
+
 ### F48 — ⚠⚠⚠ I ACCEPTED A REFUSAL AND THEN LANDED THE SAME RULE WITH THE VERBS CHANGED
+
+> ⚠⚠⚠ **AND I ACTED ON THIS REVIEW WHILE IT WAS STILL WRITING.** `TASK_PHP_022`
+> notified at **1087** lines; the report finished at **1225**. I committed it
+> inside `8e2d834` and then landed findings, acted on §5.1 and opened item 36
+> from the partial text — **four commits against a file whose author had not
+> finished.** ⚠ **That is `PROTOCOL.md` rule 11's own shape with the roles
+> reversed**: the rule forbids editing a file a running agent *reads*, and the
+> live hazard turned out to be *acting on* a file a running agent is *writing*.
+> ✅ Nothing landed was unfaithful and nothing was lost — **but four findings
+> arrived after my commit and are carried below rather than in anything I
+> landed**, and the reviewer had to **withdraw its own `m5`** (*"the finding is
+> committed and the row is not"*) because I fixed it out from under the review.
+> ⭐ **A completion notice is not a completion**, and the cheap guard is the one
+> I did not use: **re-read the file's line count before acting on it.**
 
 `TASK_PHP_022`, the review of the rebuild. **It confirmed F47's headline by
 construction, refuted the sentence I built on it, and answered the question I
@@ -1250,7 +1324,12 @@ bug** — demonstrated behaviourally, not inferred from a tag sweep.
 
 **THE NEW LADDER** (`Ir`/window byte vs R4; `-O3 isolated`; within-row only):
 **R2 +59.77 %** (was +57.67) · **R3 +11.98 %** (was +13.50) · **R4 ≡ R5**
-byte-identical. F41's claims **(a)** and **(b)** survive **unchanged**.
+**byte-identical up to relocations**. F41's claims **(a)** and **(b)** survive
+**unchanged**. ⚠ **This said *"byte-identical"* flat, and `TASK_PHP_022` is
+right that the record does not support it: `md5_fn` DIFFERS between R4 and R5
+and only `md5_fn_norel` matches, at `O3 / isolated` only.** `spec.md`'s
+`identity` entry had it right and `.memory-php/` is clean — **the handoff was
+the only place that overstated it.**
 
 ⚠⚠ **(c) SURVIVES, HALVED — AND GOT SMALLER WITHOUT GETTING CLEANER, WHICH IS
 THE OPPOSITE OF WHAT MY TASK FILE PREDICTED.** One guard instead of two:
@@ -1751,7 +1830,8 @@ negatives in all.**
 > `TASK_PHP_018` REBUILT THIS ROW (F43/F47) — read F47 for the live ladder.**
 > The shipped R1h is now hunk (a) alone, `inputs/gen.py`'s restriction is gone,
 > and the benign domain grew by the 13.5 % the withdrawn hunk changed.
-> **R2 +57.67 → +59.77 · R3 +13.50 → +11.98 · R4 ≡ R5 still byte-identical.**
+> **R2 +57.67 → +59.77 · R3 +13.50 → +11.98 · R4 ≡ R5 still byte-identical
+> UP TO RELOCATIONS** (`md5_fn_norel`; ⚠ `md5_fn` itself differs — F47).
 > ✅ **Claims (a) and (b) below survive unchanged; (c) halved and its
 > cross-check evaporated.** ⚠ **And B1's `+2.62 %` is superseded by `+1.96 %`,
 > re-derived — do not quote the old figure.**
@@ -2110,6 +2190,7 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 | 29 | ✅ **DISCHARGED at `TASK_PHP_019` → F44 — and the answer is that the rate tracked the TEST.** The mechanism test on the same population the cost-word test scored 17 % on returns **8 reversals**; across the programme **40 of 46 kills ever written down are now reversed**. ⚠ **Landing is BLOCKED on `TASK_PHP_020`** (it is sampling Part A; +8 rows would corrupt its draw). Was: | *"ZERO of the remaining `C.1` notes contains a cost word, so `ADJUDICATION_002`'s predicted re-read finds nothing. The two that DO reverse need a DIFFERENT test — **does the C support the mechanism claim?** — which that document never runs on anything, **including on its own two admissions**."* ⚠ **I audited for a WORD and called it an audit for a REASON.** The cost-word test found the two kills it was shaped to find and is now exhausted; **the mechanism test is unrun on all 12** |
 | 30 | ⚠⚠ **A SECOND ADMISSIBLE FORM OF R1h — a TAGGED UPSTREAM CONFIGURATION, pinned by `(tag range, function, body sha256)`** | `PROTOCOL_PHP.md` §C says R1h is *the real upstream `fix_commit`*. F43 makes `ph07`'s R1h a **subset** of one — hunk (a) of `cb3cca21b345`, which is byte-for-byte what four tags shipped and kept. **My argument is that what upstream KEPT is a stronger citation than what it once committed.** ⚠⚠ **It is still a protocol extension invented to make one row work — the exact shape `TASK_PHP_017` refused for the §A2a clause**, and the claimed difference (§A2a narrowed the evidence to fit the artefact; this widens the artefact to fit the evidence) is **unreviewed and is the thing to attack.** `TASK_PHP_018` §4.1 proposes the wording; **nobody lands it before a reviewer has hit it** (rule 9) |
 | 34 | ⚠⚠⚠ **BOTH BUILT ROWS ARE IN THE SAME FAMILY, THIS FILE HAS SAID *"rows built: 2"* FOR FOUR TASKS, AND NO DOCUMENT ANYWHERE SAYS IT** | `CATALOGUE.md` Part B is **93 rows in 20 mechanism families**; `ph03` and `ph07` are **both `S1` — unbounded cursor walk**, a family of 9. **So F41's *"the two rows disagree about what safety costs"* is a WITHIN-family result**, and every use of it as *"two rows"* overstates the spread it covers. ⭐⭐ **Read the other way it is the most useful thing the programme has produced**: two rows from ONE family disagreed on **four properties** — which map onto `PLAN_PHP.md` §9 items **2, 3 and 4** only; ⚠ **items 1, 5 and 6 have never been compared across the two rows, and item 5 cannot be until a spellings search exists on either** (F42) — so **the within-family variance is large on the half we measured, and the between-family variance has never been measured at all.** ⚠⚠ **One row per family — the obvious plan — would have published S1's answer as whichever of the two we happened to pick.** → `.tasks-php/QUOTA_001.md` turns that accident into the method: **an adaptive quota, minimum 2 per family, a family stays OPEN until a new row moves none of the six answers, cap 4.** Floor **40 rows ≈ 140 tasks**, and that price should be visible here rather than discovered at row 30. ⚠ **S1 is NOT settled and owes a third row — record the debt, do not pay it next.** ⚠⚠ **UNREVIEWED, and `TASK_PHP_019`/`_020` are attacking the family boundaries right now — re-derive it after they report, do not defend it** |
+| 37 | ⚠⚠ **FOUR DEFECTS IN `harness-php/provenance.py`'s NEW `extra_spans`, all found AFTER I committed it** — ▶ **`TASK_PHP_023`** | `TASK_PHP_022`'s post-notification half. **(a)** ⚠⚠ **`provenance.py:836-837`'s disclosure *"adding a span cannot make the number go up for free"* is measurably FALSE.** Union overlap is `|hit|/|want|` over deduplicated sets, so **a span above the current fraction RAISES it** — measured on `ph07`'s own excerpts: primary alone **75 % (39/52)** → primary + the 100 % table span **77 % (44/57)**. `ph07` only lands at 61 % because span 2 happens to be 15 %. ✅ The set semantics *do* defend against citing the same span twice (measured: unchanged at 61 %) — **it is the general claim that fails.** **(b)** ⚠ **A `php_provenance: false` row short-circuits before any `extra_spans` validation**, so a wholly bogus extra span passes. **(c)** `gate.py:300` cites `provenance.py:841-843` for the dotted-row glob; the +60 lines moved it to **`:924`** — **citation rot introduced BY the change and not repaired.** **(d)** *"byte-identical"* holds for the **default invocation only**: under `--no-tarball`, `ph03` gains `for any of 1 span(s)` |
 | 36 | ⚠⚠ **`ph07` CARRIES FOUR REFUTED FIGURES INSIDE ITS HASHED `why`, AND NO GATE CAN SEE THEM** — ▶ **`TASK_PHP_023`, queued** | `TASK_PHP_022` M1/M2. **(a)** `spec.md`'s `identity[0].why` cites **255 instructions** and three hashes, **all pre-rebuild values the rebuild refuted** — ⚠ **the hash still matches**, because the text was never edited, **and `NOTES.md` claims the addendum pass covered it, which is a false disclosure.** `PROTOCOL.md` rule 6's documented hole, reproduced live on a row we are quoting. **(b)** `c/kernel.h:20-25` names **`d9dda48f8a7e`** as R1h while the file ships `cb3cca21b345` hunk (a) — ⚠ **and `spec.md`'s own `forbidden[2]` calls `d9dda48f8a7e` a *different function*.** It is inside `source_sha256` and predates the rebuild. **Both fixes cost a `ph07` re-gate**, plus the minors: `bug49354.py`'s *"shares no code with `fix_scope.py`"* is **false** (byte-identical table and clamps — conclusion still safe, three independent checks agree), `NOTES.md`'s rule-6 fence names 4 against 27 moved, §10d quotes a pre-rebuild log, and `spellings.py` **re-implements** `measure.py`'s statistic rather than importing it |
 | 33 | ⚠⚠ **A php GATE RECORD IS WRITTEN IN THE REBOUND NAMESPACE AND IS READ IN THE REAL ONE — and it names the one directory `CLAUDE.md` most loudly forbids touching** | ✅ Measured on all **3** php gate records: every one keys its sources as **`common/digest_bridge.py`**, `common/driver.c`, `common/driver.h`, `common/driver.rs`. **Those files do not exist.** They are `common-php/`, and the key is correct *inside* `harness-php/root.py`'s rebinding — which is exactly how the php side reuses the frozen harness without editing it (`PLAN_PHP.md` §2). ⚠ **The hazard is a reader outside that namespace**: someone chasing a STALE key goes looking in `common/`, the **frozen PAT** tree, for a file that is not there — and this project's own F35 finding is that *"not there"* and *"I looked in the wrong place"* are indistinguishable from the output. ⭐ **`TASK_PHP_002_REPORT.md` §3 spotted it and said a reader *"has to come here to expand it"*; it then reached NEITHER `.memory-php/` NOR `PROTOCOL_PHP.md`** — grep confirms neither carries the words *rebind*, *rebound* or *namespace*. **A hazard that lives only in a task report is a hazard nobody will find.** ⚠ **Do NOT fix it**: the keys come from `check.py`'s root-relative derivation, so changing them is a `harness/` edit and a 33-pattern re-gate (items 13/17's decision shape). **Document it, in the batch** |
 | 32 | ⚠ **TWO CITATION ROTS, both found by a mechanical sweep of every rooted path in the manager docs — batch them** (rule 6; `.memory-php/` and `PROTOCOL_PHP.md` are open in running agents) | ✅ **First, the clean negative that is the point of running it: of ~500 backticked paths, the ONLY unresolved ones are row-relative (`c/kernel.c`), deliberately hypothetical (`patterns-php/shared/` — the thing F24 says nobody needs) or reports not yet written. No dangling pointer.** ⚠ **(a) `.temp/san_tests/` does not exist in this repo.** It is `/home/apt/repos_common/php-in-safe-rust/.temp/san_tests/` — **484 MB in ANOTHER project's gitignored scratch**, i.e. open item 1's hazard applied to F9's ASan census, which no document says. `.memory-php/00-corpus.md` carries the unrooted path, so an agent following it finds nothing — **and F35's whole lesson is that "found nothing" is indistinguishable from "isn't there".** ✅ `patterns-php/SOURCES.md` is the exception and does it right, both for the census trees and for the tarball (**re-checked today: 5595997 B, sha256 `5783e0c0…d6919`, matches the pin**). ⭐ **And F9's census re-derives EXACTLY, two months on: 2534 logs, 3199 reports, 2450 / 490 / 189 / 70.** ⚠ **(b) `.ph93` is used as the name of a DEMONSTRATION dotted row** in F16 and `PROTOCOL_PHP.md:431`, and `ph93` is now a real catalogued row (`wordwrap`). Rename the demo |

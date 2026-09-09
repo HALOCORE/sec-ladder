@@ -14,6 +14,38 @@ the rebuild refuted, and `c/kernel.h` names the wrong upstream fix.
 
 ---
 
+## ⚠⚠⚠ READ THIS FIRST — THIS REPORT WAS COMMITTED, AND ACTED ON, WHILE IT WAS STILL BEING WRITTEN
+
+`8e2d834` swept this file into a commit at **1087 lines**; it finished at
+**1170**. `d51d231` then landed findings into `.memory-php/` from that partial
+text, `9697b94` acted on §5.1, and `59738e3` opened item 36 from §6. All four
+landed **while this review was running**, together with the whole `ph07` rebuild
+the review is of.
+
+⚠ **That is `PROTOCOL.md` rule 11's widened form, verbatim** — *"while a
+subagent runs, do not EDIT — and do not COMMIT — any file that subagent READS or
+WRITES. That includes … the subagent's own report"* — and it is the same shape
+as the `TASK_149` case the rule records (*"committed a report at 970 lines that
+finished at 1025"*). ✅ Nothing was lost and the landed text is faithful to what
+it was taken from; the cost is that **the manager acted on a partial report**.
+
+**What arrived AFTER `8e2d834` and is therefore in nothing that has landed:**
+
+| | |
+|---|---|
+| §4.1 | the `--no-tarball` qualifier — "byte-identical" is true of the default invocation only |
+| §4.2 | the corrected consumer account, and the `php_provenance: false` hole |
+| **§6 m7** | **`provenance.py:836-837`'s *"adding a span cannot make the number go up"* is measurably FALSE — 75 % → 77 %** |
+| **§6 m8** | **`gate.py:300`'s `provenance.py:841-843` citation went stale inside the change** |
+| §7 | clean negatives 16–18 |
+
+⚠ **And one §3.1 finding is still unlanded**: `RECAP_PHP.md:1252` and `:1754`
+still say *"R4 ≡ R5 byte-identical"* without *"up to relocations"*, which
+`spec.md`'s own `identity` entry carries and the record requires. It did not
+reach `.memory-php/`, so the authoritative layer is clean; the handoff is not.
+
+---
+
 ## Bracket — both, first and last
 
 **Open**, before anything was touched:
@@ -603,11 +635,25 @@ rows under both:
     + kernel overlap 61% (46/76 ...)
 ```
 
-(Cross-checked a second way: a delegated agent ran both validators through their
-full CLI in separate scratch trees and `diff`'d the stdout — `ph00-smoke` and
-`ph03-uudecode-bound` **IDENTICAL** both times, tarball and `--no-tarball`.)
+Cross-checked a second way, in mirrored scratch trees through the full CLI
+(stdout **and** stderr, plus `--selftest`): `ph00-smoke` and
+`ph03-uudecode-bound` identical, exit 0 both.
 
-**The additive design cost exactly the churn it claimed: one row.** And ph07's
+⚠ **ONE QUALIFIER, and the report's unqualified "byte-identical" does not carry
+it.** Under **`--no-tarball`** `ph03` differs by one line (`provenance.py:794-796`):
+
+```
+old:  ⚠ --no-tarball: extract_sha256 was NOT verified. This is a PARTIAL check.
+new:  ⚠ --no-tarball: extract_sha256 was NOT verified for any of 1 span(s). ...
+```
+
+Cosmetic, no exit code and no verdict moves, and `ph00-smoke` is identical even
+there (it returns before that line). **But "byte-identical" is true of the
+default invocation only**, and `--no-tarball` is a spelling `PROTOCOL_PHP.md` §D
+documents and expects agents to use.
+
+**The additive design cost essentially the churn it claimed: one row, plus one
+line of a flag-gated message on a second.** And ph07's
 published per-span and union numbers reproduce **exactly** — `75 % (39/52)`,
 `100 % (5/5)`, `15 % (3/20)`, union `61 % (46/76)`.
 
@@ -651,12 +697,24 @@ the direction the code's own comment claims (*"adding a span cannot make the
 number go up for free"*), and it is the opposite of the `tier`/`uses_allocator`
 class of unvalidated declarations.
 
-⚠ **What is NOT enforced, and it matters for §4.3:** nothing outside
+⚠ **What is NOT enforced, and it matters for §4.3:** no key outside
 `provenance.py` reads `extra_spans` (grepped `harness-php/`, `common-php/`,
-`model.py`, `inputs/gen.py` — zero hits), and the overlap it feeds is
-**reported, never enforced** (`_OVERLAP_FLOOR` is consulted only to print an
-expectation). So the **spans** are pinned and their **fidelity** is not. ✅ It is
-inside the hashed `slb-contract` fence, so it cannot be quietly withdrawn.
+`model.py`, `inputs/gen.py`), and the overlap it feeds is **reported, never
+enforced** (`_OVERLAP_FLOOR` is consulted only to print an expectation). So the
+**spans** are pinned and their **fidelity** is not. ✅ It is inside the hashed
+`slb-contract` fence (spec.md line 373, fence 32-479; `check.py::read_contract`
+hashes the raw block and yields exactly the `1f1508531bd4…` the gate record
+carries), so it cannot be quietly withdrawn — and
+`gate.py:1243-1251` runs `provenance.py` as preflight stage 7, gates on its exit
+code, and writes `provenance_stdout` into the **committed** preflight record,
+which already carries the `OK+1`/`OK+2` and per-span lines verbatim.
+
+⚠ **One pre-existing hole the audit surfaced:** a row declaring
+`"php_provenance": false` short-circuits at `provenance.py:723-734`, so a wholly
+bogus `extra_spans` entry (bad sha, file not in the manifest, span
+`[999999, 1]`) passes with exit 0. The primary's own fields are equally
+unchecked on that arm, so it is not an `extra_spans` regression — but
+`ph00-smoke` is the only row that arm is for, and it should stay that way.
 
 
 ## 4.3 ⚠ IS `ph07`'s DECLARED TIER NOW WRONG? — **No, but the row now over-claims in a NEW place**
@@ -934,16 +992,77 @@ verus.rs sha256 unchanged: d1c61785e44185f8
 So the substance holds and only the pasted evidence is stale. Repair is to paste
 this run.
 
-## m5 (minor / process) — the finding is committed and the row is not
+## m7 (minor) — `provenance.py:836-837`'s comment about the union overlap is measurably FALSE
 
-`ad88669` ("F47: row 2 rebuilt") landed **`TASK_PHP_018_REPORT.md` and
-`RECAP_PHP.md` only** — 2 files. All 21 modified and 4 untracked files of the
-rebuild are still in the working tree, including
-**`controls/bug49354.py` and `controls/c2471b495009.patch`, which are the
-load-bearing evidence for F47's §5.1 and are untracked (`??`)**. A published
-finding cites numbers that are not in history. ✅ It is also what let me do §1 and
-M1 cleanly, so I would not undo it — but it should be committed before anything
-else touches the tree.
+The `extra_spans` code documents its own safety property:
+
+> *"A row that cites more now has MORE to resemble, which is the direction this
+> check should err in: **adding a span cannot make the number go up for free.**"*
+
+Union overlap is `|hit| / |want|` over **deduplicated line sets**
+(`_normalise` returns a `set`), so **a span whose own fraction is above the
+current union fraction raises it.** Measured on `ph07` itself, by driving
+`kernel_overlap` over subsets of the row's three real excerpts:
+
+```
+what the row PUBLISHES (all three spans):      61% (46/76)
+pre-TASK_PHP_018 state (primary span alone):   75% (39/52)
+primary + the TABLE span only (span2 removed): 77% (44/57)   <-- the comment says this cannot happen
+primary + caller frame only:                   58% (41/71)
+```
+
+So starting from the pre-rebuild single-span state at **75 %** and adding the
+100 % table span takes the published number **UP to 77 %**. `ph07`'s union only
+lands *lower* because span 2 happens to be 15 %. ✅ **The set semantics DO defend
+against the narrower attack the comment probably had in mind** — citing the same
+span three extra times leaves the union at `61 % (46/76)`, measured — but the
+sentence as written is a general claim and it is false.
+
+**Failure scenario:** the next row cites a second, highly-verbatim span
+(a table, a header, a macro block) alongside a narrowed primary, its published
+overlap goes up, and the comment says that cannot have been free. It is exactly
+the wrong reassurance to leave in a check whose number is *reported, not
+enforced*, and therefore judged by a person.
+
+## m8 (minor) — a `check.py:NNNN`-class citation went stale inside the rebuild
+
+`harness-php/gate.py:300` cites **`provenance.py:841-843`** as the dotted-row
+`glob(<row>*)` resolution. The `extra_spans` change added ~60 lines above it, so
+that code is now at **`:924`**, and `:841-843` today is the middle of the
+per-span overlap loop:
+
+```
+841:            f_i, w_i, h_i, _ = kernel_overlap(pdir, t)
+```
+
+⚠ **This is the pointer-rot class `PROTOCOL.md` rule 13 already has a reflex
+for**, and it was *introduced* by the uncommitted change: the "zero churn"
+accounting counted rows re-gated, not citations invalidated. Cheap to repair
+while the change is still uncommitted.
+
+## ~~m5 (minor / process) — the finding is committed and the row is not~~ ⚠ **WITHDRAWN: FIXED OUT FROM UNDER THE REVIEW**
+
+**As written, mid-review:** `ad88669` ("F47: row 2 rebuilt") landed
+`TASK_PHP_018_REPORT.md` and `RECAP_PHP.md` **only** — 2 files — while all 21
+modified and 4 untracked files of the rebuild sat in the working tree, including
+`controls/bug49354.py` and `controls/c2471b495009.patch`, the load-bearing
+evidence for F47 §5.1. A published finding cited numbers that were not in
+history.
+
+⚠ **`8e2d834` committed the row while this review was running, so the finding no
+longer holds and I withdraw it.** `PROTOCOL.md` rule 11 governs this exactly:
+*"DO NOT FIX A FINDING OUT FROM UNDER A RUNNING REVIEW … Collect while a review
+runs; fix after it reports."* The last time this happened the reviewer *"had to
+withdraw a live finding and keep only its mechanism"*, which is what I am doing.
+
+**The mechanism, which survives the fix and is the part worth keeping:** the
+gap between *landing a finding* and *landing the artefact the finding is about*
+is invisible to every check this programme runs. Both brackets were `66/0` and
+`6/0` across the whole window, the gate record was `PASS`, and
+`--check-stale` reads the **working tree**, not `HEAD` — so a tree whose
+evidence is uncommitted is indistinguishable from one whose evidence is
+committed. ⚠ **`git status --porcelain` before a findings commit is the check,
+and it costs one command.**
 
 ## m6 (minor) — the gate hashes `controls/*.py` and never runs them
 
@@ -994,7 +1113,12 @@ So the next agent does not re-run them.
     negatives, eleven refusals, including the extra-span-only mandatory `why`.
     §4.2.
 17. **The `extra_spans` schema change really did cost one row** — `ph03` and
-    `ph00-smoke` are byte-identical under the old and new validators. §4.1.
+    `ph00-smoke` are byte-identical under the old and new validators, stdout and
+    stderr, plus `--selftest`. §4.1.
+18. **Citing the same span repeatedly does NOT inflate the union overlap** — the
+    table span cited three extra times leaves it at `61 % (46/76)`. The set
+    semantics defend against duplication; they do not support the general claim
+    the comment makes. §6 m7.
 
 ---
 
@@ -1014,12 +1138,20 @@ FRESH  results/ph07-strcut-cursor.json        19 source(s) + 7 input(s)
 6 record(s) examined, 0 STALE
 ```
 
-`git status --porcelain`: **26** entries — the 25 the rebuild left, plus this
-report file. Verified by exclusion:
+⚠ **`git status --porcelain` is now 2 entries, not the 26 it was mid-review** —
+because `8e2d834` committed the entire rebuild, and this report with it, while
+the review was running (see the box at the top). The two remaining entries are
+this file (` M`, i.e. now tracked and edited past the commit) and
+`?? .tasks-php/land_019_020.py`, which is not mine.
+
+✅ **Proof that the review itself changed nothing in the row**, taken after all
+four commits landed:
 
 ```
-$ git status --porcelain | grep -v '^ M patterns-php/ph07\|^ M results-php/\|^ M harness-php/provenance.py\|^?? patterns-php/ph07'
-?? .tasks-php/TASK_PHP_022_REPORT.md
+$ python3 -c "re-hash spec.md's slb-contract block with check.py's own regex"
+spec.md re-hashed: 1f1508531bd41975927e07f0
+gate record      : 1f1508531bd41975927e07f0
+MATCH
 ```
 
 ---
@@ -1041,7 +1173,11 @@ $ git status --porcelain | grep -v '^ M patterns-php/ph07\|^ M results-php/\|^ M
 | minor | F47 drops "up to relocations" from `R4 ≡ R5`; `spec.md` and the proposed `.memory-php/` text keep it | §3.1 |
 | minor | `r4_nozero`'s "no spec exists" — Verus names one | §3.3 |
 | minor | `extra_spans[1]` pins a re-expressed span without saying so | §4.3 |
-| process | the row is uncommitted while F47, derived from it, is committed | §6 m5 |
+| minor | `provenance.py:836-837`'s *"adding a span cannot make the number go up"* is false — measured 75 % → 77 % | §6 m7 |
+| minor | `gate.py:300`'s `provenance.py:841-843` citation went stale inside the change | §6 m8 |
+| minor | claim (i)'s "byte-identical" holds for the default invocation only; `--no-tarball` moves one line on `ph03` | §4.1 |
+| ~~process~~ | ~~the row is uncommitted while F47 is committed~~ — **WITHDRAWN, fixed mid-review**; the mechanism survives | §6 m5 |
+| process | this report was committed at 1087 lines and acted on before it finished (rule 11) | top box |
 | process | the gate hashes `controls/*.py` and never runs them | §6 m6 |
 
 **Nothing here invalidates the rebuild.** The gate verdict, the ladder, the
@@ -1069,7 +1205,8 @@ dump is derived and deleted.
 | `bug49354/` | §2.3 — phpt extraction + blob authentication, the real-C differential, five mutants, `run.sh` |
 | `spansmf/mustfire.py` | §4.2 — eleven `extra_spans` must-fire controls on a scratch row of symlinks |
 | `spansmf/provenance_old.py` | the pre-`extra_spans` validator, for the byte-identical check |
-| `spell/`, `spans/` | §3.2 and §4 working files |
+| `spans/mutate.py`, `spans/{old,new}tree/` | §4 — the 19-case control driver and the mirrored old/new validator trees |
+| `spell/` | §3.2 working files, incl. `matcher_diff.py` |
 
 Re-run: `python3 .temp/php22/msproof/gen_ms.py && python3 .temp/php22/msproof/gen_ms2.py`,
 then `./verus_run.py .temp/php22/msproof/<f>.rs [--cfg slb_twin]`; the other
