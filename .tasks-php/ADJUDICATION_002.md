@@ -80,25 +80,50 @@ tmp = target = emalloc(new_length + 1);                                    /* :3
 ```
 
 ⭐ **The multiplier is a compile-time constant and `repl_cnt <= strlen`, so the
-attacker has exactly ONE free value.** That is what makes the wrap need
-`len >= 2^31/7 ≈ 307 MB` — **the input size is a CONSEQUENCE of the mechanism,
-not a property of our test harness**, which is precisely why *"it needs a big
-input"* cannot be the reason to refuse it. Every other member of the family
+attacker has exactly ONE free value.** Every other member of the family
 (`ph19` attacker×attacker, `ph20` collapsed into `safe_emalloc`'s first argument,
 `ph21` narrowed by the store, `ph22` accumulated across two passes) gives the
 attacker two or more.
 
+> ⚠⚠ **THE TWO SENTENCES THAT USED TO SIT HERE ARE BOTH WRONG, corrected at
+> `TASK_PHP_017` §2.2 and landed in `CATALOGUE.md:379`. Left in place rather
+> than deleted, because a claim that vanishes is worse than a claim that was
+> wrong (M1):**
+>
+> | this document said | measured |
+> |---|---|
+> | *"the wrap needs `len >= 2^31/7 ≈ 307 MB`"* | **`2^32/7 = 613 566 757` (~614 MB)**. At `2^31/7` the stored value goes **negative** and the allocation simply **fails**; the wrap **down to a small positive** needs `2^32/7` |
+> | *"the `int` overflow is the whole defect"* | **there is no `int`-expression overflow.** `sizeof` yields `size_t`, so the RHS is evaluated in **64-bit unsigned** and is **TRUNCATED BY THE STORE** into `int new_length`. **That is `ph21`'s class, not `ph19`'s** |
+>
+> ⭐ The correction **strengthens** the admission — a store truncation is a
+> sharper mechanism than an expression overflow — which is why the row stands.
+> ⚠ And the surviving half of the claim is the load-bearing one: **the input
+> size is a CONSEQUENCE of the constant multiplier, not a property of our test
+> harness**, which is precisely why *"it needs a big input"* cannot be the
+> reason to refuse it.
+
 ✅ **The sizing pass is otherwise exact** — `\r\n` costs 8 emitted bytes and is
-budgeted 2 + 6; a lone `\n` costs 7 and is budgeted 1 + 6. **The `int` overflow
-is the whole defect**, which makes it a *clean* kernel, not a muddy one.
+budgeted 2 + 6; a lone `\n` costs 7 and is budgeted 1 + 6 (**measured at
+`TASK_PHP_017`: 9 832 strings, 0 mismatches**), which makes it a *clean* kernel,
+not a muddy one.
 
 ⚠ **Rider (m5)**: the emit loop is unbounded, so the adversarial cell needs
-≥ 307 MB **resident**. `ph28` should keep its uniqueness claim narrowed to that
-word rather than to *"the only row needing a memory budget"*.
+**≥ 614 MB resident** (⚠ this said 307 MB). `ph28` should keep its uniqueness
+claim narrowed to that word rather than to *"the only row needing a memory
+budget"*.
 
 ### `ph93` — `wordwrap`: a buffer RESIZED MID-EMIT, with unchecked growth arithmetic
 
-`ext/standard/string.c:682` and **`:692-694`**, inside `PHP_FUNCTION(wordwrap)`
+⚠⚠ **THE ARM CITED HERE IS THE WRONG ONE — `:679`, NOT `:682`** (corrected at
+`TASK_PHP_017` §2.2, landed in `CATALOGUE.md:385`). `TASK_PHP_017` measured that
+`:692` is **unreachable in the else-arm**: there `chk` starts at `textlen` and
+`current` advances ≥ 1 per iteration, so `if (chk <= 0)` never fires. **Citing
+`:682` put this row's stated trigger and its stated distinctness on MUTUALLY
+EXCLUSIVE EXECUTIONS** — the ADJUDICATION_001 defect (pricing the wrong frame)
+committed inside the document that reports it. The row lifts the
+**`linelength > 0`** arm.
+
+`ext/standard/string.c:679` and **`:692-694`**, inside `PHP_FUNCTION(wordwrap)`
 → tier **`narrowed`**.
 
 ```c
@@ -122,6 +147,14 @@ that is itself unchecked `int`, and that divides by an attacker-controlled
 `linelength`.** `ph19`–`ph22` all size once and then write. **A realloc-in-loop
 is a different C shape and a different proof obligation**, and the kill note
 concedes it exists before discounting it.
+
+> ⚠⚠ **THE TRAILING CONJUNCT IS LOAD-BEARING AND MUST NOT BE DROPPED**
+> (`TASK_PHP_017` §2.2). *"No other row grows a buffer mid-emit"* **on its own is
+> FALSE** — `ph18` (`formatted_print.c:190-197`), `ph25`
+> (`metaphone.c:147-153`) and `ph27` (`reg.c:337-343`) all do. **What no other
+> row has is the attacker-controlled divisor.** ⚠ An earlier landing of this
+> block into `CATALOGUE.md` deleted exactly those words — **a quote trimmed to
+> fit is how a refuted sentence survives its own evidence** (§5).
 
 ⚠ **Two sizing formulas, not one** (`linelength > 0` vs not), so the row must say
 which arm it lifts. ⚠ **And `:692` divides by `linelength`**, which the else-arm
