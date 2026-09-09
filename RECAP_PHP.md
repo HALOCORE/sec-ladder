@@ -141,7 +141,9 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > deleted half its own security fix, and stage 7h had already said why** ·
 > **F44 ⚠⚠⚠ 2 of 13 kills correct as written; the rate tracks the TEST, not the
 > rows; and "merged by the corpus itself" is the weakest evidence there was** ·
-> **F45 ⭐⭐⭐ a defect made invisible by the commit that fixed its warning**
+> **F45 ⭐⭐⭐ a defect made invisible by the commit that fixed its warning** ·
+> **F46 ⭐⭐ the catalogue's mechanism sentences hold; its `▸ trigger` lines do
+> not, and that is the half a build task runs**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -1063,6 +1065,79 @@ That is the row engineer's job, and the window is the expensive half.
 mis-catalogued — a C-side question, so it can decide admission.** Settle it at
 source before building.
 
+### F46 — ⭐⭐ THE CATALOGUE'S MECHANISM SENTENCES HOLD. ITS `▸ trigger` LINES DO NOT, AND THAT IS THE HALF A BUILD TASK RUNS
+
+`TASK_PHP_020`, on a seeded sample **drawn and printed before any C was
+opened**. ⚠ **Two rates, never pooled** — the batch four are *chosen*, not drawn.
+
+| stratum | needs correction | |
+|---|---|---|
+| **block 1**, n = 15, seed 20 | **1** (`ph93`) | 14 `SUPPORTED`, median **6 min/row** |
+| **batch four** (`ph12 ph16 ph21 ph29`) | **1** (`ph21`) | the next rows to be built |
+
+**No `NOT SUPPORTED`. No `UNDECIDABLE`.** ✅ **The catalogue's mechanism claims
+are overwhelmingly right, and several are exact to a level a sampler does not
+expect.** That is the answer I said would be the useful one, and it licenses
+writing build tasks against a Part B block.
+
+⭐⭐ **BUT THE RATE IS NOT THE FINDING. THE DEFECT SITE WAS WRONG IN 0 OF 19
+ROWS; THE `▸ trigger` LINE WOULD HAVE COST AN ENGINEER TIME IN 3.**
+
+> **The mechanism sentence is a POINTER — a build task re-reads the C anyway, so
+> an error there is cheap. The `▸ trigger` line is LOAD-BEARING**: reachability
+> is a build task's deliverable #1 (`PLAN_PHP.md` §4.2) and a row engineer
+> starts by running the stated trigger. **`ph21`'s does not fire · `ph93`'s
+> reaches the cited line and produces nothing · `ph29`'s fires only through UB.**
+
+**→ Any follow-up audit should test `▸ trigger` lines ONLY** — 2–4 min/row once
+the file is open, and it is where the entire yield was. ⚠ **This refutes half of
+my own §6.3 hypothesis and confirms the other half**, which is the shape of a
+question worth having asked.
+
+⚠⚠ **AND THE RATE IS A LOWER BOUND, for two reasons the report states against
+its own headline.** *"A cheaper audit than mine would have returned 15/15"* —
+the one failure was the row it spent longest on (15 min), and three
+`SUPPORTED` rows took 7–9. ⚠ **And the batch four are the rows with the most
+eyes already on them** — an adjudication, `FIXSURVEY_001`, `UPSTREAM_001`, a
+tier recheck — **and one still failed. Prior scrutiny is not protective.**
+
+**`ph21` — the row that was going to be built FIRST — has a trigger that cannot
+fire.** `str_repeat($s, 2^32/strlen($s))` makes `result_len` exactly 0, which
+the guard's **surviving** first disjunct `result_len < 1` refuses. ⭐ **And the
+block never says where the harm lands**: the general emit path bounds itself
+with the *narrowed* `result_len` (`:4160`) and overflows nothing — **the
+overflow is the `Z_STRLEN == 1` fast path at `:4153`, whose `memset` takes the
+UN-NARROWED 64-bit `Z_LVAL_PP(mult)`.** Working trigger:
+`str_repeat("A", 4294967297)`.
+
+⭐ **`ph29` IS SETTLED, THE CATALOGUE WAS RIGHT, AND THE DOUBT WAS MINE.** F36
+said *"`to_read` is a `long` and `emalloc` takes a `size_t`, which on this
+64-bit box truncates nothing — either the mechanism is 32-bit-only, or it is
+elsewhere, or the row is mis-catalogued."* ✅ **Measured on this box** with a
+probe replicating `zend_alloc.c:129/132/135/182/201` verbatim: `to_read =
+LONG_MAX` → `size = 2^63` → **`real_size = 0`** → a header-sized `malloc`
+succeeds. ⚠⚠ **My doubt mis-located the truncation** — it was never at
+`emalloc`'s signature; it is `REAL_SIZE` (F5's family). **And the row is
+64-bit-ONLY, the exact opposite of the hypothesis I offered**, and satisfied in
+our environment. Three strengthenings came with it: a **UB-free** trigger
+(`to_read = 4294967295`, avoiding a `LONG_MAX + 1` gcc may fold), it **zeroes
+`CHECK_MEMORY_LIMIT`'s accumulator**, and it **reaches the second truncation**
+(`zend_alloc.h:53`'s `size:31`).
+
+**→ BUILD ORDER CHANGED, on C-side grounds: `ph16 → ph29 → ph12 → ph21`.**
+⚠ **`ph21` goes last precisely because its reachability claim is the one that
+failed** — the standing order had it first.
+
+⚠ **Two methodological corrections I am adopting.** (1) **`IMPRECISE` vs `NOT
+SUPPORTED` did not separate** — the useful line is *does the error change what a
+build task would do?* **Collapse to `SUPPORTED` / `NEEDS CORRECTION`, and count
+*additive* corrections separately** (7 of 19 here). (2) ⚠ **Block 2 (n = 10,
+seed 21) was NOT run as a mechanism audit** — per-row cost was not lower than
+assumed, so it got the **weaker citation test only: 10/10 resolve**, plus two
+cost nits. **It is a different test and must never be quoted as a mechanism
+rate.** ✅ **The report labels it as such itself**, which is the discipline the
+sampling design existed to protect.
+
 ### F44 — ⚠⚠⚠ THE MECHANISM TEST: 2 OF 13 KILLS ARE CORRECT AS WRITTEN, AND THE EVIDENCE THAT LOOKED STRONGEST WAS THE WEAKEST
 
 `TASK_PHP_019` ran the test `ADJUDICATION_002` never ran — *does the C support
@@ -1738,4 +1813,4 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 | 34 | ⚠⚠⚠ **BOTH BUILT ROWS ARE IN THE SAME FAMILY, THIS FILE HAS SAID *"rows built: 2"* FOR FOUR TASKS, AND NO DOCUMENT ANYWHERE SAYS IT** | `CATALOGUE.md` Part B is **93 rows in 20 mechanism families**; `ph03` and `ph07` are **both `S1` — unbounded cursor walk**, a family of 9. **So F41's *"the two rows disagree about what safety costs"* is a WITHIN-family result**, and every use of it as *"two rows"* overstates the spread it covers. ⭐⭐ **Read the other way it is the most useful thing the programme has produced**: two rows from ONE family disagreed on **four properties** — which map onto `PLAN_PHP.md` §9 items **2, 3 and 4** only; ⚠ **items 1, 5 and 6 have never been compared across the two rows, and item 5 cannot be until a spellings search exists on either** (F42) — so **the within-family variance is large on the half we measured, and the between-family variance has never been measured at all.** ⚠⚠ **One row per family — the obvious plan — would have published S1's answer as whichever of the two we happened to pick.** → `.tasks-php/QUOTA_001.md` turns that accident into the method: **an adaptive quota, minimum 2 per family, a family stays OPEN until a new row moves none of the six answers, cap 4.** Floor **40 rows ≈ 140 tasks**, and that price should be visible here rather than discovered at row 30. ⚠ **S1 is NOT settled and owes a third row — record the debt, do not pay it next.** ⚠⚠ **UNREVIEWED, and `TASK_PHP_019`/`_020` are attacking the family boundaries right now — re-derive it after they report, do not defend it** |
 | 33 | ⚠⚠ **A php GATE RECORD IS WRITTEN IN THE REBOUND NAMESPACE AND IS READ IN THE REAL ONE — and it names the one directory `CLAUDE.md` most loudly forbids touching** | ✅ Measured on all **3** php gate records: every one keys its sources as **`common/digest_bridge.py`**, `common/driver.c`, `common/driver.h`, `common/driver.rs`. **Those files do not exist.** They are `common-php/`, and the key is correct *inside* `harness-php/root.py`'s rebinding — which is exactly how the php side reuses the frozen harness without editing it (`PLAN_PHP.md` §2). ⚠ **The hazard is a reader outside that namespace**: someone chasing a STALE key goes looking in `common/`, the **frozen PAT** tree, for a file that is not there — and this project's own F35 finding is that *"not there"* and *"I looked in the wrong place"* are indistinguishable from the output. ⭐ **`TASK_PHP_002_REPORT.md` §3 spotted it and said a reader *"has to come here to expand it"*; it then reached NEITHER `.memory-php/` NOR `PROTOCOL_PHP.md`** — grep confirms neither carries the words *rebind*, *rebound* or *namespace*. **A hazard that lives only in a task report is a hazard nobody will find.** ⚠ **Do NOT fix it**: the keys come from `check.py`'s root-relative derivation, so changing them is a `harness/` edit and a 33-pattern re-gate (items 13/17's decision shape). **Document it, in the batch** |
 | 32 | ⚠ **TWO CITATION ROTS, both found by a mechanical sweep of every rooted path in the manager docs — batch them** (rule 6; `.memory-php/` and `PROTOCOL_PHP.md` are open in running agents) | ✅ **First, the clean negative that is the point of running it: of ~500 backticked paths, the ONLY unresolved ones are row-relative (`c/kernel.c`), deliberately hypothetical (`patterns-php/shared/` — the thing F24 says nobody needs) or reports not yet written. No dangling pointer.** ⚠ **(a) `.temp/san_tests/` does not exist in this repo.** It is `/home/apt/repos_common/php-in-safe-rust/.temp/san_tests/` — **484 MB in ANOTHER project's gitignored scratch**, i.e. open item 1's hazard applied to F9's ASan census, which no document says. `.memory-php/00-corpus.md` carries the unrooted path, so an agent following it finds nothing — **and F35's whole lesson is that "found nothing" is indistinguishable from "isn't there".** ✅ `patterns-php/SOURCES.md` is the exception and does it right, both for the census trees and for the tarball (**re-checked today: 5595997 B, sha256 `5783e0c0…d6919`, matches the pin**). ⭐ **And F9's census re-derives EXACTLY, two months on: 2534 logs, 3199 reports, 2450 / 490 / 189 / 70.** ⚠ **(b) `.ph93` is used as the name of a DEMONSTRATION dotted row** in F16 and `PROTOCOL_PHP.md:431`, and `ph93` is now a real catalogued row (`wordwrap`). Rename the demo |
-| 31 | ⚠ **HOW OFTEN IS A CATALOGUE ROW's MECHANISM CLAIM WRONG? Nobody has ever asked** — ▶ **`TASK_PHP_020` is measuring it** | Every build so far has found the claim wrong or incomplete, and **three of the four instances were found by accident while doing something else** (`ph07`'s frame, `ph92`'s class, `ph93`'s unreachable arm; `ph29`'s is open — F36). **93 rows are catalogued and 2 are built**, so the rate decides how much a build task may lean on a Part B block. ⚠ **A sample that comes back clean is the useful outcome**, not a disappointing one — F21/F37's lesson applies to this audit as much as to the kills it was derived from |
+| ~~31~~ | ✅ **DISCHARGED at `TASK_PHP_020` → F46. The mechanism sentences hold (1 of 15 on a seeded block, 1 of 4 on the chosen batch); the `▸ trigger` lines do not (3 of 19 would have cost an engineer time, against 0 wrong defect sites).** ⚠ **The rate is a LOWER bound** — *"a cheaper audit than mine would have returned 15/15"* — and the batch four, the most-scrutinised rows in the corpus, still yielded one. **Any follow-up audits `▸ trigger` lines only.** Was: | Every build so far has found the claim wrong or incomplete, and **three of the four instances were found by accident while doing something else** (`ph07`'s frame, `ph92`'s class, `ph93`'s unreachable arm; `ph29`'s is open — F36). **93 rows are catalogued and 2 are built**, so the rate decides how much a build task may lean on a Part B block. ⚠ **A sample that comes back clean is the useful outcome**, not a disappointing one — F21/F37's lesson applies to this audit as much as to the kills it was derived from |
