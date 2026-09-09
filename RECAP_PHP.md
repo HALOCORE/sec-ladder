@@ -45,25 +45,28 @@ between them read `CLAUDE.md`'s top table.
 ## ▶ START HERE — the next action, in ≤ 20 lines
 
 ```
-STATE   ROWS BUILT 2 (ph03 · ph07) · CATALOGUED 93 · .memory-php/ FIRST.
-        3 AGENTS LAUNCHED: _018 rebuilds ph07 (R1h + spellings + provenance),
-        _019 mechanism-tests the C.1/C.4 kills, _020 samples the catalogue.
-NEXT    Reconcile those three reports, in that order. Then the batch
-        ph21 -> ph16 -> ph12 -> ph29 (UPSTREAM_001.md + FIXSURVEY_001.md).
-⚠ NEW   UPSTREAM_002: PHP DELETED HALF ITS OWN 2005 FIX (c2471b495009,
-        bug #49354, WITH A REGRESSION TEST) -- so check.py stage 7h was
-        RIGHT, and ph07's R1h becomes the CONVERGED config: hunk (a) alone,
-        php-5.2.12+. MANAGER WORK, UNREVIEWED -- the next review attacks it.
-⚠ TRAPS `grep -a` ALWAYS (grep here is silently blind to 41 corpus files);
-        ask about a FUNCTION, not text -- it bit me writing UPSTREAM_002.
+STATE   ROWS BUILT 2, AND BOTH ARE FAMILY S1 -- one of 20 (item 34).
+        CATALOGUED 93, going to 102. .memory-php/ is AUTHORITATIVE.
+NEXT    _018 (ph07 rebuild) is the ONLY agent still running. When it reports:
+        reconcile it, then DISPATCH _021 -- written and HELD -- to land _019
+        + _020 into CATALOGUE.md and trigger-test the nine new rows.
+        Then build in this ORDER: ph16 -> ph29 -> ph12 -> ph21 (F46 §8).
+⚠ NEW   F43 PHP DELETED HALF ITS OWN 2005 FIX, so stage 7h was RIGHT.
+        F44/F45 10 of 13 C.1 kills fail, and a WARNING FIX HID A DEFECT --
+        5.0.4 ships a table at 41 for a declared 65, gcc -Wall silent.
+        F46 the catalogue's mechanism sentences HOLD; its `trigger` lines
+        do not (3 of 19 vs 0 wrong sites). Audit triggers ONLY.
+⚠ TRAPS `grep -a` ALWAYS (silently blind to 41 corpus files); ask about a
+        FUNCTION, not text; and a probe that CANNOT evaluate must SAY SO,
+        never "ok" -- my own counter printed a false claim about the C.
 ⚠ COST  No row has a spellings search; both ladders are fixed-R4 bounds, so
         do not quote either yet. F39's direction claim is WITHDRAWN (F42).
 BAR     C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
         patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
-⚠ OPS   .web/ is edited by a CONCURRENT SESSION -- NEVER `git add -A`.
-        Commit with explicit paths or `git add -A -- . ':!.web'`.
-READ    .memory-php/ · PLAN_PHP.md · .tasks/PROTOCOL.md (reused unchanged) ·
-        CATALOGUE.md · then F1-F42 and the open items below.
+⚠ OPS   .web/ is a CONCURRENT SESSION -- NEVER `git add -A`. Use explicit
+        paths or `git add -A -- . ':!.web'`.
+READ    .memory-php/ · PLAN_PHP.md · .tasks/PROTOCOL.md · CATALOGUE.md ·
+        QUOTA_001.md · then F1-F46 and the open items below.
 ```
 
 ---
