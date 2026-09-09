@@ -173,10 +173,21 @@ does not, **that asymmetry is a headline result — measure it and write it down
    implementations **over a domain it constructs**, not over the shipped inputs.
    ⚠ **`ph03` shipped for a full task with `model.py` and `verus.rs` computing
    different functions and the fixture hid it.** Do not repeat that.
-3. **`spec.md`'s hashed `why` must be true when you write it.** ⚠⚠ `ph07`'s
-   cites four figures its own rebuild refuted, **and no gate can see it** because
-   the hash still matches the unedited text. **Write the `why` LAST, after every
-   number is final**, and say in your report that you did.
+3. **`spec.md`'s hashed `why` must be true when you write it.** ⚠⚠ `ph07`'s was
+   **not four stale figures but NINE — a whole pre-rebuild snapshot**, and **no
+   gate could see it**, because the hash still matched text nobody had edited
+   **and every qualitative verdict it supported was still right** (F54). **Write
+   the `why` LAST, after every number is final**, re-derive each numeral from the
+   record you are shipping, and **say in your report that you did.**
+4. ⚠⚠⚠ **`PROTOCOL_PHP.md` §H — NEW, AND IT BINDS THIS TASK.** *A change to a
+   validator lands with its **must-fire negatives** in the same change, or it
+   does not land.* **Your `controls/*.py` are validators**, and so is anything
+   you add under `harness-php/`. ⚠ **A green gate EXERCISES a control; it does
+   not ATTACK it** — three passing rows say nothing about what your control does
+   to a row that should fail. **Every control ships with at least one must-fire
+   and one must-NOT-fire case, run, with output pasted.** This rule exists
+   because a validator shipped with a 16-line derivation log and no control, and
+   four defects followed.
 
 ## §5 Rules
 
