@@ -1169,6 +1169,13 @@ independently, but **two of its four cells are wrong.**
 > print `CANNOT EVALUATE` and exit non-zero; ✅ **all four of my figures were
 > right**, which is exactly why the false sentence beside them survived.
 
+⚠ **The bar question still stands and is mine to settle**: `PLAN_PHP.md` §3.1
+and `CLAUDE.md` rule 6 both say *"its C mechanism"* and **neither says whether a
+data object is part of one.** The catalogue answers it one way everywhere
+already (`ph60` is four sites in one row, `ph61` five, `ph43` two limbs), so the
+cheap fix is to **write down the reading we already use** — but it multiplies
+`ph32`, `ph39` and `ph41` if decided the other way, so it is not free either.
+
 ### F45 — ⭐⭐⭐ A DEFECT MADE INVISIBLE BY THE COMMIT THAT FIXED ITS WARNING
 
 `TASK_PHP_019` §10, on the split F44 sent back. **The answer is TWO rows, not
@@ -1230,15 +1237,6 @@ predicted before the patch was read** (*"the omission is immediately before
 **Restated: 10 of 13 fail, and only `CRASH-037 → ph39` is correct exactly as
 written. Nine new rows `ph94`–`ph102`. Catalogue 93 → 102. 41 of 46 ≈ 89 % of
 everything ever killed in this programme is reversed.**
-
-### F43 — ⭐⭐⭐ PHP DELETED HALF ITS OWN SECURITY FIX, AND OUR GATE HAD ALREADY SAID WHY
-
-⚠ **The bar question still stands and is mine to settle**: `PLAN_PHP.md` §3.1
-and `CLAUDE.md` rule 6 both say *"its C mechanism"* and **neither says whether a
-data object is part of one.** The catalogue answers it one way everywhere
-already (`ph60` is four sites in one row, `ph61` five, `ph43` two limbs), so the
-cheap fix is to **write down the reading we already use** — but it multiplies
-`ph32`, `ph39` and `ph41` if decided the other way, so it is not free either.
 
 ### F43 — ⭐⭐⭐ PHP DELETED HALF ITS OWN SECURITY FIX, AND OUR GATE HAD ALREADY SAID WHY
 
