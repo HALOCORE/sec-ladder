@@ -17,6 +17,23 @@ open in a running agent).
 S1  unbounded cursor walk   9 rows   <== ph03 AND ph07
 ```
 
+⚠⚠ **THOSE NUMBERS WERE COUNTED BY HAND, ONCE, AGAINST A CATALOGUE TWO RUNNING
+TASKS WERE EDITING. RE-DERIVE THEM — DO NOT TRUST THIS BLOCK:**
+
+```sh
+python3 .tasks-php/quota.py        # from the repo root; writes nothing
+```
+
+It prints the family sizes, which families the built rows are in, the rows still
+owed to reach the floor, and it **cross-checks Part A's section against Part B's
+axis per row**. ✅ Its first run reproduced, from scratch and by a different
+route, the two defects already on file — the section headers declaring **91**
+against 93 rows, and **`ph92`/`ph93` filed under *Temporal* in Part A while
+Part B has them in `S3` (spatial)**. ⚠ **It exits non-zero while either stands**,
+so it will stay red until `land_019_020.py` moves them. ⚠ **If it cannot parse
+the catalogue it prints `CANNOT EVALUATE` and exits 2** — it never prints a
+number it could not derive.
+
 ⚠ **`RECAP_PHP.md` has said *"rows built: 2"* for four tasks and no document
 anywhere says they are the same family.** The programme's first comparative
 result (F41 — *the two rows disagree about what safety costs*) is therefore a
