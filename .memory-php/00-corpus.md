@@ -26,9 +26,18 @@
 - ⚠ **Three corpus `root_cause_id` strings are known wrong**, not merely
   imprecise: CRASH-053 (*"unchecked `make_real_object`"* — the check IS there),
   CRASH-033, and CRASH-071. **The label is a hint; the line is the claim.**
-- **The corpus is 166 rows.** `patterns-php/CATALOGUE.md` catalogues **93**.
+- **The corpus is 166 rows.** `patterns-php/CATALOGUE.md` catalogues **102**
+  (`TASK_PHP_019`+`_020` landed by `_023`; ⚠ **count it, do not trust this line**
+  — `python3 .tasks-php/quota.py`).
   ⚠ **It uses THREE id prefixes — `CRASH-`, `V5C-` and `LOGIC-`** — and all
   three are in `index.csv` with ordinary `c_file_line` and `fix_commit` cells.
+  ⚠⚠ **THAT LAST CLAUSE IS UNDER CHALLENGE AND UNREVIEWED — see `RECAP_PHP.md`
+  F51 / open item 39.** Measured: `V5C-015`, `V5C-116` and `V5C-173` are cited
+  by `ph22`, `ph03` and `ph11` and are in **neither** the `input_id` **nor** the
+  `v5c_id` column — they live only in a surviving row's **`merged_members`**,
+  which is a namespace this entry does not mention. **Nothing here is retracted
+  until a reviewer has looked**; the pointer is so the next agent does not
+  re-derive it from scratch. `.tasks-php/coverage.py` resolves all three.
   ⚠ `LOGIC-` ids also appear under `rust-eval/`; **that is not their home and
   the rows are C-cited.** Checked deliberately, because sourcing a row from the
   port would breach `SOURCES.md`. (F40.)
