@@ -144,7 +144,9 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > rows; and "merged by the corpus itself" is the weakest evidence there was** ·
 > **F45 ⭐⭐⭐ a defect made invisible by the commit that fixed its warning** ·
 > **F46 ⭐⭐ the catalogue's mechanism sentences hold; its `▸ trigger` lines do
-> not, and that is the half a build task runs**
+> not, and that is the half a build task runs** · **F47 ⭐⭐⭐ row 2 rebuilt: it
+> was shipping a rung PHP itself calls a bug, and only a VALUE postcondition
+> could have noticed**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -1082,6 +1084,146 @@ That is the row engineer's job, and the window is the expensive half.
 > defect lives in another.** **I applied F1 to kills and to fixes and did not
 > apply it to my own doubt.**
 
+### F47 — ⭐⭐⭐ ROW 2 REBUILT: THE ROW WAS SHIPPING A RUNG PHP ITSELF CALLS A BUG, AND ONLY A **VALUE** POSTCONDITION COULD HAVE NOTICED
+
+`TASK_PHP_018`. Gate **PASS**, contract `be5f5818ffa6…` → **`1f1508531bd4…`**,
+both brackets **66/0** and **6/0** first and last. ⚠ **UNREVIEWED** — nothing
+here is in `.memory-php/` (rule 9), and the review is the next task.
+
+**§1a — the question that could have killed the plan: YES, ALL OF THEM DID.**
+All four Rust rungs carried hunk (b)'s clamp, **and so did `verus.rs`'s spec
+function `strcut_fold`** and all three `model.py` implementations. Removing it
+did **not** break the proof — **it made it cheaper**: the `rlimit` requirement
+went from ~10–12 plain / **15** twin to **9 on both**.
+
+> ⭐⭐⭐ **AND THAT IS THE ROW'S STRONGEST RESULT, ARRIVING FROM A DIRECTION
+> NOBODY DESIGNED: a memory-safety-only `ensures` WOULD HAVE STAYED GREEN
+> THROUGH THE ENTIRE REBUILD.** The clamp was never a memory-safety bug — it is
+> a *wrong answer*. Only the value postcondition moved. **That is the concrete
+> case for proving what a function computes rather than merely that it does not
+> fault**, and it was produced by an accident of the rebuild rather than by an
+> argument.
+
+⭐⭐ **I OFFERED A STOPPING POINT AND IT WAS DECLINED ON EVIDENCE BETTER THAN MY
+ARGUMENT.** `UPSTREAM_002` reasoned from archaeology. `controls/bug49354.py`
+**replays upstream's own regression test** against all three configurations:
+
+```
+R1h_ab (the shipped two-hunk fix)   FAILS case 3   <- that IS bug #49354
+R1     (5.0.0)                      FAILS case 6   <- that is CRASH-124
+R1h    (hunk (a) alone)             agrees on all six
+```
+
+**The row was shipping, as "the real upstream fix", a rung PHP itself files as a
+bug** — demonstrated behaviourally, not inferred from a tag sweep.
+
+**THE NEW LADDER** (`Ir`/window byte vs R4; `-O3 isolated`; within-row only):
+**R2 +59.77 %** (was +57.67) · **R3 +11.98 %** (was +13.50) · **R4 ≡ R5**
+byte-identical. F41's claims **(a)** and **(b)** survive **unchanged**.
+
+⚠⚠ **(c) SURVIVES, HALVED — AND GOT SMALLER WITHOUT GETTING CLEANER, WHICH IS
+THE OPPOSITE OF WHAT MY TASK FILE PREDICTED.** One guard instead of two:
+**+2.78 `Ir`/call gcc, +6.20 clang** (was +7.30 / +9.27). But the marginal
+residual got **2.1× worse on gcc** and 1.5× better on clang.
+⚠⚠⚠ **And the cross-check `TASK_PHP_017` §5c rested on has EVAPORATED**: the two
+compilers' residuals were `−3.504e−05` and `−3.518e−05`, *identical to three
+significant figures*, and §5c read that agreement as proof the residual is a
+decomposition artefact. **They are now `+7.3e−05` and `−2.3e−05` — different
+magnitudes, opposite signs. That agreement was a coincidence of one corpus.**
+✅ The conclusion survives on a replacement argument that does not sit on a
+rounding boundary (the marginal moves < 0.002 % on both compilers while the
+delta holds across a **7.4×** range of window size); **the four-decimal-place
+wording is retired.** ⭐ **A cross-check that only worked on one corpus is worth
+more retired loudly than quietly.**
+
+**§2 — `controls/spellings.py`, THE FIRST IN `patterns-php/`, and `ph07` is the
+first php row to discharge F39's obligation.** ⚠ B1's `+2.62 %` is **not**
+carried over — it was measured against the corpus §1c deleted.
+
+```
+fixed-R4 bound              R3ship - R4ship          +11.98 %
+cheapest-found in-contract  inf(R3 found) - R4ship    +1.96 %   (r3_reslice)
+```
+
+⭐⭐ **AND THE R4 SIDE WAS SEARCHED AND IS DEGENERATE — a clean negative, which
+is exactly the half F39's withdrawal said was missing.** Four R4 spellings, none
+cheaper than a tie. **`ph07` makes it 12 of 20 rows where an R4-side search
+found nothing**, which is `SYNTHESIS.md`'s *"degenerate more often than not"*
+confirmed from inside this programme. ⭐ **So this `fixed-R4 bound` is a bound
+over a SEARCHED endpoint** — materially stronger than the same number was a task
+ago. ⚠ **Not exhausted**: four R4 and five R3 spellings over about one session.
+
+⭐ **`r4_index0` is FREE and STRICTLY BETTER ON THE TRUSTED SIDE** — `s[0]`
+instead of `*s.get_unchecked(0)` compiles to **the same bytes at the same
+addresses**, verifies 21/0, and **removes one of `get_unchecked`'s four call
+sites**. ⚠ Not shipped (the bench rule forbids re-shipping) — **and it is not
+even cheaper; it is a smaller trusted surface at the same price**, which is a
+different axis from the one the rule is about.
+
+⚠ **A first draft measured the WRONG STATISTIC and said so** — `check.py`'s
+100-vs-200 marginal, landing **1 %** off the shipped record. Not a discrepancy:
+the driver picks its window from a checksum, so 200 iterations sample different
+windows than 25 000. **A control quoted beside the row's headline must compute
+the row's headline**; switched, and it now reproduces at **0.000 %** on all four
+cells. ⭐ **Reported because it is exactly the size of error that gets absorbed
+as noise.**
+
+**§3 — `extra_spans` landed in `harness-php/provenance.py`** (additive, ~60
+lines, **no PAT re-gate**, `ph03`/`ph00` byte-identical). ⚠⚠ **It exposed
+something worse than it fixed.** The row's overlap headline falls **75 % → 61 %**
+and the interesting number is `span2` at **15 %** — **the caller frame, which is
+where R1h lives.** It is `modelled` text inside a row whose single `tier` word
+says `narrowed`; the three lines that match are the two clamps and the call.
+⭐ **The finding: a single `tier` word is the wrong shape for a multi-span row.**
+`ph07` cites three spans at three fidelities — **100 % / 75 % / 15 %**. The
+schema now lets a row say it lifts three; **it does not let it say at what
+fidelity each.** ✅ Deliberately **not** extended — that is a second schema
+change on n = 1.
+
+⚠⚠ **§4.1 — I PROPOSED A PROTOCOL EXTENSION AND THE ENGINEER REFUSED IT, AND IT
+IS RIGHT.** It ran `TASK_PHP_017`'s own three tests against `UPSTREAM_002` §4's
+claim. **(b) and (c) pass** — and (b) is the strongest part of my case: *if
+stage 7h learned tomorrow to express "this R1h legitimately differs on benign
+inputs", `ph07`'s R1h would still be hunk (a) alone*, so unlike the §A2a clause
+it does not retire with the gate check. ⚠⚠ **(a) FAILS.** A permission to cite
+*"a tagged upstream configuration"* lets the next engineer **scan tags until one
+is convenient** — *"instead of choosing the corpus to fit the fix, choose the fix
+to fit the corpus."* **My distinction is true of this row and not true of the
+rule unqualified.** ⭐ **And by the criterion `TASK_PHP_017` §3.2 landed — an
+observation is settled by one command, a norm needs n ≥ 2 — a permission about
+what a row MAY ship is a NORM, and it is on n = 1.**
+
+> ✅ **ACCEPTED, as recommended: land 4.1-A (the worked example, with four
+> MANDATORY disclosures) and HOLD the general permission until a second row
+> needs it.** Disclosure **(iii) — *an upstream artefact decides it, not the
+> row's convenience*** — is the load-bearing one. **Holding costs `ph07`
+> nothing**: `spec.md` already discloses that R1h is a subset of `fix_commit`,
+> why, and what it was chosen against. ⚠ **This is the second time in three
+> tasks that a rule invented to make one row work has been refused, and this
+> time the rule was mine.**
+
+⚠ **F31 is PARTLY RETRACTED** (§4.3): stage 7h and `check_sanitizers_hardened`
+are **not** the same defect on the same axis. One asks whether R1h changes
+benign output — *a property of the fix*; the other whether it still faults — *a
+property of the fix's completeness*. **Stage 7h was right; the analogy
+`TASK_PHP_017` §4b drew was wrong**, and I had adopted it.
+
+⚠ **THE WALL CLOCK NOW CONTRADICTS A FACT YOU CAN COUNT.** R4 and R5 are
+byte-identical and their wall marginals differ by **2.73 %**; on this corpus the
+wall clock says safe Rust is **5–6 % FASTER** than unsafe while the instruction
+count says it executes **12 % more**. **A measurement that reverses a fact you
+can count is measuring the box.**
+
+⚠ **The gate cost 11 rounds, not the budgeted 6 — and every extra one caught a
+real defect**, including `spellings.json` pinning **five sources that were
+ABSENT** because it used row-relative keys where stage 9b wants repo-relative.
+⭐ **That is open item 33's rebound-namespace hazard biting a second time, on a
+new file, within a day of being written down.**
+
+⚠ **`r202895` stays unresolved** — no `git-svn-id` trailers, `svn.php.net` dead —
+**and it is not in the row.** ⭐ One thing did come out of the hunt: the removal
+was committed **three times in the same second**, once per live branch.
+
 ### F46 — ⭐⭐ THE CATALOGUE'S MECHANISM SENTENCES HOLD. ITS `▸ trigger` LINES DO NOT, AND THAT IS THE HALF A BUILD TASK RUNS
 
 `TASK_PHP_020`, on a seeded sample **drawn and printed before any C was
@@ -1474,6 +1616,15 @@ negatives in all.**
 
 ### F41 — ⭐⭐ ROW 2 IS BUILT, AND THE TWO ROWS DISAGREE ABOUT WHAT SAFETY COSTS
 
+> ⚠⚠⚠ **EVERY NUMBER BELOW WAS MEASURED ON A CORPUS THAT NO LONGER EXISTS.
+> `TASK_PHP_018` REBUILT THIS ROW (F43/F47) — read F47 for the live ladder.**
+> The shipped R1h is now hunk (a) alone, `inputs/gen.py`'s restriction is gone,
+> and the benign domain grew by the 13.5 % the withdrawn hunk changed.
+> **R2 +57.67 → +59.77 · R3 +13.50 → +11.98 · R4 ≡ R5 still byte-identical.**
+> ✅ **Claims (a) and (b) below survive unchanged; (c) halved and its
+> cross-check evaporated.** ⚠ **And B1's `+2.62 %` is superseded by `+1.96 %`,
+> re-derived — do not quote the old figure.**
+
 `ph07-strcut-cursor` — `mbfl_strcut`'s `mblen_table` arm, `mbfilter.c:1179-1259`,
 CRASH-124, tier `narrowed`. **Gate `PASS`**, contract `be5f5818ffa625c7`, R5
 **21/0**, 2 justified `loud`. ⚠ **UNREVIEWED** — nothing here is in
@@ -1820,9 +1971,9 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 | ~~22~~ | ✅ **m8 LANDED (`ph92`/`ph93`, kills withdrawn IN PLACE, `ph28` narrowed). ⚠ M1/M2/M3/M5 and m1 STILL OWED** — was: the rest of `TASK_PHP_012`'s catalogue corrections — M1 (6 of 12 "merges" are silent drops), M2 (the four-`LOGIC` set kill), M3 (CRASH-021 reverses → a `ph60` merge, not a kill), M5 (CRASH-061/126 in the wrong family), and the minors m1/m5/m8 | Batch them with item 21's landing (`PROTOCOL.md` rule 6) — they are all `CATALOGUE.md` edits and share its rule-11 block. ✅ **m8 is ADJUDICATED** (`ADJUDICATION_002.md` §2, F37): `CRASH-106` → **`ph92`**, `CRASH-109` → **`ph93`**, both admitted, mechanisms and citations verified at source, §4 gives the exact Part A / Part B / Part C edits. **What is owed is the LANDING, not the judgement** — and the catalogue goes **91 → 93** |
 | ~~23~~ | ✅ **ALL SIX LANDED** the moment `TASK_PHP_016` reported — was: blocked by `PROTOCOL.md` rule 11 — `TASK_PHP_016` is reading `CATALOGUE.md`, `.memory-php/` and `PROTOCOL_PHP.md`. **Land all five in ONE pass the moment it reports** (rule 6) | **(a)** `python3 .tasks-php/land_m4.py --apply` — the 12 mis-tiered rows (item 21). **(b)** `ADJUDICATION_002.md` §4 — add `ph92`/`ph93`, delete their `C.1` kills **and record the re-adjudication in place** (a kill that vanishes is worse than a kill that was wrong — M1), narrow `ph28`'s uniqueness claim to *resident*. Catalogue **91 → 93**. **(c)** `.memory-php/02-ladder.md` — F34's *"the guard moved to the PROLOGUE"* is **superseded**: it moved to the **CALLER, in another file** (F38), and the entry names `ph07`'s R1h, which is now `cb3cca21b345`. **(d)** `.memory-php/00-corpus.md` — its header says findings run *"F1–F34"* (rule 13: headers rot), and it should carry the **`fix_commit` column** and the **`grep -a`** hazard. **(e)** `PROTOCOL_PHP.md` — the `grep -a` rule (F35) and the pre-build item `TASK_PHP_015` asked for, in F38's stronger form: *read the CSV's `fix_commit`, fetch the patch, **and confirm against the tags that it removes the 5.0.0 defect**; if not, cite both*. **(f)** `.memory-php/02-ladder.md` again — **label row 1's table `fixed-R4 bound`** and carry F39's direction prior; the caveat there is the engineer's and is weaker than the situation |
 | ~~24~~ | ✅✅ **CLOSING BY DELETION, NOT BY A RULE — `TASK_PHP_018` §1.** `TASK_PHP_017` §4 found hunk (a) alone is memory-safety-complete and is what PHP shipped from 5.2.17, so the clause rescued an avoidable R1h choice; **F43 then found WHY — upstream deleted hunk (b) in `c2471b495009` as bug #49354, with a regression test. Stage 7h was right.** With R1h re-pinned to the converged configuration the corpus restriction goes away and **no clause is needed at all.** ⚠ **The reviewer's guard clause is kept in `TASK_PHP_017_REPORT.md` §4 unlanded**, as the fallback if `TASK_PHP_018` §5.1 declines the rebuild. Was: **`ph07` is built and unreviewed, and its report proposes a `PROTOCOL_PHP.md` §A2a addition that was LOAD-BEARING for the row** | The row gates green only because `inputs/gen.py` keeps the upstream fix's guards **dead** on the measured corpus: `cb3cca21b345` hunk (b) **changes benign output on 15 870 of 117 612 non-crashing calls**, and `check.py` stage 7h requires R1h ≡ R1 on every non-adversarial input. **Proposed clause**: *where the upstream fix changes benign behaviour, the measured corpus must leave its guards dead, `gen.py` must assert it, and the behaviour change is measured in `controls/` where it cannot contaminate the ladder.* ⚠ **NOT LANDED — rule 9.** The manager landed only its own verified items (§F 5–6). **`TASK_PHP_017` must attack this clause specifically**: it is a rule invented to make one row gateable, which is exactly the shape that needs a second row before it becomes protocol |
-| 25 | ▶ **`TASK_PHP_018` §3.** ⚠⚠ **`provenance.c_lines` pins ONE span; `ph07` lifts THREE — and the UNPINNED one is where R1h lives** (⚠ this said TWO; `TASK_PHP_017` M1 counted three) | `TASK_PHP_015` §2.5 deferred the schema change; a second row now wants it. ⚠ **It is a `harness-php/` edit, so it costs no PAT re-gate** — but it moves the php preflight record. Decide at the review |
+| ~~25~~ | ✅ **CLOSED at `TASK_PHP_018` §3 — `extra_spans` landed in `harness-php/provenance.py`, additive, ~60 lines, NO PAT re-gate, `ph03`/`ph00` byte-identical.** ⚠⚠ **And it exposed something worse than it fixed**: the row's overlap headline falls **75 % → 61 %** and the caller frame — **the span R1h lives in** — scores **15 %**. It is `modelled` text inside a row whose single `tier` word says `narrowed`. ⭐ **A single `tier` word is the wrong shape for a multi-span row** (100 % / 75 % / 15 % here); the schema now lets a row say it lifts three spans and **not at what fidelity each**. ✅ Deliberately not extended — a second schema change on n = 1. Was:; `ph07` lifts THREE — and the UNPINNED one is where R1h lives** (⚠ this said TWO; `TASK_PHP_017` M1 counted three) | `TASK_PHP_015` §2.5 deferred the schema change; a second row now wants it. ⚠ **It is a `harness-php/` edit, so it costs no PAT re-gate** — but it moves the php preflight record. Decide at the review |
 | 26 | ⚠⚠ **THE SPELLINGS DEBT IS NOW ON BOTH BUILT ROWS** (F39) | `controls/spellings.py` exists and works on **four PAT rows** (`p13 p34 p42 p49`); neither php row has one. **Two actions, and the first is cheap**: (a) ✅ **DONE** — both ladders are now labelled `fixed-R4 bound` in `.memory-php/02` and F33/F41; (b) ▶ **`TASK_PHP_018` §2 ports it to `ph07`; `ph03`'s half stays OWED.** ⚠ **Do (b) before any number reaches the crash course.** ⚠⚠ **The reason given here was WITHDRAWN at F42** — it said *"the PAT record is that the missing number moves against safe Rust, three times out of four"*, which is a theorem about taking a minimum, not evidence. **The real reason is stronger and has no direction in it: a row that has searched NEITHER side is unbounded in BOTH**, and `ph07`'s own R3-side search then moved **+13.50 % → +2.62 %**, *toward* safe Rust |
-| 27 | ▶ **`TASK_PHP_018` §2.** ⚠⚠ **`TASK_PHP_017` B1: `ph07`'s `v1` must SHIP as the cheapest-found in-contract R3** | +13.50 % → **+2.62 %**, safe, in contract by the gate's own matcher, checksums identical on all seven inputs. ⚠ **Do NOT re-ship R3** (`.memory/02-bench-rules.md`); publish **both, labelled**, which is what `ph03`'s own `why` has demanded all along. ⭐ **This makes `ph07` the first php row that can discharge F39's obligation** — and it should be done before `ph03`'s, because the code already exists |
+| ~~27~~ | ✅✅ **DONE at `TASK_PHP_018` §2 — and BOTH SIDES were searched.** `controls/spellings.py` is the **first in `patterns-php/`**. **`fixed-R4 bound +11.98 %` · `cheapest-found in-contract +1.96 %` (`r3_reslice`)**, both labelled, `safe_tuned.rs` **not** re-shipped. ⚠ B1's `+2.62 %` is **superseded, not carried** — it was measured on the corpus the rebuild deleted. ⭐⭐ **The R4 side is DEGENERATE** (four spellings, none better than a tie), making `ph07` **12 of 20** rows where an R4 search found nothing — so this bound is over a **searched** endpoint. Was: | +13.50 % → **+2.62 %**, safe, in contract by the gate's own matcher, checksums identical on all seven inputs. ⚠ **Do NOT re-ship R3** (`.memory/02-bench-rules.md`); publish **both, labelled**, which is what `ph03`'s own `why` has demanded all along. ⭐ **This makes `ph07` the first php row that can discharge F39's obligation** — and it should be done before `ph03`'s, because the code already exists |
 | 28 | ▶ **`TASK_PHP_019`.** ⚠⚠ **Two MORE `C.1` kills reverse — `CRASH-126` and `CRASH-163`** (`ADJUDICATION_002.md` §5) | Killed **twice** for reasons the bar forbids: once in `C.4`'s set-shaped *"ordinary null-deref"* kill, then again under `C.1` as *"same fallible call's failure not tested"* — **and in both the failure IS tested.** `TASK_PHP_012` M5 is the same finding independently. ⚠ **`CRASH-101` and `CRASH-061` are *slight variations*, which §3.1 admits, so they are candidates too and nobody has looked.** Catalogue **93 → 95+** |
 | 35 | ⚠⚠ **NOBODY HAS AUDITED THE 93 ROWS' `corpus rows` CELLS, AND `coverage.py` CANNOT SEE THE DEFECT** | `TASK_PHP_019` found **two** ids merged into the wrong surviving row (`CRASH-101` into `ph39` when `ph41`'s own block says *"Do not fold into ph39"*; `LOGIC-014` into `ph47` when `C.1`'s own sentence says `ph48` was **kept** for that mechanism). ⚠⚠ **The coverage checker proves every corpus id is SOMEWHERE; nothing checks it is in the RIGHT somewhere** — and that is by construction, not a bug. ⭐ This is the same shape as `TASK_PHP_012` M1 (*a checker that accepts the artefact it is checking*) on a different field. **It is the next audit after `_019`/`_020`, and it is mechanical: for each id, does the surviving row's mechanism match?** |
 | 29 | ✅ **DISCHARGED at `TASK_PHP_019` → F44 — and the answer is that the rate tracked the TEST.** The mechanism test on the same population the cost-word test scored 17 % on returns **8 reversals**; across the programme **40 of 46 kills ever written down are now reversed**. ⚠ **Landing is BLOCKED on `TASK_PHP_020`** (it is sampling Part A; +8 rows would corrupt its draw). Was: | *"ZERO of the remaining `C.1` notes contains a cost word, so `ADJUDICATION_002`'s predicted re-read finds nothing. The two that DO reverse need a DIFFERENT test — **does the C support the mechanism claim?** — which that document never runs on anything, **including on its own two admissions**."* ⚠ **I audited for a WORD and called it an audit for a REASON.** The cost-word test found the two kills it was shaped to find and is now exhausted; **the mechanism test is unrun on all 12** |
