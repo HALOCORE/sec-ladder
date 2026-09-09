@@ -47,19 +47,19 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ROWS BUILT 2, AND BOTH ARE FAMILY S1 -- one of 20 (item 34).
         CATALOGUED 93, going to 102. .memory-php/ is AUTHORITATIVE.
-NEXT    _018 (ph07 rebuild) is the ONLY agent still running. Reconcile it,
-        then DISPATCH _021 (written, HELD): land _019 + _020 into
-        CATALOGUE.md and trigger-test the nine new rows. Then build in
-        this ORDER: ph16 -> ph29 -> ph12 -> ph21 (F46 §8).
-⚠ NEW   F43 PHP DELETED HALF ITS OWN 2005 FIX, so stage 7h was RIGHT.
-        F44/F45 10 of 13 C.1 kills fail; a WARNING FIX HID A DEFECT (5.0.4
-        ships a table at 41 for a declared 65, gcc -Wall silent). F46 the
-        catalogue's mechanism sentences HOLD, its `trigger` lines do not
-        (3 of 19 vs 0 wrong sites) -- audit triggers ONLY.
+NEXT    _022 is REVIEWING the ph07 rebuild (F47) -- its §1 can refute F47's
+        headline by construction. Then DISPATCH _021 (written, HELD): land
+        _019 + _020 into CATALOGUE.md and trigger-test the nine new rows.
+        Then build in ORDER ph16 -> ph29 -> ph12 -> ph21 (F46 §8).
+⚠ NEW   F43/F47 ph07 was shipping a rung PHP ITSELF FILES AS A BUG; only a
+        VALUE postcondition could have caught it. F44/F45 10 of 13 C.1 kills
+        fail, and a WARNING FIX HID A DEFECT (5.0.4: 41 for a declared 65,
+        gcc -Wall silent). F46 the catalogue's mechanism sentences HOLD, its
+        `trigger` lines do not -- audit triggers ONLY.
 ⚠ TRAPS `grep -a` ALWAYS (blind to 41 corpus files); ask about a FUNCTION,
         not text; a probe that CANNOT evaluate must SAY SO, never "ok".
-⚠ COST  No row has a spellings search; both ladders are fixed-R4 bounds --
-        do not quote either. F39's direction is WITHDRAWN (F42).
+⚠ COST  ph07 HAS one now: +11.98% bound / +1.96% cheapest-found, R4 side
+        SEARCHED and degenerate. ph03 still owes both. F39 WITHDRAWN (F42).
 BAR     C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
         patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
 ⚠ OPS   .web/ is a CONCURRENT SESSION -- NEVER `git add -A`.
