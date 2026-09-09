@@ -1104,10 +1104,21 @@ obligation caught in 2026 what a patch missed for ten years: the fix was
 shipped.** That is a result about security patches rather than about PHP, and it
 is now n = 2.
 
-⚠ **Not verified**: the removal commit blames *"r202895"* for introducing the
-bug. The 2005 commit is CVS-era and that is an SVN revision, so the
-identification needs a mapping I did not do. **The code is measured; the blame
-is not.** ⚠ **And the decision this licenses is a rebuild of row 2**, with its
+⚠ **The blame id is UNRESOLVABLE, and the finding does not need it.** The
+removal commit says *"(This bug was introduced by the commit by r202895. Please
+double-check the specification of the function you are going to \*fix\*.)"*.
+✅ Measured: **php-src's git mirror carries no `git-svn-id` in any commit
+message** (sampled across the SVN era), so `r202895` cannot be resolved from the
+mirror at all, and I am **not** asserting it is `cb3cca21b345`. ⭐ **What
+replaces it is stronger than the blame line, and is measured**: on `PHP-5.2` —
+**the branch the removal is on** — `PHP_FUNCTION(mb_strcut)`'s body is
+**byte-identical from php-5.1.2 to php-5.2.6** and changes by one unrelated
+token to php-5.2.11, so **the three lines deleted in 2009 were added by
+`cb3cca21b345` and by no other commit.** The *identity* of the removed code is
+established; only the maintainer's *reference* to it is not. ⚠ **The same commit
+message appears verbatim on the 5.3 branch as `0c974164e248`**, and 5.3's clamp
+is respelled, so the two branches acquired it separately — one more reason the
+single revision id cannot carry the claim. ⚠ **And the decision this licenses is a rebuild of row 2**, with its
 own risk stated at `UPSTREAM_002.md` §4 — a subset of a commit is not a commit,
 and calling a tagged upstream *configuration* an R1h is a protocol extension
 invented to make one row work, **which is the exact shape `TASK_PHP_017`
