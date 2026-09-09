@@ -64,7 +64,7 @@ BAR     C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
         patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
 ⚠ OPS   .web/ is a CONCURRENT SESSION -- NEVER `git add -A`.
 READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.md
-        · F1-F50 · items 1-38. CHECK: .temp/mgr165/{box,cite}check.py, green.
+        · F1-F50 · items 1-39. CHECK .tasks-php/{box,cite,cover,quot}*.py.
 ```
 
 ---
@@ -150,7 +150,9 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > same rule with the verbs changed** · **F49 ⭐⭐⭐ the stop condition fired: 3 of
 > 9 new rows' triggers failed, and F46 predicted which half would** · **F50 ⭐⭐ a
 > fix commit is a CENSUS of its defect's siblings — `ph16`'s patches four sites
-> and we catalogued one (MANAGER, UNREVIEWED, n = 1)**
+> and we catalogued one (MANAGER, UNREVIEWED, n = 1)** · **F51 ⚠⚠ the committed
+> claim layer rests on gitignored scratch in ten places, two already gone —
+> including the catalogue's own coverage claim**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -1087,6 +1089,50 @@ That is the row engineer's job, and the window is the expensive half.
 > is this project's oldest finding: **the citation names one frame and the
 > defect lives in another.** **I applied F1 to kills and to fixes and did not
 > apply it to my own doubt.**
+
+### F51 (MANAGER, UNREVIEWED) — ⚠⚠ THE COMMITTED CLAIM LAYER RESTS ON GITIGNORED SCRATCH IN TEN PLACES, AND **TWO ARE ALREADY GONE**
+
+`CLAUDE.md` rule 1 makes everything under `.temp/` re-derivable and **mandates
+deleting it once the gates are green.** So a committed document that cites
+`.temp/` is a claim with a scheduled expiry, and `citecheck.py` could not see it
+— the path *resolves today*, which is all `os.path.exists` asks.
+
+⚠⚠ **The sharpest instance: `CATALOGUE.md` C.7's coverage claim** — *"Nothing is
+NOT killed and NOT catalogued. ✅ Measured with `python3
+.temp/php11/coverage.py`"* — **rested entirely on a script the repo does not
+carry, which existed in four divergent scratch copies (85 / 75 / 39 / 19
+lines), none authoritative.** ✅ **Promoted to `.tasks-php/coverage.py` and the
+`166/166` re-derived and CONFIRMED**, so the claim is now reproducible.
+
+⚠ **And the pasted output block is stale**: it says **91 rows / 161 ids**; the
+file has **93 / 163**. A number pasted into a document does not track the
+document — the same shape as F14 (`0 STALE` ≠ pinned) and the `why`-block hole
+at item 36. **Queued as item 39; `CATALOGUE.md` belongs to `TASK_PHP_023` today.**
+
+⭐ **Two repairs to `coverage.py` came with the promotion, both from F49:** the
+row regexes were `ph\d\d` (blind to `ph100`+), and **`gaps:` was computed from
+`range(1, len(rows)+1)` — its own hit count — so a row it could not see shrank
+the expected set by exactly one and the gap list stayed empty. The check could
+not report its own blindness.** ✅ **F49's claim that the `166/166` was
+unaffected is CORRECT**, verified by keeping both computations side by side.
+
+⭐ **A third defect the promotion found, and it was MINE.** The tool reported
+*"3 ids the catalogue names that the corpus does not have"* — `V5C-015`,
+`V5C-116`, `V5C-173` — and `CATALOGUE.md` had pasted that line in unexplained.
+They are **legitimate**: the corpus's own `merged_members` column, ids merged
+away into a surviving row (`V5C-116` → `CRASH-115`, cited by `ph03`). **The
+corpus has a THIRD namespace and the checker knew two of them.** ⚠⚠ **My first
+probe "confirmed" they were absent from `v5c_id` too — using
+`re.sub(r'\D','',...)`, which turns `V5C-001` into `5001`.** A wrong comparison
+rendered as a confident negative, **the exact failure `count_ent.py` produced
+last session**, caught only because the *"numeric range 5001–5191"* it printed
+beside the verdict was visibly absurd. **The verdict happened to be right; the
+evidence for it was nonsense.**
+
+⚠ **The general form: a checker that lives in scratch cannot outlive the claim
+it certifies.** `boxcheck.py` and `citecheck.py` were in `.temp/mgr165/` too and
+are now `.tasks-php/` alongside `quota.py`, `coverage.py`, `fixsurvey.py` and
+the landing scripts.
 
 ### F50 (MANAGER, UNREVIEWED, n = 1) — ⭐⭐ A FIX COMMIT IS A **CENSUS** OF ITS DEFECT'S SIBLINGS, AND WE HAVE ONLY EVER READ IT AS A SOURCE OF R1h
 
@@ -2253,3 +2299,4 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 | 36 | ⚠⚠ **`ph07` CARRIES FOUR REFUTED FIGURES INSIDE ITS HASHED `why`, AND NO GATE CAN SEE THEM** — ▶ **`TASK_PHP_024`, written** | `TASK_PHP_022` M1/M2. **(a)** `spec.md`'s `identity[0].why` cites **255 instructions** and three hashes, **all pre-rebuild values the rebuild refuted** — ⚠ **the hash still matches**, because the text was never edited, **and `NOTES.md` claims the addendum pass covered it, which is a false disclosure.** `PROTOCOL.md` rule 6's documented hole, reproduced live on a row we are quoting. **(b)** `c/kernel.h:20-25` names **`d9dda48f8a7e`** as R1h while the file ships `cb3cca21b345` hunk (a) — ⚠ **and `spec.md`'s own `forbidden[2]` calls `d9dda48f8a7e` a *different function*.** It is inside `source_sha256` and predates the rebuild. **Both fixes cost a `ph07` re-gate**, plus the minors: `bug49354.py`'s *"shares no code with `fix_scope.py`"* is **false** (byte-identical table and clamps — conclusion still safe, three independent checks agree), `NOTES.md`'s rule-6 fence names 4 against 27 moved, §10d quotes a pre-rebuild log, and `spellings.py` **re-implements** `measure.py`'s statistic rather than importing it |
 | 37 | ⚠⚠ **FOUR DEFECTS IN `harness-php/provenance.py`'s NEW `extra_spans`, all found AFTER I committed it** — ▶ **`TASK_PHP_024`, written** | `TASK_PHP_022`'s post-notification half. **(a)** ⚠⚠ **`provenance.py:836-837`'s disclosure *"adding a span cannot make the number go up for free"* is measurably FALSE.** Union overlap is `|hit|/|want|` over deduplicated sets, so **a span above the current fraction RAISES it** — measured on `ph07`'s own excerpts: primary alone **75 % (39/52)** → primary + the 100 % table span **77 % (44/57)**. `ph07` only lands at 61 % because span 2 happens to be 15 %. ✅ The set semantics *do* defend against citing the same span twice (measured: unchanged at 61 %) — **it is the general claim that fails.** **(b)** ⚠ **A `php_provenance: false` row short-circuits before any `extra_spans` validation**, so a wholly bogus extra span passes. **(c)** `gate.py:300` cites `provenance.py:841-843` for the dotted-row glob; the +60 lines moved it to **`:924`** — **citation rot introduced BY the change and not repaired.** **(d)** *"byte-identical"* holds for the **default invocation only**: under `--no-tarball`, `ph03` gains `for any of 1 span(s)` |
 | 38 | ⚠ **`ext/sockets/sockets.c` HAS ZERO CATALOGUE ROWS, AND THE FIX COMMIT THAT NAMES IT WAS ALREADY ON FILE** — ▶ **`TASK_PHP_026`, written; dispatch AFTER `_023` lands** | F50, **manager, unreviewed, n = 1**. `ph16`'s `fix_commit` `99e290f882c9` patches **four** unchecked fd-set sites and the catalogue has **one**; the other three are `streamsfuncs.c:577` (`FD_ISSET`, a read) and `sockets.c:536,563`. ⚠⚠ **`FIXSURVEY_001.md:67-81` had already recorded the *10 files* — as a COST** (*"F34's inside-a-rewrite shape"*, *"right fix, big commit"*). **The channel: for each of the ~91 resolved rows, does its fix name siblings we never catalogued?** ⚠ **Expected to be a MINORITY** — the discriminator is the commit *message*, sweep vs rewrite — and *"the channel is dead"* is an outcome `_026` is told to report plainly. ⚠ **Does not reopen the bar**: every candidate still faces `PLAN_PHP.md` §3 on the C alone, and `sockets.c:536` looks `EXACT` against `ph16` under `_019`'s rule. ⚠⚠ **`:541` vs `:577` is a sharp test of that rule — one upstream fix, two fault primitives — so `_026` reads `_023`'s verdict first.** ⚠ First check whether `ext/sockets/` was in the **built configuration the ASan census ran**; if not, its zero rows are explained innocently and the finding is about the census's coverage |
+| 39 | ⚠⚠ **`CATALOGUE.md` C.7's COVERAGE CLAIM RESTED ON GITIGNORED SCRATCH, AND ITS PASTED OUTPUT IS STALE** — ▶ **fix when `_023` releases the file** | F51. **(a)** ✅ **Done**: `.temp/php11/coverage.py` promoted to `.tasks-php/coverage.py`, `166/166` re-derived and confirmed, F49's two regex/gap defects repaired, and the corpus's **third namespace** (`merged_members` — `V5C-116` → `CRASH-115`) taught to the checker, which resolves the three *"ids the corpus does not have"* the catalogue had pasted in unexplained. **(b)** ⚠ **Still owed, in `CATALOGUE.md` itself**: C.7 cites `.temp/php11/coverage.py` and quotes **91 rows / 161 ids** against the file's **93 / 163**. Repoint at `.tasks-php/coverage.py` and refresh the block — ⚠ **after the landing, so it is refreshed once at 102.** **(c)** ⚠ **Nine more committed-claim citations into `.temp/`, two ALREADY GONE** (`patterns-php/SOURCES.md` ×4, `PLAN_PHP.md` ×3, `CATALOGUE.md` ×3, `.memory-php/00-corpus.md` ×1). `citecheck.py` now reports them as a **warning, not a failure** — they are evidence with a scheduled expiry, not broken pointers, and the fix is a committed generator per `CLAUDE.md` rule 1, not a whitelist. **(d)** ⚠ **`ph03` and `ph22`'s `corpus rows` cells cite merged-away ids** — legitimate, but F44 rates `merged_members` the WEAKEST evidence in C.1 and **these are the three merges C.1's kills rest on**; `TASK_PHP_019` reports the corpus's own validators flagged all three. **Not reopened here** |
