@@ -46,25 +46,25 @@ between them read `CLAUDE.md`'s top table.
 
 ```
 STATE   ROWS BUILT 2, AND BOTH ARE FAMILY S1 -- one of 20 (item 34).
-        CATALOGUED 93, going to 102. .memory-php/ is AUTHORITATIVE.
-NEXT    _023 RUNNING (review the nine rows, then land 93 -> 102). QUEUED, in
-        order: _024 ph07's refuted hashed why + 4 extra_spans defects (items
-        36,37); _025 BUILD ph16, row 3 and the first non-S1; _026 the census
-        channel, AFTER _023 lands. NOT ph21 -- its trigger is the one that failed.
-⚠ NEW   F50 A FIX COMMIT IS A CENSUS: ph16's patches 4 sites, we catalogued 1;
-        ext/sockets/ has ZERO rows (n=1, UNREVIEWED -> _026). F43/F47 ph07
-        shipped a rung PHP ITSELF FILES AS A BUG; no memory-safety-only proof
-        moves. F44/F45 10 of 13 C.1 kills fail; a WARNING FIX HID A DEFECT.
-        F46/F49 mechanism sentences HOLD, `trigger` lines do NOT. TRIGGERS ONLY.
+        CATALOGUED 102, LANDED AND VERIFIED. .memory-php/ is AUTHORITATIVE.
+NEXT    NOTHING RUNNING. Dispatch in order, ONE AT A TIME: _024 ph07's refuted
+        hashed why + 4 extra_spans defects (items 36,37); _025 BUILD ph16, row 3
+        and the FIRST NON-S1; _026 the census channel. NOT ph21.
+⚠ NEW   F52 A PROBE THAT MAKES THE STATE IT MEASURES -- 4 cases, 3 MINE. ph94's
+        original claim RESTORED; _021's headline retracted. F53 A SHARED FIX IS
+        NOT EVIDENCE OF A SHARED MECHANISM -> PROTOCOL_PHP §G replaces _019's
+        folklore rule (UNREVIEWED). F50 a fix commit is a CENSUS: ph16's patches
+        4 sites, we catalogued 1. F51 the checkers now live in .tasks-php/.
 ⚠ TRAPS `grep -a` ALWAYS (blind to 41 corpus files); ask about a FUNCTION, not
-        text; a probe that CANNOT evaluate must SAY SO, never "ok".
+        text. ⚠⚠ A PROBE WHOSE SETUP ENCODES THE ANSWER evaluates fine and is
+        wrong -- CHANGE THE SETUP'S ARBITRARY CONSTANT AND SEE IF IT MOVES (F52).
 ⚠ COST  ph07 HAS a spellings search: +11.98% bound / +1.96% cheapest-found, R4
         side SEARCHED and degenerate. ph03 owes both. F39 WITHDRAWN (F42).
 BAR     C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
         patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
 ⚠ OPS   .web/ is a CONCURRENT SESSION -- NEVER `git add -A`.
 READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.md
-        · F1-F50 · items 1-39. CHECK .tasks-php/{box,cite,cover,quot}*.py.
+        · F1-F53 · items 1-41. CHECK .tasks-php/{box,cite,cover,quot}*.py.
 ```
 
 ---
@@ -74,10 +74,10 @@ READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.
 | | |
 |---|---|
 | **rows built** | **2, and ⚠⚠ THEY ARE THE SAME FAMILY** — `ph03-uudecode-bound` and `ph07-strcut-cursor` are **both `S1`, unbounded cursor walk**, 1 of the catalogue's **20**. Both reviewed; `ph07` is being **rebuilt** at `TASK_PHP_018` (F43). Each five rungs + R1h. ⚠ **This row said *"2"* for four tasks and no document said they were one family** — the cost of that, and the quota rule that comes out of it, are open item 34 / `QUOTA_001.md`. (`ph00-smoke` is a relocated PAT calibration kernel, throwaway, **no PHP provenance**, and prices nothing) |
-| **tasks** | **26 written, `_001`–`_026`; 22 have reported; `_023` is RUNNING.** `_001` mining · `_002`–`_011` Phase 0, built and reviewed twice · `_012` catalogue corrections + row-1 prep · `_013`/`_014` **`ph03` built and reviewed** · `_015` `ph07` prep (**stalled on *"no fix exists"*, overturned — F34/F38**) · `_016`/`_017` **`ph07` built and reviewed** · **`_018` `ph07` REBUILT** (new R1h, spellings control, `extra_spans`) and **`_022` reviewed it** · `_019` the C.1/C.4 mechanism test (**9 new rows adjudicated**) · `_020` the catalogue's error rate · **`_021` STOPPED ITSELF** — 3 of 9 triggers failed, so the catalogue is **unchanged at 93** and `land_019_020.py` waits. ▶ **`_023` (review the nine, then land) is RUNNING. `_024` (`ph07`'s hashed `why` + `extra_spans`), `_025` (BUILD `ph16` — row 3, and the first outside family `S1`) and `_026` (F50's census channel, ⚠ **dispatch after `_023` lands**, because it counts catalogue rows) are WRITTEN and NOT DISPATCHED.** ⚠ **≈ 3.5 tasks per built row** against `PLAN_PHP.md` §8's PAT-measured ~3, and ⚠ **the *"and falling"* is a projection with n = 2, not a measurement** (`QUOTA_001.md` §2). ⚠ **This row was stuck at `_006` for fourteen tasks** — rule 13 |
+| **tasks** | **26 written, `_001`–`_026`; 23 have reported; NOTHING RUNNING.** `_001` mining · `_002`–`_011` Phase 0, built and reviewed twice · `_012` catalogue corrections + row-1 prep · `_013`/`_014` **`ph03` built and reviewed** · `_015` `ph07` prep (**stalled on *"no fix exists"*, overturned — F34/F38**) · `_016`/`_017` **`ph07` built and reviewed** · **`_018` `ph07` REBUILT** (new R1h, spellings control, `extra_spans`) and **`_022` reviewed it** · `_019` the C.1/C.4 mechanism test (**9 new rows adjudicated**) · `_020` the catalogue's error rate · **`_021` STOPPED ITSELF** — 3 of 9 triggers failed, so the catalogue is **unchanged at 93** and `land_019_020.py` waits. ▶ **`_023` (review the nine, then land) is RUNNING. `_024` (`ph07`'s hashed `why` + `extra_spans`), `_025` (BUILD `ph16` — row 3, and the first outside family `S1`) and `_026` (F50's census channel, ⚠ **dispatch after `_023` lands**, because it counts catalogue rows) are WRITTEN and NOT DISPATCHED.** ⚠ **≈ 3.5 tasks per built row** against `PLAN_PHP.md` §8's PAT-measured ~3, and ⚠ **the *"and falling"* is a projection with n = 2, not a measurement** (`QUOTA_001.md` §2). ⚠ **This row was stuck at `_006` for fourteen tasks** — rule 13 |
 | **infrastructure** | **built and reviewed TWICE**: `harness-php/{root,gate,provenance}.py` · `common-php/` · `patterns-php/{SOURCES.md,php-5.0.0.manifest}` (1170 files, 109 KB) · `.tasks-php/PROTOCOL_PHP.md` · `results-php/`. ⚠ **Reviewed is not the same as correct — the second review found a blocker in the first review's own fix.** ⚠ There used to be a SECOND row in this table also labelled `infrastructure` saying *"not yet built — Phase 0"* (`TASK_PHP_003` m1); it is gone |
 | **candidates** | **54** delivered across three axes. ⚠ **`.tasks-php/ADJUDICATION_001.md` takes that to ≈ 80**: +6 splits, −2 merges, **+17 kills reversed**, +1 dropped with no reason recorded, +4 that fell between axes. Evidence in `.tasks-php/TASK_PHP_001_MINE/` |
-| **catalogue** | ✅ **`patterns-php/CATALOGUE.md` — 93 rows** (⚠ this said **91** and *"23 family headings"*; count it, do not trust a line: `grep -c '^| ph[0-9]' patterns-php/CATALOGUE.md`). **20 mechanism families** — `S1`–`S6` spatial **40** · `T1`–`T6` type **22** · `E1`–`E8` temporal **31**. ⚠ **UNREVIEWED, and under attack right now**: `TASK_PHP_019` on Part C's kills, `TASK_PHP_020` on whether Parts A/B's mechanism claims survive the C. ⚠ **Part A's own section headers still say `Spatial (38)` and sum to 91** — `ph92`/`ph93` were added under them and the header was not moved. Part A is a scannable table, Part B a ~150-word block per row, Part C the kill list with a re-derived criterion per kill. ⚠ **Size was measured, not argued: 1 304 B/row against `.memory/06-catalogue.md`'s 4 340 — 3.3× denser than the PAT catalogue that works.** Built from `.tasks-php/ADJUDICATION_001.md`, which it also reviews |
+| **catalogue** | ✅ **`patterns-php/CATALOGUE.md` — 102 rows, LANDED AND VERIFIED** by `TASK_PHP_023` (⚠ this line has said **91** and **93**; count it, do not trust it: `python3 .tasks-php/quota.py`). **20 mechanism families**, unchanged by the landing — spatial **42** · type **29** · temporal **31**. ✅ **Part A and Part B agree row-for-row, and every row is filed under the same axis in both** — the `ph92`/`ph93` mismatch is gone. ✅ `coverage.py` **166/166, MISSING 0**; all 8 withdrawn `C.1` kills present in place with their notes. ⚠⚠ **Two landed sentences were measured FALSE and are corrected in `CATALOGUE.md` AND in `land_019_020.py`** (F52 `ph94`'s trigger, F53 `ph32`'s *"one commit"*) — a landing script left carrying a refuted claim is a cited artefact. ⚠ **`_023` reviewed the nine admissions and would overturn NONE of `_019`'s reversals**; ~70 citations opened across 15 files, including the ones `_019` called correct. ⚠ **Parts A/B beyond the nine are still UNREVIEWED**, and `_020` measured the mechanism sentences right and the `▸ trigger` lines wrong (F46). Part A is a scannable table, Part B a ~150-word block per row, Part C the kill list with a re-derived criterion per kill |
 | **citation base** | PHP 5.0.0, pristine tarball, sha256 `5783e0c0…d6919`, 5595997 B, 3815 entries. **4.0.x ignored** (`DP-06`) |
 | **rungs** | all five, R4/R5 may land as findings (`DP-02`) |
 | **PAT tree** | untouched and must stay so — `harness/*.py` and `common/*.py` are hashed into all 33 gate records (`PLAN_PHP.md` §2.1) |
@@ -152,7 +152,10 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > fix commit is a CENSUS of its defect's siblings — `ph16`'s patches four sites
 > and we catalogued one (MANAGER, UNREVIEWED, n = 1)** · **F51 ⚠⚠ the committed
 > claim layer rests on gitignored scratch in ten places, two already gone —
-> including the catalogue's own coverage claim**
+> including the catalogue's own coverage claim** · **F52 ⚠⚠⚠ the probe made the
+> state it was measuring, and so did mine, twice, the same week — `ph94`'s
+> original claim is restored** · **F53 ⚠⚠⚠ a shared upstream fix is not evidence
+> of a shared mechanism; `PROTOCOL_PHP.md` §G replaces the folklore rule**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -1090,6 +1093,108 @@ That is the row engineer's job, and the window is the expensive half.
 > defect lives in another.** **I applied F1 to kills and to fixes and did not
 > apply it to my own doubt.**
 
+### F53 — ⚠⚠⚠ A SHARED UPSTREAM FIX IS NOT EVIDENCE OF A SHARED MECHANISM, AND THE RULE THAT SAID OTHERWISE HAD ALREADY PUT A FALSE SENTENCE IN THE CATALOGUE
+
+`TASK_PHP_023` §2.6 and §4.3. **The landed `ph32` block said all three short
+entity tables *"are repaired by ONE commit … which is why they are one row"*.**
+✅ **Measured at each commit** (`entcount.py` run at nine PHP-5.0 commits
+touching `html.c` between 5.0.3 and 5.0.4): at **`b9ff04703f16` (2005-01-11)**,
+two months earlier, `ent_uni_spacing` and `ent_uni_8592_9002` are **already
+`ok`** while `ent_uni_338_402` is still **63/65**. **`56adfe1f3cf1` repairs one
+of the three.** ⚠ **So `ph32`'s stated R1h is wrong for two of the three tables
+it claims** — and `_019` §10.3's quoted *"spacing"* diff is `b9ff04703f16`'s,
+misattributed. ✅ **No `phNN` moves**; neither table is a corpus row, and `ph102`
+is unaffected and now rests on stronger evidence.
+
+⭐⭐ **THE RULE FIRED CORRECTLY FOR `ph102` AND INCORRECTLY FOR `ph32` IN THE
+SAME PARAGRAPH.** The culprit is `TASK_PHP_019`'s second disjunct — *"different
+upstream fixes, each leaving the other standing"* — and `_023`'s attack on it
+holds:
+
+> ✅ **A DISTINCT fix is evidence for DIFFERENT.**
+> ⚠⚠⚠ **A SHARED fix is NOT evidence for SAME.** One commit routinely repairs
+> unrelated errors in one file — `56adfe1f3cf1` fixes `ent_uni_338_402`'s
+> **count** and, in the same patch, two pure **name** typos in a correctly-sized
+> table. **Absence of a distinguishing fix is not presence of a shared
+> mechanism.**
+
+⚠ It is also **not a C-side test**, **contingent** on what a maintainer noticed,
+**often counterfactual**, and **silent on a large part of the corpus** (`ph36`
+has no sha, 17 rows are `fixed-by-rewrite`, 31 % of fixes are 2010+).
+⚠⚠ **And `.memory-php/02-ladder.md` ALREADY WARNED** that the `fix_commit`
+column *"names **a** fix … NOT necessarily the one that removes the 5.0.0
+defect"* — **§2.6 is that warning firing on a hand-bisected chain.**
+
+⭐ **Landed as `PROTOCOL_PHP.md` §G/§G1** — *one test, one burden: can I show
+these are the SAME?* — ⚠⚠ **and the rule it replaces was never in a standing
+document at all.** `_019` wrote it in a report, **I adopted it without review
+and then used it myself to overturn a verdict**, and it has been operating as
+folklore ever since. ⚠ **§G is marked UNREVIEWED and owes a second pair of
+eyes.** ⚠⚠⚠ **It is a CHECKLIST, NOT A DECISION PROCEDURE**: (a)(b)(c) have no
+stated level of abstraction, so **the verdict is a function of the description,
+not of the C** — `_019` §7 concedes it returns *both* answers on `CRASH-090` and
+breaks the tie from outside itself. ✅ **The half that was always right is the
+BURDEN** — kill only on a proof of *same*, the correct inversion of the corpus's
+own `merged_members` predicate.
+
+⭐ **This lands on F50 immediately, and helpfully**: the census channel is **good
+for FINDING sibling sites and useless for deciding whether they are
+duplicates.** Finding is what it is for.
+
+### F52 — ⚠⚠⚠ THE PROBE MADE THE STATE IT WAS MEASURING, AND SO DID MINE, TWICE, THE SAME WEEK
+
+`TASK_PHP_023` §2.2, answering the starred question I put to it — *"`_021`
+measured that gcc zeroes the padding `ph94` is about; is the row still
+admissible?"* ⭐ **The answer is that the measurement was wrong.**
+
+`TASK_PHP_021`'s probe opened each trial with
+
+```c
+zval arg;
+memset(&arg, 0, sizeof arg);            /* labelled "zend_API.c:692" */
+```
+
+⚠⚠ **There is no such `memset` in PHP, and `zend_API.c:692` is the function's
+signature line, not a statement.** The zval reaches `_object_and_properties_init`
+from `zend_execute.c:3245 ALLOC_ZVAL` — `emalloc`, contents unspecified — and
+`zend_API.c:708` writes only `arg->type`. **Nothing zeroes `value`. The probe
+was reading its own zeroes**, and could not distinguish *"the store wrote a
+zeroed high half"* from *"the store never touched the padding."*
+
+✅ **Re-run with a `0xAA` poison and the zval from the allocator, nothing else
+changed: WILD READ at `-O0`, `-O1`, `-O2` and `-O3`.** ⭐ **The `-O0`
+disassembly is the mechanism and it is toolchain-independent**: the store at
+`zend_API.c:710` is `mov %ecx,(%rbx)` (4-byte handle) + `mov %rax,0x8(%rbx)`
+(handlers) — **bytes 4–7 are never written by anything.** `_021`'s
+`mov %esi,%eax` is in the *callee's* return and is irrelevant, because the
+caller never stores RAX's high half into the zval at all.
+
+**So `ph94`'s ORIGINAL claim is restored** — *the index is uninitialised memory,
+not a program value* — and the corpus's own valgrind *"Use of uninitialised
+value of size 8"* at `:4033` is **corroborated, not contradicted.** ⭐ The blob
+advice survives for a different reason: not *"a faithful producer gives zeros"*
+(false) but *"a faithful producer gives whatever `emalloc` left, which is
+neither reproducible nor measurable"* — **a `projection`, and it must be
+declared in the divergence ledger with that `kind`.**
+
+⚠⚠⚠ **THE PATTERN IS THE FINDING, AND IT IS MINE TOO.** Three probes, one week,
+all of them **constructing the state they were measuring** and rendering it as a
+confident result:
+
+| probe | the construction | what it claimed |
+|---|---|---|
+| `_021`'s `ph94_probe2.c` | a `memset` PHP does not do | *"no OOB read at any `-O`"* — ⚠ **published as a ⭐ headline** |
+| my `asan_reach.c` | `CANARY_BYTE 0xA5`, bit 0 already set, so `|= 1` was a **no-op** | *"canary INTACT — nothing saw it"* (F50) |
+| my `V5C` check | `re.sub(r'\D','',…)`, turning `V5C-001` into `5001` | *"absent from `v5c_id`"* (F51) |
+
+⚠⚠ **`count_ent.py` last session was the fourth.** ⭐ **The common shape is not
+"a bug in a probe" — it is a probe whose SETUP encodes the answer, so both the
+true and the false world render identically.** ⚠ **`.memory-php/00`'s rule
+(*"a probe that cannot evaluate must say so"*) does not catch this class**: these
+probes *could* evaluate, and did, on a world they built. **The check that works
+is the one `_023` used — change the setup's arbitrary constant and see whether
+the verdict moves.**
+
 ### F51 (MANAGER, UNREVIEWED) — ⚠⚠ THE COMMITTED CLAIM LAYER RESTS ON GITIGNORED SCRATCH IN TEN PLACES, AND **TWO ARE ALREADY GONE**
 
 `CLAUDE.md` rule 1 makes everything under `.temp/` re-derivable and **mandates
@@ -1173,13 +1278,20 @@ negative (F7, F13), and this manager's projections have been wrong before (F32,
 F36, and the `ph29` doubt that was wrong in all three limbs).
 
 ⚠ **This does NOT reopen the admission bar.** Every candidate it yields still
-faces `PLAN_PHP.md` §3 on the C alone, and #3 above looks `EXACT` against `ph16`
-under `TASK_PHP_019`'s rule. ⚠⚠ **#1 vs #2 is a sharp test case for that rule,
-which `TASK_PHP_023` is attacking right now**: they share *one upstream fix*,
-which is the near-inverse of `_019`'s `DIFFERENT MECHANISM` disjunct (*"different
-upstream fixes each leaving the other standing"*), while differing in **fault
-primitive**, which §3.1 admits as a variation. **`_026` reads `_023`'s verdict
-before it uses either phrase.** **The finding is the CHANNEL, not a row count.**
+faces `PLAN_PHP.md` §3 on the C alone.
+
+⭐⭐ **AND `TASK_PHP_023` HAS SINCE SETTLED HOW TO READ IT, IN THE DIRECTION THAT
+MAKES THE CHANNEL MORE USEFUL.** I had flagged #1 vs #2 as a sharp test of
+`_019`'s rule, because they **share one upstream fix** while differing in fault
+primitive. `_023` measured that disjunct and it failed: **a *distinct* fix is
+evidence for DIFFERENT; a *shared* fix is NOT evidence for SAME** — one commit
+routinely repairs unrelated errors in one file, and that exact inference put a
+false sentence into `ph32` (F53). **So the fix commit is good for FINDING
+sibling sites and useless for deciding whether they are duplicates.** A clean
+division of labour, and finding is what the channel is for. ⚠ **`_026` is told
+not to report *"these four share a fix, therefore one mechanism"*** — the
+refuted inference, in this task's own subject matter. **The finding is the
+CHANNEL, not a row count.**
 
 ⭐ Also re-confirmed at source, and the catalogue is **exact**: `:541`, the
 caller's `fd_set` at `:657` (`_020` said `:658`, off by one and harmless),
@@ -2329,3 +2441,5 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 | 37 | ⚠⚠ **FOUR DEFECTS IN `harness-php/provenance.py`'s NEW `extra_spans`, all found AFTER I committed it** — ▶ **`TASK_PHP_024`, written** | `TASK_PHP_022`'s post-notification half. **(a)** ⚠⚠ **`provenance.py:836-837`'s disclosure *"adding a span cannot make the number go up for free"* is measurably FALSE.** Union overlap is `|hit|/|want|` over deduplicated sets, so **a span above the current fraction RAISES it** — measured on `ph07`'s own excerpts: primary alone **75 % (39/52)** → primary + the 100 % table span **77 % (44/57)**. `ph07` only lands at 61 % because span 2 happens to be 15 %. ✅ The set semantics *do* defend against citing the same span twice (measured: unchanged at 61 %) — **it is the general claim that fails.** **(b)** ⚠ **A `php_provenance: false` row short-circuits before any `extra_spans` validation**, so a wholly bogus extra span passes. **(c)** `gate.py:300` cites `provenance.py:841-843` for the dotted-row glob; the +60 lines moved it to **`:924`** — **citation rot introduced BY the change and not repaired.** **(d)** *"byte-identical"* holds for the **default invocation only**: under `--no-tarball`, `ph03` gains `for any of 1 span(s)` |
 | 38 | ⚠ **`ext/sockets/sockets.c` HAS ZERO CATALOGUE ROWS, AND THE FIX COMMIT THAT NAMES IT WAS ALREADY ON FILE** — ▶ **`TASK_PHP_026`, written; dispatch AFTER `_023` lands** | F50, **manager, unreviewed, n = 1**. `ph16`'s `fix_commit` `99e290f882c9` patches **four** unchecked fd-set sites and the catalogue has **one**; the other three are `streamsfuncs.c:577` (`FD_ISSET`, a read) and `sockets.c:536,563`. ⚠⚠ **`FIXSURVEY_001.md:67-81` had already recorded the *10 files* — as a COST** (*"F34's inside-a-rewrite shape"*, *"right fix, big commit"*). **The channel: for each of the ~91 resolved rows, does its fix name siblings we never catalogued?** ⚠ **Expected to be a MINORITY** — the discriminator is the commit *message*, sweep vs rewrite — and *"the channel is dead"* is an outcome `_026` is told to report plainly. ⚠ **Does not reopen the bar**: every candidate still faces `PLAN_PHP.md` §3 on the C alone, and `sockets.c:536` looks `EXACT` against `ph16` under `_019`'s rule. ⚠⚠ **`:541` vs `:577` is a sharp test of that rule — one upstream fix, two fault primitives — so `_026` reads `_023`'s verdict first.** ⚠ First check whether `ext/sockets/` was in the **built configuration the ASan census ran**; if not, its zero rows are explained innocently and the finding is about the census's coverage |
 | 39 | ⚠⚠ **`CATALOGUE.md` C.7's COVERAGE CLAIM RESTED ON GITIGNORED SCRATCH, AND ITS PASTED OUTPUT IS STALE** — ▶ **fix when `_023` releases the file** | F51. **(a)** ✅ **Done**: `.temp/php11/coverage.py` promoted to `.tasks-php/coverage.py`, `166/166` re-derived and confirmed, F49's two regex/gap defects repaired, and the corpus's **third namespace** (`merged_members` — `V5C-116` → `CRASH-115`) taught to the checker, which resolves the three *"ids the corpus does not have"* the catalogue had pasted in unexplained. **(b)** ⚠ **Still owed, in `CATALOGUE.md` itself**: C.7 cites `.temp/php11/coverage.py` and quotes **91 rows / 161 ids** against the file's **93 / 163**. Repoint at `.tasks-php/coverage.py` and refresh the block — ⚠ **after the landing, so it is refreshed once at 102.** **(c)** ⚠ **Nine more committed-claim citations into `.temp/`, two ALREADY GONE** (`patterns-php/SOURCES.md` ×4, `PLAN_PHP.md` ×3, `CATALOGUE.md` ×3, `.memory-php/00-corpus.md` ×1). `citecheck.py` now reports them as a **warning, not a failure** — they are evidence with a scheduled expiry, not broken pointers, and the fix is a committed generator per `CLAUDE.md` rule 1, not a whitelist. **(d)** ⚠ **`ph03` and `ph22`'s `corpus rows` cells cite merged-away ids** — legitimate, but F44 rates `merged_members` the WEAKEST evidence in C.1 and **these are the three merges C.1's kills rest on**; `TASK_PHP_019` reports the corpus's own validators flagged all three. **Not reopened here** |
+| 40 | ⚠ **`ph98`'s TRIGGER HAS AN UNSTATED RESIDUE DEPENDENCE — F52's CLASS AT A THIRD SITE** | `TASK_PHP_023` §2.5.1. `zend_builtin_functions.c:1054` tests `Z_STRLEN_PP(exception_handler)==0` and for the trigger's `array($o,'m')` that reads `value.str.len` at offset 8 of a zval whose `_array_init` (`zend_API.c:644-651`) writes **only** `value.ht` (offset 0–7) and `type`. ⚠ **If the residue is 0 the handler is silently never stored and the trigger no-ops** — so the row's witness is allocator-dependent in exactly the way `ph94`'s was (F52), at a third site. ✅ **Not a kill and not a block**: the C-side mechanism is unaffected. **A build task on `ph98` must know this before it spends an hour on a trigger that sometimes does nothing.** ⚠ Additive, and `ph100` is *understated* the same way — `zend_execute_API.c:450 INIT_PZVAL(p)` clears `is_ref` and `:451` restores only `refcount`, so the binding breaks even where `SEPARATE_ZVAL` no-ops |
+| 41 | ⚠ **`PROTOCOL_PHP.md` §G IS ONE REVIEWER'S RESTATEMENT AND THE MANAGER LANDED IT** | F53. `TASK_PHP_023` §4.3 attacked `TASK_PHP_019`'s duplication rule, measured its second disjunct false, and proposed a replacement; I landed it as `PROTOCOL_PHP.md` §G/§G1 **marked UNREVIEWED**. ⚠⚠ **This is the shape F48 warns about** — I have twice now taken one agent's construction into a standing document without a second pair of eyes, and the rule it replaces got there the same way. ✅ **The difference I am claiming**: the old rule was folklore in a report and is now in a document where it can be attacked, and it had a **measured** defect. ⚠ **If that reasoning is wrong, §G should come back out** — it is one paragraph. **Give it to the next reviewer whose task touches admission** |

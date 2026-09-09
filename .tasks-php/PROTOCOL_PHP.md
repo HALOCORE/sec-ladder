@@ -863,3 +863,77 @@ A checklist, not a restatement of the definition of done:
    Read `unevaluable_conditionals`'s count beside it: a kernel with many
    conditions the heuristic cannot evaluate is a kernel whose number means
    less.
+
+---
+
+## G. Is this candidate a duplicate of a built or catalogued row?
+
+⚠⚠ **UNREVIEWED — `TASK_PHP_023` §4.3's restatement, landed by the manager and
+owing a second pair of eyes.** It is recorded here because the version it
+replaces was **folklore**: `TASK_PHP_019` wrote it in a report, the manager
+adopted it without review, used it himself to overturn a verdict, and it was
+never written into any standing document where it could be attacked.
+
+⚠⚠⚠ **THIS IS A CHECKLIST, NOT A DECISION PROCEDURE, AND IT MUST BE QUOTED AS
+ONE.** (a)(b)(c) below have no stated level of abstraction, so **the verdict is
+a function of the description, not of the C** — any pair can be made the same by
+describing coarsely and different by describing finely. `TASK_PHP_019` §7
+concedes the old rule returns **both answers** on `CRASH-090` and breaks the tie
+from outside itself. **Describe at the level the catalogue already uses, and
+state the level in the note so it can be attacked.**
+
+> **ONE TEST, ONE BURDEN: *can I show these are the SAME?*** Kill only on a
+> proof of *same* — (a) the unchecked predicate, (b) the attacker-controlled
+> quantity, (c) the fault primitive, **all three**, at a stated level of
+> description. Anything else is a row.
+
+⚠ **The burden is the half that was always right**, and it is the correct
+inversion of the corpus's own `merged_members` predicate (`TASK_PHP_019` §3,
+verified verbatim at `TASK_PHP_023` §6.1). ⚠ **The old rule's three names had
+only two outcomes** — `PLAN_PHP.md` §3.1 admits a slight variation, so
+`SLIGHT VARIATION` and `DIFFERENT MECHANISM` both produce a row — which made it
+look more discriminating than it is and invited arguments that change nothing.
+
+### G1. ⚠⚠⚠ The upstream fix, and the asymmetry the old rule did not state
+
+The old second disjunct — *"different upstream fixes, each of which leaves the
+other standing"* — **is not a C-side test and it failed a measurement.**
+
+- ✅ **A DISTINCT fix is admitted as evidence for DIFFERENT.**
+- ⚠⚠⚠ **A SHARED fix is NOT evidence for SAME.** One commit routinely repairs
+  unrelated errors in one file: `56adfe1f3cf1` fixes `ent_uni_338_402`'s
+  **count** and, in the same patch, two pure **name** typos in a correctly-sized
+  table. **Absence of a distinguishing fix is not presence of a shared
+  mechanism** — and that is exactly the inference that put a false sentence into
+  `ph32` (`TASK_PHP_023` §0 B2, §2.6).
+- ⚠ **It is contingent** on what a maintainer noticed and in which batch, and
+  **often counterfactual** (`TASK_PHP_019` §10.5 concedes one direction is).
+- ⚠ **It is silent on a large part of the corpus**: `ph36` has no sha, 17 rows
+  are `fixed-by-rewrite`, 31 % of fixes are 2010 or later.
+- ⚠⚠ **Any fix-commit claim is verified AT THE COMMIT, never at the column** —
+  §F5(iii), and `.memory-php/02-ladder.md`'s warning that the column *"names **a**
+  fix for the row's function, NOT necessarily the one that removes the 5.0.0
+  defect"*. **§2.6 is that warning firing on a hand-bisected chain: the disjunct
+  fired correctly for `ph102` and incorrectly for `ph32`, in one paragraph.**
+
+⚠ **The manager's own use of the old rule survives** — `CRASH-090` → `ph102` is
+right, re-derived from the patch bytes — but ***"the rule got the answer right"*
+and *"the rule is sound"* are different claims.**
+
+### G2. The stop condition for a batch of new rows
+
+⚠⚠ **`TASK_PHP_021`'s *"more than two corrections → stop"* counts heterogeneous
+things.** Measured on the batch it fired on: `ph94` was *about something other
+than what it said*, `ph98`'s trigger could not be set up, `ph101`'s **witness**
+was incomplete while the harm occurred. **A rule keyed on the count fires on
+three typos and stays silent on one `ph94`** — over-powered in one direction,
+under-powered in the other.
+
+> ⭐ **STOP ON KIND, NOT ON COUNT: if any correction changes what the row
+> CLAIMS, stop — even if it is the only one.**
+
+⚠ Under that rule `ph94` stops the batch alone, `ph101` never enters the count,
+and the stop happens for the reason that was actually true. ⚠ **And `_021` had
+already folded all three corrected triggers into the landing script**, so when
+the rule fired there was nothing left to repair: **the stop bought a REVIEW, not
+a repair** — right on the merits, wrong in its stated reason.

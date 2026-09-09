@@ -72,13 +72,21 @@ with new timelib code"* — a rewrite, which should yield nothing.
 ## §3 ⚠⚠ What you must NOT do
 
 1. ⚠⚠⚠ **DO NOT ADJUDICATE.** Deliver **candidates with evidence**, each with
-   the C quoted and the primitive named. Whether `sockets.c:536` is an `EXACT`
-   duplicate of `ph16` or a `PLAN_PHP.md` §3.1 variation is decided by the rule
-   `TASK_PHP_019` wrote — **and `TASK_PHP_023` was sent to attack that rule.
-   Read `_023`'s verdict before you so much as use the words.** If `_023`
-   changed the rule, apply the changed one; if it refuted it without replacing
-   it, **say the candidates are unadjudicable until a rule exists** and stop
-   there. That is a real answer.
+   the C quoted and the primitive named.
+   ⚠⚠ **`TASK_PHP_023` ATTACKED `_019`'s RULE AND IT DID NOT SURVIVE INTACT.**
+   The replacement is **`PROTOCOL_PHP.md` §G** — one test, one burden, *kill
+   only on a proof of SAME*; three names collapsed to two outcomes; and it is a
+   **checklist, not a decision procedure**, because (a)(b)(c) have no stated
+   level of abstraction. **Read §G and §G1 before you use any of these words.**
+   ⚠⚠⚠ **AND §G1 BEARS DIRECTLY ON THIS TASK'S PREMISE.** *"A **distinct**
+   upstream fix is evidence for DIFFERENT. A **shared** upstream fix is NOT
+   evidence for SAME"* — measured, on `ph32`, where exactly that inference put a
+   false sentence into the catalogue. **So the census channel is good for
+   FINDING sibling sites and useless for deciding whether they are duplicates.**
+   That is a clean division of labour, and it makes the channel more useful, not
+   less: **finding is what it is for.** ⚠ **Do not report "these four share a fix,
+   therefore they are one mechanism."** That is the refuted inference, in this
+   task's own subject matter.
 2. ⚠⚠ **DO NOT KILL A CANDIDATE FOR A RUST, VERUS, MIRI, LADDER OR COST REASON**
    (`CLAUDE.md` rule 6). *"Safe Rust can't express it"*, *"no cost gradient"*,
    *"a worse kernel"*, *"needs a big input"* are **findings, never kills**.
