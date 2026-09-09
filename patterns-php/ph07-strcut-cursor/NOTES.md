@@ -176,14 +176,57 @@ newline before the closing fence — and the second one is what
 `results-php/gate/ph07-strcut-cursor.json` carries, so the disclosure is
 checkable against the record rather than against a re-derivation.
 
-⚠ Four edits inside the fence, every one of them forced by §00: `idiom.required[4]`
+⚠⚠ **THE `TASK_PHP_018` DISCLOSURE HERE SAID *"Four edits inside the fence"* AND
+THAT IS AN UNDERCOUNT BY A FACTOR OF NEARLY SEVEN** (`TASK_PHP_022` m3; re-derived at
+`TASK_PHP_024` §1.3 with `.temp/php24/fencediff.py`, which parses both fences and
+diffs them leaf by leaf). **Measured, `8214b5f` → `8e2d834`: 27 leaf values
+changed — 6 moved and 21 added — across 10 second-level keys**, 191 leaves before
+and 212 after:
+
+```
+MOVED   .idiom.required[4]          .provenance.divergences[6].why
+        .idiom.why                  .provenance.divergences[8].why
+        .provenance.fix_commit_note .verus.twin_obligations_note
+ADDED   .idiom.forbidden[3].{c,rust}
+        .provenance.extra_spans[0].{c_file,c_lines[0],c_lines[1],extract_cmd,
+                                    extract_sha256,why}
+        .provenance.extra_spans[1].{ same six }
+        .provenance.extra_spans_note   .provenance.fix_commit_removal
+        .provenance.r1h_configuration.{body_bytes,body_sha256_16,function,
+                                       respelled_as,tags}
+```
+
+The four the disclosure named are all real and all forced by §00: `idiom.required[4]`
 (R1h is now a tagged configuration, and the entry states the alternative it was
 chosen against), a new `idiom.forbidden[3]` (hunk (b)'s two spellings, pinned
 ABSENT), `provenance.extra_spans` (§1), and
-`provenance.fix_commit_removal` / `r1h_configuration`. ⚠ A re-gate AND a
+`provenance.fix_commit_removal` / `r1h_configuration`. ⚠ **None of the six it
+missed is a defect in itself** — `.verus.twin_obligations_note` had to move for
+the rlimit finding and `.idiom.why` for §00 — **but rule 6 exists so a reviewer
+can check the SCOPE of a declaration edit against a statement of it, and a
+statement narrower than the edit removes the check it was written to enable.**
+⚠ The reviewer's *"10 top-level keys"* is the same 10 counted one level down;
+there are **three** top-level keys (`idiom`, `provenance`, `verus`).
+⚠ A re-gate AND a
 re-measure were owed and both were taken — `spec.md` is not in
 `measure.py::measurement_sources`, but `c/kernel_hardened.c`, the four `.rs`
 rungs and every `.bin` are.
+
+**IT MOVED A THIRD TIME AT `TASK_PHP_024`, AND THAT MOVE IS A CORRECTION, NOT A
+REBUILD:**
+
+```
+1f1508531bd41975927e07f0bca9d592a65a9b6f0620ce4d8a2ca7b3d0e00c0c   BEFORE
+a70c115a9fa05520c64f334fcd8903c8da06140aefc47c1b31d0c209fcd4b1a1   AFTER
+```
+
+⚠ **One edit inside the fence: `identity[0].why`, and nothing else.** Verified
+leaf-by-leaf with the same `fencediff.py` — `8e2d834 → WORKTREE` reports
+**1 changed leaf, 0 added, 0 removed**, and that leaf is `.identity[0].why`.
+It carried **nine** figures the `TASK_PHP_018` rebuild had refuted; they are
+re-derived from the current record in §0a below. **No `required`, `forbidden`,
+`identity` level, `provenance` field or `verus` entry moved**, so nothing about
+what the row is obliged to changed — only what it says it measured.
 
 ⚠⚠ **AND ONE SCHEMA FACT, MEASURED THE HARD WAY**: `check.py` stage 0
 hard-fails on ANY key inside `idiom` other than `required`, `forbidden` and
@@ -198,9 +241,72 @@ except for the one spelling the entry exists to pin.
 
 ⚠ **Any later move is disclosed here with its reason**, per rule 6.
 
-Also per rule 6's addendum: the hashed `idiom.why` and every rung-source doc
-comment were re-read against the measured numbers in §8 before this row was
-finished, not only against what they said when written.
+⚠⚠⚠ **THE RULE-6-ADDENDUM SENTENCE THAT USED TO STAND HERE WAS A FALSE
+DISCLOSURE, AND A FALSE DISCLOSURE IS WORSE THAN THE STALE THING IT DESCRIBES,
+BECAUSE IT IS WHAT A REVIEWER TRUSTS *INSTEAD OF* RE-CHECKING.** It read:
+
+> ~~Also per rule 6's addendum: the hashed `idiom.why` and every rung-source doc
+> comment were re-read against the measured numbers in §8 before this row was
+> finished, not only against what they said when written.~~
+
+**`idiom.why` was** — it carries no stale ladder figure, checked twice.
+**Two things it names were not** (`TASK_PHP_022` M1/M2):
+
+- **`identity[0].why` is also hashed and also carries measured numbers**, and
+  nine of its eleven were pre-rebuild values. §0a.
+- **`c/kernel.h:20-25` is a rung-source doc comment** — it is in the measurement
+  record's `source_sha256` — and it named the **wrong upstream commit** as R1h,
+  from the day the row was built. §4b-bis.
+- **And so did `safe_naive.rs:7-17`**, which `TASK_PHP_022` did not find because
+  it looked at `c/`. Same error, second measured source, and it contradicted its
+  own ladder table four lines below. §4b-bis.
+
+⚠ **The sentence was narrower than the rule and did not say so.** What is true,
+as of `TASK_PHP_024`: `idiom.why`, `identity[0].why` and every doc comment in
+`c/kernel.h`, `c/kernel.c`, `c/kernel_hardened.c`, `c/main.c` and the four `.rs`
+rungs have been read against `results-php/ph07-strcut-cursor.json` as it stands
+after this task's re-measure. **The two that were wrong are corrected in place
+and the correction is disclosed above rather than made quietly.**
+
+### §0a The nine refuted figures in `identity[0].why`, re-derived
+
+⚠⚠ **The `contract_sha256` MATCHED THROUGHOUT. That is the point.** The entry
+was written from the pre-rebuild record and never edited, so `PROTOCOL.md`
+rule 6's evidence — *"no `required`/`forbidden`/`identity`/`why` moved after I
+measured"* — was **true and useless**: it certifies *when* a declaration was
+written, not whether it is still true (p46's hole, PAT `TASK_089_REVIEW`,
+reproduced here on the first php row to be rebuilt).
+
+`.temp/php24/identity_rederive.py` reads the record and prints every cell beside
+every claim; run it with `--record` against `git show 8214b5f:` for the left
+column.
+
+| claim in the hashed `why` | pre-rebuild (`8214b5f`) | current record | |
+|---|---:|---:|---|
+| O3/iso instructions, both cells | 255 | **251** | moved |
+| O3/iso bytes, both cells | 953 | 953 | survives |
+| O3/iso `md5_fn_norel`, identical | `702235d5f057…` | **`cc8d629987e1196f…`** | moved |
+| O3/iso `md5_fn` `unsafe` | `b20b2fd9aa42e532` | **`909a1a4db15d5bb8`** | moved |
+| O3/iso `md5_fn` `verus` | `b3ecc80e00209841` | **`f6fec880e0ec2b0f`** | moved |
+| O0/iso instructions | 442 vs 464 | **427 vs 449** | moved ×2 |
+| O0/iso bytes | 2530 vs 2683 | **2432 vs 2585** | moved ×2 |
+| O3/`whole` instructions | 875 vs 888 | 875 vs **883** | moved ×1 |
+
+**All eleven numerals reproduce EXACTLY against the pre-rebuild record**, which
+is what identifies the entry as a snapshot rather than a set of typos.
+
+⭐ **Every QUALITATIVE claim in the entry survived, and that is why nothing
+caught it**: at O3/isolated the two cells still have equal instruction counts
+and equal `fn_bytes`, `md5_fn_norel` is still identical and `md5_fn` still
+differs, so **`norel` was the right level before and after and no gate verdict
+ever moved**. ⚠ **A declaration can be wrong in every number and right in every
+verdict** — which is exactly the configuration no check in this project can see.
+
+⚠ `TASK_PHP_022` M1 found **four** of the nine. The other five (the O0
+instruction pair, the O0 byte pair, and the `whole` 888) came out of re-deriving
+**every cell the entry names** rather than the first sentence. The cheap
+generalisation, and it is the answer to the question the task asked: **re-derive
+the whole declaration, not the figures a reader's eye lands on.**
 
 ---
 
@@ -397,6 +503,77 @@ controls/cb3cca21b345.patch, 829 B, sha256 14dbafc9a3b970d0…
 +
  	ret = mbfl_strcut(&string, &result, from, len);
 ```
+
+### 4b-bis ⚠⚠ `c/kernel.h` NAMED THE WRONG COMMIT AS R1h, FOR THE WHOLE LIFE OF THE ROW
+
+`TASK_PHP_022` M2. `c/kernel.h:20-25` described `c/kernel_hardened.c` as
+
+> *"the same file plus the prologue hunk of the real upstream fix
+> `d9dda48f8a7e182ed8c0f56e5fde9e367131a07a` (Moriyoshi Koizumi, 2010-03-12),
+> and nothing else"*
+
+while the file ships `if (from > str_len) { return 0xFFFFFFFFu ^ php_shim_tally(); }`
+— **`cb3cca21b345` hunk (a)**, in the caller's frame — and says so itself at
+`kernel_hardened.c:10` and `:81`.
+
+⚠⚠ **These are different programs and `spec.md` says so in the same block.**
+`idiom.forbidden[2]` pins the 2010 clamp **ABSENT** with the reason
+*"cb3cca21b345 returns FALSE where the clamp returns a cut"*, so the header
+described R1h as **the very thing the contract forbids the Rust rungs from
+being.** Measured, `controls/fix_scope.py` Q1 re-run at `TASK_PHP_024`
+(`.temp/php24/fix_scope-rerun.log`): over 133 932 interpreted calls the two
+guards are not the same function —
+
+```
+    variant    reads past val[slen]  answer != R1
+    R1                        15333             0
+    R1h                           0         16320     <- cb3cca21b345 hunk (a), SHIPPED
+    R1_2010                       0          5717     <- d9dda48f8a7e's clamp
+```
+
+**Failure scenario, and it is concrete:** an agent reading `c/` to answer *"what
+is this row's R1h?"* gets a guard that moves **5 717** answers where the shipped
+one moves 16 320, and the two disagree on every call with `from > slen`.
+
+⚠ **It is in the measurement record's `source_sha256`**, so correcting a comment
+in it cost a re-measure — taken at `TASK_PHP_024`. ⚠ **And it survived three
+passes** — the row's build, `TASK_PHP_016`, `TASK_PHP_017` and the
+`TASK_PHP_018` rebuild — **including the one whose §0 disclosure claimed every
+rung-source doc comment had been re-read.** The 2010 commit is still cited,
+correctly, at `controls/d9dda48f8a7e-mbfilter.patch`,
+`controls/fix_scope.py::R1_2010`, `spec.md`'s `forbidden[2]` and §4c below; the
+defect was one sentence in one header, and nothing but a person could see it.
+
+⚠⚠⚠ **AND IT HAD A SECOND COPY, IN `safe_naive.rs`, WHICH `TASK_PHP_022` DID
+NOT FIND — IT LOOKED AT `c/` AND NOBODY GREPPED THE RUNGS** (`TASK_PHP_024`
+§6a). `safe_naive.rs:7-17` said the four Rust rungs implement *"`mbfl_strcut`'s
+mblen_table arm with **`d9dda48f8a7e`'s prologue**"* — **and contradicted the
+ladder table four lines below it**, which names `cb3cca21b345`. It is in
+`measure.py::measurement_sources` exactly as `c/kernel.h` is, and it would have
+been a claim that the rungs carry the spelling `forbidden[2]` pins ABSENT.
+
+**The sweep that found it, and it is three lines** — every hash-shaped token in
+every measured source, asked what it is:
+
+```sh
+for f in c/kernel.c c/kernel.h c/kernel_hardened.c c/main.c \
+         safe_naive.rs safe_tuned.rs unsafe.rs verus.rs model.py inputs/gen.py; do
+  grep -a -o -E '\b[0-9a-f]{8,}\b' "$f" | grep -a -E '[a-f]' | sort -u; done
+```
+
+Everything else resolved to a commit sha, a tarball sha, a patch sha or a
+body-sha pin. ✅ **The four OTHER `d9dda48f8a7e` mentions in measured sources —
+`c/kernel.c:243`, `model.py:506`, `inputs/gen.py:27` and `:383` — are CORRECT**:
+they describe that commit's `from < 0 || length < 0` hunk and its clamp to
+`string->len`, and both really are in it
+(`controls/d9dda48f8a7e-mbfilter.patch:106` and `:110`). `safe_tuned.rs`,
+`unsafe.rs` and `verus.rs` name `cb3cca21b345` and do not mention 2010 at all.
+
+⚠⚠ **THE COST LESSON: I RAN THAT SWEEP AFTER THE FIRST RE-MEASURE INSTEAD OF
+BEFORE, AND IT COST A SECOND FULL PASS OF THE SIX-COMMAND CHAIN.**
+`PROTOCOL.md` rule 6 says *"batch every rung-source doc fix into ONE pass"*;
+**the enumeration that tells you what to batch is three lines of shell and
+belongs before the first `--tool build`, not after it.**
 
 ### 4c. ⭐ The history, and it is the row's second finding
 
@@ -1203,15 +1380,28 @@ elsewhere and much more strongly: stage 2 compares this rung's stdout against
 
 (c) N/A.
 
-### 10d. The mutants — `controls/negatives.py`, `.temp/php16/13-negatives.log`
+### 10d. The mutants — `controls/negatives.py`, `.temp/php24/negatives-rerun.log`
 
 ```
-noguard    expect FAIL got FAIL   20 verified, 1 errors   ok
-nopos      expect FAIL got FAIL   (mbtab_matches_upto(256) fails)   ok
-notable    expect FAIL got FAIL   (one table entry changed)   ok
-noconsume  expect PASS got PASS   21 verified, 0 errors   ok
-verus.rs sha256 unchanged: 28811d6d6f45c3b2
+noguard    expect FAIL got FAIL  verification results:: 20 verified, 1 errors  ok
+nopos      expect FAIL got FAIL  p.rs:159:12  assert(mbtab_matches_upto(256))
+                                 by (compute_only);  error: aborting  ok
+notable    expect FAIL got FAIL  p.rs:159:12  assert(mbtab_matches_upto(256))
+                                 by (compute_only);  error: aborting  ok
+noconsume  expect PASS got PASS  verification results:: 21 verified, 0 errors  ok
+  verus.rs sha256 unchanged: d1c61785e44185f8
+EXIT=0
 ```
+
+⚠⚠ **THE BLOCK THAT USED TO STAND HERE WAS `\.temp/php16/13-negatives.log` — a
+PRE-REBUILD RUN — and it announced the fact in its own last line without acting
+on it** (`TASK_PHP_022` m4): it ended `verus.rs sha256 unchanged: 28811d6d6f45c3b2`,
+which is `git show 8214b5f:`'s hash, while the rebuilt `verus.rs` is
+`d1c61785e44185f8`. ✅ **The substance was true and stayed true** — the reviewer
+re-ran it, and so did `TASK_PHP_024`; all four mutants behave, on the file the
+row actually ships. **Only the pasted evidence was stale, and pasting the run is
+the whole repair.** ⚠ It is the same class as §0a's hashed `why`: a block of
+evidence that is correct about a program the row no longer contains.
 
 ⭐⭐ **`noguard` NOW ISOLATES ONE GUARD, AND IT DID NOT BEFORE.** It used to have
 to delete **both** `cb3cca21b345` hunks, because hunk (b)'s `slen - frm` needs

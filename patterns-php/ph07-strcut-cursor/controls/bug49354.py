@@ -22,10 +22,44 @@ same second** -- `c2471b495009`, `0c974164e248`, `ce3c028803aa`, one per live
 branch -- so it is not one branch's local decision.
 
 **What this file runs.** A transcription of `PHP_FUNCTION(mb_strcut)`'s clamps
-plus `mbfl_strcut`'s mblen_table arm -- deliberately a FIFTH spelling of the
-kernel, sharing no code with `../model.py`, `../inputs/gen.py::_cut`,
-`fix_scope.py` or any rung, so an agreement here is an independent one -- in
-three configurations:
+plus `mbfl_strcut`'s mblen_table arm, in three configurations:
+
+⚠⚠⚠ **AND IT IS NOT INDEPENDENT OF `fix_scope.py`. THIS PARAGRAPH USED TO CLAIM
+IT WAS, AND THAT WAS A FALSE DISCLOSURE** (`TASK_PHP_022` §5.3, re-measured at
+`TASK_PHP_024` §1.5). It read *"deliberately a FIFTH spelling of the kernel,
+**sharing no code with** `../model.py`, `../inputs/gen.py::_cut`, `fix_scope.py`
+or any rung, so an agreement here is an independent one"*. What is actually
+true, `diff`ed line for line:
+
+    MBTAB              bug49354.py:51-53  vs fix_scope.py:55-57
+                       BYTE-IDENTICAL, 3 lines, trailing `assert` included
+    the caller clamps  bug49354.py:77-84  vs fix_scope.py:64-71
+                       identical code, differing only in two trailing comments
+    the end walk       bug49354.py:98-110 vs fix_scope.py:119-130
+                       the same five statements; `fix_scope` reads through its
+                       `at()` accounting helper where this file indexes `s`
+                       directly and returns "OOB", and the comments differ
+
+**So the two CAN agree for the same wrong reason** on the table, on the clamps
+and on the shape of the walk. ✅ **The risk did not materialise, and it is not
+this file that establishes that** -- three checks that share nothing with either
+do: `model.py:576-628` re-derives all 256 `MBTAB` entries **from `c/kernel.c`'s
+literal text** and fails the selfcheck on a mismatch (this file only asserts
+`len == 256`); the differential against the row's **real C** --
+`.temp/php22/bug49354/phpt_real_c.c`, which links `c/kernel.c` and
+`c/kernel_hardened.c` themselves and folds their `u64` -- reproduces this table
+**18 of 18 cells**, R1 wrong on case 6 only and R1h_ab on case 3 only (re-run at
+`TASK_PHP_024`); and `TASK_PHP_022` §2.1/§2.4's independent transcription
+reproduces `fix_scope` Q1's conclusion and `gen.py`'s window counts without
+sharing a line with either.
+
+⚠ **A false disclosure is worse than the thing it describes, because it is what
+a reviewer trusts INSTEAD of re-checking** (`PROTOCOL.md` definition of done,
+rule 6). **What is independent here is the ORACLE, not the model**: the six
+`--EXPECT--` lines come out of upstream's own `.phpt` and out of nothing in this
+repository, which is the property the control actually needs.
+
+The three configurations:
 
     R1      php-5.0.0, no guards at all              <- ../c/kernel.c
     R1h_ab  + hunk (a) AND hunk (b)                  <- php-5.1.2 .. php-5.2.11

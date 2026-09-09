@@ -1,6 +1,6 @@
 # ph07-strcut-cursor — results
 
-Generated 2026-09-09T04:43:29Z from `results/ph07-strcut-cursor.json` (git `fd071760a687`, working tree dirty).
+Generated 2026-09-09T14:24:06Z from `results/ph07-strcut-cursor.json` (git `2d780eaaef8b`, working tree dirty).
 
 ## Toolchain
 
@@ -57,7 +57,7 @@ Every delta below is a difference between rungs that are meant to be spellings o
 
 ### Spelling audit (stage `0b`, reporting only)
 
-Measured by the gate, not by this file — from `results/gate/ph07-strcut-cursor.json`, contract `1f1508531bd4`.
+Measured by the gate, not by this file — from `results/gate/ph07-strcut-cursor.json`, contract `a70c115a9fa0`.
 
 `27` backticked spelling(s) over `6` rung(s) → **78** (spelling, rung) pair(s), **28** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
 
@@ -75,7 +75,7 @@ Measured by the gate, not by this file — from `results/gate/ph07-strcut-cursor
 
 ## What the gate said out loud (reporting only)
 
-From `results/gate/ph07-strcut-cursor.json` — the `loud` and `controls_json` keys, at contract `1f1508531bd4`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above. The run's **verdict** is deliberately not printed here: it is an output of the same gate run that checks this table is current (stage `9c`), and rendering it made the table an input to its own checker — see `read_gate_loud`. Read the verdict from `results/gate/ph07-strcut-cursor.json`.
+From `results/gate/ph07-strcut-cursor.json` — the `loud` and `controls_json` keys, at contract `a70c115a9fa0`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above. The run's **verdict** is deliberately not printed here: it is an output of the same gate run that checks this table is current (stage `9c`), and rendering it made the table an input to its own checker — see `read_gate_loud`. Read the verdict from `results/gate/ph07-strcut-cursor.json`.
 
 - **`doc-citation-other`** — 3 line citation(s) into harness modules other than `check.py`. NOT failed: these sit in measurement-hashed files, so re-citing them by function costs a re-measure (RECAP queue item 38). Cite the FUNCTION when one of these files is next re-measured anyway: patterns/ph07-strcut-cursor/c/emalloc_shim.h:117 -> build.py:163-165 . patterns/ph07-strcut-cursor/c/emalloc_shim.h:133 -> build.py:167 . patterns/ph07-strcut-cursor/c/emalloc_shim.h:492 -> build.py:168-171
 - **`tcb-unsafe`** — verus.rs:380 `vset_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `x: u8` is a PURE VALUE and needs no precondition. The unchecked operation is `*v.get_unchecked_mut(i) = x`: its definedness depends on `i` being in bounds and on `v` being a live `Vec<u8>`, and on NOTHING about the byte being written -- every one of the 256 values of `x` is a legal `u8` store into a byte that is already initialised (`vec![0u8; cap]` initialised the whole buffer before the first call site is reached). Contrast the shape this stage exists to catch, `requires n >= 0` on a `usize`: there the unconstrained parameter was the one the body indexed with. Here the indexing parameter `i` IS constrained, by `i < old(v)@.len()`, and the `ensures` names `x` in the post-state -- `final(v)@ == old(v)@.update(i as int, x)` -- so a body that stored anything other than `x`, or stored it anywhere other than `i`, could not satisfy its own postcondition.
@@ -164,26 +164,26 @@ Compared in `isolated` builds, where the kernel is its own symbol, and on the **
 
 | rung | mode | large.bin min (ms) | large.bin median (ms) | large.bin spread | small.bin min (ms) | small.bin median (ms) | small.bin spread |
 |---|---|---:|---:|---:|---:|---:|---:|
-| c-gcc | isolated | 49.91 | 51.36 | 2.9% | 15.15 | 16.27 | 7.4% |
-| c-gcc | whole | 50.10 | 51.06 | 1.9% | 14.92 | 15.83 | 6.1% |
-| c-clang | isolated | 50.48 | 51.81 | 2.6% | 15.07 | 16.33 | 8.4% |
-| c-clang | whole | 50.45 | 51.76 | 2.6% | 15.01 | 16.34 | 8.8% |
-| safe_naive | isolated | 50.80 | 51.83 | 2.0% | 16.07 | 17.18 | 6.9% |
-| safe_naive | whole | 50.49 | 51.70 | 2.4% | 16.10 | 17.19 | 6.8% |
-| safe_tuned | isolated | 50.60 | 52.07 | 2.9% | 15.78 | 17.06 | 8.1% |
-| safe_tuned | whole | 50.26 | 52.17 | 3.8% | 15.81 | 16.88 | 6.8% |
-| unsafe | isolated | 50.22 | 54.28 | 8.1% | 15.74 | 16.67 | 5.9% |
-| unsafe | whole | 50.57 | 54.72 | 8.2% | 15.69 | 16.33 | 4.1% |
-| verus | isolated | 50.97 | 55.58 | 9.0% | 16.01 | 16.74 | 4.5% |
-| verus | whole | 50.08 | 55.59 | **11.0% ✗** | 15.72 | 16.89 | 7.4% |
-| c-gcc-h | isolated | 49.89 | 54.76 | 9.8% | 14.99 | 16.05 | 7.0% |
-| c-gcc-h | whole | 50.53 | 55.08 | 9.0% | 15.00 | 16.21 | 8.1% |
-| c-clang-h | isolated | 50.56 | 52.92 | 4.7% | 14.93 | 16.09 | 7.7% |
-| c-clang-h | whole | 50.36 | 52.34 | 3.9% | 15.06 | 16.12 | 7.0% |
+| c-gcc | isolated | 50.44 | 54.20 | 7.5% | 14.95 | 15.95 | 6.7% |
+| c-gcc | whole | 50.22 | 55.59 | **10.7% ✗** | 14.72 | 15.43 | 4.8% |
+| c-clang | isolated | 50.63 | 54.77 | 8.2% | 15.14 | 15.70 | 3.7% |
+| c-clang | whole | 50.66 | 54.40 | 7.4% | 15.12 | 15.75 | 4.1% |
+| safe_naive | isolated | 50.95 | 54.04 | 6.1% | 16.21 | 16.83 | 3.9% |
+| safe_naive | whole | 50.94 | 52.33 | 2.7% | 16.15 | 16.77 | 3.8% |
+| safe_tuned | isolated | 50.88 | 51.78 | 1.8% | 15.95 | 16.69 | 4.6% |
+| safe_tuned | whole | 50.93 | 51.69 | 1.5% | 16.03 | 16.54 | 3.2% |
+| unsafe | isolated | 50.60 | 51.47 | 1.7% | 15.83 | 16.23 | 2.5% |
+| unsafe | whole | 50.69 | 51.46 | 1.5% | 15.90 | 16.23 | 2.0% |
+| verus | isolated | 51.06 | 51.98 | 1.8% | 16.12 | 16.91 | 4.9% |
+| verus | whole | 50.80 | 51.67 | 1.7% | 16.01 | 16.54 | 3.3% |
+| c-gcc-h | isolated | 50.38 | 51.31 | 1.8% | 15.11 | 16.01 | 5.9% |
+| c-gcc-h | whole | 51.33 | 52.40 | 2.1% | 15.07 | 16.22 | 7.6% |
+| c-clang-h | isolated | 50.76 | 53.85 | 6.1% | 15.16 | 15.81 | 4.2% |
+| c-clang-h | whole | 50.61 | 53.30 | 5.3% | 15.19 | 15.90 | 4.7% |
 
 **1 of 32 wall-clock cells exceed the 10% min-to-median spread threshold and are DISCARDED** per `.memory/03-measurement.md` step 4. They are printed above marked ✗ rather than deleted, because a missing cell that looks like an omission is worse than a documented failure (`.memory/02-bench-rules.md`). **No claim in this report rests on a marked row.**
 
-- `verus / whole` on `large.bin`: spread 11.0%
+- `c-gcc / whole` on `large.bin`: spread 10.7%
 
 
 ## Cells and metrics not measured

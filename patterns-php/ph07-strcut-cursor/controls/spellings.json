@@ -3,14 +3,14 @@
     "regenerate": "python3 patterns-php/ph07-strcut-cursor/controls/spellings.py --verus",
     "note": "The pin covers the two rung sources the variants are derived from, verus.rs (the R4 admissibility half), spec.md (the declaration the audit runs against), inputs/gen.py (the corpus every number is measured over) and this script. It does NOT cover results-php/ph07-strcut-cursor.json: stage 3 compares against that record at run time and prints the delta, which is a stronger check than a hash of it."
   },
-  "measured_utc": "2026-09-09T05:29:57Z",
+  "measured_utc": "2026-09-09T14:46:58Z",
   "derived_from_sha256": {
     "patterns/ph07-strcut-cursor/safe_tuned.rs": "d7c484b87152d531980befcb538c17b76ce9236f075900f04cb8a91100fd214c",
     "patterns/ph07-strcut-cursor/unsafe.rs": "fce732a31d10db616f6931bbf076986e17a06cb8c7830d8cd50c5c1f23dfa6b4",
     "patterns/ph07-strcut-cursor/verus.rs": "d1c61785e44185f88a5f0eb8ab6e87f29e7d1bd64b4e94b85d80b1232d0326bf",
-    "patterns/ph07-strcut-cursor/spec.md": "6a47087e3400975a6bdacacf11f61923d7f042e34c55b6c18e33ae69a725e75c",
+    "patterns/ph07-strcut-cursor/spec.md": "33412d1fe5cf9dd86c5b85ccd8189aa8d70ad011350b86ee9d83e176c7107be2",
     "patterns/ph07-strcut-cursor/inputs/gen.py": "304b878730f091cbff54a151239c83fc82864f5617bb60982f1b908e8c6c09b4",
-    "patterns/ph07-strcut-cursor/controls/spellings.py": "cf00b81a7c117052b74209c8eca2a53af6b133b43c17d9793437f39779715fcd"
+    "patterns/ph07-strcut-cursor/controls/spellings.py": "c59424549159ea85aca20df41e3c776ace80b0e2aef91f87a22ac59a34537d19"
   },
   "probes": [
     {
@@ -25,7 +25,8 @@
     }
   ],
   "tie_pct": 0.05,
-  "statistic": "kernel_exclusive_ir / n_iters on the SHIPPED inputs -- harness/measure.py's own, so stage 3 above compares against results-php/ph07-strcut-cursor.json directly",
+  "verus_checked": true,
+  "statistic": "kernel_exclusive_ir / n_iters on the SHIPPED inputs -- harness/measure.py::_sum_rows itself, IMPORTED and not transcribed since TASK_PHP_024 (TASK_PHP_022 \u00a73.2 measured that the transcription was a different function), so stage 3 above compares against results-php/ph07-strcut-cursor.json directly",
   "reproduces_shipped_record": true,
   "variants": [
     {

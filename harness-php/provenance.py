@@ -725,6 +725,33 @@ def check_row(pdir, tarball, use_tarball=True, show=False):
             return False, [f"{row}: declares {NON_PHP_KEY}=false with no "
                            f"`why`. Say what it is instead, so nobody ever "
                            f"mistakes it for a php row."]
+        # ⚠⚠ THIS ARM USED TO RETURN BEFORE ANY SPAN WAS LOOKED AT, so a row
+        # could declare it has NO php source and still ship a fully-formed
+        # `extra_spans` -- bad sha, file not in the manifest, span [999999, 1]
+        # -- and pass with exit 0 (TASK_PHP_022 §4.2, must-fire controls at
+        # `.temp/php24/nonphp_spans.py`). ⚠ The repair REFUSES THE
+        # CONTRADICTION rather than validating the spans: a row that cites PHP
+        # lines is a row with PHP provenance, and the two declarations cannot
+        # both be true. That question has a FINITE answer space -- the four
+        # `_SPAN_FIELDS` plus `extra_spans`, enumerated here -- which is why it
+        # is a substitution and not another round of the unbounded
+        # "does this row use X?" detector PROTOCOL_PHP.md §B2 deleted twice.
+        cited = [k for k in list(_SPAN_FIELDS) + [EXTRA_SPANS_KEY]
+                 if prov.get(k)]
+        if cited:
+            return False, [f"{row}: declares {NON_PHP_KEY}=false AND cites PHP "
+                           f"source in {cited}. A row with no PHP provenance "
+                           f"may not carry a span: on this arm nothing "
+                           f"verifies one, so a pinned `extract_sha256` here "
+                           f"would be a hash nobody checked. Drop the span "
+                           f"fields, or drop {NON_PHP_KEY}=false and let the "
+                           f"row be validated as a php row."]
+        # ⚠ DELIBERATELY SILENT ON SUCCESS. An `ok ...` line here would be one
+        # more line in every `php_provenance:false` row's COMMITTED preflight
+        # record, for a check that can only fire on a malformed row -- and
+        # §2.4 below is spending an edit to REMOVE exactly that kind of churn.
+        # The evidence that the check works is the must-fire control, not a
+        # printed line.
         msgs.append(f"{row}: NOT A PHP ROW -- {NON_PHP_KEY}=false. "
                     f"why: {prov['why'][:90]}")
         if uses_alloc is None:
@@ -792,8 +819,17 @@ def check_row(pdir, tarball, use_tarball=True, show=False):
         msgs.append(f"{row}: ⚠ no manifest at {MANIFEST}; file-level check skipped")
 
     if not use_tarball:
-        msgs.append(f"{row}: ⚠ --no-tarball: extract_sha256 was NOT verified "
-                    f"for any of {len(spans)} span(s). This is a PARTIAL check.")
+        # ⚠ THE SUFFIX IS CONDITIONAL ON PURPOSE (TASK_PHP_024 §2.4).
+        # `TASK_PHP_018` claimed the `extra_spans` schema change was
+        # byte-identical on `ph03` and `ph00-smoke`; `TASK_PHP_022` §4.1
+        # measured that it held for the DEFAULT invocation only -- under
+        # `--no-tarball`, which `PROTOCOL_PHP.md` §D documents and expects
+        # agents to use, single-span `ph03` gained `for any of 1 span(s)`.
+        # A one-span row now prints exactly what it printed before the change.
+        extra_note = (f" for any of {len(spans)} span(s)" if len(spans) > 1
+                      else "")
+        msgs.append(f"{row}: ⚠ --no-tarball: extract_sha256 was NOT verified"
+                    f"{extra_note}. This is a PARTIAL check.")
         return True, msgs
 
     if not os.path.exists(tarball):
@@ -832,9 +868,36 @@ def check_row(pdir, tarball, use_tarball=True, show=False):
     # the kernel half -- does the row's C actually look like what it cites?
     # ⚠⚠ OVER THE UNION OF EVERY CITED SPAN SINCE TASK_PHP_018. `ph07` lifted
     # three and pinned one, so this number was computed against a span
-    # containing neither its fix nor the frame the fix goes in. A row that
-    # cites more now has MORE to resemble, which is the direction this check
-    # should err in: adding a span cannot make the number go up for free.
+    # containing neither its fix nor the frame the fix goes in.
+    #
+    # ⚠⚠⚠ THIS COMMENT USED TO END *"a row that cites more now has MORE to
+    # resemble, which is the direction this check should err in: ADDING A SPAN
+    # CANNOT MAKE THE NUMBER GO UP FOR FREE."* THAT IS FALSE, AND IT IS THE
+    # WRONG REASSURANCE TO LEAVE IN A NUMBER THAT IS REPORTED RATHER THAN
+    # ENFORCED, i.e. judged by a person (TASK_PHP_022 m7, re-measured with the
+    # full subset sweep at TASK_PHP_024 §2.1, `.temp/php24/union_overlap.py`).
+    #
+    # The union is `|hit| / |want|` over DEDUPLICATED line sets (`_normalise`
+    # returns a `set`), i.e. a weighted mean of the spans' own fractions, so it
+    # is NOT MONOTONE: a span whose own fraction is above the current union
+    # RAISES it, one below LOWERS it. Measured on `ph07`'s three real
+    # excerpts -- span0 walk 75 % (39/52), span1 table 100 % (5/5), span2
+    # caller 15 % (3/20) -- over all seven subsets:
+    #
+    #     {0} 75 %   {1} 100 %   {2} 15 %
+    #     {0,1} 77 %   {0,2} 58 %   {1,2} 32 %   {0,1,2} 61 %  <- published
+    #
+    # so the pre-TASK_PHP_018 single-span state of 75 % goes UP to 77 % on
+    # adding the table span. Of the nine single-span additions, FIVE raise the
+    # union and four lower it. `ph07`'s union lands below its primary only
+    # because span 2 happens to be 15 %.
+    #
+    # ✅ WHAT THE SET SEMANTICS DO DEFEND AGAINST IS DUPLICATION -- citing the
+    # same span 1, 2, 4 or 8 extra times leaves `ph07` at 61 % (46/76),
+    # measured. And an extra span IS a real obligation, for a different reason
+    # than this comment used to give: `check_row` REFUSES a bad one, with
+    # eleven must-fire negatives at `TASK_PHP_022` §4.2 -- not because the
+    # number can only fall.
     if len(spans) > 1:
         per = []
         for i, t in enumerate(texts):

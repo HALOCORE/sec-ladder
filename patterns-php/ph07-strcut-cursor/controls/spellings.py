@@ -285,12 +285,65 @@ R4_VARIANTS = [
 
 
 # ---- machinery ---------------------------------------------------------------
-def load_check():
+def _load(name, relpath):
     spec = importlib.util.spec_from_file_location(
-        "slb_check", os.path.join(REPO, "harness", "check.py"))
+        name, os.path.join(REPO, *relpath))
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
     return m
+
+
+def load_check():
+    return _load("slb_check", ("harness", "check.py"))
+
+
+_MEASURE = None
+
+
+def load_measure():
+    """`harness/measure.py`, loaded exactly the way `load_check()` loads
+    `check.py`, and cached.
+
+    ⚠⚠⚠ IMPORTED, NOT TRANSCRIBED, SINCE `TASK_PHP_024` §1.6. `kernel_ir`
+    below used to re-implement `measure.py::_sum_rows`, and `TASK_PHP_022` §3.2
+    measured that the two are NOT the same function: the copy took the FIRST
+    matching annotate row and `break`ed where `measure.py` SUMS all of them,
+    matched `":kernel" in line` on the whole line where `measure.py` matches
+    `(?:^|::)kernel(?:$|[^A-Za-z0-9_])` on the FUNCTION FIELD, and did not
+    check callgrind's return code. On `ph07` the two agree to the digit; on two
+    synthetic shapes they do not, and both produce a PLAUSIBLE WRONG NUMBER
+    rather than an error -- a function split across two annotate rows
+    (16 000 000 -> 10 000 000) and a sibling symbol named `kernel_prologue`
+    (9 100 000 -> 900 000). The first is not hypothetical:
+    `measure.py::_sum_rows`'s own docstring exists to warn about it in terms.
+    ⚠⚠ CITED BY FUNCTION AND NOT BY LINE, DELIBERATELY, AND THE ROW'S OWN GATE
+    TAUGHT ME THAT -- TWICE IN ONE TASK (`TASK_PHP_024` §6b). The first draft of
+    this docstring cited that function by a LINE RANGE; `check.py`'s
+    `doc-citation-other` stage counted it and the row's `loud` section went from
+    3 line citations to 4, in the same task whose §2.3 was repairing a rotted
+    line citation. ⚠ The SECOND draft cited the function correctly but NARRATED
+    the old line range in this very sentence -- and the detector counted that
+    too, because it matches TEXT and cannot tell a citation from a story about
+    one. So the range is not written here at all.
+    ⭐ **That stage is the half of the pointer-rot problem this project HAS a
+    working check for, and its one failure mode is that it penalises an honest
+    disclosure of the citation it just made you fix.** It is `loud` and not a
+    failure, which is exactly the right strength for a check with that
+    property -- and it is the argument for `TASK_PHP_024` §3's proposed
+    stale-figure check being REPORTED and never ENFORCED, made by the tree
+    rather than by me.
+    ⚠ **This file is the first `controls/spellings.py` in `patterns-php/` and
+    every later php row will clone it**, so a transcribed statistic is a defect
+    that reproduces itself. Importing `harness/measure.py` is NOT an edit to it
+    -- `PLAN_PHP.md` §2.1 forbids writing under `harness/`, and reading is what
+    the whole shim is built to do.
+    ⚠ It is imported LAZILY so that `--audit-only`, which prices nothing, does
+    not pay for `measure.py`'s own imports of `slb`, `asm` and `build`.
+    """
+    global _MEASURE
+    if _MEASURE is None:
+        _MEASURE = _load("slb_measure", ("harness", "measure.py"))
+    return _MEASURE
 
 
 def contract():
@@ -345,28 +398,45 @@ def run(exe, path):
     return r.stdout.strip()
 
 
-_KIR = re.compile(r"^\s*([0-9,]+)\s", re.M)
-
-
 def kernel_ir(exe, path, tag):
-    """Kernel-EXCLUSIVE Ir, off the pinned callgrind, same as the harness."""
+    """`(kernel_exclusive_ir, error_or_None)` off the pinned callgrind.
+
+    ⚠⚠ THE STATISTIC IS `harness/measure.py::_sum_rows`, IMPORTED. See
+    `load_measure()` for what the transcription that used to live here got
+    wrong and why it mattered on the first control every later php row clones.
+    Three behaviours come with the import and none of them were here before:
+
+      * annotate rows are SUMMED, not first-one-wins;
+      * the needle is matched on the FUNCTION FIELD with
+        `(?:^|::)kernel(?:$|[^A-Za-z0-9_])`, so a sibling `kernel_prologue`
+        cannot be read as `kernel`;
+      * `stdout + stderr` is scanned, as `measure.py::sh` does.
+
+    ⚠ And callgrind's RETURN CODE is now checked. It was not, so a crashed
+    valgrind produced `None` that read as *"no kernel figure"* rather than as
+    *"the measurement did not happen"* -- which is probe rule 1: a probe that
+    CANNOT EVALUATE must say so.
+    """
+    M = load_measure()
     out = os.path.join(SCRATCH, f"cg.{tag}")
-    subprocess.run([VALGRIND, "--tool=callgrind",
-                    "--callgrind-out-file=" + out, exe, path],
-                   capture_output=True, text=True, timeout=3600)
+    r = subprocess.run([VALGRIND, "--tool=callgrind",
+                        "--callgrind-out-file=" + out, exe, path],
+                       capture_output=True, text=True, timeout=3600)
+    if r.returncode != 0:
+        if os.path.exists(out):
+            os.unlink(out)
+        return None, (f"callgrind exit {r.returncode} on {tag}: "
+                      f"{r.stderr[-200:]}")
     ann = subprocess.run(
-        [os.path.expanduser("~/tools/valgrind/bin/callgrind_annotate"),
-         "--threshold=100", out], capture_output=True, text=True, timeout=600)
-    tot = None
-    for ln in ann.stdout.splitlines():
-        if ":kernel" in ln or ln.strip().endswith("kernel"):
-            m = _KIR.match(ln)
-            if m:
-                tot = int(m.group(1).replace(",", ""))
-                break
+        [M.CG_ANNOTATE, "--threshold=100", out],
+        capture_output=True, text=True, timeout=600)
+    tot, names = M._sum_rows((ann.stdout + ann.stderr).strip(), "kernel")
     if os.path.exists(out):
         os.unlink(out)
-    return tot
+    if tot is None:
+        return None, (f"callgrind_annotate named no `kernel` function for "
+                      f"{tag} (rc {ann.returncode})")
+    return tot, None
 
 
 def verus_ok(vp):
@@ -498,8 +568,10 @@ def main():
             continue
         per = {}
         for inp, stride, nit in PROBES:
-            tot = kernel_ir(r["exe"], os.path.join(PDIR, "inputs", inp),
-                            f"{side}.{name}.{inp}")
+            tot, err = kernel_ir(r["exe"], os.path.join(PDIR, "inputs", inp),
+                                 f"{side}.{name}.{inp}")
+            if err:
+                problems.append(f"{side} {name} {inp}: {err}")
             per[inp] = None if tot is None else tot / float(nit)
         r["ir_small"] = per[PROBES[0][0]]
         r["ir_large"] = per[PROBES[1][0]]
@@ -576,6 +648,22 @@ def main():
     else:
         print("\n4. R4 ADMISSIBILITY -- skipped (pass --verus). ⚠ Until it is "
               "run, no R4 variant below is a RUNG; each is a control.")
+        # ⚠⚠⚠ AND THE SIDECAR MUST SAY SO, BECAUSE A RUN WITHOUT `--verus`
+        # WRITES A FILE THAT LOOKS COMPLETE AND IS NOT (`TASK_PHP_022` §3.2
+        # gap 5, DEMONSTRATED LIVE AT `TASK_PHP_024` §1.6). Regenerating this
+        # row's own sidecar without the flag flipped `r4_nozero`'s
+        # `in_contract` from **false to true** -- the one R4 variant that does
+        # NOT verify became admissible -- dropped all three `verus_verifies`
+        # and `verus_msg` fields, and still wrote `"problems": []` and exited
+        # 0. ⚠ `pin.regenerate` names `--verus` for exactly this reason.
+        # PROBE RULE 1: a probe that CANNOT EVALUATE must say so and exit
+        # non-zero. It now does.
+        problems.append(
+            "R4 ADMISSIBILITY WAS NOT CHECKED (no --verus), so every R4 "
+            "variant's `in_contract` below is unverified: `spec.md` pins "
+            "`identity: unsafe == verus`, and without a verifying twin an R4 "
+            "candidate is a control and not a rung. Regenerate with "
+            "`--verus`, which is what `pin.regenerate` names.")
 
     # ---- the two published numbers -----------------------------------------
     print("\n5. THE TWO NUMBERS THAT MAY BE QUOTED, LABELLED")
@@ -662,9 +750,16 @@ def main():
         "probes": [{"input": i, "stride": st, "n_iters": n}
                    for i, st, n in PROBES],
         "tie_pct": TIE_PCT,
+        # ⚠ RECORDED SINCE `TASK_PHP_024`: without it, a sidecar regenerated
+        # without `--verus` is indistinguishable from one regenerated with it,
+        # except that its R4 `in_contract` flags mean nothing. See stage 4.
+        "verus_checked": bool(args.verus),
         "statistic": "kernel_exclusive_ir / n_iters on the SHIPPED inputs -- "
-                     "harness/measure.py's own, so stage 3 above compares "
-                     "against results-php/ph07-strcut-cursor.json directly",
+                     "harness/measure.py::_sum_rows itself, IMPORTED and not "
+                     "transcribed since TASK_PHP_024 (TASK_PHP_022 §3.2 "
+                     "measured that the transcription was a different "
+                     "function), so stage 3 above compares against "
+                     "results-php/ph07-strcut-cursor.json directly",
         "reproduces_shipped_record": rec_ok,
         "variants": [
             {k: v for k, v in r.items()

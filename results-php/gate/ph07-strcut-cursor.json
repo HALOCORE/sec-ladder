@@ -10,7 +10,7 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "1f1508531bd41975927e07f0bca9d592a65a9b6f0620ce4d8a2ca7b3d0e00c0c",
+  "contract_sha256": "a70c115a9fa05520c64f334fcd8903c8da06140aefc47c1b31d0c209fcd4b1a1",
   "run_timeout_s": {},
   "expected_hang": [],
   "idiom": {
@@ -176,14 +176,14 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
     "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
-    "patterns/ph07-strcut-cursor/NOTES.md": "5c14c2d33153432f60a83912ea9620362721ea950f9e79c1e59dff16ab46b816",
+    "patterns/ph07-strcut-cursor/NOTES.md": "fba170c4a34bccab39cc321223d845078f6edebc02a163ecdff507be3a36b670",
     "patterns/ph07-strcut-cursor/README.md": "448a6ec18fd53a17a03e633399332e632d2d75fa281531afcd472407c58bd251",
     "patterns/ph07-strcut-cursor/c/emalloc_shim.h": "aa9abf48535e8df93c9398e96c044697a784d73c40d7a7ccc830b5ee308c378f",
     "patterns/ph07-strcut-cursor/c/kernel.c": "a5fc216233dc10efe5df92dcc7a0edc09aff48a4c5f99b3f38e4c1a6bcc54d5f",
-    "patterns/ph07-strcut-cursor/c/kernel.h": "e6062fdae751761aee5867deff41de7d2da8502f1a5241b2165c5074d08159de",
+    "patterns/ph07-strcut-cursor/c/kernel.h": "8fd53188409319d1d7548b3762991b89fb0bd092a04d09414f43ba25a1fcca19",
     "patterns/ph07-strcut-cursor/c/kernel_hardened.c": "4ce7fa47c07bc66d61b75829bf16293b7a80a8510f67baeb18d069ee49a51bfc",
     "patterns/ph07-strcut-cursor/c/main.c": "32776ebd982e65a58f20db979e14de52076fe6ffcc9453dee7a5f615e9c67d14",
-    "patterns/ph07-strcut-cursor/controls/bug49354.py": "60396d3e2a3a71f207bf450a5a736b15248b74b8209e6453c58ad90f56808443",
+    "patterns/ph07-strcut-cursor/controls/bug49354.py": "5778f24a2926c5d92cde49b25b4d095ac86022e47a65f0abc9a311644945c47e",
     "patterns/ph07-strcut-cursor/controls/c2471b495009.patch": "92e8a7b19b002827f244e227864b9e5821c1d03830e4435d7f06086f4c65649c",
     "patterns/ph07-strcut-cursor/controls/cb3cca21b345.patch": "14dbafc9a3b970d048e0a24347c503b436c51d15e5fb382427be2bece5353b64",
     "patterns/ph07-strcut-cursor/controls/d9dda48f8a7e-mbfilter.patch": "b3a76fc9379d2da2526635d3b588a59223098c1ef1e3242550db4dc07f173e74",
@@ -191,12 +191,12 @@
     "patterns/ph07-strcut-cursor/controls/guard_equiv.c": "cc65f2b47e2da0cb4921a61aca6ffa4668694dda3c8638b2e80abd2b1c4ea235",
     "patterns/ph07-strcut-cursor/controls/guard_equiv.py": "5224e554b167fd1dee2dd12929d11a119ddb6a0586dad05e8ef986310bf60c84",
     "patterns/ph07-strcut-cursor/controls/negatives.py": "cdf32e9dbdf1433fa794929b46ce15541ae77b4a4460583f8d1f43cdf0905242",
-    "patterns/ph07-strcut-cursor/controls/spellings.py": "cf00b81a7c117052b74209c8eca2a53af6b133b43c17d9793437f39779715fcd",
+    "patterns/ph07-strcut-cursor/controls/spellings.py": "c59424549159ea85aca20df41e3c776ace80b0e2aef91f87a22ac59a34537d19",
     "patterns/ph07-strcut-cursor/inputs/gen.py": "304b878730f091cbff54a151239c83fc82864f5617bb60982f1b908e8c6c09b4",
     "patterns/ph07-strcut-cursor/model.py": "ed4e433cba1e28b1f7521e907f50c8705beee67fd45e73c0d0124f956e3a48df",
-    "patterns/ph07-strcut-cursor/safe_naive.rs": "9c2a9fa340ee31da9f79b748b074e031ccf7bb0823dd4f926f0f7226d0a3745e",
+    "patterns/ph07-strcut-cursor/safe_naive.rs": "43e61df0bb35af8029ae0c18c48a45c66890a2f93c49155d776e68f94edf1c77",
     "patterns/ph07-strcut-cursor/safe_tuned.rs": "d7c484b87152d531980befcb538c17b76ce9236f075900f04cb8a91100fd214c",
-    "patterns/ph07-strcut-cursor/spec.md": "6a47087e3400975a6bdacacf11f61923d7f042e34c55b6c18e33ae69a725e75c",
+    "patterns/ph07-strcut-cursor/spec.md": "33412d1fe5cf9dd86c5b85ccd8189aa8d70ad011350b86ee9d83e176c7107be2",
     "patterns/ph07-strcut-cursor/unsafe.rs": "fce732a31d10db616f6931bbf076986e17a06cb8c7830d8cd50c5c1f23dfa6b4",
     "patterns/ph07-strcut-cursor/verus.rs": "d1c61785e44185f88a5f0eb8ab6e87f29e7d1bd64b4e94b85d80b1232d0326bf",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
@@ -1439,7 +1439,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2698299==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x502000000019 at pc 0x55dcbf215ef3 bp 0x7ffca97e0eb0 sp 0x7ffca97e0ea0 READ of size 1 at 0x502000000019 thread T0 #0 0x55dcbf215ef2 in ph07_strcut /home/apt/repos_co",
+      "diagnostic": "================================================================= ==3068265==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x502000000019 at pc 0x55a388fe4ef3 bp 0x7ffc661b7490 sp 0x7ffc661b7480 READ of size 1 at 0x502000000019 thread T0 #0 0x55a388fe4ef2 in ph07_strcut /home/apt/repos_co",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1461,7 +1461,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2698302==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50b000000159 at pc 0x564777fd9ef3 bp 0x7ffc3ce4d0b0 sp 0x7ffc3ce4d0a0 READ of size 1 at 0x50b000000159 thread T0 #0 0x564777fd9ef2 in ph07_strcut /home/apt/repos_co",
+      "diagnostic": "================================================================= ==3068268==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50b000000159 at pc 0x56236529cef3 bp 0x7ffd4a1bba60 sp 0x7ffd4a1bba50 READ of size 1 at 0x50b000000159 thread T0 #0 0x56236529cef2 in ph07_strcut /home/apt/repos_co",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1472,7 +1472,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2698304==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50b000000159 at pc 0x55751c50eef3 bp 0x7ffd62752d90 sp 0x7ffd62752d80 READ of size 1 at 0x50b000000159 thread T0 #0 0x55751c50eef2 in ph07_strcut /home/apt/repos_co",
+      "diagnostic": "================================================================= ==3068269==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50b000000159 at pc 0x564734b09ef3 bp 0x7ffea1e6e720 sp 0x7ffea1e6e710 READ of size 1 at 0x50b000000159 thread T0 #0 0x564734b09ef2 in ph07_strcut /home/apt/repos_co",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1483,7 +1483,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2698306==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50b000000159 at pc 0x558f06a26ef3 bp 0x7ffd6ad70aa0 sp 0x7ffd6ad70a90 READ of size 1 at 0x50b000000159 thread T0 #0 0x558f06a26ef2 in ph07_strcut /home/apt/repos_co",
+      "diagnostic": "================================================================= ==3068270==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50b000000159 at pc 0x55d8b17b1ef3 bp 0x7ffe9bc1b150 sp 0x7ffe9bc1b140 READ of size 1 at 0x50b000000159 thread T0 #0 0x55d8b17b1ef2 in ph07_strcut /home/apt/repos_co",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1678,7 +1678,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "132216273209280",
         "model_stdout": "132216273209280",
         "stderr": ""
@@ -1690,7 +1690,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 2.3,
+        "seconds": 2.4,
         "stdout": "2931856680888643218",
         "model_stdout": "2931856680888643218",
         "stderr": ""
@@ -1702,7 +1702,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.4,
+        "seconds": 0.5,
         "stdout": "2029531144131732403",
         "model_stdout": "2029531144131732403",
         "stderr": ""
@@ -1711,17 +1711,17 @@
   },
   "published_table": {
     "table": "results/tables/ph07-strcut-cursor.md",
-    "contract_sha256": "1f1508531bd41975927e07f0bca9d592a65a9b6f0620ce4d8a2ca7b3d0e00c0c",
+    "contract_sha256": "a70c115a9fa05520c64f334fcd8903c8da06140aefc47c1b31d0c209fcd4b1a1",
     "cited": [
-      "1f1508531bd4"
+      "a70c115a9fa0"
     ],
     "verdict": "FRESH"
   },
   "table_render": {
     "table": "results/tables/ph07-strcut-cursor.md",
     "renders_to": "results/tables/ph07-strcut-cursor.md",
-    "render_sha256": "4d7b6ef0c4ad1f63cf2e7cc39fb63f92c97a0ef5b9401676f9ec29a664a12940",
-    "published_sha256": "4d7b6ef0c4ad1f63cf2e7cc39fb63f92c97a0ef5b9401676f9ec29a664a12940",
+    "render_sha256": "78aff1bc3d9afb460bd56cb77d0783a2c304043b9b3f172b07ae7afaad3860e2",
+    "published_sha256": "78aff1bc3d9afb460bd56cb77d0783a2c304043b9b3f172b07ae7afaad3860e2",
     "verdict": "FRESH"
   },
   "controls_json": {

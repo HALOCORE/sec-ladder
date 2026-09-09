@@ -6,15 +6,33 @@
 //!
 //! ⚠⚠ **READ THIS BEFORE COMPARING THIS RUNG TO R1h.** Unlike ph03, the four
 //! Rust rungs here implement **exactly** what `c/kernel_hardened.c` implements
-//! -- `mbfl_strcut`'s mblen_table arm with `d9dda48f8a7e`'s prologue -- because
-//! that upstream fix is COMPLETE: over 133 932 interpreted calls its first
-//! guard removes every one of the 15 333 out-of-bounds reads and leaves no
-//! residue (controls/fix_scope.py), so no rung has to carry a second fix the
-//! way ph03's do. The ladder reads:
+//! -- `mbfl_strcut`'s mblen_table arm with `cb3cca21b345` hunk (a), the ONE
+//! guard `php-5.2.12 .. php-5.2.17` shipped and kept -- because that fix is
+//! COMPLETE for the memory-safety defect: over 133 932 interpreted calls it
+//! removes every one of the 15 333 out-of-bounds reads and leaves no residue
+//! (controls/fix_scope.py Q1), so no rung has to carry a second fix the way
+//! ph03's do. The ladder reads:
 //!
 //!     R1    mbfilter.c:1179-1259 as shipped 5.0.0 .. 5.3.2 -- CRASH-124
 //!     R1h   + cb3cca21b345 (2005), the real upstream fix, IN THE CALLER
 //!     R2-5  the same function, in Rust
+//!
+//! ⚠⚠⚠ **THE THIRD LINE ABOVE NAMED `d9dda48f8a7e`'s PROLOGUE UNTIL
+//! `TASK_PHP_024`, WHICH CONTRADICTED THE LADDER TABLE FOUR LINES BELOW IT AND
+//! NAMED A DIFFERENT PROGRAM.** It is `c/kernel.h`'s M2 (`TASK_PHP_022`) in a
+//! SECOND measured source, and that review did not find this copy -- it looked
+//! at `c/` and nobody grepped the rungs. `safe_naive.rs` is in
+//! `measure.py::measurement_sources` exactly as `c/kernel.h` is.
+//! ⚠ **It is not cosmetic**: ../spec.md's `forbidden[2]` pins the 2010 clamp
+//! ABSENT from every Rust rung, so the sentence described these rungs as
+//! carrying the spelling their own contract forbids -- and if it were true the
+//! gate would refuse the row. The 2010 commit CLAMPS `from` to `string->len`
+//! where `cb3cca21b345` RETURNS FALSE, and controls/fix_scope.py Q1 prices them
+//! separately: `R1h` moves **16 320** answers, `R1_2010` moves **5 717**, over
+//! the same 133 932 calls. ⚠ The other four `d9dda48f8a7e` mentions in measured
+//! sources -- c/kernel.c, model.py and inputs/gen.py x2 -- are CORRECT; they
+//! describe that commit's `from < 0 || length < 0` hunk and its clamp, both of
+//! which are really in controls/d9dda48f8a7e-mbfilter.patch (:106, :110).
 //!
 //! ⚠ **WHY THE SLICE IS `slen + 1` BYTES LONG.** `string->val` is a zval
 //! string: `emalloc(len + 1)` with `val[len] == 0`. The terminator is not

@@ -297,13 +297,23 @@ def _walk_files(top, _seen=None):
 #: whole invariant, and until TASK_PHP_010 it was false: `shim_link_audit`,
 #: `c_digest_audit`, `why_sizes` and `preflight_coverage_audit` all iterated
 #: `glob(patterns-php/*)`, and **`glob` NEVER MATCHES A LEADING DOT**, while
-#: `build.py::pattern_dir` (os.listdir) and `provenance.py:841-843`
-#: (`glob(<row>*)`, where the row string carries the dot) both resolve a dotted
-#: row. The reviewer ran the real `gate.py --preflight .ph93` on a row carrying
+#: `build.py::pattern_dir` (os.listdir) and `provenance.py::main`'s row
+#: resolution (`glob.glob(PATTERNS + a.row + "*")`, where the row string carries
+#: the dot) both resolve a dotted row. The reviewer ran the real
+#: `gate.py --preflight .ph93` on a row carrying
 #: a REGULAR-FILE allocator copy AND an unkeyed subdirectory source and got
 #: **rc=0**, with the preflight printing `ok  every patterns-php/*/c/ file has a
 #: digest key` about a tree where that sentence was false, on the line under a
 #: provenance stage that names the row (`.temp/php9/17-dotted-e2e.log`).
+#:
+#: ⚠ THE CITATION ABOVE USED TO READ `provenance.py:841-843` AND IT ROTTED
+#: INSIDE THE CHANGE THAT MOVED IT: `TASK_PHP_018`'s `extra_spans` work added
+#: ~60 lines above it (`:841` is now the per-span overlap loop) and its "zero
+#: churn" accounting counted rows re-gated, not citations invalidated
+#: (`TASK_PHP_022` m8). Repaired at `TASK_PHP_024` §2.3 by naming the FUNCTION
+#: and the CONSTRUCT instead of a line -- `PROTOCOL.md` rule 13's pointer-rot
+#: class, and a symbol does not move when the file above it does. It is at
+#: `:987` today; grep for the construct, not for that number.
 #:
 #: ⚠⚠⚠ AND THE REASON THIS IS A SUBSTITUTION RATHER THAN ANOTHER ROUND OF
 #: WHACK-A-MOLE, WHICH IS WHY THE DESIGN SURVIVES M1 AT ALL (TASK_PHP_009 §1.1,
