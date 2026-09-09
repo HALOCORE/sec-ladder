@@ -9,7 +9,9 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings F1–F41 live in `RECAP_PHP.md`.
+> The narrative, the open items and findings **F1–F48** live in `RECAP_PHP.md`
+> (⚠ this said *F1–F41* for seven findings — `PROTOCOL.md` rule 13, headers rot;
+> count it with `grep -c '^### F' RECAP_PHP.md` rather than trusting the line).
 
 ---
 
