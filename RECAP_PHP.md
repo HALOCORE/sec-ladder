@@ -47,15 +47,15 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ROWS BUILT 2, AND BOTH ARE FAMILY S1 -- one of 20 (item 34).
         CATALOGUED 93, going to 102. .memory-php/ is AUTHORITATIVE.
-NEXT    NOTHING RUNNING; both next task files WRITTEN. _023 review the nine
-        new rows then run land_019_020.py (93 -> 102); _024 ph07's refuted
-        hashed why + 4 extra_spans defects (items 36,37). THEN build ph16
-        FIRST -- not ph21, whose trigger is the one that failed.
-⚠ NEW   F43/F47 ph07 shipped a rung PHP ITSELF FILES AS A BUG; no strength of
-        memory-safety-only proof moves. F44/F45 10 of 13 C.1 kills fail, and a
-        WARNING FIX HID A DEFECT (5.0.4: 41 for a declared 65, -Wall silent).
-        F46/F49 mechanism sentences HOLD, `trigger` lines do NOT -- 3 of 9 new
-        rows failed on triggers. AUDIT TRIGGERS ONLY.
+NEXT    _023 RUNNING (review the nine rows, then land 93 -> 102). QUEUED, in
+        order: _024 ph07's refuted hashed why + 4 extra_spans defects (items
+        36,37); _025 BUILD ph16, row 3 and the first non-S1; _026 the census
+        channel, AFTER _023 lands. NOT ph21 -- its trigger is the one that failed.
+⚠ NEW   F50 A FIX COMMIT IS A CENSUS: ph16's patches 4 sites, we catalogued 1;
+        ext/sockets/ has ZERO rows (n=1, UNREVIEWED -> _026). F43/F47 ph07
+        shipped a rung PHP ITSELF FILES AS A BUG; no memory-safety-only proof
+        moves. F44/F45 10 of 13 C.1 kills fail; a WARNING FIX HID A DEFECT.
+        F46/F49 mechanism sentences HOLD, `trigger` lines do NOT. TRIGGERS ONLY.
 ⚠ TRAPS `grep -a` ALWAYS (blind to 41 corpus files); ask about a FUNCTION, not
         text; a probe that CANNOT evaluate must SAY SO, never "ok".
 ⚠ COST  ph07 HAS a spellings search: +11.98% bound / +1.96% cheapest-found, R4
@@ -64,7 +64,7 @@ BAR     C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
         patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
 ⚠ OPS   .web/ is a CONCURRENT SESSION -- NEVER `git add -A`.
 READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.md
-        · F1-F49 · items 1-37. CHECK: .temp/mgr165/{box,cite}check.py, green.
+        · F1-F50 · items 1-38. CHECK: .temp/mgr165/{box,cite}check.py, green.
 ```
 
 ---
@@ -74,7 +74,7 @@ READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.
 | | |
 |---|---|
 | **rows built** | **2, and ⚠⚠ THEY ARE THE SAME FAMILY** — `ph03-uudecode-bound` and `ph07-strcut-cursor` are **both `S1`, unbounded cursor walk**, 1 of the catalogue's **20**. Both reviewed; `ph07` is being **rebuilt** at `TASK_PHP_018` (F43). Each five rungs + R1h. ⚠ **This row said *"2"* for four tasks and no document said they were one family** — the cost of that, and the quota rule that comes out of it, are open item 34 / `QUOTA_001.md`. (`ph00-smoke` is a relocated PAT calibration kernel, throwaway, **no PHP provenance**, and prices nothing) |
-| **tasks** | **24 written, `_001`–`_024`; 22 have reported.** `_001` mining · `_002`–`_011` Phase 0, built and reviewed twice · `_012` catalogue corrections + row-1 prep · `_013`/`_014` **`ph03` built and reviewed** · `_015` `ph07` prep (**stalled on *"no fix exists"*, overturned — F34/F38**) · `_016`/`_017` **`ph07` built and reviewed** · **`_018` `ph07` REBUILT** (new R1h, spellings control, `extra_spans`) and **`_022` reviewed it** · `_019` the C.1/C.4 mechanism test (**9 new rows adjudicated**) · `_020` the catalogue's error rate · **`_021` STOPPED ITSELF** — 3 of 9 triggers failed, so the catalogue is **unchanged at 93** and `land_019_020.py` waits. ▶ **`_023` (review the nine, then land) and `_024` (`ph07`'s hashed `why` + `extra_spans`) are WRITTEN and NOT DISPATCHED.** ⚠ **≈ 3.5 tasks per built row** against `PLAN_PHP.md` §8's PAT-measured ~3, and ⚠ **the *"and falling"* is a projection with n = 2, not a measurement** (`QUOTA_001.md` §2). ⚠ **This row was stuck at `_006` for fourteen tasks** — rule 13 |
+| **tasks** | **26 written, `_001`–`_026`; 22 have reported; `_023` is RUNNING.** `_001` mining · `_002`–`_011` Phase 0, built and reviewed twice · `_012` catalogue corrections + row-1 prep · `_013`/`_014` **`ph03` built and reviewed** · `_015` `ph07` prep (**stalled on *"no fix exists"*, overturned — F34/F38**) · `_016`/`_017` **`ph07` built and reviewed** · **`_018` `ph07` REBUILT** (new R1h, spellings control, `extra_spans`) and **`_022` reviewed it** · `_019` the C.1/C.4 mechanism test (**9 new rows adjudicated**) · `_020` the catalogue's error rate · **`_021` STOPPED ITSELF** — 3 of 9 triggers failed, so the catalogue is **unchanged at 93** and `land_019_020.py` waits. ▶ **`_023` (review the nine, then land) is RUNNING. `_024` (`ph07`'s hashed `why` + `extra_spans`), `_025` (BUILD `ph16` — row 3, and the first outside family `S1`) and `_026` (F50's census channel, ⚠ **dispatch after `_023` lands**, because it counts catalogue rows) are WRITTEN and NOT DISPATCHED.** ⚠ **≈ 3.5 tasks per built row** against `PLAN_PHP.md` §8's PAT-measured ~3, and ⚠ **the *"and falling"* is a projection with n = 2, not a measurement** (`QUOTA_001.md` §2). ⚠ **This row was stuck at `_006` for fourteen tasks** — rule 13 |
 | **infrastructure** | **built and reviewed TWICE**: `harness-php/{root,gate,provenance}.py` · `common-php/` · `patterns-php/{SOURCES.md,php-5.0.0.manifest}` (1170 files, 109 KB) · `.tasks-php/PROTOCOL_PHP.md` · `results-php/`. ⚠ **Reviewed is not the same as correct — the second review found a blocker in the first review's own fix.** ⚠ There used to be a SECOND row in this table also labelled `infrastructure` saying *"not yet built — Phase 0"* (`TASK_PHP_003` m1); it is gone |
 | **candidates** | **54** delivered across three axes. ⚠ **`.tasks-php/ADJUDICATION_001.md` takes that to ≈ 80**: +6 splits, −2 merges, **+17 kills reversed**, +1 dropped with no reason recorded, +4 that fell between axes. Evidence in `.tasks-php/TASK_PHP_001_MINE/` |
 | **catalogue** | ✅ **`patterns-php/CATALOGUE.md` — 93 rows** (⚠ this said **91** and *"23 family headings"*; count it, do not trust a line: `grep -c '^| ph[0-9]' patterns-php/CATALOGUE.md`). **20 mechanism families** — `S1`–`S6` spatial **40** · `T1`–`T6` type **22** · `E1`–`E8` temporal **31**. ⚠ **UNREVIEWED, and under attack right now**: `TASK_PHP_019` on Part C's kills, `TASK_PHP_020` on whether Parts A/B's mechanism claims survive the C. ⚠ **Part A's own section headers still say `Spatial (38)` and sum to 91** — `ph92`/`ph93` were added under them and the header was not moved. Part A is a scannable table, Part B a ~150-word block per row, Part C the kill list with a re-derived criterion per kill. ⚠ **Size was measured, not argued: 1 304 B/row against `.memory/06-catalogue.md`'s 4 340 — 3.3× denser than the PAT catalogue that works.** Built from `.tasks-php/ADJUDICATION_001.md`, which it also reviews |
@@ -145,10 +145,12 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > **F45 ⭐⭐⭐ a defect made invisible by the commit that fixed its warning** ·
 > **F46 ⭐⭐ the catalogue's mechanism sentences hold; its `▸ trigger` lines do
 > not, and that is the half a build task runs** · **F47 ⭐⭐⭐ row 2 rebuilt: it
-> was shipping a rung PHP itself calls a bug, and only a VALUE postcondition
-> could have noticed** · **F48 ⚠⚠⚠ I accepted a refusal and then landed the
+> was shipping a rung PHP itself calls a bug, and no strength of
+> memory-safety-only proof would have moved** · **F48 ⚠⚠⚠ I accepted a refusal and then landed the
 > same rule with the verbs changed** · **F49 ⭐⭐⭐ the stop condition fired: 3 of
-> 9 new rows' triggers failed, and F46 predicted which half would**
+> 9 new rows' triggers failed, and F46 predicted which half would** · **F50 ⭐⭐ a
+> fix commit is a CENSUS of its defect's siblings — `ph16`'s patches four sites
+> and we catalogued one (MANAGER, UNREVIEWED, n = 1)**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -1085,6 +1087,61 @@ That is the row engineer's job, and the window is the expensive half.
 > is this project's oldest finding: **the citation names one frame and the
 > defect lives in another.** **I applied F1 to kills and to fixes and did not
 > apply it to my own doubt.**
+
+### F50 (MANAGER, UNREVIEWED, n = 1) — ⭐⭐ A FIX COMMIT IS A **CENSUS** OF ITS DEFECT'S SIBLINGS, AND WE HAVE ONLY EVER READ IT AS A SOURCE OF R1h
+
+Found while prepping `ph16`'s build task — evidence and a `REFETCH.sh` that
+regenerates all of it in `.temp/mgr166/`. ⚠ **`PROTOCOL.md` rule 3: this is my
+own observation and I have not cleared it. `TASK_PHP_026` is written to attack
+it, and my prediction is written down there so it can be refuted.**
+
+`ph16`'s `fix_commit` `99e290f882c9` was already on file, and
+`FIXSURVEY_001.md:67-81` already recorded that it touches **10 files** — under a
+heading that reads that number as a **cost**: *"⚠ 12 fixes touch ≥ 5 files
+(F34's 'inside a rewrite' shape)"*, and `UPSTREAM_001.md:64`'s *"⚠ right fix,
+big commit; cite the hunk, not the commit."*
+
+⭐ **For `ph16` the extra files are not rewrite collateral. They are the same
+defect at three other sites.** The commit adds one macro *pair* —
+`PHP_SAFE_FD_SET` **and `PHP_SAFE_FD_ISSET`** — and applies it at four places:
+
+| # | site in pristine 5.0.0 | primitive | catalogued? |
+|---|---|---|---|
+| 1 | `ext/standard/streamsfuncs.c:541` | OOB **write** | ✅ **`ph16`** |
+| 2 | `ext/standard/streamsfuncs.c:577` | OOB **read** | ❌ |
+| 3 | `ext/sockets/sockets.c:536` | OOB **write** | ❌ |
+| 4 | `ext/sockets/sockets.c:563` | OOB **read** | ❌ |
+
+⚠⚠ **`ext/sockets/sockets.c` has ZERO rows in the entire catalogue.**
+
+> **The number we recorded as a liability is a lead.** Every one of the ~91
+> resolved rows has a `fix_commit` on file, so the channel costs a patch fetch
+> and a read — **and the discriminator is the commit MESSAGE**: `ph16`'s is a
+> deliberate sweep (*"we avoid… by using poll(2)"*), `ph24`'s is *"Reimplemented
+> date and gmdate with new timelib code"* and will yield nothing.
+
+⚠⚠⚠ **n = 1, AND I EXPECT IT TO BE A MINORITY.** ✅ **"`ph16` is the only one
+and the channel is dead" is a good result and `_026` is told to say it plainly**
+— a one-instance channel dressed up as a programme is worse than a measured
+negative (F7, F13), and this manager's projections have been wrong before (F32,
+F36, and the `ph29` doubt that was wrong in all three limbs).
+
+⚠ **This does NOT reopen the admission bar.** Every candidate it yields still
+faces `PLAN_PHP.md` §3 on the C alone, and #3 above looks `EXACT` against `ph16`
+under `TASK_PHP_019`'s rule. ⚠⚠ **#1 vs #2 is a sharp test case for that rule,
+which `TASK_PHP_023` is attacking right now**: they share *one upstream fix*,
+which is the near-inverse of `_019`'s `DIFFERENT MECHANISM` disjunct (*"different
+upstream fixes each leaving the other standing"*), while differing in **fault
+primitive**, which §3.1 admits as a variation. **`_026` reads `_023`'s verdict
+before it uses either phrase.** **The finding is the CHANNEL, not a row count.**
+
+⭐ Also re-confirmed at source, and the catalogue is **exact**: `:541`, the
+caller's `fd_set` at `:657` (`_020` said `:658`, off by one and harmless),
+`FD_SETSIZE 1024`, `sizeof(fd_set) 128`, index 4096 → **byte offset 512, past
+the object**. ⚠ And `PHP_SAFE_FD_SET`'s safety is `#ifdef`-conditional — **Win32
+gets the unguarded spelling and the comment saying so is CORRECT**, because
+Win32's `fd_set` is a counted array of `SOCKET`s. **R1h must state which branch
+it compiles.**
 
 ### F49 — ⭐⭐⭐ THE STOP CONDITION FIRED, AND THE AUDIT'S OWN FINDING PREDICTED WHICH HALF WOULD FAIL
 
@@ -2195,3 +2252,4 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 | 35 | ⚠⚠ **NOBODY HAS AUDITED THE 93 ROWS' `corpus rows` CELLS, AND `coverage.py` CANNOT SEE THE DEFECT** | `TASK_PHP_019` found **two** ids merged into the wrong surviving row (`CRASH-101` into `ph39` when `ph41`'s own block says *"Do not fold into ph39"*; `LOGIC-014` into `ph47` when `C.1`'s own sentence says `ph48` was **kept** for that mechanism). ⚠⚠ **The coverage checker proves every corpus id is SOMEWHERE; nothing checks it is in the RIGHT somewhere** — and that is by construction, not a bug. ⭐ This is the same shape as `TASK_PHP_012` M1 (*a checker that accepts the artefact it is checking*) on a different field. **It is the next audit after `_019`/`_020`, and it is mechanical: for each id, does the surviving row's mechanism match?** |
 | 36 | ⚠⚠ **`ph07` CARRIES FOUR REFUTED FIGURES INSIDE ITS HASHED `why`, AND NO GATE CAN SEE THEM** — ▶ **`TASK_PHP_024`, written** | `TASK_PHP_022` M1/M2. **(a)** `spec.md`'s `identity[0].why` cites **255 instructions** and three hashes, **all pre-rebuild values the rebuild refuted** — ⚠ **the hash still matches**, because the text was never edited, **and `NOTES.md` claims the addendum pass covered it, which is a false disclosure.** `PROTOCOL.md` rule 6's documented hole, reproduced live on a row we are quoting. **(b)** `c/kernel.h:20-25` names **`d9dda48f8a7e`** as R1h while the file ships `cb3cca21b345` hunk (a) — ⚠ **and `spec.md`'s own `forbidden[2]` calls `d9dda48f8a7e` a *different function*.** It is inside `source_sha256` and predates the rebuild. **Both fixes cost a `ph07` re-gate**, plus the minors: `bug49354.py`'s *"shares no code with `fix_scope.py`"* is **false** (byte-identical table and clamps — conclusion still safe, three independent checks agree), `NOTES.md`'s rule-6 fence names 4 against 27 moved, §10d quotes a pre-rebuild log, and `spellings.py` **re-implements** `measure.py`'s statistic rather than importing it |
 | 37 | ⚠⚠ **FOUR DEFECTS IN `harness-php/provenance.py`'s NEW `extra_spans`, all found AFTER I committed it** — ▶ **`TASK_PHP_024`, written** | `TASK_PHP_022`'s post-notification half. **(a)** ⚠⚠ **`provenance.py:836-837`'s disclosure *"adding a span cannot make the number go up for free"* is measurably FALSE.** Union overlap is `|hit|/|want|` over deduplicated sets, so **a span above the current fraction RAISES it** — measured on `ph07`'s own excerpts: primary alone **75 % (39/52)** → primary + the 100 % table span **77 % (44/57)**. `ph07` only lands at 61 % because span 2 happens to be 15 %. ✅ The set semantics *do* defend against citing the same span twice (measured: unchanged at 61 %) — **it is the general claim that fails.** **(b)** ⚠ **A `php_provenance: false` row short-circuits before any `extra_spans` validation**, so a wholly bogus extra span passes. **(c)** `gate.py:300` cites `provenance.py:841-843` for the dotted-row glob; the +60 lines moved it to **`:924`** — **citation rot introduced BY the change and not repaired.** **(d)** *"byte-identical"* holds for the **default invocation only**: under `--no-tarball`, `ph03` gains `for any of 1 span(s)` |
+| 38 | ⚠ **`ext/sockets/sockets.c` HAS ZERO CATALOGUE ROWS, AND THE FIX COMMIT THAT NAMES IT WAS ALREADY ON FILE** — ▶ **`TASK_PHP_026`, written; dispatch AFTER `_023` lands** | F50, **manager, unreviewed, n = 1**. `ph16`'s `fix_commit` `99e290f882c9` patches **four** unchecked fd-set sites and the catalogue has **one**; the other three are `streamsfuncs.c:577` (`FD_ISSET`, a read) and `sockets.c:536,563`. ⚠⚠ **`FIXSURVEY_001.md:67-81` had already recorded the *10 files* — as a COST** (*"F34's inside-a-rewrite shape"*, *"right fix, big commit"*). **The channel: for each of the ~91 resolved rows, does its fix name siblings we never catalogued?** ⚠ **Expected to be a MINORITY** — the discriminator is the commit *message*, sweep vs rewrite — and *"the channel is dead"* is an outcome `_026` is told to report plainly. ⚠ **Does not reopen the bar**: every candidate still faces `PLAN_PHP.md` §3 on the C alone, and `sockets.c:536` looks `EXACT` against `ph16` under `_019`'s rule. ⚠⚠ **`:541` vs `:577` is a sharp test of that rule — one upstream fix, two fault primitives — so `_026` reads `_023`'s verdict first.** ⚠ First check whether `ext/sockets/` was in the **built configuration the ASan census ran**; if not, its zero rows are explained innocently and the finding is about the census's coverage |
