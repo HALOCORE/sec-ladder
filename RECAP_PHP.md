@@ -47,14 +47,14 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ROWS BUILT 2, AND BOTH ARE FAMILY S1 -- one of 20 (item 34).
         CATALOGUED 102, LANDED AND VERIFIED. .memory-php/ is AUTHORITATIVE.
-NEXT    NOTHING RUNNING. Dispatch in order, ONE AT A TIME: _024 ph07's refuted
-        hashed why + 4 extra_spans defects (items 36,37); _025 BUILD ph16, row 3
-        and the FIRST NON-S1; _026 the census channel. NOT ph21.
-⚠ NEW   F52 A PROBE THAT MAKES THE STATE IT MEASURES -- 4 cases, 3 MINE. ph94's
-        original claim RESTORED; _021's headline retracted. F53 A SHARED FIX IS
-        NOT EVIDENCE OF A SHARED MECHANISM -> PROTOCOL_PHP §G replaces _019's
-        folklore rule (UNREVIEWED). F50 a fix commit is a CENSUS: ph16's patches
-        4 sites, we catalogued 1. F51 the checkers now live in .tasks-php/.
+NEXT    NOTHING RUNNING. _023 and _024 BOTH LANDED, gate PASS, brackets 66/0
+        and 6/0. Dispatch ONE AT A TIME: _025 BUILD ph16 -- row 3 and the FIRST
+        NON-S1, oracle solved in its §3; then _026 the census channel. NOT ph21.
+⚠ NEW   F54 ph07's hashed why was a WHOLE PRE-REBUILD SNAPSHOT: 9 stale numerals,
+        EVERY VERDICT STILL RIGHT -- the configuration no check can see. -> §H a
+        VALIDATOR lands with its must-fire negatives or NOT AT ALL. F52 a probe
+        that MAKES the state it measures: 4 cases, 3 MINE. F53 a SHARED FIX is
+        not evidence of a shared mechanism -> §G. F50 a fix commit is a CENSUS.
 ⚠ TRAPS `grep -a` ALWAYS (blind to 41 corpus files); ask about a FUNCTION, not
         text. ⚠⚠ A PROBE WHOSE SETUP ENCODES THE ANSWER evaluates fine and is
         wrong -- CHANGE THE SETUP'S ARBITRARY CONSTANT AND SEE IF IT MOVES (F52).
@@ -64,7 +64,7 @@ BAR     C-SIDE ONLY. Nothing about Rust/Verus/Miri/cost may kill a row.
         patterns-php/ is FRESH: duplication with patterns/ is NOT a filter.
 ⚠ OPS   .web/ is a CONCURRENT SESSION -- NEVER `git add -A`.
 READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.md
-        · F1-F53 · items 1-41. CHECK .tasks-php/{box,cite,cover,quot}*.py.
+        · F1-F55 · items 1-43. CHECK .tasks-php/{box,cite,cover,quot}*.py.
 ```
 
 ---
@@ -74,7 +74,7 @@ READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.
 | | |
 |---|---|
 | **rows built** | **2, and ⚠⚠ THEY ARE THE SAME FAMILY** — `ph03-uudecode-bound` and `ph07-strcut-cursor` are **both `S1`, unbounded cursor walk**, 1 of the catalogue's **20**. Both reviewed; `ph07` is being **rebuilt** at `TASK_PHP_018` (F43). Each five rungs + R1h. ⚠ **This row said *"2"* for four tasks and no document said they were one family** — the cost of that, and the quota rule that comes out of it, are open item 34 / `QUOTA_001.md`. (`ph00-smoke` is a relocated PAT calibration kernel, throwaway, **no PHP provenance**, and prices nothing) |
-| **tasks** | **26 written, `_001`–`_026`; 23 have reported; NOTHING RUNNING.** `_001` mining · `_002`–`_011` Phase 0, built and reviewed twice · `_012` catalogue corrections + row-1 prep · `_013`/`_014` **`ph03` built and reviewed** · `_015` `ph07` prep (**stalled on *"no fix exists"*, overturned — F34/F38**) · `_016`/`_017` **`ph07` built and reviewed** · **`_018` `ph07` REBUILT** (new R1h, spellings control, `extra_spans`) and **`_022` reviewed it** · `_019` the C.1/C.4 mechanism test (**9 new rows adjudicated**) · `_020` the catalogue's error rate · **`_021` STOPPED ITSELF** — 3 of 9 triggers failed, so the catalogue is **unchanged at 93** and `land_019_020.py` waits. ▶ **`_023` (review the nine, then land) is RUNNING. `_024` (`ph07`'s hashed `why` + `extra_spans`), `_025` (BUILD `ph16` — row 3, and the first outside family `S1`) and `_026` (F50's census channel, ⚠ **dispatch after `_023` lands**, because it counts catalogue rows) are WRITTEN and NOT DISPATCHED.** ⚠ **≈ 3.5 tasks per built row** against `PLAN_PHP.md` §8's PAT-measured ~3, and ⚠ **the *"and falling"* is a projection with n = 2, not a measurement** (`QUOTA_001.md` §2). ⚠ **This row was stuck at `_006` for fourteen tasks** — rule 13 |
+| **tasks** | **26 written, `_001`–`_026`; 24 have reported; NOTHING RUNNING.** `_001` mining · `_002`–`_011` Phase 0, built and reviewed twice · `_012` catalogue corrections + row-1 prep · `_013`/`_014` **`ph03` built and reviewed** · `_015` `ph07` prep (**stalled on *"no fix exists"*, overturned — F34/F38**) · `_016`/`_017` **`ph07` built and reviewed** · **`_018` `ph07` REBUILT** (new R1h, spellings control, `extra_spans`) and **`_022` reviewed it** · `_019` the C.1/C.4 mechanism test (**9 new rows adjudicated**) · `_020` the catalogue's error rate · **`_021` STOPPED ITSELF** — 3 of 9 triggers failed, so the catalogue is **unchanged at 93** and `land_019_020.py` waits. ▶ **`_023` (review the nine, then land) is RUNNING. `_024` (`ph07`'s hashed `why` + `extra_spans`), `_025` (BUILD `ph16` — row 3, and the first outside family `S1`) and `_026` (F50's census channel, ⚠ **dispatch after `_023` lands**, because it counts catalogue rows) are WRITTEN and NOT DISPATCHED.** ⚠ **≈ 3.5 tasks per built row** against `PLAN_PHP.md` §8's PAT-measured ~3, and ⚠ **the *"and falling"* is a projection with n = 2, not a measurement** (`QUOTA_001.md` §2). ⚠ **This row was stuck at `_006` for fourteen tasks** — rule 13 |
 | **infrastructure** | **built and reviewed TWICE**: `harness-php/{root,gate,provenance}.py` · `common-php/` · `patterns-php/{SOURCES.md,php-5.0.0.manifest}` (1170 files, 109 KB) · `.tasks-php/PROTOCOL_PHP.md` · `results-php/`. ⚠ **Reviewed is not the same as correct — the second review found a blocker in the first review's own fix.** ⚠ There used to be a SECOND row in this table also labelled `infrastructure` saying *"not yet built — Phase 0"* (`TASK_PHP_003` m1); it is gone |
 | **candidates** | **54** delivered across three axes. ⚠ **`.tasks-php/ADJUDICATION_001.md` takes that to ≈ 80**: +6 splits, −2 merges, **+17 kills reversed**, +1 dropped with no reason recorded, +4 that fell between axes. Evidence in `.tasks-php/TASK_PHP_001_MINE/` |
 | **catalogue** | ✅ **`patterns-php/CATALOGUE.md` — 102 rows, LANDED AND VERIFIED** by `TASK_PHP_023` (⚠ this line has said **91** and **93**; count it, do not trust it: `python3 .tasks-php/quota.py`). **20 mechanism families**, unchanged by the landing — spatial **42** · type **29** · temporal **31**. ✅ **Part A and Part B agree row-for-row, and every row is filed under the same axis in both** — the `ph92`/`ph93` mismatch is gone. ✅ `coverage.py` **166/166, MISSING 0**; all 8 withdrawn `C.1` kills present in place with their notes. ⚠⚠ **Two landed sentences were measured FALSE and are corrected in `CATALOGUE.md` AND in `land_019_020.py`** (F52 `ph94`'s trigger, F53 `ph32`'s *"one commit"*) — a landing script left carrying a refuted claim is a cited artefact. ⚠ **`_023` reviewed the nine admissions and would overturn NONE of `_019`'s reversals**; ~70 citations opened across 15 files, including the ones `_019` called correct. ⚠ **Parts A/B beyond the nine are still UNREVIEWED**, and `_020` measured the mechanism sentences right and the `▸ trigger` lines wrong (F46). Part A is a scannable table, Part B a ~150-word block per row, Part C the kill list with a re-derived criterion per kill |
@@ -1092,6 +1092,86 @@ That is the row engineer's job, and the window is the expensive half.
 > is this project's oldest finding: **the citation names one frame and the
 > defect lives in another.** **I applied F1 to kills and to fixes and did not
 > apply it to my own doubt.**
+
+### F55 (MANAGER, UNREVIEWED) — ⚠ THE PREFLIGHT RECORD IS KEYED BY THE NAME YOU TYPED, NOT THE ROW IT RESOLVED TO — AND ONE WRONGLY-KEYED DUPLICATE IS COMMITTED
+
+Found verifying `TASK_PHP_024`, which left an untracked
+`results-php/preflight/ph07.preflight.json` beside the real
+`ph07-strcut-cursor.preflight.json` and correctly called it the manager's call.
+**It is not a stray file; it is a defect with a committed instance.** Measured:
+
+| file | `row` field | runs | tools |
+|---|---|---:|---|
+| `ph00.preflight.json` ⚠ **committed** | `ph00` | **12** | check, measure, report |
+| `ph00-smoke.preflight.json` | `ph00-smoke` | **1** | check |
+| `ph07.preflight.json` ⚠ untracked, stale | `ph07` | **4** | build, check, measure, report |
+| `ph07-strcut-cursor.preflight.json` | `ph07-strcut-cursor` | **16** | build, check, measure, report |
+
+⚠⚠ **`harness-php/` resolves an abbreviated row through `glob(<row>*)` for the
+WORK and then keys the record on the STRING YOU TYPED**, so `provenance.py ph07`
+operates on `ph07-strcut-cursor` and writes its history to a different file.
+**The two then diverge**, and `ph00.preflight.json` — a wrongly-keyed record with
+**twelve** runs against the real row's one — has been in the repository since
+`TASK_PHP_010`.
+
+✅ **Nothing published rests on it**: the gate reads `results-php/gate/`, and
+`--check-stale` is 6/0 either way. ⚠ **What it costs is the audit trail** — a
+row's preflight history is silently split by how someone typed its name.
+⚠⚠ **I am NOT fixing it here.** `_024` §5.3's rule, which I asked for and am
+landing, says a validator change lands **with its must-fire negatives or not at
+all**; this needs a control that types both spellings and asserts one file.
+**Queued as item 42.**
+
+### F54 — ⭐⭐ A DECLARATION CAN BE WRONG IN EVERY NUMBER AND RIGHT IN EVERY VERDICT, AND THAT IS THE CONFIGURATION NO CHECK HERE CAN SEE
+
+`TASK_PHP_024`. `TASK_PHP_022` M1 checked the hashed `why`'s **first sentence**
+and found four stale figures (item 36). Re-deriving **every cell the entry
+names** found **nine**, and ⚠⚠ **all eleven numerals reproduce exactly against
+`git show 8214b5f:`** — **it is not typos, it is a whole pre-rebuild snapshot**
+that was never re-read after the rebuild.
+
+⚠⚠⚠ **WHY NOTHING CAUGHT IT, PRECISELY: every *qualitative* claim survived.** At
+O3/isolated the two cells still have equal `n_fn` and equal `fn_bytes`,
+`md5_fn_norel` is still identical and `md5_fn` still differs — **so `norel` was
+the right level before and after, and no gate verdict ever moved.** The hash
+still matched because the text was never edited. ⭐ **A row can publish six wrong
+numbers and be right about everything they were cited to support.**
+
+⭐ **AND THE WRONG-COMMIT DEFECT HAD A SECOND COPY THE REVIEW MISSED.**
+`c/kernel.h` named `d9dda48f8a7e` as R1h while shipping `cb3cca21b345` hunk (a)
+— and so did **`safe_naive.rs`**, ⚠ **also a `measurement_sources` file**, ⚠⚠
+**contradicting the ladder table four lines below it.** `TASK_PHP_022` looked at
+`c/` and **nobody grepped the rungs**; `_024` found it with a 3-line hash sweep
+run *after* its first re-measure, which cost a second full pass.
+
+⭐ **The `extra_spans` disclosure was worse than I reported.** I said *"adding a
+span cannot make the number go up for free"* was false in one measured case.
+Swept over all seven subsets: **5 of 9 single-span additions RAISE it.** The
+union overlap is a **weighted mean and is non-monotone** — so the claim was not
+imprecise, it was **false in the common case**.
+
+⭐⭐ **THE PROCESS RULE, AND IT IS NARROWER AND BETTER THAN THE ONE I OFFERED.**
+I asked whether I should have committed a `harness-php/` change before review.
+The answer: *no, but that is not the mechanism.* **All four defects were in the
+harness half; the row half survived intact.** The row shipped with `.temp/php18/`
+full of controls; **the validator change shipped with none** — its only artefact
+is a 16-line derivation log with no mutation, no expectation and no control in
+it, and the eleven must-fire negatives were written **by the reviewer, after the
+commit.** ⚠ **A gate run EXERCISES a validator on three rows; it does not ATTACK
+it**, and I let the row's green gate stand as evidence about the validator.
+
+> ⭐ **`PROTOCOL_PHP.md` §H, landed: A CHANGE TO A VALIDATOR LANDS WITH ITS
+> MUST-FIRE NEGATIVES IN THE SAME CHANGE, OR IT DOES NOT LAND.** All four
+> defects were minutes of probe work — ~250 lines caught every one.
+
+⚠ **The `why`-staleness check is priced and deliberately NOT landed**: ~28 lines,
+fires on exactly this defect with **zero false alarms across all three rows**,
+goes silent after the repair. `_024` refused to land its own new gate stage in
+the task that argues the manager should not have — *"landing mine in the same
+task would refute the argument by example."* ✅ **Correct, and it is `PROTOCOL.md`
+rule 3 applied to itself.** ⭐ **The tree then proved its own point**: the gate
+caught two citations `_024` introduced, and then caught its *disclosure* of the
+first — which is why the check must be **reported, never enforced**.
 
 ### F53 — ⚠⚠⚠ A SHARED UPSTREAM FIX IS NOT EVIDENCE OF A SHARED MECHANISM, AND THE RULE THAT SAID OTHERWISE HAD ALREADY PUT A FALSE SENTENCE IN THE CATALOGUE
 
@@ -2443,3 +2523,5 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 | 39 | ⚠⚠ **`CATALOGUE.md` C.7's COVERAGE CLAIM RESTED ON GITIGNORED SCRATCH, AND ITS PASTED OUTPUT IS STALE** — ▶ **fix when `_023` releases the file** | F51. **(a)** ✅ **Done**: `.temp/php11/coverage.py` promoted to `.tasks-php/coverage.py`, `166/166` re-derived and confirmed, F49's two regex/gap defects repaired, and the corpus's **third namespace** (`merged_members` — `V5C-116` → `CRASH-115`) taught to the checker, which resolves the three *"ids the corpus does not have"* the catalogue had pasted in unexplained. **(b)** ⚠ **Still owed, in `CATALOGUE.md` itself**: C.7 cites `.temp/php11/coverage.py` and quotes **91 rows / 161 ids** against the file's **93 / 163**. Repoint at `.tasks-php/coverage.py` and refresh the block — ⚠ **after the landing, so it is refreshed once at 102.** **(c)** ⚠ **Nine more committed-claim citations into `.temp/`, two ALREADY GONE** (`patterns-php/SOURCES.md` ×4, `PLAN_PHP.md` ×3, `CATALOGUE.md` ×3, `.memory-php/00-corpus.md` ×1). `citecheck.py` now reports them as a **warning, not a failure** — they are evidence with a scheduled expiry, not broken pointers, and the fix is a committed generator per `CLAUDE.md` rule 1, not a whitelist. **(d)** ⚠ **`ph03` and `ph22`'s `corpus rows` cells cite merged-away ids** — legitimate, but F44 rates `merged_members` the WEAKEST evidence in C.1 and **these are the three merges C.1's kills rest on**; `TASK_PHP_019` reports the corpus's own validators flagged all three. **Not reopened here** |
 | 40 | ⚠ **`ph98`'s TRIGGER HAS AN UNSTATED RESIDUE DEPENDENCE — F52's CLASS AT A THIRD SITE** | `TASK_PHP_023` §2.5.1. `zend_builtin_functions.c:1054` tests `Z_STRLEN_PP(exception_handler)==0` and for the trigger's `array($o,'m')` that reads `value.str.len` at offset 8 of a zval whose `_array_init` (`zend_API.c:644-651`) writes **only** `value.ht` (offset 0–7) and `type`. ⚠ **If the residue is 0 the handler is silently never stored and the trigger no-ops** — so the row's witness is allocator-dependent in exactly the way `ph94`'s was (F52), at a third site. ✅ **Not a kill and not a block**: the C-side mechanism is unaffected. **A build task on `ph98` must know this before it spends an hour on a trigger that sometimes does nothing.** ⚠ Additive, and `ph100` is *understated* the same way — `zend_execute_API.c:450 INIT_PZVAL(p)` clears `is_ref` and `:451` restores only `refcount`, so the binding breaks even where `SEPARATE_ZVAL` no-ops |
 | 41 | ⚠ **`PROTOCOL_PHP.md` §G IS ONE REVIEWER'S RESTATEMENT AND THE MANAGER LANDED IT** | F53. `TASK_PHP_023` §4.3 attacked `TASK_PHP_019`'s duplication rule, measured its second disjunct false, and proposed a replacement; I landed it as `PROTOCOL_PHP.md` §G/§G1 **marked UNREVIEWED**. ⚠⚠ **This is the shape F48 warns about** — I have twice now taken one agent's construction into a standing document without a second pair of eyes, and the rule it replaces got there the same way. ✅ **The difference I am claiming**: the old rule was folklore in a report and is now in a document where it can be attacked, and it had a **measured** defect. ⚠ **If that reasoning is wrong, §G should come back out** — it is one paragraph. **Give it to the next reviewer whose task touches admission** |
+| 42 | ⚠ **THE PREFLIGHT RECORD IS KEYED BY THE TYPED NAME, NOT THE RESOLVED ROW** | F55, **manager, unreviewed**. `harness-php/` resolves an abbreviated row through `glob(<row>*)` for the WORK and keys the record on **the string you typed**, so `provenance.py ph07` operates on `ph07-strcut-cursor` and writes its history elsewhere. **Measured**: `ph00.preflight.json` (`row: ph00`, **12 runs**) beside `ph00-smoke.preflight.json` (**1 run**), and `ph07.preflight.json` (**4**) beside `ph07-strcut-cursor.preflight.json` (**16**). ⚠⚠ **The `ph00` one is COMMITTED**, since `TASK_PHP_010`. ✅ **Nothing published rests on it** — the gate reads `results-php/gate/` and `--check-stale` is 6/0 either way; **what it costs is the audit trail**, silently split by how someone typed the name. ⚠ **The fix needs a control that types both spellings and asserts one file** — §H, so not a one-liner. ⚠ **Decide whether the committed `ph00.preflight.json` is deleted or kept as the record of the defect** |
+| 43 | ⚠ **`ph00-smoke` IS NOW RETIRABLE AND NOBODY HAS RETIRED IT** | Its own `README.md` and `NOTES.md` say to delete it **once a real php row has gated green**; `ph03` and `ph07` both have. ⚠ It is a relocated PAT calibration kernel with **no PHP provenance** (`php_provenance: false`), it prices nothing, and it is **one of the 3 rows every `provenance.py --all` and every `--check-stale` bracket counts** — so the *6 records* and *3 rows checked* figures both include a fixture. ⚠⚠ **It is also the ONLY row the `php_provenance: false` path is exercised on** (item 42's sibling defect lives on that path), so retiring it removes the only live test of that branch. **Decide deliberately; do not just delete it** |

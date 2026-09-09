@@ -937,3 +937,44 @@ and the stop happens for the reason that was actually true. ⚠ **And `_021` had
 already folded all three corrected triggers into the landing script**, so when
 the rule fired there was nothing left to repair: **the stop bought a REVIEW, not
 a repair** — right on the merits, wrong in its stated reason.
+
+---
+
+## H. ⭐ A change to a VALIDATOR lands with its must-fire negatives, or it does not land
+
+**`TASK_PHP_024` §5.3's formulation, in answer to a question the manager asked
+about his own conduct.** It replaces the obvious framing — *"don't commit a
+`harness-php/` change before it is reviewed"* — which is **weaker and slightly
+wrong**, and the history says why.
+
+`8e2d834` committed `ph07`'s rebuild **and** `provenance.py`'s `extra_spans`
+schema change together. `TASK_PHP_022` then found defects in both halves —
+except it did not: ⚠ **all four `extra_spans` defects were in the harness half,
+and the row half survived intact** (*"nothing here invalidates the rebuild"*).
+
+**The mechanism is not the timing. It is that a validator landed with no
+negatives, and a row's green gate was allowed to stand as evidence about it.**
+
+> ⚠⚠⚠ **A GATE RUN *EXERCISES* A VALIDATOR ON THE ROWS THAT PASS. IT DOES NOT
+> *ATTACK* IT.** Three green rows say nothing about what the validator does to a
+> row that should fail.
+
+- The row half shipped with `.temp/php18/` full of controls. **The validator
+  change shipped with none** — its only artefact is `extra-spans.log`, **16
+  lines**, and it is a *derivation*: three spans' bytes, hashes, first and last
+  lines. **No mutation, no expectation, no control.**
+- The eleven must-fire negatives were written **by the reviewer, after the
+  commit**.
+- ⚠ **Every one of the four was minutes of work** — ~250 lines of probe caught
+  all of them: drive the statistic over its subsets (~40), one scratch row with
+  a bogus span (~60), `grep -n 'provenance\.py:[0-9]' harness-php/` (1), run the
+  CLI under both flags and diff (~50).
+
+⚠ **`PROTOCOL_PHP.md` §B2/§B3 already record four bypassed guards, and every
+repair that stuck came with negatives** — but that was a *description of what
+good repairs happened to have*, never a **landing condition**. It is one now.
+
+⚠ **Scope**: a *validator* is anything whose output is a verdict other code or a
+human trusts — `harness-php/{gate,provenance}.py`, a row's `controls/*.py`, the
+manager's checkers in `.tasks-php/`. **It is not a rule about commits**, and it
+binds the manager exactly as it binds an engineer.
