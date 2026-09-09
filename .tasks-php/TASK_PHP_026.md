@@ -54,6 +54,11 @@ with new timelib code"* — a rewrite, which should yield nothing.
    · `ph65` · `ph73` · `ph76` · `ph84`, 5f each) as **SWEEP** / **REWRITE** /
    **UNCLEAR** **from the message alone, and WRITE THE CLASSIFICATION DOWN BEFORE
    FETCHING ANY PATCH.** That makes the triage testable instead of retrofitted.
+   ⚠⚠ **DO NOT READ §4 UNTIL YOURS IS WRITTEN.** §4 is the manager's prediction,
+   and a prediction you read first is an anchor, not a control. **Write yours
+   into the report file, then read mine, then fetch.** ⚠ **If you have already
+   read §4, say so in the report** — a disclosed anchor is worth something, an
+   undisclosed one makes the whole triage unusable.
 2. **Then fetch and read all 12** (`https://github.com/php/php-src/commit/<sha>.patch`;
    ⚠ `git fetch` of a bare SHA does **not** work). For each, list every hunk that
    applies **the same repair** as the row's own hunk, and resolve each to a
