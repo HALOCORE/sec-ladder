@@ -146,7 +146,8 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > **F46 ⭐⭐ the catalogue's mechanism sentences hold; its `▸ trigger` lines do
 > not, and that is the half a build task runs** · **F47 ⭐⭐⭐ row 2 rebuilt: it
 > was shipping a rung PHP itself calls a bug, and only a VALUE postcondition
-> could have noticed**
+> could have noticed** · **F48 ⚠⚠⚠ I accepted a refusal and then landed the
+> same rule with the verbs changed**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -1084,7 +1085,107 @@ That is the row engineer's job, and the window is the expensive half.
 > defect lives in another.** **I applied F1 to kills and to fixes and did not
 > apply it to my own doubt.**
 
-### F47 — ⭐⭐⭐ ROW 2 REBUILT: THE ROW WAS SHIPPING A RUNG PHP ITSELF CALLS A BUG, AND ONLY A **VALUE** POSTCONDITION COULD HAVE NOTICED
+### F48 — ⚠⚠⚠ I ACCEPTED A REFUSAL AND THEN LANDED THE SAME RULE WITH THE VERBS CHANGED
+
+`TASK_PHP_022`, the review of the rebuild. **It confirmed F47's headline by
+construction, refuted the sentence I built on it, and answered the question I
+was least sure of with *"you were half right, and the half you got wrong is the
+one you asked about."***
+
+⚠⚠⚠ **§5.1 — THE DEFERRAL.** `TASK_PHP_018` refused my protocol extension
+(4.1-B) and proposed landing 4.1-A as *"an observation, not a general
+permission"*. **I accepted within minutes and said so.** ✅ **Holding 4.1-B was
+right. Landing 4.1-A is not, because 4.1-A IS A NORM:**
+
+1. **Its head clause is a deontic permission, in capitals, first** — *"**AND A
+   ROW MAY SHIP A SUBSET OF ITS `fix_commit`, IF IT SAYS SO AND SAYS WHY.**"*
+   Everything after it *qualifies a permission the preceding sentence has
+   already granted.*
+2. **It carries a requirement schedule for future rows** — *"a row that wants to
+   do the same **owes** … all four of (i)–(iv)"*. **An observation does not tell
+   future rows what they owe. That sentence is the definition of a norm.**
+3. **It goes into `PROTOCOL_PHP.md` §C**, immediately under the sentence that
+   *defines* R1h, in a document every later builder reads as rules.
+4. ⚠ **The difference between 4.1-A and 4.1-B is PLACEMENT, NOT SUBSTANCE.**
+   Both grant it, both attach the same four disclosures, both make (iii)
+   mandatory.
+
+⚠⚠ **And the engineer's own argument for holding refutes landing**: *"holding
+costs `ph07` nothing, because the row does not need the protocol to change in
+order to ship."* **By exactly that argument, landing 4.1-A buys nothing** — the
+only thing it does is tell *future* rows what they may do, which is the thing
+the programme had just decided it lacked the evidence for. ⚠ **And (iii) does
+not close (a)'s objection**: *any* later upstream change to the function
+satisfies it, and `UPSTREAM_002` §1 is itself a demonstration that this
+function's guard set moves across many tags.
+
+> ✅ **ACCEPTED. The reviewer's replacement lands instead: the same facts, past
+> tense, descriptive, no deontic verbs, no owed-list — plus one sentence saying
+> the generalisation is OPEN at n = 1 and that a second row brings it to the
+> manager as a proposal.** ⚠ **The asymmetry is the argument**: an under-stated
+> observation costs one task when a second row needs it; **an over-stated norm
+> is, on this project's own record, what has to be un-landed.**
+
+⭐⭐ **THE PATTERN IS THE FINDING, AND IT IS ABOUT ME.** `TASK_PHP_017` refused
+a rule invented to make one row gateable. `TASK_PHP_018` refused mine. **I agreed
+with both — and then re-published the second one with softer wording.**
+**Agreeing with a refusal and re-wording the refused thing is not accepting it**,
+and I could not see it from where I was standing, which is exactly why §5.1 was
+in the task file.
+
+**✅ WHAT SURVIVED A HARD ATTACK** — the review re-derived rather than re-read:
+
+- **§2 — the R1h decision holds, on an independent transcription.** Hunk (b)
+  **alone removes 0 of 396** over-reads; hunk (a) **alone removes 396 of 396**,
+  and it is *structural* — the start walk never reads `length`. The corpus is
+  genuinely unrestricted (**read from the `.bin` files**, not from `gen.py`).
+  ⭐ **`bug49354.py` is a faithful replay, authenticated against the patch's own
+  git blob sha1** and checked against the real C on 18/18 cells.
+- **§3 — every published ladder figure reproduces exactly**, and ⭐⭐ **the
+  DEGENERATE R4 claim survived a real attack**: three further spellings
+  (`copy_from_slice`, fold-from-source, raw-pointer walk) at **+0.001 %,
+  −0.003 %, +1.965 %** — none cheaper — **and the metric objection was tested
+  too** (whole-program `Ir` beside kernel-exclusive) **and failed.** It now
+  stands on **seven spellings from two agents.** `r4_index0`'s byte-identical
+  claim checked independently and **true**.
+- **§4 — `extra_spans` validates an extra span as strictly as the primary**
+  (negatives built), and `ph03`/`ph00` really are byte-identical.
+
+⚠⚠ **MY OWN PREMISE ABOUT THE BOUNDARY IS WRONG, and it is one I put in a task
+file.** I wrote that `from == string->len` is safe *"because
+`mblen_table_utf8[0] == 1` at the terminator"*. **It is not.** ⭐ **Any step ≥ 1
+is in bounds; a step of 0 gives NON-TERMINATION, not an over-read.** The
+operative premise is **`mbtab[b] >= 1`** — which is what the proof actually uses.
+✅ All **11** `mblen_table`s in 5.0.0 are 256 entries with minimum 1.
+
+⚠⚠ **TWO MAJORS NOBODY ASKED FOR, both on the row as committed:**
+
+1. **`spec.md`'s HASHED `identity[0].why` cites FOUR figures the rebuild
+   refuted** — 255 instructions and three hashes, all pre-rebuild. **The hash
+   still matches**, so no gate can see it, ⚠ **and `NOTES.md` claims the
+   addendum pass covered it, which is a false disclosure.** `PROTOCOL.md` rule
+   6's documented hole, reproduced live.
+2. **`c/kernel.h:20-25` names `d9dda48f8a7e` as R1h** while the file ships
+   `cb3cca21b345` hunk (a) — ⚠ **and `spec.md`'s own `forbidden[2]` calls
+   `d9dda48f8a7e` a *different function*.** It is inside `source_sha256` and
+   predates the rebuild.
+
+⚠ **Minors worth carrying**: `bug49354.py`'s docstring says it *"shares no code
+with `fix_scope.py`"* and **the table and clamps are byte-identical copies** — a
+**false disclosure**, though the conclusion is safe because three independent
+checks agree; `spellings.py` **re-implements** `measure.py`'s statistic rather
+than importing it; and ⚠ **the gate hashes `controls/*.py` and never runs them.**
+
+### F47 — ⭐⭐⭐ ROW 2 REBUILT: THE ROW WAS SHIPPING A RUNG PHP ITSELF CALLS A BUG, AND **NO STRENGTH OF MEMORY-SAFETY-ONLY PROOF WOULD HAVE MOVED**
+
+> ⚠⚠⚠ **THIS HEADING SAID *"AND ONLY A VALUE POSTCONDITION COULD HAVE NOTICED"*.
+> THAT IS FALSE AND IT WAS MY AMPLIFICATION** (`TASK_PHP_022` §1). **The gate's
+> own stage 2 separates the two configurations** on the rebuilt corpus — **4/32
+> windows move on `small.bin`, 297/2050 on `large.bin`**, and the final `u64`
+> differs on both. ⚠ **`NOTES.md:70` said only the true half — that the *proof*
+> does not move — and I turned it into a claim about every observer.**
+> ✅ The corrected claim is narrower, was **confirmed by construction**, and is
+> quantified below.
 
 `TASK_PHP_018`. Gate **PASS**, contract `be5f5818ffa6…` → **`1f1508531bd4…`**,
 both brackets **66/0** and **6/0** first and last. ⚠ **UNREVIEWED** — nothing
@@ -1099,10 +1200,40 @@ went from ~10–12 plain / **15** twin to **9 on both**.
 > ⭐⭐⭐ **AND THAT IS THE ROW'S STRONGEST RESULT, ARRIVING FROM A DIRECTION
 > NOBODY DESIGNED: a memory-safety-only `ensures` WOULD HAVE STAYED GREEN
 > THROUGH THE ENTIRE REBUILD.** The clamp was never a memory-safety bug — it is
-> a *wrong answer*. Only the value postcondition moved. **That is the concrete
-> case for proving what a function computes rather than merely that it does not
-> fault**, and it was produced by an accident of the rebuild rather than by an
-> argument.
+> a *wrong answer*. **That is the concrete case for proving what a function
+> computes rather than merely that it does not fault**, and it was produced by
+> an accident of the rebuild rather than by an argument.
+
+✅✅ **CONFIRMED BY CONSTRUCTION AT `TASK_PHP_022` §1 — the proof nobody had
+written was written, and the result is STRONGER than the assertion.** A
+mechanical weakening of the row's own `verus.rs`, audited for value tokens:
+**`ms_hunkab` (the pre-rebuild exec, both hunks) and `ms_hunka` (hunk (a) alone)
+BOTH verify 17/0 plain and 20/0 twin**, and the `diff` between them is *comments
+plus hunk (b)'s six exec lines* — **not one invariant, assert, ghost binding or
+`decreases` differs.** Must-fire control holds: delete hunk (a) and both regimes
+fail at `frm <= slen`.
+
+⭐⭐ **AND THE ANSWER TO *"what did memory-safety-only cost to define?"* IS THE
+BETTER HALF: NOTHING, BECAUSE THERE IS NOTHING TO DEFINE.** The kernel returns a
+`u64` and writes no caller-visible memory, **so the honest memory-safety-only
+spec is the EMPTY postcondition** — safety lives in the trusted items'
+`requires`, the `decreases`, and Verus's built-in checks. ✅ **Vacuity measured
+rather than argued: the same kernel with its body replaced by `0u64` verifies
+13/0.** ⚠ The reviewer also built the *stronger* reading — an explicit ghost
+*"no read past `slen`"* postcondition — **and it too verifies in both
+configurations, and even with all four instrumentation points deleted.** *Even
+that postcondition is bookkeeping nothing forces.*
+
+> ⭐⭐⭐ **THE NUMBER THAT SAYS IT BEST: the memory-safety-only proof verifies at
+> `rlimit` 1, against the row's 9. Essentially the ENTIRE proof budget is the
+> value postcondition.**
+
+⚠⚠ **What this does NOT license, and I claimed it did: *"only a value
+postcondition could have noticed."*** **The GATE would have** — stage 2's
+identity check moves on 4/32 and 297/2050 windows. **The correct statement is
+about PROOFS, not about observers**: no strength of memory-safety-only
+postcondition distinguishes the two rungs, and the row's `NOTES.md` said exactly
+that and no more.
 
 ⭐⭐ **I OFFERED A STOPPING POINT AND IT WAS DECLINED ON EVIDENCE BETTER THAN MY
 ARGUMENT.** `UPSTREAM_002` reasoned from archaeology. `controls/bug49354.py`
