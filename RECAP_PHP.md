@@ -47,14 +47,14 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ROWS BUILT 3 -- ph03+ph07 (S1) and ph16 (S2, FIRST NON-S1). 20 families,
         S2 now owes 1. CATALOGUED 102, VERIFIED. .memory-php/ is AUTHORITATIVE.
-NEXT    NOTHING RUNNING. _023/_024/_025 ALL LANDED; gate PASS, brackets 66/0 and
-        8/0. ONLY _026 (F50's census channel) is written+undispatched. Then pick
-        row 4: ph29 -> ph12 -> ph21 (F46), or a NEW family. NOT ph21 first.
-⚠ NEW   F56 ⚠⚠⚠ GCC WAS ALREADY ENFORCING ph16's OWN BOUND -- _FORTIFY_SOURCE=3
-        makes FD_SET __fdelt_chk, +60.6%; R1 was not R1 in half the gcc cells.
-        NOT ph03/ph07 (checked). F57 ASan BLIND, MIRI FIRES -- and the oracle was
-        upstream's own wfds. F54 a why can be wrong in every number, right in
-        every verdict -> §H. F52 a probe that MAKES the state it measures.
+NEXT    NOTHING RUNNING. _023..._026 ALL REPORTED AND LANDED; gate PASS, brackets
+        66/0 and 8/0. NO TASK IS WRITTEN. Pick row 4 -- ph29, or a NEW family
+        (S2 owes 1, 18 families owe 2). ⚠ ph73 owes an R1h hunt FIRST (item 45).
+⚠ NEW   F56 GCC WAS ALREADY ENFORCING ph16's OWN BOUND (_FORTIFY_SOURCE=3, +60.6%);
+        not ph03/ph07, checked. F57 ASan BLIND, MIRI FIRES; oracle was upstream's
+        own wfds. F58 CENSUS CHANNEL REAL -- 12 sites / 6 of 12 commits -- but the
+        >=5-file selector has NO signal; a NAMED WRAPPER does. F59 ext/sockets WAS
+        built+fuzzed, 0 corpus rows. F54 a why wrong in every number -> §H.
 ⚠ TRAPS `grep -a` ALWAYS (blind to 41 corpus files); ask about a FUNCTION, not
         text. ⚠⚠ A PROBE WHOSE SETUP ENCODES THE ANSWER evaluates fine and is
         wrong -- CHANGE THE SETUP'S ARBITRARY CONSTANT AND SEE IF IT MOVES (F52).
@@ -64,7 +64,7 @@ NEXT    NOTHING RUNNING. _023/_024/_025 ALL LANDED; gate PASS, brackets 66/0 and
 BAR     C-SIDE ONLY: nothing about Rust/Verus/Miri/cost kills a row, and
         patterns-php/ is FRESH. ⚠ .web/ is CONCURRENT -- NEVER `git add -A`.
 READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.md
-        · F1-F57 · items 1-44. CHECK .tasks-php/{box,cite,cover,quot}*.py.
+        · F1-F59 · items 1-47. CHECK .tasks-php/{box,cite,cover,quot}*.py.
 ```
 
 ---
@@ -74,7 +74,7 @@ READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.
 | | |
 |---|---|
 | **rows built** | **3 — `ph03`, `ph07` (both `S1`) and ⭐ `ph16` (`S2`, the FIRST outside `S1`)**. ⚠ Kept below because its lesson outlived the arithmetic: **2, and ⚠⚠ THEY WERE THE SAME FAMILY** — `ph03-uudecode-bound` and `ph07-strcut-cursor` are **both `S1`, unbounded cursor walk**, 1 of the catalogue's **20**. Both reviewed; `ph07` is being **rebuilt** at `TASK_PHP_018` (F43). Each five rungs + R1h. ⚠ **This row said *"2"* for four tasks and no document said they were one family** — the cost of that, and the quota rule that comes out of it, are open item 34 / `QUOTA_001.md`. (`ph00-smoke` is a relocated PAT calibration kernel, throwaway, **no PHP provenance**, and prices nothing) |
-| **tasks** | **26 written, `_001`–`_026`; 25 have reported; NOTHING RUNNING.** ▶ **`_026` (F50's census channel) is the only one left undispatched.** `_001` mining · `_002`–`_011` Phase 0, built and reviewed twice · `_012` catalogue corrections + row-1 prep · `_013`/`_014` **`ph03` built and reviewed** · `_015` `ph07` prep (**stalled on *"no fix exists"*, overturned — F34/F38**) · `_016`/`_017` **`ph07` built and reviewed** · **`_018` `ph07` REBUILT** (new R1h, spellings control, `extra_spans`) and **`_022` reviewed it** · `_019` the C.1/C.4 mechanism test (**9 new rows adjudicated**) · `_020` the catalogue's error rate · **`_021` STOPPED ITSELF** — 3 of 9 triggers failed, so the catalogue is **unchanged at 93** and `land_019_020.py` waits. ▶ **`_023` (review the nine, then land) is RUNNING. `_024` (`ph07`'s hashed `why` + `extra_spans`), `_025` (BUILD `ph16` — row 3, and the first outside family `S1`) and `_026` (F50's census channel, ⚠ **dispatch after `_023` lands**, because it counts catalogue rows) are WRITTEN and NOT DISPATCHED.** ⚠ **≈ 3.5 tasks per built row** against `PLAN_PHP.md` §8's PAT-measured ~3, and ⚠ **the *"and falling"* is a projection with n = 2, not a measurement** (`QUOTA_001.md` §2). ⚠ **This row was stuck at `_006` for fourteen tasks** — rule 13 |
+| **tasks** | **26 written, `_001`–`_026`; ALL 26 have reported; NOTHING RUNNING and NO TASK IS WRITTEN.** ⚠ **The manager owes the next task file** — see the START HERE box. `_001` mining · `_002`–`_011` Phase 0, built and reviewed twice · `_012` catalogue corrections + row-1 prep · `_013`/`_014` **`ph03` built and reviewed** · `_015` `ph07` prep (**stalled on *"no fix exists"*, overturned — F34/F38**) · `_016`/`_017` **`ph07` built and reviewed** · **`_018` `ph07` REBUILT** (new R1h, spellings control, `extra_spans`) and **`_022` reviewed it** · `_019` the C.1/C.4 mechanism test (**9 new rows adjudicated**) · `_020` the catalogue's error rate · **`_021` STOPPED ITSELF** — 3 of 9 triggers failed, so the catalogue is **unchanged at 93** and `land_019_020.py` waits. ▶ **`_023` (review the nine, then land) is RUNNING. `_024` (`ph07`'s hashed `why` + `extra_spans`), `_025` (BUILD `ph16` — row 3, and the first outside family `S1`) and `_026` (F50's census channel, ⚠ **dispatch after `_023` lands**, because it counts catalogue rows) are WRITTEN and NOT DISPATCHED.** ⚠ **≈ 3.5 tasks per built row** against `PLAN_PHP.md` §8's PAT-measured ~3, and ⚠ **the *"and falling"* is a projection with n = 2, not a measurement** (`QUOTA_001.md` §2). ⚠ **This row was stuck at `_006` for fourteen tasks** — rule 13 |
 | **infrastructure** | **built and reviewed TWICE**: `harness-php/{root,gate,provenance}.py` · `common-php/` · `patterns-php/{SOURCES.md,php-5.0.0.manifest}` (1170 files, 109 KB) · `.tasks-php/PROTOCOL_PHP.md` · `results-php/`. ⚠ **Reviewed is not the same as correct — the second review found a blocker in the first review's own fix.** ⚠ There used to be a SECOND row in this table also labelled `infrastructure` saying *"not yet built — Phase 0"* (`TASK_PHP_003` m1); it is gone |
 | **candidates** | **54** delivered across three axes. ⚠ **`.tasks-php/ADJUDICATION_001.md` takes that to ≈ 80**: +6 splits, −2 merges, **+17 kills reversed**, +1 dropped with no reason recorded, +4 that fell between axes. Evidence in `.tasks-php/TASK_PHP_001_MINE/` |
 | **catalogue** | ✅ **`patterns-php/CATALOGUE.md` — 102 rows, LANDED AND VERIFIED** by `TASK_PHP_023` (⚠ this line has said **91** and **93**; count it, do not trust it: `python3 .tasks-php/quota.py`). **20 mechanism families**, unchanged by the landing — spatial **42** · type **29** · temporal **31**. ✅ **Part A and Part B agree row-for-row, and every row is filed under the same axis in both** — the `ph92`/`ph93` mismatch is gone. ✅ `coverage.py` **166/166, MISSING 0**; all 8 withdrawn `C.1` kills present in place with their notes. ⚠⚠ **Two landed sentences were measured FALSE and are corrected in `CATALOGUE.md` AND in `land_019_020.py`** (F52 `ph94`'s trigger, F53 `ph32`'s *"one commit"*) — a landing script left carrying a refuted claim is a cited artefact. ⚠ **`_023` reviewed the nine admissions and would overturn NONE of `_019`'s reversals**; ~70 citations opened across 15 files, including the ones `_019` called correct. ⚠ **Parts A/B beyond the nine are still UNREVIEWED**, and `_020` measured the mechanism sentences right and the `▸ trigger` lines wrong (F46). Part A is a scannable table, Part B a ~150-word block per row, Part C the kill list with a re-derived criterion per kill |
@@ -159,7 +159,10 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > **F54 ⭐⭐ a declaration can be wrong in every number and right in every verdict** ·
 > **F55 ⚠ the preflight record is keyed by the name you typed** ·
 > **F56 ⚠⚠⚠ the compiler was already enforcing the bound the row is about, at +60.6 %** ·
-> **F57 ⭐⭐⭐ row 3: ASan blind, Miri fires, and the oracle was in upstream's own frame**
+> **F57 ⭐⭐⭐ row 3: ASan blind, Miri fires, and the oracle was in upstream's own frame** ·
+> **F58 ⭐⭐ the census channel is real — 12 sibling sites from 6 of 12 commits — but
+> the ≥5-file selector carries no signal; a NAMED WRAPPER does** ·
+> **F59 ⚠⚠ `ext/sockets/` was built and fuzzed and has zero corpus rows**
 
 ### F1 (PROVISIONAL) — `c_file_line` names the FAULTING FRAME, not the defect
 
@@ -1096,6 +1099,70 @@ That is the row engineer's job, and the window is the expensive half.
 > is this project's oldest finding: **the citation names one frame and the
 > defect lives in another.** **I applied F1 to kills and to fixes and did not
 > apply it to my own doubt.**
+
+### F59 — ⚠⚠ `ext/sockets/` WAS BUILT AND FUZZED AND HAS **ZERO** CORPUS ROWS. MY INNOCENT EXPLANATION IS REFUTED.
+
+`TASK_PHP_026` §5, and I asked for exactly this check: *"if `ext/sockets` was
+not in the built configuration, its zero rows are explained innocently."*
+✅ **It was.** Verified independently: `--enable-sockets` is in the build's own
+`config.nice`, and `sockets.o` is present in the ASan build trees.
+
+| | `sockets.c` | `streamsfuncs.c` |
+|---|---:|---:|
+| corpus rows (`index.csv`, `c_file_line`) | **0** | **6** |
+| catalogue rows | **0** | 6 |
+
+> ⭐ **So this is a finding about the CORPUS's coverage, not the catalogue's.**
+> The catalogue faithfully inherited a blind spot it did not create — and
+> `99e290f882c9` proves the C in there carries the same defect as a row we built.
+
+⚠⚠ **ONE LIMB OF THE ARGUMENT IS WEAKER THAN IT READS, AND I CHECKED IT.**
+`_026` also cites *"0 of 2534 ASan logs name it"*. True — **but 0 of 2534 name
+`streamsfuncs.c` either**, and that file has six rows. **The ASan census and the
+corpus rows are largely disjoint** (F9 said so first: *not one spatial ASan
+report is in the code the spatial axis mines*), so **the log count is not
+evidence about `sockets.c` specifically.** ✅ **The corpus-row count is, and it
+is the limb that carries the finding.**
+
+### F58 — ⭐⭐ THE CENSUS CHANNEL IS REAL: **12 UNCATALOGUED SIBLING SITES FROM 6 OF 12 FIX COMMITS** — AND THE SELECTOR THAT FOUND THEM CARRIES NO SIGNAL
+
+`TASK_PHP_026`, testing F50. **My 5–15 band is hit and the channel is not a
+one-instance curiosity.** `ph16` **3** (my n = 1 confirmed byte-exact) · `ph73`
+**3+1** · `ph23` **2** · `ph76` **2** · `ph39` **1** · `ph26` **1**.
+
+⚠⚠⚠ **BUT THE ≥ 5-FILE SELECTOR THAT PRODUCED THE LIST IS WORTHLESS.**
+Measured: files ≥ 8 → **1.00** siblings/row; files == 5 → **1.00**. **The two
+biggest commits (17 files, 16 files) yielded nothing.** ⭐ **What actually
+predicts a census is a NAMED WRAPPER in the repair** — `PHP_SAFE_FD_SET`,
+`MAKE_REAL_ZVAL_PTR`, `zend_reset_all_cv`. **All three top rows had one, and it
+is one grep per patch.** So `FIXSURVEY_001.md`'s *"12 fixes touch ≥ 5 files"*
+heading was a **liability read** of a number that is **also not a lead** — my F50
+promoted the wrong half of it.
+
+⚠ **The message triage is a good POSITIVE predictor and a bad NEGATIVE one.**
+`SWEEP` → yielded **3/3, no false positives**; but **3 of 12 were false
+negatives, worth 5 of the 12 sites (42 %).** **Drop it as a filter** — it was
+worth running once, as a control, and that is all.
+⭐ **`ph26` kills my *"REWRITE yields nothing"*.** `main/snprintf.c:296`'s
+`ap_php_cvt` is a line-for-line clone of `ph26`'s defect — same `NDIG 80`, same
+negative-`mvl` `memmove` — deleted by the same commit, and **`snprintf.c` has
+zero catalogue mentions.** ⚠ The variation is a **stack** buffer rather than
+static BSS, **which is the oracle `ph26`'s own risk note says it lacks.**
+
+⚠⚠ **AND THE ANCHORING CONTROL FAILED — MY FAULT, NOT THE AGENT'S.** The task
+said *"do not read §4 until your triage is written"*; **my launch prompt said
+*"read it in full"*.** The agent disclosed the contradiction up front and
+**correctly reports its triage as anchored.** ⭐ **The fix is structural: a
+prediction cannot be fenced inside a file the bootstrap says to read whole — put
+it in a separate file.** ✅ It also disclosed that its extractor leaked the
+diffstat on 4 of 12 rows, ⚠ **and noted that the row which REFUTES its triage is
+one of the 8 clean ones**, so the leak did not manufacture the headline.
+
+✅ **It did not adjudicate**, as instructed — §G1 is quoted at the head of its
+findings. ⭐ **Its best clean negative is the one it expected to get wrong**:
+three of `ph73`'s five `zval tmp_member` sites use the **byte-identical idiom**
+and **never publish to userland** — *the idiom is not the defect, the
+publication is*, and an idiom grep would have produced three false candidates.
 
 ### F57 — ⭐⭐⭐ ROW 3, THE FIRST OUTSIDE `S1`: THE SANITIZER IS BLIND, MIRI IS NOT, AND THE ROW'S ORACLE WAS ALREADY IN UPSTREAM'S OWN FRAME
 
@@ -2622,3 +2689,6 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 | 42 | ⚠ **THE PREFLIGHT RECORD IS KEYED BY THE TYPED NAME, NOT THE RESOLVED ROW** | F55, **manager, unreviewed**. `harness-php/` resolves an abbreviated row through `glob(<row>*)` for the WORK and keys the record on **the string you typed**, so `provenance.py ph07` operates on `ph07-strcut-cursor` and writes its history elsewhere. **Measured**: `ph00.preflight.json` (`row: ph00`, **12 runs**) beside `ph00-smoke.preflight.json` (**1 run**), and `ph07.preflight.json` (**4**) beside `ph07-strcut-cursor.preflight.json` (**16**). ⚠⚠ **The `ph00` one is COMMITTED**, since `TASK_PHP_010`. ✅ **Nothing published rests on it** — the gate reads `results-php/gate/` and `--check-stale` is 6/0 either way; **what it costs is the audit trail**, silently split by how someone typed the name. ⚠ **The fix needs a control that types both spellings and asserts one file** — §H, so not a one-liner. ⚠ **Decide whether the committed `ph00.preflight.json` is deleted or kept as the record of the defect** |
 | 43 | ⚠ **`ph00-smoke` IS NOW RETIRABLE AND NOBODY HAS RETIRED IT** | Its own `README.md` and `NOTES.md` say to delete it **once a real php row has gated green**; `ph03` and `ph07` both have. ⚠ It is a relocated PAT calibration kernel with **no PHP provenance** (`php_provenance: false`), it prices nothing, and it is **one of the 3 rows every `provenance.py --all` and every `--check-stale` bracket counts** — so the *6 records* and *3 rows checked* figures both include a fixture. ⚠⚠ **It is also the ONLY row the `php_provenance: false` path is exercised on** (item 42's sibling defect lives on that path), so retiring it removes the only live test of that branch. **Decide deliberately; do not just delete it** |
 | 44 | ⚠⚠ **`vparse` TRUNCATES A VERUS CLAUSE AT THE FIRST `{`, AND THE GATE COMPARES THE PREFIX AND PASSES** | `TASK_PHP_025` §15.5. An `ensures` written with an `if … { … } else { … }` block expression derives as a **prefix** — the reporter's came out as `"r == if not_an_array"`. ⚠⚠ **Verus is unaffected** (it reads the source), **but the `spec.md` item pin under-describes the contract and the gate passes it** — a **false-PASS** shape, not a false-fail. ✅ Worked around in `ph16` by routing the conditional through two spec helpers, so no shipped clause contains a brace; **`harness/` untouched**. ⚠⚠⚠ **The fix is in `harness/vparse.py`, which is hashed into all 33 PAT gate records — a 33-pattern re-gate for a defect no built row currently trips.** Record it, price it, do not pay it on impulse. ⚠ Sibling, same report §15.6: **a `forbidden` entry bans every backticked span in its own PROSE** — documented in `check.py`, and `ph16` is the first row to *fire* on it (**14 refusals**), with the same mistake recurring inside the text that fixed it. **Write `forbidden` prose without backticks.** ⚠ And §15.7: **foreground `sleep` is blocked here, so an `until … sleep` poll loop returns INSTANTLY and reads exactly like a completed wait** — the third distinct shape of the poller hazard, after the `pgrep` self-match (four leaked loops killed 2026-09-09) and a waiter dying while its gate succeeded |
+| 45 | ⚠⚠ **`ph73`'s `fix_commit` DOES NOT TOUCH `ph73`'s FUNCTION — R1h HUNT OWED BEFORE IT IS BUILT** | `TASK_PHP_026`, verified by the manager. `ph73` cites `Zend/zend_object_handlers.c:520-592` (`zend_std_call_user_call`); its `fix_commit` `3d7b0bab28e7` touches **5 files including that one** and contains **zero** occurrences of `call_user_call`. ⚠ **This is F38's warning firing on an unbuilt row, and in its strong form**: the column names not merely a *later* fix but a fix **in a different function of the same file**. ⚠⚠ **`ph73` carries FIVE corpus ids** (`CRASH-052/051/027/032/100`), so it is a fat row and the R1h question is not optional. **Do the hunt before the build task, not inside it** — `ph07` lost a whole task to exactly this (F34/F38) |
+| 46 | ⚠ **`ph16`'s FIX COMMIT HAS A SECOND REPAIR NOBODY HAS PRICED — 20 MORE `FD_SET`s DELETED VIA `poll(2)`, 19 RESOLVABLE IN 5.0.0** | `TASK_PHP_026` kept them **out** of its 12 and flagged it as the manager's call: same unchecked predicate and same fault primitive, **different attacker quantity** — which is `PROTOCOL_PHP.md` §G limb (b), the one place the restated rule still needs a stated level of description. ⚠ **`ph16` is BUILT, so this is not a build question but a catalogue one**: are those 19 sites a row, a variation, or the same row's other instances? ⚠⚠ **Do not settle it with the fix commit** — §G1: a shared fix is not evidence for SAME, and all 20 share one |
+| 47 | ⚠ **`FIXSURVEY_001.md` COVERS 91 OF THE NOW-102 ROWS** | `ph92`–`ph102` landed after the survey ran and have **no `fix_commit` on file**. `python3 .tasks-php/fixsurvey.py` re-run is owed before any census sweep or R1h lookup touches them. ⚠ **Cheap, and it silently under-answers until done** — a lookup that finds nothing for `ph101` looks the same as a row with no fix |
