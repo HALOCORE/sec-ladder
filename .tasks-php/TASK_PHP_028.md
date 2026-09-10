@@ -38,7 +38,14 @@ re-gated two days ago. **Read it, do not touch it.**
 spellings work and `.temp/php25/` row 3's — **reuse them.**
 
 **Bracket**: `harness/measure.py --check-stale` → **`66/0`** and
-`harness-php/gate.py --tool measure --check-stale` → **`8/0`**, first and last.
+`harness-php/gate.py --tool measure --check-stale` → **`10/0`**, first and last.
+⚠ **This line said `8/0` until 2026-09-10 and it was STALE** — `TASK_PHP_027`
+built `ph29`, and **a row adds TWO measure records**, not one. Both figures were
+re-run by the manager at dispatch. **If yours disagrees at the START, stop and
+say so**; a bracket that has already moved before you touch anything means
+someone else has been in the tree.
+⚠ `.temp/php18/` (57 files) and `.temp/php25/` (64 files) were confirmed
+**present** at dispatch. `.temp/php28/` does not exist yet — make it.
 
 ---
 
