@@ -28,7 +28,7 @@ correct -- verified here by keeping both computations side by side.
 
 Exits 1 on any missing/duplicate/unknown id, 2 if it cannot evaluate.
 """
-import csv, os, re, sys
+import csv, os, re, sys, textwrap
 
 CAT = 'patterns-php/CATALOGUE.md'
 CSV = ('/home/apt/repos_common/php-in-safe-rust/paper/evaluation/security/'
@@ -117,10 +117,33 @@ def main():
         print(f'   {a:<11} merged into {merged[a]}  by rows {covered.get(a, ["(kill list)"])}')
     print(f'ids in NO corpus namespace at all     : {len(unknown)}  {unknown or ""}')
 
+    # ⚠ A double-claim is NOT automatically a defect -- the catalogue splits by
+    # MECHANISM, so one corpus report can legitimately feed two rows. This
+    # warning used to print three ids with nothing saying which were settled and
+    # where, so every reader re-derived the same answer. Carry the verdict.
+    ADJUDICATED = {
+        frozenset(('ph77', 'ph83')):
+            "ADJUDICATED in CATALOGUE.md -- ph83's risk note: the ids are SITES "
+            "in ph77 (the zval *garbage[2] resurrect-and-queue) and the "
+            "MECHANISM in ph83 (the unbalanced PZVAL_LOCK). Corroborated: they "
+            "resolve to DIFFERENT fix commits, and PROTOCOL_PHP §G1 says a "
+            "distinct fix IS evidence for DIFFERENT.",
+        frozenset(('ph49', 'ph50')):
+            "OPEN -- RECAP_PHP.md: 'nobody has checked these two are distinct. "
+            "Flagged, not judged.' Both resolve to the SAME commit 86434be9462c, "
+            "and §G1 says a shared fix is NOT evidence for SAME, so that adds "
+            "nothing. This one is still a real question.",
+    }
     dup = {k: v for k, v in covered.items() if len(v) > 1}
     print(f'\nids claimed by MORE THAN ONE catalogue row : {len(dup)}')
     for k, v in sorted(dup.items()):
+        note = ADJUDICATED.get(frozenset(v), "⚠ UNRECORDED -- no verdict on file "
+                                             "for this pair; adjudicate it under "
+                                             "PROTOCOL_PHP.md §G before relying "
+                                             "on either row")
         print(f'   {k:<11} {v}')
+        for line in textwrap.wrap(note, 74):
+            print(f'      {line}')
 
     # ---- row sanity. `ph\d+`, and gaps from the observed RANGE.
     rows = re.findall(r'^\| (ph\d+) \|', text, re.M)
