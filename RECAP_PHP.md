@@ -47,10 +47,10 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ROWS BUILT 3 -- ph03+ph07 (S1) and ph16 (S2, FIRST NON-S1). 20 families,
         S2 now owes 1. CATALOGUED 102, VERIFIED. .memory-php/ is AUTHORITATIVE.
-NEXT    NOTHING RUNNING; _023..._026 ALL LANDED, brackets 66/0 and 8/0. ▶ _027
-        WRITTEN, NOT DISPATCHED: BUILD ph29 -- row 4, and the only row that CANNOT
-        PASS without the emalloc shim, which is why it precedes the temporal
-        axis. Then _028: discharge the spellings debt on all rows.
+NEXT    NOTHING RUNNING; _023..._026 ALL LANDED, brackets 66/0 and 8/0. TWO TASKS
+        WRITTEN, NEITHER DISPATCHED, one at a time: ▶ _027 BUILD ph29 (row 4; the
+        only row that CANNOT PASS without the emalloc shim, which is why it
+        precedes the temporal axis) · _028 the spellings debt on ph03 + ph16.
 ⚠ NEW   F56 GCC WAS ALREADY ENFORCING ph16's OWN BOUND (_FORTIFY_SOURCE=3, +60.6%);
         not ph03/ph07, checked. F57 ASan BLIND, MIRI FIRES; oracle was upstream's
         own wfds. F58 CENSUS CHANNEL REAL -- 12 sites / 6 of 12 commits -- but the
@@ -74,7 +74,7 @@ READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.
 | | |
 |---|---|
 | **rows built** | **3 — `ph03`, `ph07` (both `S1`) and ⭐ `ph16` (`S2`, the FIRST outside `S1`)**. ⚠ Kept below because its lesson outlived the arithmetic: **2, and ⚠⚠ THEY WERE THE SAME FAMILY** — `ph03-uudecode-bound` and `ph07-strcut-cursor` are **both `S1`, unbounded cursor walk**, 1 of the catalogue's **20**. Both reviewed; `ph07` is being **rebuilt** at `TASK_PHP_018` (F43). Each five rungs + R1h. ⚠ **This row said *"2"* for four tasks and no document said they were one family** — the cost of that, and the quota rule that comes out of it, are open item 34 / `QUOTA_001.md`. (`ph00-smoke` is a relocated PAT calibration kernel, throwaway, **no PHP provenance**, and prices nothing) |
-| **tasks** | **27 written, `_001`–`_027`; 26 have reported; NOTHING RUNNING.** ▶ **`_027` (build `ph29`, row 4) is WRITTEN and NOT DISPATCHED.** ⚠ **≈ 3.3 tasks per built row** at n = 3 — `PLAN_PHP.md` §8's PAT-measured figure is ~3, and this is the first time the ratio has been computed on more than two rows. `_001` mining · `_002`–`_011` Phase 0, built and reviewed twice · `_012` catalogue corrections + row-1 prep · `_013`/`_014` **`ph03` built and reviewed** · `_015` `ph07` prep (**stalled on *"no fix exists"*, overturned — F34/F38**) · `_016`/`_017` **`ph07` built and reviewed** · **`_018` `ph07` REBUILT** (new R1h, spellings control, `extra_spans`) and **`_022` reviewed it** · `_019` the C.1/C.4 mechanism test (**9 new rows adjudicated**) · `_020` the catalogue's error rate · **`_021` STOPPED ITSELF** — 3 of 9 triggers failed, so the catalogue is **unchanged at 93** and `land_019_020.py` waits. ▶ **`_023` (review the nine, then land) is RUNNING. `_024` (`ph07`'s hashed `why` + `extra_spans`), `_025` (BUILD `ph16` — row 3, and the first outside family `S1`) and `_026` (F50's census channel, ⚠ **dispatch after `_023` lands**, because it counts catalogue rows) are WRITTEN and NOT DISPATCHED.** ⚠ **≈ 3.5 tasks per built row** against `PLAN_PHP.md` §8's PAT-measured ~3, and ⚠ **the *"and falling"* is a projection with n = 2, not a measurement** (`QUOTA_001.md` §2). ⚠ **This row was stuck at `_006` for fourteen tasks** — rule 13 |
+| **tasks** | **28 written, `_001`–`_028`; 26 have reported; NOTHING RUNNING.** ▶ **`_027` (build `ph29`, row 4) and `_028` (the spellings debt on `ph03` + `ph16`) are WRITTEN and NOT DISPATCHED.** ⚠ **≈ 3.3 tasks per built row** at n = 3 — `PLAN_PHP.md` §8's PAT-measured figure is ~3, and this is the first time the ratio has been computed on more than two rows. `_001` mining · `_002`–`_011` Phase 0, built and reviewed twice · `_012` catalogue corrections + row-1 prep · `_013`/`_014` **`ph03` built and reviewed** · `_015` `ph07` prep (**stalled on *"no fix exists"*, overturned — F34/F38**) · `_016`/`_017` **`ph07` built and reviewed** · **`_018` `ph07` REBUILT** (new R1h, spellings control, `extra_spans`) and **`_022` reviewed it** · `_019` the C.1/C.4 mechanism test (**9 new rows adjudicated**) · `_020` the catalogue's error rate · **`_021` STOPPED ITSELF** — 3 of 9 triggers failed, so the catalogue is **unchanged at 93** and `land_019_020.py` waits. ▶ **`_023` (review the nine, then land) is RUNNING. `_024` (`ph07`'s hashed `why` + `extra_spans`), `_025` (BUILD `ph16` — row 3, and the first outside family `S1`) and `_026` (F50's census channel, ⚠ **dispatch after `_023` lands**, because it counts catalogue rows) are WRITTEN and NOT DISPATCHED.** ⚠ **≈ 3.5 tasks per built row** against `PLAN_PHP.md` §8's PAT-measured ~3, and ⚠ **the *"and falling"* is a projection with n = 2, not a measurement** (`QUOTA_001.md` §2). ⚠ **This row was stuck at `_006` for fourteen tasks** — rule 13 |
 | **infrastructure** | **built and reviewed TWICE**: `harness-php/{root,gate,provenance}.py` · `common-php/` · `patterns-php/{SOURCES.md,php-5.0.0.manifest}` (1170 files, 109 KB) · `.tasks-php/PROTOCOL_PHP.md` · `results-php/`. ⚠ **Reviewed is not the same as correct — the second review found a blocker in the first review's own fix.** ⚠ There used to be a SECOND row in this table also labelled `infrastructure` saying *"not yet built — Phase 0"* (`TASK_PHP_003` m1); it is gone |
 | **candidates** | **54** delivered across three axes. ⚠ **`.tasks-php/ADJUDICATION_001.md` takes that to ≈ 80**: +6 splits, −2 merges, **+17 kills reversed**, +1 dropped with no reason recorded, +4 that fell between axes. Evidence in `.tasks-php/TASK_PHP_001_MINE/` |
 | **catalogue** | ✅ **`patterns-php/CATALOGUE.md` — 102 rows, LANDED AND VERIFIED** by `TASK_PHP_023` (⚠ this line has said **91** and **93**; count it, do not trust it: `python3 .tasks-php/quota.py`). **20 mechanism families**, unchanged by the landing — spatial **42** · type **29** · temporal **31**. ✅ **Part A and Part B agree row-for-row, and every row is filed under the same axis in both** — the `ph92`/`ph93` mismatch is gone. ✅ `coverage.py` **166/166, MISSING 0**; all 8 withdrawn `C.1` kills present in place with their notes. ⚠⚠ **Two landed sentences were measured FALSE and are corrected in `CATALOGUE.md` AND in `land_019_020.py`** (F52 `ph94`'s trigger, F53 `ph32`'s *"one commit"*) — a landing script left carrying a refuted claim is a cited artefact. ⚠ **`_023` reviewed the nine admissions and would overturn NONE of `_019`'s reversals**; ~70 citations opened across 15 files, including the ones `_019` called correct. ⚠ **Parts A/B beyond the nine are still UNREVIEWED**, and `_020` measured the mechanism sentences right and the `▸ trigger` lines wrong (F46). Part A is a scannable table, Part B a ~150-word block per row, Part C the kill list with a re-derived criterion per kill |
@@ -2642,6 +2642,27 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 **and nobody has checked that either.**
 
 ## Open items — carried, not closed
+
+⚠ **THE NUMBERS HAVE GAPS AND THAT IS CORRECT — DO NOT "REPAIR" THEM.** 33 rows
+run 1 → 47; **4, 7, 10, 12, 18–25, 27 and 31 are RETIRED**, closed and removed,
+and their numbers are never reused. The table is **sorted**, has **no
+duplicates**, and every citation elsewhere resolves to a stable number.
+✅ Check it rather than eyeballing it:
+
+```sh
+python3 - <<'EOF'
+import re; s=open('RECAP_PHP.md').read(); sec=s[s.index('## Open items'):]
+n=[int(m) for m in re.findall(r'^\| (\d+) \|', sec, re.M)]
+print(len(n), 'rows,', 'sorted' if n==sorted(n) else '⚠ UNSORTED',
+      '| dups:', [x for x in set(n) if n.count(x)>1] or 'none',
+      '| retired:', sorted(set(range(1, max(n)+1))-set(n)))
+EOF
+```
+
+⚠ **The manager spent real effort re-deriving this once**, because a summary had
+described the table as *"1..37, a permutation"* when it had **23 rows** — the
+count and the highest number are different facts and the shorter sentence was
+the wrong one.
 
 | # | item | note |
 |---|---|---|

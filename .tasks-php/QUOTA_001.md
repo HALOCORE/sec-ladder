@@ -17,6 +17,27 @@ open in a running agent).
 S1  unbounded cursor walk   9 rows   <== ph03 AND ph07
 ```
 
+⚠⚠ **THAT BLOCK IS THE STATE AT `TASK_PHP_020`. IT IS NOW STALE AND KEPT ONLY
+BECAUSE §2 ONWARDS ARGUES FROM IT.** Re-derived 2026-09-10 (`quota.py`):
+
+```
+102 rows in 20 mechanism families   spatial 42 · type 29 · temporal 31
+S1  unbounded cursor walk   9 rows   <== ph03, ph07     (open)
+S2  a guard that runs and is wrong   8 rows  <== ph16   (owes 1)
+                                     18 other families owe 2 each
+built 3 · floor 40 · still owed 37
+```
+
+⭐⭐ **THE FACT §1 IS BUILT ON IS NOW HALF-REPAIRED, AND THE OTHER HALF IS
+WORSE.** `ph16` (`TASK_PHP_025`) is the first row outside `S1`, so *"both built
+rows are the same family"* no longer holds. ⚠⚠ **But all three built rows are
+SPATIAL, and the TYPE and TEMPORAL axes have ZERO** — 60 catalogued rows, no
+measurement. **The between-family gap this file was written about is smaller
+than the between-AXIS gap nobody had named.** `TASK_PHP_027` takes `ph29`
+(spatial) anyway, on a stated reason about the allocator shim that the temporal
+axis depends on — **that reason is in `_027` §0 and it is the manager's, so
+attack it there.**
+
 ⚠⚠ **THOSE NUMBERS WERE COUNTED BY HAND, ONCE, AGAINST A CATALOGUE TWO RUNNING
 TASKS WERE EDITING. RE-DERIVE THEM — DO NOT TRUST THIS BLOCK:**
 

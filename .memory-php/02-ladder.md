@@ -47,6 +47,12 @@
   (`PROTOCOL_PHP.md` §C). ⚠ **Set beside `ph03`: of two shipped security fixes,
   one was half dead and half incomplete, the other half wrong. NEITHER WAS
   MINIMAL NOR SUFFICIENT AS SHIPPED.**
+  ⚠⚠ **A THIRD ROW BREAKS THE RUN, AND IT IS UNREVIEWED — `RECAP_PHP.md` F57.**
+  `ph16`'s `99e290f882c9` is reported **complete and minimal** for the
+  memory-safety defect. **n = 3 now, and the sentence above is true of the two
+  rows it names and NOT of the population** — which is what it was starting to
+  be read as. **Nothing here is retracted until a reviewer has looked**; the
+  pointer is so the next agent does not generalise from two.
 - ⭐⭐⭐ **AND ONLY THE VALUE POSTCONDITION MOVED. A memory-safety-only proof
   cannot see the difference at ANY strength.** Demonstrated by construction, not
   asserted (`TASK_PHP_022` §1): a mechanical weakening of `ph07`'s `verus.rs`
@@ -190,3 +196,12 @@
   ⚠⚠ **`ph03` has still searched NEITHER side and is unbounded in BOTH
   directions.** (F39, corrected by `TASK_PHP_017` §2.4; discharged for `ph07`
   only.)
+  ⚠⚠ **AND SO DOES `ph16`, DELIBERATELY.** Row 3 (`TASK_PHP_025`) was told to
+  say if carrying `controls/spellings.py` made the build two tasks; **it did**,
+  so the row shipped with the debt declared in three places. ⚠⚠⚠ **`ph16`'s
+  `R3ship − R4ship` is NEGATIVE — safe-tuned measures CHEAPER than unsafe — so
+  no figure in that row is a `fixed-R4 bound` at all**, and whether that is a
+  real non-monotone ladder or a spelling artefact is **unknown**.
+  ▶ **`TASK_PHP_028` discharges both rows; it is written and not dispatched.**
+  **2 of 3 built rows are unbounded in both directions** — this is the largest
+  standing threat to the programme's headline quantity.
