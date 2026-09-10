@@ -92,6 +92,23 @@ def selftest():
     else:
         print("            ✅ silent")
 
+    # ⚠ Regression guard for the `break` that reported one fix per fat row. A
+    # test that only counted rows would pass with the break still in, because
+    # the break never lost a ROW -- it lost the 2nd..nth ID of a row.
+    fat = sorted((ph for ph in cat
+                  if len([c for c in cat[ph] if sighted.get(c)]) > 1),
+                 key=lambda s: int(s[2:]))
+    n_ids = sum(len([c for c in cat[ph] if sighted.get(c)]) for ph in fat)
+    print(f"MUST-FIRE   rows with >1 resolvable id (the `break` reported 1 each):")
+    print(f"            {len(fat)} rows, {n_ids} ids, "
+          f"{n_ids - len(fat)} of them formerly unexamined")
+    if fat:
+        print(f"            e.g. {fat[:6]}  ✅ fires -- fat rows exist, so the")
+        print("               per-id walk is load-bearing and must not regress")
+    else:
+        print("            ❌ DID NOT FIRE: no fat rows, so this guard is inert")
+        ok = False
+
     print(f"\nselftest: {'PASS' if ok else 'FAIL'}   "
           f"({len(seen)} catalogue rows, {len(cat)} with an id)")
     return 0 if ok else 1
@@ -191,7 +208,18 @@ def main():
             rec["verdict"] = ("same-file" if defect_file in rec["files"]
                               else "OTHER-FILE")
             res.setdefault(ph, []).append(rec)
-            break        # one id per row is enough
+            # ⚠⚠ THERE WAS A `break` HERE -- "one id per row is enough". It was
+            # not. A FAT ROW CARRIES ONE fix_commit PER ID, and stopping at the
+            # first reported one fix and hid the rest: 68 ids across 31 rows were
+            # never looked at, and 30 of those rows have ids naming DIFFERENT
+            # commits (ph82 is 9 ids -> 9 commits).
+            #
+            # This is what made open item 45 look like "ph73's fix_commit does
+            # not touch ph73's function". TASK_PHP_029 showed the column is
+            # RIGHT: 3d7b0bab28e7 is the exact fix for CRASH-052, while the
+            # catalogue's cited span is CRASH-051's, fixed by 235e6c0afe1d. The
+            # catalogue was right and the single-record output was what looked
+            # wrong -- a tool defect that spent a manager's open item.
 
     json.dump({"rows": res, "unmapped_rows": unmapped,
                "unfetched": unfetched}, open(os.path.join(OUT, "fixsurvey.json"), "w"),
@@ -215,6 +243,23 @@ def main():
               "rows without a fix, they are rows NOBODY LOOKED UP:")
         for x in sorted(unres, key=lambda r: int(r["row"][2:])):
             print(f"   {x['row']:6} {x['id']}")
+
+    # ---- ID SPREAD -------------------------------------------------------
+    # ⚠ Counts above are per RECORD, and a fat row now contributes several. This
+    # section is per ROW, and it is the useful selector: a row whose ids name
+    # DIFFERENT commits has no single "the fix", so §F5's "kernel_hardened.c =
+    # the real fix_commit, sha-pinned" has no spelling for it until someone
+    # decides which. TASK_PHP_029 measured this as nearly ORTHOGONAL to the
+    # fix-date selector (date 31, id-spread 30, overlap only 10).
+    spread = []
+    for ph, recs in res.items():
+        shas = {r["sha"] for r in recs if r.get("sha")}
+        if len(shas) > 1:
+            spread.append((ph, len(recs), len(shas)))
+    print(f"\n⚠ ROWS WHOSE IDS NAME DIFFERENT fix_commits: {len(spread)} of {len(res)}")
+    print("  (these owe an R1h decision BEFORE a build task, not inside one)")
+    for ph, n, s in sorted(spread, key=lambda t: (-t[2], int(t[0][2:])))[:12]:
+        print(f"   {ph:6} {n} ids -> {s} distinct fix commits")
     print("\n⚠ ROWS WHOSE FIX IS IN A DIFFERENT FILE FROM THE DEFECT "
           "(the ph07 shape -- a function-name search cannot find these):\n")
     print("| row | id | sha | defect file | fix touches | subject |")
