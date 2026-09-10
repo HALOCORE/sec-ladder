@@ -85,11 +85,11 @@ corpus's**. `echoes` is a reading throughout this file (§0.3, §9.4) — for th
 |---|---|---|---|---|---|---|---|
 | ph01 | spatial | limit initialised to the start; refill hook is a no-op | narrowed | I1/O3 | CRASH-066 | p16 | catalogued |
 | ph02 | spatial | blind fixed `+2` advance of the caller's cursor | narrowed | I1/O1 | CRASH-120 | p16 | catalogued |
-| ph03 | spatial | loop bound computed from a length byte inside the data | verbatim | I1/O2 | CRASH-115, V5C-116 | p16 | catalogued |
+| ph03 | spatial | loop bound computed from a length byte inside the data | verbatim | I1/O2 | CRASH-115, V5C-116 | p16 | **BUILT** |
 | ph04 | spatial | fixed forward peeks; then a length counter desynced from its cursor | narrowed | I1/O1, I11/O2 | CRASH-110, CRASH-073 | p16, p24 | catalogued |
 | ph05 | spatial | end-pointer built from a clamp evaluated at 32 bits | narrowed | I11/O2 | CRASH-102 | p24 | catalogued |
 | ph06 | spatial | the bound is not a parameter, so no bound is in scope | narrowed | I1/O1 | CRASH-091 | — | catalogued |
-| ph07 | spatial | an `mblen_table` cursor loop whose only exit is `n > from` | narrowed | I1/O1 | CRASH-124 | p16 | catalogued |
+| ph07 | spatial | an `mblen_table` cursor loop whose only exit is `n > from` | narrowed | I1/O1 | CRASH-124 | p16 | **BUILT** |
 | ph08 | spatial | lookahead consumes the NUL terminator as data | verbatim | I1/O3 | CRASH-016 | p16 | catalogued |
 | ph09 | spatial | leading NUL is an in-band tag; the empty string collides | verbatim | I1/O1 | CRASH-033 | p35 | catalogued |
 | ph10 | spatial | one bounds check serves two branches of different widths | narrowed | I1/O1 | CRASH-094 | p16 | catalogued |
@@ -111,7 +111,7 @@ corpus's**. `echoes` is a reading throughout this file (§0.3, §9.4) — for th
 | ph26 | spatial | negative `memmove` length into a fixed 80-byte static buffer | verbatim | I11/O2 | CRASH-149 | p13 | catalogued |
 | ph27 | spatial | `1 + buf_len + 2*new_l` wraps; emit walks a bare output cursor | modelled | I11/O1 | CRASH-009 | p13 | catalogued |
 | ph28 | spatial | `uint`→`int` store; the NEXT concat memcpys at a negative offset | verbatim | I11/O2 | CRASH-147 | p13 | catalogued |
-| ph29 | spatial | `emalloc(n+1)` where the allocator truncates n mod 2^32 | narrowed | I11/O2 | CRASH-097 | — | catalogued |
+| ph29 | spatial | `emalloc(n+1)` where the allocator truncates n mod 2^32 | narrowed | I11/O2 | CRASH-097 | — | **BUILT** |
 | ph30 | spatial | an unclamped scale wraps the `length+scale` allocation size | narrowed | I11/O1 | CRASH-133 | p13 | catalogued |
 | ph31 | spatial | `long` day number truncated to `int`, then `sprintf` into `char[16]` | verbatim | I11/O2 | CRASH-135 | p13 | catalogued |
 | ph32 | spatial | a range declared in one place, a table literal sized in another | verbatim | I1/O2 | CRASH-089 | p27 | catalogued |
@@ -1245,7 +1245,10 @@ corpus does not have"; that is correct and expected.
    cannot speak to the spatial axis at all: ✅ **zero of its 2520 spatial
    reports fault in `Zend/` or `ext/standard/`** — 2156 fault inside
    `libmysqlclient.so.14`'s XML charset parser and 364 in the regex matcher
-   (`ADJUDICATION_001.md` §8b, re-derived from `.temp/san_tests/asan-logs`).
+   (`.tasks-php/ADJUDICATION_001.md` §8b, which is the committed evidence —
+   it carries the counts, the breakdown and a pasted sample fault chain.
+   ⚠ The raw ASan log tree it was derived from is **gone** per rule 1 and
+   nothing rebuilds it — §8b names the path and is what survives).
    Frequency evidence for spatial rows does not exist yet.
 4. **`echoes` is a reading, not a measurement.** No `pNN` was re-opened to
    confirm the mechanism match; treat every one as a hypothesis to check when

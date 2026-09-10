@@ -17,7 +17,11 @@ commits checked by hand are LATER fixes** (`ph12`, `ph21`, `ph22`), and only a
 tag comparison settles that. **A `same` verdict is a starting point, never a
 licence.**
 
-## Summary — ✅ complete coverage
+## Summary
+
+⚠⚠⚠ **THIS TABLE IS THE STATE AT 91 ROWS AND ONE ID PER ROW. IT IS SUPERSEDED —
+SEE THE BLOCK BELOW IT — AND IT IS KEPT ONLY BECAUSE THE PER-ROW TABLES FURTHER
+DOWN STILL ARGUE FROM IT.** Do not quote these numbers.
 
 | | |
 |---|---|
@@ -26,6 +30,52 @@ licence.**
 | fix touches the **same file** as the defect | **82** |
 | ⚠ fix is in **another file** — the `ph07` shape | **8** |
 | ⚠⚠ **no sha exists** | **1** — `ph36`, cell reads `(bison-regeneration; no single commit)` |
+
+### ✅ CURRENT, re-derived 2026-09-10 — and the shape of the answer changed
+
+⚠⚠ **Two defects in the tool were fixed on 2026-09-10 and BOTH moved these
+numbers** (`RECAP_PHP.md` F62, F63):
+
+1. **A third id namespace.** 22 corpus ids live only in `merged_members`;
+   `ph94`/`ph95` cite one **and nothing else** and were silently dropped while
+   `unmapped: 0` still printed.
+2. ⭐ **A `break` — *"one id per row is enough"*. It was not.** A fat row carries
+   **one `fix_commit` per id**. **31 rows carry >1 resolvable id, 99 between
+   them, so 68 were never examined.**
+
+```
+catalogue rows                     102   (was 91)
+resolved RECORDS                   169   (was 90 -- this is now per ID, not per ROW)
+  same file as the defect          151
+  ⚠ another file (the ph07 shape)   18   (was 8 -- ELEVEN more of the shape
+                                          this survey exists to find)
+  ⚠⚠ no sha                          1   ph36, unchanged and legitimate
+⚠ rows whose ids name DIFFERENT fix_commits   30 of 102   (ph82 is 9->9, ph78 7->7)
+```
+
+⚠⚠ **`ph73` IS THE WORKED EXAMPLE AND IT RETIRED AN OPEN ITEM.** Item 45 read
+*"`ph73`'s `fix_commit` does not touch `ph73`'s function"*. **The column was
+right**: `3d7b0bab28e7` is the exact fix for **CRASH-052**, while the catalogue's
+cited span is **CRASH-051's**, fixed by `235e6c0afe1d`. **The catalogue was
+correct and this tool's output was what looked wrong.**
+
+⭐⭐ **AND THE "only a tag comparison settles that" LINE ABOVE IS NO LONGER TRUE.**
+`TASK_PHP_030` built a **proof of exclusion** that needs no tags and no network:
+
+```sh
+python3 .tasks-php/preimage_screen.py --selftest   # ten negatives, 9/9 ground truth
+python3 .tasks-php/preimage_screen.py --all
+```
+
+> If a `fix_commit`'s patch touches the defect's file but its **PRE-IMAGE** does
+> not contain the 5.0.0 text, **that commit is not the repair.**
+
+**170 records: 43 NOT-THE-REPAIR (⚠ only 33 with positive evidence — cite 33/43,
+never 43) · 106 CANDIDATE · 18 INAPPLICABLE · 2 NO-SPAN · 1 NO-SHA.**
+⚠ **`CANDIDATE` means only *"could not exclude"*, and 100 of the 106 have never
+been looked at by anyone.**
+✅ It settled `ph95` (`db420cb6a141…`, bug #78833) and gave **`ph22`** a sha
+(`6d98fc38b53c…`) where this file had only a tag bracket.
 
 ⚠ **An earlier version of this file reported 84 rows and 7 "unmapped".** The
 corpus uses **three** id prefixes — `CRASH-`, `V5C-` **and `LOGIC-`** — and the

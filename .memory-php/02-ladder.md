@@ -53,6 +53,17 @@
   rows it names and NOT of the population** — which is what it was starting to
   be read as. **Nothing here is retracted until a reviewer has looked**; the
   pointer is so the next agent does not generalise from two.
+  ⚠⚠⚠ **A FOURTH ROW, AND IT SWINGS BACK — ALSO UNREVIEWED (`RECAP_PHP.md`
+  F65).** `ph29` (`TASK_PHP_027`) measured **BOTH** stages of its upstream fix
+  and reports that **NEITHER removes the row's defect**: stage 2 buys *exactly
+  two values of `to_read`* over stage 1 and removes **ZERO** truncation faults,
+  and the stage-1 guard is **over-broad** — it refuses `to_read == 0`, which was
+  never a fault. ⭐ **So at n = 4 the tally is: two shipped fixes not minimal and
+  not sufficient (`ph03`, `ph07`), one complete and minimal (`ph16`), and one
+  where neither of two candidate stages closes the defect at all (`ph29`).**
+  ⚠⚠ **THE HONEST READING IS THAT THERE IS NO RUN AND NEVER WAS ONE** — four
+  rows, four different answers. **Do not generalise from any of them until a
+  reviewer has been over `_027` and `_025`.**
 - ⭐⭐⭐ **AND ONLY THE VALUE POSTCONDITION MOVED. A memory-safety-only proof
   cannot see the difference at ANY strength.** Demonstrated by construction, not
   asserted (`TASK_PHP_022` §1): a mechanical weakening of `ph07`'s `verus.rs`
@@ -202,6 +213,25 @@
   `R3ship − R4ship` is NEGATIVE — safe-tuned measures CHEAPER than unsafe — so
   no figure in that row is a `fixed-R4 bound` at all**, and whether that is a
   real non-monotone ladder or a spelling artefact is **unknown**.
-  ▶ **`TASK_PHP_028` discharges both rows; it is written and not dispatched.**
-  **2 of 3 built rows are unbounded in both directions** — this is the largest
-  standing threat to the programme's headline quantity.
+  ⚠⚠⚠ **AND SO DOES `ph29`, AND ITS SPREAD IS NEGATIVE TOO — UNREVIEWED
+  (`RECAP_PHP.md` F65).** Row 4 (`TASK_PHP_027`) measured **`R3 − R4` at
+  −6.1 %/−6.4 %**, the same direction as `ph16` and larger.
+  ⭐⭐ **THAT IS THE PART WORTH NOTICING: TWO INDEPENDENTLY BUILT ROWS, IN
+  DIFFERENT FAMILIES, PUT SAFE-TUNED CHEAPER THAN UNSAFE.** Re-derived by the
+  manager from the published tables (`Ir`, O3/isolated), **not taken from a
+  report**:
+
+  ```
+  ph03   R3 191,208,596  R4 170,434,489   +12.19 %   POSITIVE
+  ph16   R3  88,874,724  R4  89,974,452    -1.22 %   NEGATIVE
+  ph29   R3  23,441,029  R4  24,951,895    -6.06 %   NEGATIVE
+  ```
+
+  ⚠⚠ **n = 2, and both came off the same machinery, so this is NOT yet an effect
+  and must not be reported as one** — but it is materially harder to explain as a
+  per-row spelling artefact than one row was. ⚠ **`ph03` is POSITIVE and belongs
+  to the other case** — it owes the search because it is unbounded on both
+  sides, not because its sign is odd. **`TASK_PHP_028` is how we find out.**
+  ▶ **`TASK_PHP_028` discharges all THREE rows; it is written and not
+  dispatched.** **3 of 4 built rows are unbounded in both directions** — this is
+  the largest standing threat to the programme's headline quantity.

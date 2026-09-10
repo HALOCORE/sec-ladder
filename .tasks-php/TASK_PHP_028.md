@@ -1,4 +1,24 @@
-# TASK_PHP_028 — discharge the spellings debt on `ph03` and `ph16`
+# TASK_PHP_028 — discharge the spellings debt on `ph03`, `ph16` and `ph29`
+
+⚠⚠ **SCOPE GREW ON 2026-09-10 AND THE TITLE USED TO SAY TWO ROWS.** `TASK_PHP_027`
+built `ph29`. **THREE of the four built rows now owe this** — ⚠ **but NOT for the
+same reason, and an earlier draft of this line said they did.** Re-derived from
+the published tables (`Ir`, O3/isolated):
+
+```
+ph03   safe_tuned 191,208,596   unsafe 170,434,489   R3-R4 = +12.19 %  POSITIVE
+ph16   safe_tuned  88,874,724   unsafe  89,974,452   R3-R4 =  -1.22 %  NEGATIVE
+ph29   safe_tuned  23,441,029   unsafe  24,951,895   R3-R4 =  -6.06 %  NEGATIVE
+```
+
+- **`ph03`** owes it because it has searched **neither side** and is unbounded in
+  **both** directions. Its spread is an ordinary positive one.
+- **`ph16` and `ph29`** owe it because their spread is **negative**, so no figure
+  in either row is a `fixed-R4 bound` **at all**.
+
+⚠ **Read every "two rows" below as THREE**; those sections were written when it
+was two and their argument is unchanged.
+⭐ **`ph07` remains the ONLY discharged row and the only template.**
 
 **Role:** research **engineer**. **One agent, alone.**
 **Report:** `.tasks-php/TASK_PHP_028_REPORT.md` — **write the FILE** (rule 10).
@@ -24,7 +44,7 @@ spellings work and `.temp/php25/` row 3's — **reuse them.**
 
 ## §1 Why this is its own task
 
-**Two of the three built rows publish ratios that are not bounded cost
+**THREE of the four built rows publish ratios that are not bounded cost
 statements**, and that undermines the one thing this programme exists to
 measure. `.memory-php/02-ladder.md`:
 
@@ -41,7 +61,7 @@ row is a `fixed-R4 bound` at all.**
 
 ## §2 What ships, per row
 
-Two numbers, **labelled**, for `ph03` and for `ph16`:
+Two numbers, **labelled**, for `ph03`, `ph16` and `ph29`:
 
 ```
 fixed-R4 bound              R3ship - R4ship          both held by fiat
@@ -87,16 +107,27 @@ whole point of the exercise.
 
 ## §4 What I am least sure of
 
-1. ⚠⚠ **That `ph16`'s negative `R3ship − R4ship` is a debt rather than a
-   result.** Row 3 measured R3 at **−3.5 %** and R4/R5 at **−2.3 %** against
-   `c-gcc`, so **safe-tuned is CHEAPER than unsafe on that row** — which may be
-   real (the `unsafe` rung has a bounds-check-free path the optimiser was
-   already producing) or may be a spelling artefact. **This task is how we find
-   out, and if the answer is "the ladder is genuinely non-monotone here", that
-   is a headline result and not a defect.**
-2. ⚠ **That one task covers two rows.** If the first row's search is honest and
-   expensive, **stop, ship it, and say the second needs its own task** — that is
-   what `TASK_PHP_025` did and it was the right call.
+1. ⭐⭐ **THAT THE NEGATIVE `R3ship − R4ship` IS A DEBT RATHER THAN A RESULT — AND
+   THIS GOT MUCH MORE INTERESTING ON 2026-09-10.** It is no longer one row:
+
+   ```
+   ph16   R3 -3.5 %   R4/R5 -2.3 %   vs c-gcc     safe-tuned CHEAPER than unsafe
+   ph29   R3 - R4 = -6.1 % / -6.4 %                same direction, bigger
+   ```
+
+   **Two independently built rows, different families, same sign.** ⚠ That is
+   weak evidence for a *systematic* effect (the `unsafe` rung has a
+   bounds-check-free path the optimiser was already producing anyway) and
+   correspondingly weaker evidence for a per-row spelling artefact. ⚠⚠ **But n = 2
+   and both were built by the same machinery, so do NOT report it as an effect** —
+   **this task is how we find out.** ⭐ **If the answer is "the ladder is
+   genuinely non-monotone here", that is a headline result, not a defect** — and
+   with two rows it would be the strongest cost finding the programme has.
+2. ⚠ **That one task covers THREE rows.** If the first row's search is honest and
+   expensive, **stop, ship it, and say the rest need their own task** — that is
+   what `TASK_PHP_025` did and it was the right call. ⭐ **Prefer `ph16` or `ph29`
+   first**, because they carry §4.1's question; `ph03` is the one that may not be
+   searchable at all (§4.3).
 3. ⚠⚠ **That searching is even well-defined on `ph03`.** ⚠ **`ph03`'s
    declaration backticks nothing**, so `spellings` is 0 and admission is decided
    by prose plus one grep — the exact condition that made PAT's `p05` audit

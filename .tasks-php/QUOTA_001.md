@@ -28,15 +28,38 @@ S2  a guard that runs and is wrong   8 rows  <== ph16   (owes 1)
 built 3 · floor 40 · still owed 37
 ```
 
+⚠ **SUPERSEDED 2026-09-10 — `TASK_PHP_027` built `ph29` (S3).** Current:
+
+```
+built rows  4   ph03, ph07 (S1)  ·  ph16 (S2)  ·  ph29 (S3)
+S1  9 rows  n=2  OPEN     S2  8 rows  n=1 OWES 1     S3  17 rows  n=1 OWES 1
+floor = 40 · built 4 · still owed 36
+```
+
+⚠⚠ **AND THE AXIS GAP DID NOT CLOSE — IT WIDENED IN IMPORTANCE.** All **four**
+built rows are **SPATIAL**; **TYPE (29) and TEMPORAL (31) are still ZERO**.
+✅ `ph29`'s reason for jumping the queue is now **discharged**, so the argument
+that deferred the temporal axis has been spent: it was *"`ph29` is the only row
+that cannot pass unless the allocator shim is faithful"*, and `TASK_PHP_027`
+proved the shim (F65). **There is no longer a stated reason to build a fifth
+spatial row before a temporal one.**
+
 ⭐⭐ **THE FACT §1 IS BUILT ON IS NOW HALF-REPAIRED, AND THE OTHER HALF IS
 WORSE.** `ph16` (`TASK_PHP_025`) is the first row outside `S1`, so *"both built
-rows are the same family"* no longer holds. ⚠⚠ **But all three built rows are
+rows are the same family"* no longer holds. ⚠⚠ **But all FOUR built rows are
 SPATIAL, and the TYPE and TEMPORAL axes have ZERO** — 60 catalogued rows, no
 measurement. **The between-family gap this file was written about is smaller
-than the between-AXIS gap nobody had named.** `TASK_PHP_027` takes `ph29`
+than the between-AXIS gap nobody had named.** `TASK_PHP_027` took `ph29`
 (spatial) anyway, on a stated reason about the allocator shim that the temporal
-axis depends on — **that reason is in `_027` §0 and it is the manager's, so
-attack it there.**
+axis depends on — ⚠ **that reason is now SPENT: the shim is proven (F65), so it
+cannot be used again.** ⭐ **The next row should be TEMPORAL unless someone
+states a new reason.** The manager's finalists are in `RECAP_PHP.md`'s box:
+**`ph64`** (8-line `zend_llist_apply`, ONE corpus id, write-after-free) against
+**`ph61`** (5 ids / 5 fix commits, so it also owes item 48's §F5-for-five call).
+⚠⚠ **The manager's stated reason for `ph64` is that it is the smallest honest
+specimen — which is the CHEAPEST-NEXT heuristic §3 exists to remove. It is
+defended on the grounds that the maximal-difference clause governs the SECOND
+row in a family and both `E1`/`E2` are at n = 0. ATTACK THAT, do not accept it.**
 
 ⚠⚠ **THOSE NUMBERS WERE COUNTED BY HAND, ONCE, AGAINST A CATALOGUE TWO RUNNING
 TASKS WERE EDITING. RE-DERIVE THEM — DO NOT TRUST THIS BLOCK:**

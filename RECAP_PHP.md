@@ -47,10 +47,10 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ROWS BUILT 4 -- ph03+ph07 (S1), ph16 (S2), ph29 (S3). ⚠⚠ ALL FOUR SPATIAL;
         TYPE+TEMPORAL ZERO vs 60 of 102 catalogued. .memory-php/ is AUTHORITATIVE.
-NEXT    NOTHING RUNNING; _027/_029/_030 LANDED, brackets 66/0 and 10/0 (a row adds
-        TWO measure records). ▶ _028 SPELLINGS DEBT, now THREE of four rows (ph03,
-        ph16, ph29 -- all R3-R4 NEGATIVE), then THE FIRST TEMPORAL ROW: ph64
-        (8-line zend_llist_apply, ONE id); ph61 is 5-id/5-commit, so it owes §F5.
+NEXT    NOTHING RUNNING; _027/_029/_030 LANDED, brackets 66/0 and 10/0. ▶ _028
+        SPELLINGS DEBT, 3 of 4 rows: ph03 +12.2% (unbounded BOTH sides) · ⚠ ph16
+        -1.2% + ph29 -6.1% NEGATIVE, two families, safe-tuned CHEAPER than unsafe.
+        THEN THE FIRST TEMPORAL ROW: ph64 (8-line, ONE id); ph61 owes §F5 too.
 ⚠ NEW   F60 ph16 guard (c) MEASURED -- kernel writes past the fd_set at nfds=1025;
         my probe was wrong TWICE, both answer-encoding. F61 date + id-spread
         selectors measured, NEITHER promoted. F62 a THIRD id namespace. F63 ITEM 45

@@ -57,7 +57,10 @@
   pattern reported presence where the hit was in a different function, **and
   neither error is visible from its own output.** **Ask a question about a
   FUNCTION, not about text.**
-- ⚠ **`.temp/san_tests/`'s ASan census cannot speak to the spatial axis.**
+- ⚠ **The ASan census cannot speak to the spatial axis.** (Evidence:
+  `.tasks-php/ADJUDICATION_001.md` §8b. ⚠ The raw ASan log tree it was derived
+  from is **gone** per rule 1 and nothing rebuilds it; §8b names the path, and
+  carries the counts and a pasted sample fault chain, so it is what survives.)
   3 199 reports, and **zero of the 2 520 spatial ones fault in `Zend/` or
   `ext/standard/`** — 2 156 are inside `libmysqlclient.so.14`'s XML charset
   parser, a different shared object. Every spatial `hotness` field is
