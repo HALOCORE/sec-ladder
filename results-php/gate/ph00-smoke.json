@@ -118,8 +118,8 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
     "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
-    "patterns/ph00-smoke/NOTES.md": "296244a1629619a31cbece6235ffc18b85e6b153f149350e5307e2d0010ac0ed",
-    "patterns/ph00-smoke/README.md": "850f67da40738dc52d95cac1a0cb40d9001338b7ffecf07807784424c9025578",
+    "patterns/ph00-smoke/NOTES.md": "393299450d95623c9741136e8b7513607cd27ee4c7b70f1bcb37794b6665c23c",
+    "patterns/ph00-smoke/README.md": "504cd35d5ed9e9f7ecf00a55210d92772d76e7b38f90a005245b0d697c99f395",
     "patterns/ph00-smoke/c/emalloc_shim.h": "aa9abf48535e8df93c9398e96c044697a784d73c40d7a7ccc830b5ee308c378f",
     "patterns/ph00-smoke/c/kernel.c": "1b79c738a5ab4da534d62a931919ec2d16a6add4f3710b29a347e16b88c96fe7",
     "patterns/ph00-smoke/c/kernel.h": "2eaee3e8be741b9ef00a9d6061e72f8ab6199143724b2438251c7032db01add4",
@@ -1649,5 +1649,5 @@
   ],
   "verdict": "PASS-WITH-BLOCKED-ROWS",
   "complete_run": true,
-  "invocation": "ph00"
+  "invocation": "ph00-smoke"
 }

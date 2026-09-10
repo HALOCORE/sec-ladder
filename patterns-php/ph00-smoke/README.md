@@ -1,6 +1,21 @@
 # `ph00-smoke` — the pipeline's own smoke test
 
-⚠⚠⚠ **NOT A PHP ROW. NOT A RESULT. DELETE ONCE A REAL PHP ROW IS GREEN.**
+⚠⚠⚠ **NOT A PHP ROW. NOT A RESULT.**
+
+⚠⚠ **THIS LINE USED TO SAY *"DELETE ONCE A REAL PHP ROW IS GREEN"*. FOUR ARE
+GREEN, AND THE DECISION IS TO KEEP IT — `RECAP_PHP.md` OPEN ITEM 43, DECIDED
+2026-09-10.** It is the **only row that exercises the `php_provenance: false`
+path**, and open item 42's sibling defect lives on that path, so retiring it
+would delete the only live test of the branch.
+
+⚠ **What keeping it costs, so no count is quoted innocently: its records are
+FIXTURES.** `ph00-smoke` is one of the rows every `provenance.py --all` and every
+`--check-stale` bracket counts. **Subtract it from any population figure.**
+
+⚠⚠ **A retirement condition that has been met and is deliberately not acted on
+must stop saying it is a retirement condition** — otherwise the next agent
+retires this row *correctly by the document* and *wrongly by the programme*.
+**That is why this paragraph replaced one sentence.**
 
 A byte-for-byte relocation of `patterns/p01-array-sum/` — window sum over a
 `u64` array, wrapping addition — landed at `TASK_PHP_002` for exactly one

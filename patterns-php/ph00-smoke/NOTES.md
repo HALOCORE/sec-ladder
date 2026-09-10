@@ -98,8 +98,15 @@ has actually run green through `.temp/php-root/` and written into
 `results-php/gate/`; this is the row that proves it. It carries **no PHP
 provenance, no CWE, no `fix_commit`, no adversarial claim and no result**.
 
-**Delete it once a real php row has gated green.** Until then it is the only
-regression test the shim has.
+⚠⚠ **THIS SAID *"Delete it once a real php row has gated green"*. FOUR HAVE
+(`ph03`, `ph07`, `ph16`, `ph29`) AND THE DECISION IS TO KEEP IT** —
+`RECAP_PHP.md` open item 43, decided 2026-09-10. It is not merely *"the only
+regression test the shim has"*: it is the **only row that exercises the
+`php_provenance: false` path**, where open item 42's sibling defect lives, so
+retiring it removes the only live test of that branch.
+
+⚠ **Its records are FIXTURES — subtract it from any population count.** See
+`README.md` for the full statement.
 
 ## Why relocating `p01` was the right call, measured rather than assumed
 
