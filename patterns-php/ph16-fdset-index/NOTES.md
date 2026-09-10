@@ -524,6 +524,50 @@ redundant bounds check per entry, on a loop whose useful body is ~13
 instructions. Quoting +31 % as the cost of safe Rust would be quoting the cost
 of a spelling.
 
+> ### 8b-RETRACTED ⚠⚠⚠ THE PARAGRAPH ABOVE NAMES THE WRONG RESPELLING, AND IT WAS MEASURED WRONG IN BOTH DIRECTIONS
+>
+> `TASK_PHP_028`, `controls/spellings.py` — **the guard respelling emits
+> BYTE-IDENTICAL MACHINE CODE, either way round.** The two variants that
+> establish it are shipped in that control and its `spellings.json` carries
+> their fingerprints:
+>
+> | variant | what it is | `kernel` | cost |
+> |---|---|---:|---:|
+> | `r3_guard_r2` | R2's guard spelling put into **R3** | 487 insn, **the shipped R3's own fingerprint** | **±0 Ir** |
+> | `r2x_guard_r3` | R3's guard spelling put into **R2** | 483 insn, **`safe_naive.rs`'s own fingerprint** | **±0 Ir** |
+>
+> **rustc elides the second bounds test under BOTH spellings**, so it cannot be
+> what separates R2 from R3, and the sentence *"rustc emits a second bounds
+> check on `fds[..]`"* is false of this kernel at `-O3`.
+>
+> ⭐ **What the R2 → R3 gap actually is: item 2 of `safe_tuned.rs`'s module
+> comment — the entry run taken as a SUBSLICE and walked with
+> `chunks_exact(2)`.** Measured, same control:
+>
+> | variant | vs shipped R3, `small.bin` / slope |
+> |---|---:|
+> | `r3_index_walk` — subslice kept, walked by index | **+6.15 % / +6.29 %** |
+> | `r3_absindex` — R4's `(win, base, n)` signature and an absolute index | **+33.07 % / +36.78 %**, and **byte-identical to `safe_naive.rs`** |
+>
+> So the whole +31 % is the *signature and the walk*, split roughly one part
+> iterator to four parts subslice, and **item 1 of that comment is worth zero
+> instructions.**
+>
+> ⚠⚠ **THE TWO RUNG SOURCES SAY IT TOO AND THEY ARE NOT CORRECTED HERE.**
+> `safe_naive.rs`'s module comment (*"pays a bounds check on `fds[this_fd / 64]`
+> that R3's spelling makes provable — that difference is this row's R2→R3
+> gradient"*) and `safe_tuned.rs`'s item 1 both carry the retracted mechanism.
+> **Both files are pinned into the MEASUREMENT record's `source_sha256` (19
+> files), so editing either costs a 28-cell re-measure of this row.** This file
+> is not pinned there, which is why the correction lives here. **Whether the
+> rung comments follow is the manager's call**, and until they do, a reader who
+> starts from either `.rs` will meet the wrong mechanism first.
+>
+> ⭐ **The retraction does not touch §8a.** That one is the R1-vs-R1h number,
+> read off two gcc cells' disassembly, and it is unaffected: guard (b) really is
+> two instructions in the C loop. What is retracted is the claim about what the
+> same guard costs *in Rust*.
+
 ### 8b-bis ⚠⚠ AND ONE COLUMN IN THE PUBLISHED TABLE IS NOT A SAFETY EFFECT
 
 `results-php/tables/ph16-fdset-index.md`'s `vec` column, O3/isolated:
@@ -561,14 +605,123 @@ the Rust-vs-C ones are not.**
 * **Not comparable to `ph03`'s or `ph07`'s ladder**, and certainly not to any
   `pNN`: different kernels, different work per call
   (`.memory-php/03-numbers.md`).
-* **Not a `fixed-R4 bound` with a counterpart.** `controls/spellings.py` was NOT
-  built — see §11. The `R3ship − R4ship` figure below is **the cost of THESE
-  spellings of these rungs** and nothing more.
 * ⚠⚠ **`R3ship − R4ship` is NEGATIVE on this row**: `safe_tuned` is
   **1.84 % cheaper than `unsafe`** on `large.bin` (305 508 386 vs 311 246 696).
-  A safe rung beating the unsafe one is a real measurement and it is what the
-  unsearched endpoint is worth here; **do not publish it as a bound**, because
-  neither side has been searched.
+  A safe rung beating the unsafe one is a real measurement; **do not publish it
+  as an upper bound on the cost of safety**, because a negative number is not
+  one. ⭐ **It IS now a spread over two searched endpoints** — see §8e.
+* ⚠ **Not a claim about any other row.** §8e's result is n = 1.
+
+### 8e ⭐⭐⭐ THE SPELLING SEARCH — BOTH SIDES, AND THE NEGATIVE SPREAD SURVIVES IT
+
+`controls/spellings.py` (`TASK_PHP_028`), the second in `patterns-php/` after
+`ph07`'s. **17 variants: 8 R3 rung candidates, 5 R4 rung candidates each with a
+Verus twin, 2 exec-only R4 controls and 2 exec-only R2 controls.** Every one is
+a text substitution on a shipped rung with its hit count asserted, audited
+against every backticked `spec.md` `idiom` entry, and required to return R3's
+checksum on all six inputs. **The pipeline reproduces all six (cell, input)
+pairs it can check against the shipped record — `safe_naive`, `safe_tuned` and
+`unsafe` on both probe inputs — TO THE DIGIT.**
+
+⚠ **Three statistics are in circulation on this row and they do not agree**;
+`spellings.py` publishes all three and so does this section.
+
+| | `small.bin`/call | `large.bin`/call | Ir/window byte |
+|---|---:|---:|---:|
+| **`fixed-R4 bound`** — `R3ship − R4ship`, both by fiat | **−1.22 %** | **−1.84 %** | **−1.94 %** |
+| **cheapest-found in-contract** — `inf(R3 found) − R4ship`, spelling **`r3_split_at`**, inputs `small.bin` + `large.bin` | **−1.42 %** | **−1.87 %** | **−1.94 %** |
+
+⚠⚠ **QUOTE BOTH, LABELLED, OR NEITHER**, and **NO PAIR INTERVAL**:
+`min(R3 found) − min(R4 found)` differences two upper bounds and bounds nothing
+(`ph03`'s hashed `why` retracts that construction in terms).
+
+⭐⭐ **THE R4 SIDE IS SEARCHED AND IT IS DEGENERATE.** Four independent
+respellings of the index the mechanism blames — `r4_hoistbase` (byte-identical,
+and its twin **does not verify**), `r4_cursor` (+3.74 %), `r4x_endcursor`
+(+4.34 %) and `r4x_subslice` (+1.80 %, and it is *R3's own spelling*) — and not
+one is cheaper. `ph16` is the **13th of 21** rows where an R4-side search found
+nothing. **So the negative spread is not the artefact of an unsearched R4
+endpoint; it is what this ladder does.**
+
+⭐ **`r4_fold_index` is the third kind of result again** (`ph07`'s `r4_index0`,
+`p34`'s `r4_readdirect`): `s[i]` for `aget_unchecked(s, i)` in `fold_set` is
+**byte-identical machine code**, verifies 15/0, and **removes one of two uses of
+a trusted item** — a smaller trusted surface at the same price. It is not a
+cheaper spelling and it is not a re-ship.
+
+⚠⚠ **AND NO RUNG IS RE-SHIPPED.** `.memory/02-bench-rules.md`: the shipped rung
+is chosen by IDIOM, before measurement, and it stays. `r3_split_at` moves the
+**published bound**; `safe_tuned.rs` does not move.
+
+**Where the spread is**, exact, from `spellings.py --attribute` (callgrind
+`--dump-instr=yes`, decomposed by execution-count class, `small.bin`, 25 000
+calls):
+
+```
+R4 cheaper off the entry loops   -450 686 Ir   -18.0 /call   R3's slicings and
+                                                             header reads carry
+                                                             bounds tests
+R4 dearer in ARM 2's entry loop +1 550 414 Ir  +62.0 /call   ONE extra
+                                                             `lea (%rsi,%rdx,1),%rcx`
+                                                             per entry
+net                             +1 099 728 Ir  +44.0 /call = 89 974 452 - 88 874 724
+```
+
+⭐ **The prologue term is the safety saving and it is the only place R4 is
+ahead.** The `lea` is `to_fd_set(win, base, n)` indexing `win` absolutely, in
+the one of three inlined copies where LLVM could not fold a runtime `base` into
+the addressing mode: arm 1 has `base == 0`, arm 3 is strength-reduced to a
+pointer, arm 2 is not.
+
+⚠⚠ **THE MIRROR CONTROL IS WHAT MAKES THIS A RESULT AND NOT A COMPLAINT ABOUT
+R4.** `r3_absindex` — R3 given R4's signature — is **+33.07 %** against the
+shipped R3. So the subslice signature is worth **−24.9 %** in the safe rung and
+**+1.8 %** in the unsafe one: it hoists a bounds test out of the loop where
+there is one, and buys a pointer-plus-length where there is not. **The two
+rungs' cheapest spellings are DIFFERENT SPELLINGS, and R3's minimum sits below
+R4's.** ⚠ **n = 1 row. This says nothing about `ph03`, `ph07`, `ph29` or any
+`pNN`**, and `.memory-php/03-numbers.md` forbids the comparison anyway.
+
+⚠ **What the search did NOT cover, named**: no R4 candidate that would need a
+NEW trusted item or a rewrite of `walk`'s spec was attempted, because
+`spec.md`'s `verus.items` pins those; `r4x_subslice` is the closest such
+candidate and it was priced exec-only and is dearer, so admissibility could not
+have changed the answer. The candidate set was chosen from the instruction
+attribution above, and **the check that it is wide enough is that the
+attribution closes to 0 Ir** — `spellings.py` fails the run if it stops closing.
+Must-fire negatives for the control itself: `.temp/php28/negatives_spellings.py`,
+**54 cases — 36 must-FIRE, 18 must-NOT-fire, 0 failed**, of which 9 drive the
+whole pipeline over a mutated configuration.
+
+⚠⚠ **THEY CAUGHT FOUR DEFECTS IN THE CONTROL, AND NOT ONE OF THEM WAS IN A
+NUMBER — three were in the thing that REPORTS the numbers, and one had already
+published a wrong claim:**
+
+1. **`kernel_fingerprint` was layout-sensitive** (kept absolute jump targets and
+   objdump's resolved `#` comments), so two builds of one source under crate
+   names of different lengths fingerprinted differently;
+2. **and on the strength of that it had published** *"`r4_fold_index` is NOT
+   byte-identical, unlike `ph07`'s `r4_index0`"*. **It is byte-identical** — it
+   is `ph07`'s result exactly;
+3. **stage 5 narrated a hardcoded count** (*"FOUR respellings … including
+   `r4x_subslice`"*) that the 3-variant end-to-end negatives printed verbatim
+   over one. Now derived from the variant table;
+4. ⚠ **`per_instruction` did not learn names from `cfn=` lines.** `fn` and `cfn`
+   share callgrind's compression namespace, and **the `ph16` dumps are not
+   stable in this respect across builds** — the parser worked on the dump taken
+   while the file was written and returned **ZERO** on a rebuilt one.
+   ⭐ **It failed LOUDLY**, because stage 6 asserts the per-instruction sum
+   against `callgrind_annotate`: a stopped measurement, not a wrong number.
+
+**And the docstring itself was corrected in one place**: it claimed a forbidden
+token *in a comment* is refused. It is not — `spelling_matches` matches against
+`exec_code(src)`, which blanks comments, string literals, ghost code and
+cfg-gated code, so the ban is on the program and not on the file.
+
+`TASK_PHP_028_REPORT.md` §4.1 has all of it. ⚠⚠ **None was reachable through a
+gate run: the gate hashes `controls/*.py` and never executes it** — *a gate run
+exercises a validator on the rows that pass; it does not attack it*
+(`PROTOCOL_PHP.md` §H).
 
 ### 8d ⚠ The wall clock says nothing here
 
@@ -680,14 +833,22 @@ manager as a minor harness observation; nothing was edited under `harness/`.**
 
 ## §11 What I did NOT do
 
-* ⚠⚠ **`controls/spellings.py` — NOT BUILT. The debt is now three rows old**
-  (`ph03` owes both sides, `ph16` owes both, `ph07` has discharged it).
-  `TASK_PHP_025` §6.2 asked to be told if carrying it turned this into two
-  tasks, and it did: this row cost a re-measure for the R1h restructure, a
-  second for the `kernel.h` correction, five `report.py` renders and SEVEN gate rounds. **§8c states the
-  consequence in terms**: no figure here is a `fixed-R4 bound`, and the
-  R3-vs-R4 number is *negative*, which makes searching both sides more
-  interesting on this row than on either predecessor and not less.
+* ⭐ **`controls/spellings.py` — BUILT AT `TASK_PHP_028`, and §8e is the
+  result.** This entry read *"NOT BUILT. The debt is now three rows old"* until
+  then, and `TASK_PHP_025` §6.2's judgement that carrying it made the build two
+  tasks was correct: it was a task, and it cost a re-gate of this row plus a
+  re-render. **Both sides are searched; the R4 side is degenerate; the negative
+  spread survives.** ⚠ The debt is still open on **`ph03`** (neither side) and
+  **`ph29`** (neither side, and its `idiom` `required` half backticks nothing at
+  all — `spellings: 4`, all four `forbidden` — so a token audit there can
+  discriminate almost nothing and admission would rest on prose). `TASK_PHP_028`
+  was dispatched for three rows and completed one.
+* **No `spec.md` edit.** §8e needed none; the hashed block is untouched by
+  `TASK_PHP_028` and the `contract_sha256` in §0 still stands.
+* ⚠⚠ **No correction to `safe_naive.rs`'s or `safe_tuned.rs`'s module
+  comments**, both of which carry §8b's retracted mechanism. They are pinned
+  into the measurement record's `source_sha256`, so touching either costs a
+  28-cell re-measure — see 8b-RETRACTED. The manager's call.
 * **No tag-by-tag bisect of the `fix_commit`** — §4c.
 * **No adjudication of the three uncatalogued sibling sites** — §9.
 * **`adversarial-far.bin`** (an index past the frame) was designed and dropped:

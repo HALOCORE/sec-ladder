@@ -188,8 +188,8 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
     "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
-    "patterns/ph16-fdset-index/NOTES.md": "453022b7ffe39ef06093fe50247170bfabd3b158a01d5d0be33494a1bee4f398",
-    "patterns/ph16-fdset-index/README.md": "beca50bbb2afc79fb3c9384fb5e0c8bc2eb3453ad882bfa94f835db54d2ab4be",
+    "patterns/ph16-fdset-index/NOTES.md": "2ececa14f96de669f0ce41487cb74e6c648e46706b2174c9d9985d22fa563062",
+    "patterns/ph16-fdset-index/README.md": "45bcb6cc2d87a1e4fa8e4a01cbbde0d70e91a66458461881a952140c846daecf",
     "patterns/ph16-fdset-index/c/emalloc_shim.h": "aa9abf48535e8df93c9398e96c044697a784d73c40d7a7ccc830b5ee308c378f",
     "patterns/ph16-fdset-index/c/kernel.c": "ff22c491a032f45a6a6424184076685f9e28ef9355c82dac8bfbaea9de9b7fd7",
     "patterns/ph16-fdset-index/c/kernel.h": "a6298aab5c0887bcb4c4e3a6604a77c6f02319963af78211f362e7f9e5ee558f",
@@ -203,6 +203,7 @@
     "patterns/ph16-fdset-index/controls/miri_vs_asan.py": "7bfa89cb5720818f713a662f253a2649b743349e3e3bc4dea7201acc288430ce",
     "patterns/ph16-fdset-index/controls/negatives.py": "f80bbca9190d2a533b64a2e56b8a2d6228fb7ba1f6428fc1fb5e7beb45a3bb1c",
     "patterns/ph16-fdset-index/controls/oracle.py": "6fcbb454682be49b361ecfe9c3525855e64279e3159e05e61c1847efdd957508",
+    "patterns/ph16-fdset-index/controls/spellings.py": "c15d5b33cf3015b1483d4d082058268d59fa1cee3db1488b26820aa0d2be3f7c",
     "patterns/ph16-fdset-index/inputs/gen.py": "f67da38307f3a76845fd8103c6b779ccf2c71411d987e82afe3b948ee69ec093",
     "patterns/ph16-fdset-index/model.py": "1ffa300e74419e0aeeca9f408b4e85641c5833f25a6f82fe151f68ad21ce98b9",
     "patterns/ph16-fdset-index/safe_naive.rs": "f35b51a241c5bb10de3df83773e1585b12b7bb05a6f9622acc67fb127e6b4ba3",
@@ -1394,7 +1395,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==3436360==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7fc401b000c0 at pc 0x5594d945a845 bp 0x7ffe47e64a80 sp 0x7ffe47e64a70 READ of size 8 at 0x7fc401b000c0 thread T0 #0 0x5594d945a844 in ph16_stream_array_to_fd_set /",
+      "diagnostic": "================================================================= ==3997527==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7fd70ff000c0 at pc 0x5647f13f6845 bp 0x7ffd0e001920 sp 0x7ffd0e001910 READ of size 8 at 0x7fd70ff000c0 thread T0 #0 0x5647f13f6844 in ph16_stream_array_to_fd_set /",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1551,7 +1552,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.2,
+        "seconds": 0.1,
         "stdout": "0",
         "model_stdout": "0",
         "stderr": ""
@@ -1599,7 +1600,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 1.7,
+        "seconds": 1.6,
         "stdout": "11295096062038360481",
         "model_stdout": "11295096062038360481",
         "stderr": ""
@@ -1633,7 +1634,9 @@
     "published_sha256": "e91076c24baf2ca2000edf4cdb91c30eb1c3079776405a6c905d64fc638e6f76",
     "verdict": "FRESH"
   },
-  "controls_json": {},
+  "controls_json": {
+    "spellings.json": "FRESH"
+  },
   "failures": [],
   "notes": [
     "adversarial-redzone.bin/c-gcc: opt/mode variants of this rung disagree (2 distinct behaviours)",

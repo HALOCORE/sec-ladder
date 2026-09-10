@@ -1,0 +1,725 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns-php/ph16-fdset-index/controls/spellings.py --verus --attribute",
+    "note": "The pin covers the three rung sources the variants are derived from (safe_naive.rs is one, for the NOTES.md 8b controls), verus.rs (the R4 admissibility half), spec.md (the declaration the audit runs against), inputs/gen.py (the corpus every number is measured over) and this script. It does NOT cover results-php/ph16-fdset-index.json: stage 3 compares against that record at run time and prints the delta, which is a stronger check than a hash of it. WARNING: spec.md is pinned as a FILE, so an edit anywhere in it -- including one that touches nothing this file reads -- stales this sidecar. TASK_PHP_024 4.2 measured that ph07's was the only sidecar in the tree that pinned spec.md at all; it is pinned here deliberately, so the two php sidecars are comparable, and TASK_PHP_028's report argues the pin should become the CONTRACT BLOCK rather than the file."
+  },
+  "measured_utc": "2026-09-10T08:53:22Z",
+  "derived_from_sha256": {
+    "patterns/ph16-fdset-index/safe_naive.rs": "f35b51a241c5bb10de3df83773e1585b12b7bb05a6f9622acc67fb127e6b4ba3",
+    "patterns/ph16-fdset-index/safe_tuned.rs": "6a8e8f8331c6616c9fc460f47ca335e9090270a620b7e02c6914bbf4dd237eac",
+    "patterns/ph16-fdset-index/unsafe.rs": "d76cd5c85a6982649d52fe162b93f5ca0d47b67dd87991ef85694543109f2763",
+    "patterns/ph16-fdset-index/verus.rs": "523aca5a64c4b9ac7cd8b88a4e769cb077078fe02b4edcfd1c674b3c9da834b9",
+    "patterns/ph16-fdset-index/spec.md": "7793d6cd38dd996112989032b834346d275f0292954762b54b95360a0e870d0b",
+    "patterns/ph16-fdset-index/inputs/gen.py": "f67da38307f3a76845fd8103c6b779ccf2c71411d987e82afe3b948ee69ec093",
+    "patterns/ph16-fdset-index/controls/spellings.py": "c15d5b33cf3015b1483d4d082058268d59fa1cee3db1488b26820aa0d2be3f7c"
+  },
+  "probes": [
+    {
+      "input": "small.bin",
+      "stride": 550,
+      "n_iters": 25000
+    },
+    {
+      "input": "large.bin",
+      "stride": 4076,
+      "n_iters": 12000
+    }
+  ],
+  "tie_pct": 0.05,
+  "verus_checked": true,
+  "attributed": true,
+  "attribution": {
+    "input": "small.bin",
+    "n_iters": 25000,
+    "classes": [
+      {
+        "exec_count": 1550414,
+        "r3_insns": 6,
+        "r4_insns": 7,
+        "delta_ir": 1550414
+      },
+      {
+        "exec_count": 25000,
+        "r3_insns": 71,
+        "r4_insns": 67,
+        "delta_ir": -100000
+      },
+      {
+        "exec_count": 12606,
+        "r3_insns": 12,
+        "r4_insns": 5,
+        "delta_ir": -88242
+      },
+      {
+        "exec_count": 17080,
+        "r3_insns": 8,
+        "r4_insns": 3,
+        "delta_ir": -85400
+      },
+      {
+        "exec_count": 20411,
+        "r3_insns": 6,
+        "r4_insns": 2,
+        "delta_ir": -81644
+      },
+      {
+        "exec_count": 20342,
+        "r3_insns": 7,
+        "r4_insns": 3,
+        "delta_ir": -81368
+      },
+      {
+        "exec_count": 20205,
+        "r3_insns": 6,
+        "r4_insns": 2,
+        "delta_ir": -80820
+      },
+      {
+        "exec_count": 17278,
+        "r3_insns": 2,
+        "r4_insns": 6,
+        "delta_ir": 69112
+      },
+      {
+        "exec_count": 9515,
+        "r3_insns": 15,
+        "r4_insns": 8,
+        "delta_ir": -66605
+      },
+      {
+        "exec_count": 12406,
+        "r3_insns": 3,
+        "r4_insns": 8,
+        "delta_ir": 62030
+      },
+      {
+        "exec_count": 17289,
+        "r3_insns": 2,
+        "r4_insns": 5,
+        "delta_ir": 51867
+      },
+      {
+        "exec_count": 7763,
+        "r3_insns": 4,
+        "r4_insns": 0,
+        "delta_ir": -31052
+      },
+      {
+        "exec_count": 7799,
+        "r3_insns": 0,
+        "r4_insns": 3,
+        "delta_ir": 23397
+      },
+      {
+        "exec_count": 4683,
+        "r3_insns": 3,
+        "r4_insns": 0,
+        "delta_ir": -14049
+      },
+      {
+        "exec_count": 6382,
+        "r3_insns": 2,
+        "r4_insns": 0,
+        "delta_ir": -12764
+      },
+      {
+        "exec_count": 7003,
+        "r3_insns": 1,
+        "r4_insns": 0,
+        "delta_ir": -7003
+      },
+      {
+        "exec_count": 3257,
+        "r3_insns": 0,
+        "r4_insns": 2,
+        "delta_ir": 6514
+      },
+      {
+        "exec_count": 3120,
+        "r3_insns": 5,
+        "r4_insns": 3,
+        "delta_ir": -6240
+      },
+      {
+        "exec_count": 3125,
+        "r3_insns": 2,
+        "r4_insns": 1,
+        "delta_ir": -3125
+      },
+      {
+        "exec_count": 3051,
+        "r3_insns": 3,
+        "r4_insns": 2,
+        "delta_ir": -3051
+      },
+      {
+        "exec_count": 2243,
+        "r3_insns": 1,
+        "r4_insns": 0,
+        "delta_ir": -2243
+      }
+    ],
+    "net": 1099728,
+    "closes": true
+  },
+  "statistic": "kernel_exclusive_ir / n_iters on the SHIPPED inputs -- harness/measure.py::_sum_rows itself, IMPORTED and not transcribed, so stage 3 above compares against results-php/ph16-fdset-index.json directly. THREE percentages are published per cell because the row has three statistics in circulation and they do not agree to the digit: small.bin per call (the published table's own ratio, -1.22% for R3ship-R4ship), large.bin per call (-1.84%) and Ir per window byte (the marginal, -1.94%, and the one .memory-php/02-ladder.md quotes for ph07). All three are negative and no conclusion here turns on which is chosen. A FOURTH kind of answer is recorded beside them, `kernel_fingerprint`, because three of these results are byte-identity results and a percentage cannot say that.",
+  "reproduces_shipped_record": true,
+  "variants": [
+    {
+      "side": "R3",
+      "name": "v0_shipped",
+      "why": "the shipped R3, unmodified",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `this_fd < FD_SETSIZE`",
+        "required[5] `this_fd < FD_SETSIZE`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 487,
+      "kernel_fingerprint": "d0091b202786",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 88874724,
+      "ir_total_large": 305508386,
+      "ir_small": 3554.98896,
+      "ir_large": 25459.032166666668,
+      "ir_per_window_byte": 6.212150654187938,
+      "fixed_per_call": 138.30610019663436,
+      "pct_vs_r4ship_small": -1.2222669608479453,
+      "pct_vs_r4ship_large": -1.843653305800865,
+      "pct_vs_r4ship": -1.9437666171129244
+    },
+    {
+      "side": "R3",
+      "name": "r3_split_at",
+      "why": "the three `&ents[a..b]` range slicings replaced by one `split_at` pair -- same three subslices, two bounds tests instead of three, computed unconditionally. THE CHEAPEST R3 FOUND, and the whole of it is in the fixed term",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `this_fd < FD_SETSIZE`",
+        "required[5] `this_fd < FD_SETSIZE`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 458,
+      "kernel_fingerprint": "42884623e2ac",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 88699523,
+      "ir_total_large": 305421724,
+      "ir_small": 3547.98092,
+      "ir_large": 25451.810333333335,
+      "ir_per_window_byte": 6.212090020797882,
+      "fixed_per_call": 131.3314085611646,
+      "pct_vs_r4ship_small": -1.4169900140097518,
+      "pct_vs_r4ship_large": -1.8714968142183799,
+      "pct_vs_r4ship": -1.9447236901423859
+    },
+    {
+      "side": "R3",
+      "name": "r3_head_array",
+      "why": "the six header reads taken through one `&win[0..6]` slicing. Different machine code, identical cost -- rustc already merges the six tests",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `this_fd < FD_SETSIZE`",
+        "required[5] `this_fd < FD_SETSIZE`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 487,
+      "kernel_fingerprint": "262806d8bde0",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 88874724,
+      "ir_total_large": 305508386,
+      "ir_small": 3554.98896,
+      "ir_large": 25459.032166666668,
+      "ir_per_window_byte": 6.212150654187938,
+      "fixed_per_call": 138.30610019663436,
+      "pct_vs_r4ship_small": -1.2222669608479453,
+      "pct_vs_r4ship_large": -1.843653305800865,
+      "pct_vs_r4ship": -1.9437666171129244
+    },
+    {
+      "side": "R3",
+      "name": "r3_prologue",
+      "why": "r3_split_at and r3_head_array composed. They do NOT compose: the pair costs exactly what r3_split_at costs alone",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `this_fd < FD_SETSIZE`",
+        "required[5] `this_fd < FD_SETSIZE`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 458,
+      "kernel_fingerprint": "00be2c549597",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 88699523,
+      "ir_total_large": 305421724,
+      "ir_small": 3547.98092,
+      "ir_large": 25451.810333333335,
+      "ir_per_window_byte": 6.212090020797882,
+      "fixed_per_call": 131.3314085611646,
+      "pct_vs_r4ship_small": -1.4169900140097518,
+      "pct_vs_r4ship_large": -1.8714968142183799,
+      "pct_vs_r4ship": -1.9447236901423859
+    },
+    {
+      "side": "R3",
+      "name": "r3_u16",
+      "why": "`u16::from_le_bytes([c[0], c[1]])` for the entry decode. Byte-identical; a search whose every entry moves has not found its floor",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `this_fd < FD_SETSIZE`",
+        "required[5] `this_fd < FD_SETSIZE`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 487,
+      "kernel_fingerprint": "d0091b202786",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 88874724,
+      "ir_total_large": 305508386,
+      "ir_small": 3554.98896,
+      "ir_large": 25459.032166666668,
+      "ir_per_window_byte": 6.212150654187938,
+      "fixed_per_call": 138.30610019663436,
+      "pct_vs_r4ship_small": -1.2222669608479453,
+      "pct_vs_r4ship_large": -1.843653305800865,
+      "pct_vs_r4ship": -1.9437666171129244
+    },
+    {
+      "side": "R3",
+      "name": "r3_guard_r2",
+      "why": "the row's own R2 spelling of guard (b). In contract (`this_fd < FD_SETSIZE` is a `required` token), identical over all 16 384 reachable values, expected DEARER by NOTES.md 8b -- and measured BYTE-IDENTICAL, which is what refutes 8b",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `w < NW`",
+        "required[5] `w < NW`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 487,
+      "kernel_fingerprint": "d0091b202786",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 88874724,
+      "ir_total_large": 305508386,
+      "ir_small": 3554.98896,
+      "ir_large": 25459.032166666668,
+      "ir_per_window_byte": 6.212150654187938,
+      "fixed_per_call": 138.30610019663436,
+      "pct_vs_r4ship_small": -1.2222669608479453,
+      "pct_vs_r4ship_large": -1.843653305800865,
+      "pct_vs_r4ship": -1.9437666171129244
+    },
+    {
+      "side": "R3",
+      "name": "r3_index_walk",
+      "why": "THE FIRST REAL LOSER: R2's index walk over the same subslice instead of `chunks_exact(2)`, so the per-entry index computation and its bounds test come back into the loop",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `this_fd < FD_SETSIZE`",
+        "required[5] `this_fd < FD_SETSIZE`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 470,
+      "kernel_fingerprint": "6d6e0e21eb2b",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 95505631,
+      "ir_total_large": 330762177,
+      "ir_small": 3820.22524,
+      "ir_large": 27563.51475,
+      "ir_per_window_byte": 6.733774676687464,
+      "fixed_per_call": 116.64916782189493,
+      "pct_vs_r4ship_small": 6.14749951464001,
+      "pct_vs_r4ship_large": 6.270100614979701,
+      "pct_vs_r4ship": 6.289853224970583
+    },
+    {
+      "side": "R3",
+      "name": "r3_absindex",
+      "why": "THE MIRROR CONTROL: R3 given R4's `(win, base, n)` signature and absolute indexing. Byte-identical to safe_naive.rs, and the control the non-monotonicity claim rests on -- the subslice signature is worth -24.9% (small.bin) / -26.9% (slope) in the safe rung and +1.8% in the unsafe one",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `this_fd < FD_SETSIZE`",
+        "required[5] `this_fd < FD_SETSIZE`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 483,
+      "kernel_fingerprint": "5950ba114532",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 118269785,
+      "ir_total_large": 416298533,
+      "ir_small": 4730.7914,
+      "ir_large": 34691.544416666664,
+      "ir_per_window_byte": 8.497093878805066,
+      "fixed_per_call": 57.38976665721384,
+      "pct_vs_r4ship_small": 31.44818598061593,
+      "pct_vs_r4ship_large": 33.751952502654035,
+      "pct_vs_r4ship": 34.12311884205696
+    },
+    {
+      "side": "R4",
+      "name": "v0_shipped",
+      "why": "the shipped R4, unmodified",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `this_fd < FD_SETSIZE`",
+        "required[5] `this_fd < FD_SETSIZE`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 426,
+      "kernel_fingerprint": "9148de644fa1",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 89974452,
+      "ir_total_large": 311246696,
+      "ir_small": 3598.97808,
+      "ir_large": 25937.224666666665,
+      "ir_per_window_byte": 6.335293983739836,
+      "fixed_per_call": 114.5663889430898,
+      "pct_vs_r4ship_small": 0.0,
+      "pct_vs_r4ship_large": 0.0,
+      "pct_vs_r4ship": 0.0,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 15 verified, 0 errors"
+    },
+    {
+      "side": "R4",
+      "name": "r4_cursor",
+      "why": "the entry offset carried as a CURSOR beside `i`. The twin needs ONE more invariant, `j == 6 + 2 * (base + i)`: no new trusted item, no new proof term. DEARER -- two induction variables where LLVM was maintaining one",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `this_fd < FD_SETSIZE`",
+        "required[5] `this_fd < FD_SETSIZE`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 455,
+      "kernel_fingerprint": "3199cdf4a32f",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 92750997,
+      "ir_total_large": 322613714,
+      "ir_small": 3710.03988,
+      "ir_large": 26884.476166666667,
+      "ir_per_window_byte": 6.572443643410852,
+      "fixed_per_call": 95.1958761240312,
+      "pct_vs_r4ship_small": 3.085925991524793,
+      "pct_vs_r4ship_large": 3.652092743821456,
+      "pct_vs_r4ship": 3.7433094704000216,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 15 verified, 0 errors"
+    },
+    {
+      "side": "R4",
+      "name": "r4_hoistbase",
+      "why": "the same idea spelled the other way: `let b = 6 + 2 * base;` hoisted. BYTE-IDENTICAL machine code to the shipped R4 -- LLVM already re-associates it -- and its twin DOES NOT VERIFY. A free respelling the prover cannot follow is inadmissible as a rung",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `this_fd < FD_SETSIZE`",
+        "required[5] `this_fd < FD_SETSIZE`"
+      ],
+      "in_contract": false,
+      "built": true,
+      "kernel_insns": 426,
+      "kernel_fingerprint": "9148de644fa1",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 89974452,
+      "ir_total_large": 311246696,
+      "ir_small": 3598.97808,
+      "ir_large": 25937.224666666665,
+      "ir_per_window_byte": 6.335293983739836,
+      "fixed_per_call": 114.5663889430898,
+      "pct_vs_r4ship_small": 0.0,
+      "pct_vs_r4ship_large": 0.0,
+      "pct_vs_r4ship": 0.0,
+      "verus_verifies": false,
+      "verus_msg": "verification results:: 14 verified, 1 errors"
+    },
+    {
+      "side": "R4",
+      "name": "r4_fold_index",
+      "why": "`s[i]` for `aget_unchecked(s, i)` in `fold_set`. Verifies, costs the same to the instruction, and removes one of two uses of a trusted item -- a smaller trusted surface at the same price (ph07 `r4_index0`, p34 `r4_readdirect`). BYTE-IDENTICAL machine code to the shipped R4, which is ph07's result exactly -- this said the opposite until the negatives found kernel_fingerprint layout-sensitive",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `this_fd < FD_SETSIZE`",
+        "required[5] `this_fd < FD_SETSIZE`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 426,
+      "kernel_fingerprint": "9148de644fa1",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 89974452,
+      "ir_total_large": 311246696,
+      "ir_small": 3598.97808,
+      "ir_large": 25937.224666666665,
+      "ir_per_window_byte": 6.335293983739836,
+      "fixed_per_call": 114.5663889430898,
+      "pct_vs_r4ship_small": 0.0,
+      "pct_vs_r4ship_large": 0.0,
+      "pct_vs_r4ship": 0.0,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 15 verified, 0 errors"
+    },
+    {
+      "side": "R4",
+      "name": "r4_cursor_fold",
+      "why": "r4_cursor and r4_fold_index composed. It inherits the cursor's loss exactly, which is the check that the two edits are independent",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `this_fd < FD_SETSIZE`",
+        "required[5] `this_fd < FD_SETSIZE`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 455,
+      "kernel_fingerprint": "3199cdf4a32f",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 92750997,
+      "ir_total_large": 322613714,
+      "ir_small": 3710.03988,
+      "ir_large": 26884.476166666667,
+      "ir_per_window_byte": 6.572443643410852,
+      "fixed_per_call": 95.1958761240312,
+      "pct_vs_r4ship_small": 3.085925991524793,
+      "pct_vs_r4ship_large": 3.652092743821456,
+      "pct_vs_r4ship": 3.7433094704000216,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 15 verified, 0 errors"
+    },
+    {
+      "side": "R4x",
+      "name": "r4x_endcursor",
+      "why": "the cursor with `i` DELETED: one induction variable bounded by `end = 6 + 2 * (base + n)`, the closest R4 gets to R3's `chunks_exact` without changing its signature. DEARER, so no twin was attempted",
+      "rung_candidate": false,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `this_fd < FD_SETSIZE`",
+        "required[5] `this_fd < FD_SETSIZE`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 446,
+      "kernel_fingerprint": "87a8e2981eb4",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 93658340,
+      "ir_total_large": 324658707,
+      "ir_small": 3746.3336,
+      "ir_large": 27054.89225,
+      "ir_per_window_byte": 6.610481749858196,
+      "fixed_per_call": 110.56863757799192,
+      "pct_vs_r4ship_small": 4.0943711443777415,
+      "pct_vs_r4ship_large": 4.309125581850362,
+      "pct_vs_r4ship": 4.343725276595791
+    },
+    {
+      "side": "R4x",
+      "name": "r4x_subslice",
+      "why": "THE DECISIVE ONE: the arm's entries taken as a SUBSLICE once -- exactly what R3 does -- with the reads still unchecked. The one spelling that removes arm 2's `lea`, and it pays more for the slice than the `lea` costs. Its failure is what makes the R4 endpoint degenerate. No twin: it would need `run@ =~= win@.subrange(...)` threaded through `walk`'s spec, which is a spec rewrite and not a substitution, and it cannot move a bound it is DEARER than",
+      "rung_candidate": false,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `this_fd < FD_SETSIZE`",
+        "required[5] `this_fd < FD_SETSIZE`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 484,
+      "kernel_fingerprint": "46100c3793db",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 91605900,
+      "ir_total_large": 316848936,
+      "ir_small": 3664.236,
+      "ir_large": 26404.078,
+      "ir_per_window_byte": 6.449189449801475,
+      "fixed_per_call": 117.18180260918871,
+      "pct_vs_r4ship_small": 1.8132347168949696,
+      "pct_vs_r4ship_large": 1.7999355726494313,
+      "pct_vs_r4ship": 1.7977929099101406
+    },
+    {
+      "side": "R2x",
+      "name": "r2x_shipped",
+      "why": "../safe_naive.rs unmodified, so r2x_guard_r3 has a baseline in this file's own statistic",
+      "rung_candidate": false,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `w < NW`",
+        "required[5] `w < NW`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 483,
+      "kernel_fingerprint": "5950ba114532",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 118269785,
+      "ir_total_large": 416298533,
+      "ir_small": 4730.7914,
+      "ir_large": 34691.544416666664,
+      "ir_per_window_byte": 8.497093878805066,
+      "fixed_per_call": 57.38976665721384,
+      "pct_vs_r4ship_small": 31.44818598061593,
+      "pct_vs_r4ship_large": 33.751952502654035,
+      "pct_vs_r4ship": 34.12311884205696
+    },
+    {
+      "side": "R2x",
+      "name": "r2x_guard_r3",
+      "why": "R3's `w < NW` guard spelling put into R2. BYTE-IDENTICAL to r2x_shipped; with r3_guard_r2 this is NOTES.md 8b refuted in both directions",
+      "rung_candidate": false,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[5] `this_fd < FD_SETSIZE`",
+        "required[5] `this_fd < FD_SETSIZE`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 483,
+      "kernel_fingerprint": "5950ba114532",
+      "answers": {
+        "adversarial-nowin.bin": "0",
+        "adversarial-redzone.bin": "1579715119127751680",
+        "adversarial-silent.bin": "4869664044563382272",
+        "adversarial-trunc.bin": "",
+        "large.bin": "14909576716847395481",
+        "small.bin": "12905063228042140532"
+      },
+      "ir_total_small": 118269785,
+      "ir_total_large": 416298533,
+      "ir_small": 4730.7914,
+      "ir_large": 34691.544416666664,
+      "ir_per_window_byte": 8.497093878805066,
+      "fixed_per_call": 57.38976665721384,
+      "pct_vs_r4ship_small": 31.44818598061593,
+      "pct_vs_r4ship_large": 33.751952502654035,
+      "pct_vs_r4ship": 34.12311884205696
+    }
+  ],
+  "problems": [],
+  "invariant": "Every variant is in contract by harness/check.py::spelling_matches over EVERY backticked idiom entry, returns R3 v0_shipped's checksum on all six inputs, and is priced by the harness's own per-call Ir method on both probe inputs. TWO numbers ship, labelled: the fixed-R4 bound and the cheapest-found in-contract counterpart. NO PAIR INTERVAL. The R4 side is searched too and what it finds is reported whether or not it is degenerate; on this row it is degenerate, which is what makes the negative spread a result rather than a spelling artefact."
+}

@@ -66,8 +66,21 @@ the bound lives in the platform's data structure instead of in the code.
 | `spec.md` | the contract the gate enforces, and the hashed declaration |
 | `NOTES.md` | **the measurements** — §2 fortify, §3 the oracle, §4 the fix, §8 the ladder and its mechanism, §10 Verus |
 | `model.py` | three independent implementations, and the arm table over the calls the driver actually makes |
-| `controls/` | `oracle.py` `fortify.py` `fix_scope.py` `guard_equiv.py` `negatives.py` `miri_vs_asan.py` — each with its must-fire and must-NOT-fire cases |
+| `controls/` | `oracle.py` `fortify.py` `fix_scope.py` `guard_equiv.py` `negatives.py` `miri_vs_asan.py` `spellings.py` — each with its must-fire and must-NOT-fire cases |
 
-⚠ `NOTES.md` §11 lists what this row does **not** do; the largest item is that
-`controls/spellings.py` was not built, so **no figure here is a `fixed-R4
-bound`**.
+⭐ **`R3ship − R4ship` IS NEGATIVE ON THIS ROW — `safe_tuned` measures cheaper
+than `unsafe` — AND BOTH ENDPOINTS HAVE NOW BEEN SEARCHED** (`controls/spellings.py`,
+`TASK_PHP_028`; **17 variants**, and the R4 side came back **degenerate**). So no
+figure here is an upper bound on the cost of safety, because a negative number
+is not one — but it is no longer a number over an unsearched endpoint either.
+**Two figures ship, labelled, and §8e is the place they are stated**:
+`fixed-R4 bound` **−1.22 %** (`small.bin`) and cheapest-found in-contract
+**−1.42 %** (`r3_split_at`). ⚠ **Quote both or neither, and never a pair
+interval.**
+
+⚠⚠ **`NOTES.md` §8b IS RETRACTED** by that same control: the R2→R3 guard
+respelling emits **byte-identical machine code** in both directions, so the
+mechanism §8b names — and the one both `safe_naive.rs` and `safe_tuned.rs` state
+in their module comments — is not what the R2→R3 gap is. See 8b-RETRACTED.
+
+⚠ `NOTES.md` §11 lists what this row does **not** do.
