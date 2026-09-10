@@ -1,0 +1,22 @@
+From 6ac8ffdfea108696fe32b4738b779a00d2d4328c Mon Sep 17 00:00:00 2001
+From: Antony Dovgal <tony2001@php.net>
+Date: Mon, 25 Dec 2006 22:12:46 +0000
+Subject: [PATCH] MFH
+
+---
+ ext/standard/streamsfuncs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/standard/streamsfuncs.c b/ext/standard/streamsfuncs.c
+index 3fbc4dd6ba93..efd71e0e8465 100644
+--- a/ext/standard/streamsfuncs.c
++++ b/ext/standard/streamsfuncs.c
+@@ -361,7 +361,7 @@ PHP_FUNCTION(stream_socket_recvfrom)
+ 		RETURN_FALSE;
+ 	}
+ 	
+-	read_buf = emalloc(to_read + 1);
++	read_buf = safe_emalloc(1, to_read, 1);
+ 	
+ 	recvd = php_stream_xport_recvfrom(stream, read_buf, to_read, flags, NULL, NULL,
+ 			zremote ? &Z_STRVAL_P(zremote) : NULL,

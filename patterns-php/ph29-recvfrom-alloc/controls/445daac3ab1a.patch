@@ -1,0 +1,26 @@
+From 445daac3ab1aa26ad95f9c75177f1ae604f75d1d Mon Sep 17 00:00:00 2001
+From: Ilia Alshanetsky <iliaa@php.net>
+Date: Wed, 28 Jul 2004 23:21:54 +0000
+Subject: [PATCH] Fixed possible crash in stream_socket_recvfrom() when length
+ parameter has a negative value.
+
+---
+ ext/standard/streamsfuncs.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/ext/standard/streamsfuncs.c b/ext/standard/streamsfuncs.c
+index 1e889f0b8a30..db4d26134543 100644
+--- a/ext/standard/streamsfuncs.c
++++ b/ext/standard/streamsfuncs.c
+@@ -317,6 +317,11 @@ PHP_FUNCTION(stream_socket_recvfrom)
+ 		ZVAL_NULL(zremote);
+ 		Z_STRLEN_P(zremote) = 0;
+ 	}
++
++	if (to_read <= 0) {
++		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Length parameter must be greater than 0.");
++		RETURN_FALSE;
++	}
+ 	
+ 	read_buf = emalloc(to_read + 1);
+ 	

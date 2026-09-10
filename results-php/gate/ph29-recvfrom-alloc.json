@@ -1,0 +1,1626 @@
+{
+  "pattern": "ph29-recvfrom-alloc",
+  "skipped_inputs": [],
+  "inputs_checked": [
+    "adversarial-neg.bin",
+    "adversarial-nowin.bin",
+    "adversarial-short.bin",
+    "adversarial-trunc.bin",
+    "large.bin",
+    "small.bin"
+  ],
+  "contract_sha256": "28a92facffb331484bd1e708e8a1c6696b27b479c91d976515a8ec01dbb6bcf6",
+  "run_timeout_s": {},
+  "expected_hang": [],
+  "idiom": {
+    "required": [
+      {
+        "c": "emalloc(to_read + 1)",
+        "rust": "tr.wrapping_add(1)"
+      },
+      {
+        "c": "read_buf[recvd] = '\\0'",
+        "rust": "vset_unchecked(&mut read_buf, recvd, 0)"
+      },
+      {
+        "c": "php_shim_tally() -- THE ALLOCATOR'S BEHAVIOUR IS IN THE CHECKSUM, NOT ONLY IN A SANITIZER (PROTOCOL_PHP.md B1.2). The C rungs fold php_shim_tally(), whose fourth field is bytes_mallocked -- the sum of the TRUNCATED real_size, i.e. what reached malloc, and NOT bytes_requested. The four Rust rungs fold the same u64 computed arithmetically, and 1000039 is the mixing constant that multiplies bytes_mallocked, so a rung that folded the un-truncated request instead would not carry this token. On adversarial-trunc.bin that field is 0 while bytes_requested is 18446744069414584320, and the two are exactly the two sides of truncation T1. PER-LANGUAGE because the two spellings share no token and not because the fact differs.",
+        "rust": "1000039 -- THE ALLOCATOR'S BEHAVIOUR IS IN THE CHECKSUM, NOT ONLY IN A SANITIZER (PROTOCOL_PHP.md B1.2). The C rungs fold php_shim_tally(), whose fourth field is bytes_mallocked -- the sum of the TRUNCATED real_size, i.e. what reached malloc, and NOT bytes_requested. The four Rust rungs fold the same u64 computed arithmetically, and 1000039 is the mixing constant that multiplies bytes_mallocked, so a rung that folded the un-truncated request instead would not carry this token. On adversarial-trunc.bin that field is 0 while bytes_requested is 18446744069414584320, and the two are exactly the two sides of truncation T1. PER-LANGUAGE because the two spellings share no token and not because the fact differs."
+      },
+      {
+        "c": "php_shim_reset -- PROTOCOL_PHP.md B1.3: one request per kernel call, so call N does not inherit call N-1's size-class cache and the marginal-Ir subtraction every number rests on survives. The C rungs call it at the top of the kernel; the Rust rungs have no cache to reset and instead name real_size, the quantity that reset makes a pure function of to_read. PER-LANGUAGE for the same reason as the entry above.",
+        "rust": "real_size -- PROTOCOL_PHP.md B1.3: one request per kernel call, so call N does not inherit call N-1's size-class cache and the marginal-Ir subtraction every number rests on survives. The C rungs call it at the top of the kernel; the Rust rungs have no cache to reset and instead name real_size, the quantity that reset makes a pure function of to_read. PER-LANGUAGE for the same reason as the entry above."
+      },
+      "R1h IS THE WHOLE OF 445daac3ab1a (Ilia Alshanetsky, 2004-07-28, 'Fixed possible crash in stream_socket_recvfrom() when length parameter has a negative value'), ONE FILE AND FIVE LINES, and it is the corpus index's own fix_commit for CRASH-097. Verified AT THE COMMIT and not at the column (PROTOCOL_PHP.md F5(iii)): the patch bytes are under controls/445daac3ab1a.patch, 807 B, sha256 48ac72d125ac39d200271013d1743fd3a87113db444c0697113483cbf8c1c1c2, byte-identical to the copy the manager cached independently. IT IS NOT COMPLETE AND THE ROW SAYS SO IN ITS OWN HASHED BLOCK. Measured over the whole to_read domain, controls/fix_scope.py: the guard removes every fault with to_read < 0; it ALSO refuses to_read == 0, which was never a fault, so it is over-broad on the safe side; and it removes NOTHING in [1, LONG_MAX - 2], where 2147483647 distinct values still make to_read + 1 a multiple of 2^32 and truncate. THE SECOND UPSTREAM CHANGE IS CITED HERE TOO AND IS NOT SHIPPED: 6ac8ffdfea108696fe32b4738b779a00d2d4328c (Antony Dovgal, 2006-12-25, one line, emalloc(to_read + 1) -> safe_emalloc(1, to_read, 1), in the 5.2.0 -> 5.3.0 window; patch under controls/). Measured marginal effect over stage 1: it removes the signed-overflow UB in to_read + 1 and refuses exactly TWO further values, LONG_MAX - 1 and LONG_MAX; it removes ZERO truncation faults. So the two stages are NOT the same rung, and shipping both would price a checked multiply that buys nothing this row can observe. NOTES.md section 4 is the argument and controls/fix_scope.py is the measurement. NO BACKTICKED SPELLING IN THIS ENTRY, deliberately: it is a statement about WHICH ALGORITHM each C rung implements and no single token decides it. The mechanical checks are controls/negatives.py --emit noclamp, which must NOT verify, and controls/fix_scope.py.",
+      "THE FOUR RUST RUNGS COMPUTE PHP'S OWN ALLOCATOR ARITHMETIC AND BOUND THE COPY BY IT, AND THAT IS WHAT MAKES R1..R5 DIFFER IN EXACTLY ONE THING. real_size is what _emalloc returns (zend_alloc.c:182), so a memory-safe translation binds the destination's length to it and clamps the receive; R1 hands the transport to_read instead, and the gap between the two IS the defect. THE ALTERNATIVE READING IS STATED SO A READER CAN DISAGREE: one could argue the safe port of emalloc(to_read + 1) is a Vec of to_read + 1 bytes, since Rust's allocator has no 32-bit truncation, and then safe Rust simply does not have the bug -- true, and unmeasurable, because it allocates 4 GiB per kernel call on the row's own trigger. NOTES.md section 6. A rung that allocated the UNTRUNCATED size would not be this ladder."
+    ],
+    "forbidden": [
+      "the addition computed in anything wider than a long, or reordered. \u26a0\u26a0 THIS ENTRY OPENED WITH THE EXPRESSION IN BACKTICKS AND THE GATE REFUSED THE ROW FOR IT -- twice, once per C rung -- WHICH IS THE EXACT TRAP ITS OWN LAST SENTENCE WARNS ABOUT. In a forbidden entry EVERY backticked span becomes a banned token, so an entry that quotes what it is PROTECTING bans that too, and c/kernel.c spells the protected thing because that is the point of protecting it. ph16's first draft lost fourteen (spelling x rung) obligations to the same shape; writing the warning into the entry did not stop me repeating it, which is worth more than the warning. The protected expression is streamsfuncs.c:321's, it is signed-overflow UB at LONG_MAX, that UB is PHP's and it is kept, and inputs/gen.py REFUSES to emit LONG_MAX so the measured corpus never evaluates it -- F46's UB-free-trigger strengthening applied to the whole corpus rather than to one input. NOTE THE ABSENCE OF BACKTICKS throughout this entry and the three below.",
+      "a capacity passed alongside the request. emalloc receives to_read + 1 and nothing that says how big the block it returns actually is; handing this kernel both numbers would be modelling a different bug and would delete the row.",
+      "plain malloc, calloc or realloc in place of the shim. Under plain malloc this row's adversarial input is CLEAN -- measured both ways in controls/allocator.py -- so a substituted allocator does not weaken the row, it deletes it. This is the one row in the corpus where PLAN_PHP.md 4.3's warning is load-bearing rather than prudential. \u26a0 THE ONE BACKTICKED TOKEN IN THIS ENTRY IS `calloc`, and it is safe to backtick BECAUSE NO RUNG SPELLS IT: it is the substitution, not the thing protected. The protected name is written without backticks two sentences up, for the reason forbidden[0] now records at length.",
+      "an undef of the fortify level. ph16 needs one and this row does not: gcc emits no memcpy check here in any of the eight measured configurations, and controls/fortify.py measures that with a must-fire control rather than inheriting ph16's answer. A rung that added one would be suppressing a mitigation that is not there, and would make this row's own fortify finding unfalsifiable. \u26a0 The banned token here is `#undef _FORTIFY_SOURCE`, spelled in backticks because it is what must NOT appear -- ph16's two C rungs both carry it and ph29's must not."
+    ],
+    "why": "ph29 is `PHP_FUNCTION(stream_socket_recvfrom)` out of PHP 5.0.0, `ext/standard/streamsfuncs.c:300-345`, corpus row CRASH-097, tier `narrowed`. THE IDIOM IS A SIZE THAT IS ASKED FOR, SILENTLY TRUNCATED BY THE ALLOCATOR, AND THEN USED AGAIN AS IF IT HAD BEEN HONOURED. `:321` is `read_buf = emalloc(to_read + 1);` where `to_read` is a `long` that `zend_parse_parameters` took from USERLAND at `:309`; `Zend/zend_alloc.c:129` declares `unsigned int real_size` and `:135` assigns `REAL_SIZE(size)` into it, so `:182` allocates `header + real_size` and hands back a block of `real_size` bytes. `:323` then calls `php_stream_xport_recvfrom(stream, read_buf, to_read, ...)` -- with `to_read`, the number it ASKED for -- and `:332` writes `read_buf[recvd]`. NOTHING IN PHP EVER COMPARES THE TWO. \u2b50 THE ROW EXISTS TO TEST `common-php/emalloc_shim.h` AND IT CANNOT PASS WITHOUT IT: under plain `malloc` the defect disappears in two different ways and both are measured in `controls/allocator.py` -- `malloc(2^64 - 2^32)` FAILS, so PHP prints and `exit(1)`s at `zend_alloc.c:189`, while `malloc(2^32)` SUCCEEDS with a real 4 GiB block and the write is in bounds. `PLAN_PHP.md` \u00a74.3 records that a substituted allocator once made a real defect look unreachable; this is the row where that warning is tested by something that fails without it. \u26a0\u26a0 R1h IS `445daac3ab1a` AND IT DOES NOT REMOVE THE DEFECT. The guard it adds is `if (to_read <= 0) RETURN_FALSE;` -- exactly what its own subject says, *\"when length parameter has a negative value\"* -- and `stream_socket_recvfrom($s, 4294967295)` is positive. The second upstream change, `6ac8ffdfea10`, does not remove it either, because `_safe_emalloc` checks in 64-bit `long` and then calls the truncating `_emalloc` at `zend_alloc.c:238`. `controls/fix_scope.py` prices both, separately and together, over the whole `to_read` domain. \u26a0 SO THE SHIPPED ADVERSARIAL INPUTS ARE THE ARM THE FIX DOES CLOSE (`to_read < 0`), because `check.py` stage 7h requires R1h to be clean on every input; the arm it does not close is in `controls/`, which is where `.memory-php/02-ladder.md` F31 says that evidence belongs. \u2b50 AND THE COMPILER DOES NOT CLOSE IT EITHER. Ubuntu's gcc injects `-D_FORTIFY_SOURCE=3` at `-O3` and level 3 uses `__builtin_dynamic_object_size`, which tracks allocation sizes -- exactly the check this row is about. It emits NO `__memcpy_chk` here, in any of the eight (compiler \u00d7 opt \u00d7 mode) configurations. `controls/fortify.py` isolates why, with must-fire controls: `php_shim_emalloc`'s SIZE-CLASS CACHE gives the returned pointer TWO PROVENANCES and `__bdos` of that PHI is unknown, so PHP 5.0.0's own allocator feature defeats a 2024 compiler mitigation. \u26a0 Unlike `ph16`, no rung here needs `#undef _FORTIFY_SOURCE`, and that is MEASURED rather than inherited (F56 says explicitly not to inherit it). NAMED-SPELLING STANDARD -- POLICY ADOPTED AT TASK_018, AFTER the alternate spellings had been measured, and REPAIRED AT TASK_019 because TASK_018_REVIEW B1 measured that the version it replaced did not describe the shipped tree. It is NOT a disambiguation of what these entries always meant, and presenting it as one would be the self-certification this mechanism exists to prevent (TASK_017_REVIEW). The rule, and this paragraph is byte-identical in all six patterns' `why` -- diff them: where a `required` entry quotes an expression in backticks it pins THAT SPELLING, not merely the property the expression has, so a rung that establishes the same fact by a different expression is out of contract even when it is semantically identical and even when it compiles to the same bytes; a `forbidden` entry excludes the spelling it quotes, the same way. HOW A SPELLING IS MATCHED -- written down because `literal` never was, and twenty shipped obligations turned on the gap: a rung matches a quoted spelling when the spelling occurs in that rung's EXEC source after comments and string literals are blanked, after Verus ghost clauses are blanked, and after every whitespace character is deleted from both sides. That is `harness/check.py::spelling_matches`, selftested at gate stage 0 and therefore hashed into `source_sha256`, so the convention cannot drift while remaining an adjective. Each of its three parts was forced by a shipped cell, not chosen. (a) Whitespace is not a spelling: p17 declares `2 + 2*nsuf > len` and all six p17 rungs write `2 + 2 * nsuf > len`, which put six cells out of their own contract on two space characters. (b) A comment is not code: `patterns/p02-buffer-copy/c/kernel_hardened.c` and `patterns/p16-tlv-walk/c/kernel_hardened.c` each quote their own pattern's `forbidden` spelling inside the comment that explains why they do not use it, and `patterns/p17-http-range/c/kernel.c` would otherwise satisfy `2 + 2*nsuf > len` on the strength of a comment while its code writes the spaced form -- a match for the wrong reason is as bad as a miss. (c) Ghost is not exec: a Verus `requires`/`ensures`/`invariant`/`decreases` is erased before codegen and its arithmetic is over unbounded `int`, so it cannot carry the overflow an additive spelling is forbidden for; `patterns/p16-tlv-walk/verus.rs`'s loop invariant `p + 3 + vlen <= end` is the shipped instance, and without this part p16's own R5 violates p16's `forbidden[0]` on a grep. PER-LANGUAGE ENTRIES: an entry of `required` or `forbidden` may be an object keyed by language, with keys `c` and `rust`, instead of a string; each rung is then matched only against its own language's spelling. A plain string still applies to every rung and stays the right shape whenever one spelling covers all six -- which it does for p16's comparisons, so per-language is a tool and not a habit. THE CLAUSE THIS REPLACED IS RETRACTED, and so is the count that justified it. Until TASK_019 this paragraph read `where a rung's LANGUAGE cannot express the quoted spelling, that rung spells the same operands the way its language forces and nothing else varies`, justified by EIGHT SHIPPED CELLS. Both are wrong (TASK_018_REVIEW B1). The count was never eight: p08's `dr = d + r` carries no backticks and so was never pinned, and six p17 cells nobody had counted were out on spacing. TASK_018_REVIEW put the corrected figure at 10, or 4 once whitespace is normalised; measured against the WHOLE declaration rather than the two entries that review looked at, the pre-repair figure is 20 obligations failing on raw text, 15 once comments and ghost are blanked and 9 once whitespace is deleted. The five it adds are p17's `required[1]`, which quoted an ELLIPSIS -- `if start < end && start >= 0 { ... }` -- that no rung can contain, and which nobody had counted either. And the clause's antecedent is FALSE exactly where it was needed -- Rust CAN spell `len > src_len - (src_off + 2)`, and a p02 R3 variant that does is byte-identical to the shipped cell (`md5_fn e207ec6c8697...`, identical marginal on both bands), so the clause never fired for the four cells it existed to rescue. Per-language entries do that job, and they do it by NARROWING and not by widening: with p02's `required[0]` and `forbidden[0]` carrying Rust spellings, the shipped R3 matches and BOTH variants that are not it fail to match -- the forbidden additive guard, 3.00 Ir/call cheaper than shipped R3, and the byte-identical `src_len`-spelled guard -- where before the edit the pin matched none of the three and decided nothing at all. THE COUNT, MEASURED AFTER THE REPAIR RATHER THAN ASSERTED (TASK_019, `.temp/p19/pins.py`, a hand-transcribed table of every backticked spelling against every rung it scopes to): the repaired declaration makes 82 (spelling x rung) obligations across the six patterns, of which 11 fail on raw text, 6 once comments and ghost are blanked, and 0 under the rule above -- so NO shipped cell is out of its own declaration, and that is a count and not an adjective. The pre-repair declaration made 78 obligations and failed 20 / 15 / 9. The total ROSE because per-language entries pin MORE and not less: the Rust three-term guard `len > dst.len() || len > src.len() - (src_off + 2)` is now pinned where before only a sub-expression of it was. WHY IT WAS ADOPTED: TASK_017 applied this reading to p16 and refused it for p17 in the same commit, writing into p17's NOTES.md that a spelling with no `end` binding anywhere in its code satisfied entries naming `start < end` (TASK_017_REVIEW B1). One rule across all six is the repair, and it still holds `.temp/p05r3/v17/tuned_suffix.rs` out: every p17 rung binds `end`, so p17's entries name spellings its rungs really write and no per-language key rescues a variant that binds no `end` at all. TOKENS rather than SEMANTICS, for a reason that is checkable rather than rhetorical: only the token reading partitions cleanly. `.temp/p05r3/v16/tuned_split.rs` satisfies p16's `every comparison is subtraction-first` VACUOUSLY -- it contains no comparison at all -- and `tuned_splitat.rs`'s `rest.len() >= 3` is neither subtraction-first nor additive, so the semantic reading does not decide either of them (TASK_017_REVIEW m5). A contract a grep can settle beats a contract only an argument can settle -- WHERE a grep settles it, which is narrower than TASK_018 wrote. WHAT NO GREP SETTLES, recorded so nobody re-derives it: `required` in p01 and p05 contains no backticks at all, so those two patterns pin no token and their rungs are matched by prose only; and the POLARITY of a quoted span (p02's `|`, p08's `&` and p17's `continue` are quoted in order to be ABSENT) and the SET OF RUNGS it scopes to (p02's first entry, p16's fourth, p17's third) live in the entry's English. `spelling_matches` decides one spelling against one rung; which spelling and which rung is a reading, and no gate stage reproduces it. WHAT THE STANDARD DOES NOT BUY, measured and put here rather than in a footnote: a pinned idiom makes the admissible class DECIDABLE, not SINGULAR. Respelling only what the declaration leaves free moves p16's R3 by `4*nrec - 8` Ir/call, p17's by 51 flat and p02's by 3 to 4. THE UNSAFE SIDE DOES NOT MOVE, AND THE SENTENCE THAT SAID IT DID IS WITHDRAWN (TASK_028, on TASK_027_REVIEW's seven Verus twins). Until TASK_028 this paragraph read `and it moves the UNSAFE rung too, by the same lever: p16's R4 by 4*nrec (TASK_023) and p05's by 7 flat (TASK_022)`, and that names ONE lever -- respelling the header read -- which is NOT ADMISSIBLE ON EITHER PATTERN. All six patterns pin `identity: unsafe == verus, O3 exact`, so an R4 is not merely a program that MAY use `unsafe`: it is a program that must have a byte-identical R5 twin that Verus verifies. At the pinned vstd every route to that respelling is `is not supported` -- `read_unaligned`, `as_ptr`, `add`, `from_raw_parts`, `TryFromSliceError` and `from_le_bytes` -- so p16's `r4_hdr` and p05's `c4_hu16_nz` are controls and not rungs, and shipping either costs a NEW TRUSTED ITEM, which is exactly what disqualified `r4_hdr` on p16. `4*nrec` and `7 flat` are therefore both withdrawn, NEITHER PATTERN'S R4 SIDE HAS MOVED BY A SINGLE ADMISSIBLE INSTRUCTION, and the reason is this block's own `identity` pin rather than anything about those two patterns -- it binds all six, and p01's R2 as well, which is pinned the same way. Read the ERROR TEXT and not the exit code: `is not supported` disqualifies, because it is what forces a new TRUSTED item, while `postcondition not satisfied` disqualifies nothing -- the same p05 exec code went from `11 verified, 1 errors` to `13 verified, 0 errors` with one lemma and one `proof` block, at zero TCB. THIS PROJECT PUBLISHES NO PAIR INTERVAL, and the two it did publish fall with that sentence: p05's `2*nrow - 2` ... `6*nrow + 20` (36...134 / 128...410, whose bottom endpoint was quoted as `exactly 0.00`) took its endpoints from `r4_dataslice` and `c4_hu16_nz`, and p16's from `r4_hdr`; none of the three is a rung. What ships is TWO quantities and not three. THE ONE REAL BOUND needs R4 held fixed BY FIAT rather than minimised: then, and only then, `R3ship - R4ship` bounds `inf(in-contract R3) - R4ship`. Beside it goes the R3-SIDE SPAN, cheapest-found to dearest-found in contract. A pair interval over the ADMISSIBLE class is not unavailable, it is DEGENERATE, which is the more informative thing to say and is why `unavailable` is not written here: the only p05 R4 SHOWN admissible is the shipped cell -- six more measure exactly R4ship and were never put through Verus, and the two that MOVE were put through it and failed -- so the R4 endpoint has ZERO measured width and the interval collapses onto the R3-side span, `5*nrow + 6` ... `6*nrow + 13` = 101...127 / 331...403, width `nrow + 7` = 26 / 72. That is p05's R3-side span exactly, i.e. a third NAME for a second NUMBER, so do not quote it as a pair result; it becomes one the day somebody builds an admissible R4 that MOVES, and on two patterns now -- p05's unbuilt zero-guard deletion and p16's unbuilt hand-unrolled 32x fold -- that is the open question and nobody has built it. And `min(R3 found) - min(R4 found)` is NOT the repair -- two upper bounds differenced bound nothing in either direction; on p05 one edit moved it -2 on R4 and +1 on R3, so the constant does not cancel (the R4 half of that illustration is an inference from the inadmissible `c4_hu16_nz` family and has never been compiled; the arithmetic point does not rest on it), and its third published minimum EXCEEDS its published figure at `nrow <= 3`. Every pattern owes an in-contract spread beside its headline; on the R3 side p16 and p17 have one from TASK_018, p02 from TASK_019 and p05 from TASK_021 (their NOTES.md 10a / 14; 14 also measured that this audit CANNOT settle p05 -- its declaration backticks nothing, so `spellings` is 0 and admission is decided by prose plus one grep), on the R4 side ONLY p05 and p16, and p01 and p08 neither"
+  },
+  "idiom_audit": {
+    "spellings": 4,
+    "rungs": 6,
+    "pairs": 12,
+    "present": 0,
+    "languages": [
+      "c",
+      "rust"
+    ],
+    "forbidden_only_sources": [
+      "c/kernel.h"
+    ],
+    "forbidden_spellings": 4,
+    "forbidden_hits": 0,
+    "hits": [],
+    "forbidden_unaudited_entries": 2,
+    "forbidden_unaudited": [
+      {
+        "entry": "forbidden[0]",
+        "text": "the addition computed in anything wider than a long, or reordered. \u26a0\u26a0 THIS ENTRY OPENED WITH THE EXPRESSION IN BACKTICKS AND THE GATE REFUSED THE ROW FOR IT -- twice, once per C rung -- WHICH IS THE EXACT TRAP ITS OWN LAST SENTENCE WARNS ABOUT. In a forbidden entry EVERY backticked span becomes a banned token, so an entry that quotes what it is PROTECTING bans that too, and c/kernel.c spells the protected thing because that is the point of protecting it. ph16's first draft lost fourteen (spelling x rung) obligations to the same shape; writing the warning into the entry did not stop me repeating it, which is worth more than the warning. The protected expression is streamsfuncs.c:321's, it is signed-overflow UB at LONG_MAX, that UB is PHP's and it is kept, and inputs/gen.py REFUSES to emit LONG_MAX so the measured corpus never evaluates it -- F46's UB-free-trigger strengthening applied to the whole corpus rather than to one input. NOTE THE ABSENCE OF BACKTICKS throughout this entry and the three below."
+      },
+      {
+        "entry": "forbidden[1]",
+        "text": "a capacity passed alongside the request. emalloc receives to_read + 1 and nothing that says how big the block it returns actually is; handing this kernel both numbers would be modelling a different bug and would delete the row."
+      }
+    ],
+    "required_pins_nothing": 0,
+    "pins_nothing": [],
+    "required_absent": 0,
+    "absent": [],
+    "no_rung_entries": 0,
+    "no_rung": []
+  },
+  "doc_citations": {
+    "fatal": [],
+    "other": [
+      {
+        "file": "patterns/ph29-recvfrom-alloc/c/emalloc_shim.h",
+        "line": 117,
+        "module": "build.py",
+        "cited_line": 163,
+        "as_written": "build.py:163-165"
+      },
+      {
+        "file": "patterns/ph29-recvfrom-alloc/c/emalloc_shim.h",
+        "line": 133,
+        "module": "build.py",
+        "cited_line": 167,
+        "as_written": "build.py:167"
+      },
+      {
+        "file": "patterns/ph29-recvfrom-alloc/c/emalloc_shim.h",
+        "line": 492,
+        "module": "build.py",
+        "cited_line": 168,
+        "as_written": "build.py:168-171"
+      },
+      {
+        "file": "patterns/ph29-recvfrom-alloc/c/kernel_hardened.c",
+        "line": 66,
+        "module": "build.py",
+        "cited_line": 163,
+        "as_written": "build.py:163-165"
+      }
+    ],
+    "harness_modules": [
+      "asm.py",
+      "build.py",
+      "check.py",
+      "composition.py",
+      "contract_diff.py",
+      "dloop.py",
+      "fixture.py",
+      "limbs.py",
+      "measure.py",
+      "report.py",
+      "table_render_inputs.py",
+      "temp_citations.py",
+      "vparse.py"
+    ]
+  },
+  "codegen_cfgs": {
+    "build_py_cfgs": [
+      "slb_isolated"
+    ],
+    "missing": [],
+    "unresolved": 0,
+    "verdict": "OK"
+  },
+  "source_sha256": {
+    "common/digest_bridge.py": "aaa5931dd76e491f1b95a3fcc84304da245cb2ed1db880893bee8600310d5ca9",
+    "common/driver.c": "f21be5c4a8dab98b074f7932d933538ebee5ee9875aff2bad925b728f2d46ad3",
+    "common/driver.h": "57f72fffa54edc449f2b95f181e887f743681d86ba9e4a62ee251361810e5674",
+    "common/driver.rs": "595de2393cfa0bebcef7f014b8edba7c2004949c9216e99826fdc9221d2ae80e",
+    "common/slb.py": "2abd87f76712ac0cccbce47caed5f9a73d66c25098bfdfa014ebfb085781ea2f",
+    "harness/asm.py": "85ea334dc96abfcf87b2603ed96f92e5f5f42320a5e3a36aafd16113cd309ac0",
+    "harness/build.py": "456e8f95323bcad96331be4d27bd7b68174c9ec9d4f0ce228a36bb7f12091675",
+    "harness/check.py": "eeb7ffa7b0346724d4fc83d03e9b96d7476d482d5fc39ab0a4e3e1e8aa493c2a",
+    "harness/dloop.py": "7bfcc47d13ddc90757b645caea5dc1bf8c41d6939ec31d744dffacc451f30278",
+    "harness/fixture.py": "b4d4c3769e84c6f149d26b21ae0f1aa1113815e710252f97c0b175c994597dfc",
+    "harness/limbs.py": "a2bfc2e6bf2b72083479d86c2d6edb1ac065b3e83d3118262f99a569db2315ac",
+    "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
+    "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
+    "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
+    "patterns/ph29-recvfrom-alloc/NOTES.md": "bbc3f1a8ad761caf6a340a68eee75a466c8aa3d4aca38ac6b41b484f2787c514",
+    "patterns/ph29-recvfrom-alloc/README.md": "c3bec74ff2ea1adc6ceb2dfae745e481c005e3f21120912bec77cbc978a7ad1f",
+    "patterns/ph29-recvfrom-alloc/c/emalloc_shim.h": "aa9abf48535e8df93c9398e96c044697a784d73c40d7a7ccc830b5ee308c378f",
+    "patterns/ph29-recvfrom-alloc/c/kernel.c": "e573fa2222df64095e646ca2bd7c0452dddb73db3f11888481c1b05e59c2dab7",
+    "patterns/ph29-recvfrom-alloc/c/kernel.h": "85f54a50aefbdd12f7dd578fe39e732bcc288dcb4c99b81dbcfdc5cecf4557a3",
+    "patterns/ph29-recvfrom-alloc/c/kernel_hardened.c": "8be2e7fb4a408cd33a257b6351b5d5895e910377b7a371c4b594e44de8f673b5",
+    "patterns/ph29-recvfrom-alloc/c/main.c": "81c8b1ba89eba2383a4dc2a4411db773b3af0486842d841775f3cfaf8975457a",
+    "patterns/ph29-recvfrom-alloc/controls/445daac3ab1a.patch": "48ac72d125ac39d200271013d1743fd3a87113db444c0697113483cbf8c1c1c2",
+    "patterns/ph29-recvfrom-alloc/controls/6ac8ffdfea10.patch": "00776f9576ef3b5a602bb0da38196c304ddbb43e228358b19d8b273b0c2c82af",
+    "patterns/ph29-recvfrom-alloc/controls/allocator.c": "0e1830055e141fc9103b5cef06fc7f5eb6fc834d989ee1e9fc0f336b2c946e08",
+    "patterns/ph29-recvfrom-alloc/controls/allocator.py": "f4cceae46efdb4a6e7a9bdf2ead7f17f4f8aafba83370ebedda121eeabd1be2a",
+    "patterns/ph29-recvfrom-alloc/controls/fix_scope.py": "21b611ffb89a5320b41839fb79d1cd28ed9dc3b223651ac0030b37605d381313",
+    "patterns/ph29-recvfrom-alloc/controls/fortify.py": "fec3144030a9d7048dfd9f94fc9719db8ed26a4581ec0e3f734f37704e70b7c0",
+    "patterns/ph29-recvfrom-alloc/controls/negatives.py": "b526c620b4fecfd0f2e912bac11b03668c66e20a4ab4a47f6859af58c3786591",
+    "patterns/ph29-recvfrom-alloc/controls/oracle.c": "56ba375246d788b5d3d4ed1a7c004dc900b23e865ab0f95124a1c96da15a54d6",
+    "patterns/ph29-recvfrom-alloc/controls/oracle.py": "fd9f64e9a00c47a72a367415bd1826a82b6a2686bbbd39f78795d7f690938982",
+    "patterns/ph29-recvfrom-alloc/inputs/gen.py": "b4579a235250e9d2f789e019626dec9d294d46122cf4315238f059310deec917",
+    "patterns/ph29-recvfrom-alloc/model.py": "47a04eff7d3176dcaaf7c77e391eccdd22a8228b54ed53547823d14767d0a66e",
+    "patterns/ph29-recvfrom-alloc/safe_naive.rs": "f7cda41d92e94e8dd53e424110f8618e94e9b18d64e1d2fa8ab939d4a1a135f4",
+    "patterns/ph29-recvfrom-alloc/safe_tuned.rs": "ac8e84a7653be6b96f0f3776af24be8c8e78c3b6d38eee7c8a4b2709b33e9907",
+    "patterns/ph29-recvfrom-alloc/spec.md": "83fc7ab0872faf16dd14f600d2c74ef693066915e029d00167d110225b4c9e7e",
+    "patterns/ph29-recvfrom-alloc/unsafe.rs": "bb1c9e48af4bd95f7f03cd89ff8c2410ec322060ff586d6f6ace1d5aefece1c3",
+    "patterns/ph29-recvfrom-alloc/verus.rs": "5ebc37500853348cbc3775e997f69c179abefb41429470c0a9c6a931ecd2893b",
+    "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
+  },
+  "derived_contract": {
+    "requires": [
+      "off + len <= buf_len",
+      "16 <= len"
+    ],
+    "ensures": [
+      "result == recv_fold(buf, off, len)"
+    ],
+    "alpha_ir_per_work": 0.25,
+    "collapse_rate_ir_per_work": 0.25,
+    "collapse_work_unit": "byte",
+    "collapse_floor_min_declarable": 0.015625,
+    "collapse_tightest_margin": 7.34459273797841
+  },
+  "identity": [
+    {
+      "pair": "unsafe vs verus",
+      "opt": "O0",
+      "level": "norel",
+      "expected": "norel",
+      "md5_fn_a": "2a8f2758f4dbf84afa8d0ab1251892fa",
+      "md5_fn_b": "21f7fa2d2dd6439664d83289ec66dced",
+      "md5_raw_equal": false,
+      "counts_a": [
+        406,
+        406,
+        2354
+      ],
+      "counts_b": [
+        406,
+        406,
+        2354
+      ],
+      "pad_a": [
+        14,
+        14
+      ],
+      "pad_b": [
+        14,
+        14
+      ]
+    },
+    {
+      "pair": "unsafe vs verus",
+      "opt": "O3",
+      "level": "exact",
+      "expected": "exact",
+      "md5_fn_a": "a7adc5d4e32f2a63787f84dccb2c04f3",
+      "md5_fn_b": "a7adc5d4e32f2a63787f84dccb2c04f3",
+      "md5_raw_equal": true,
+      "counts_a": [
+        182,
+        180,
+        671
+      ],
+      "counts_b": [
+        182,
+        180,
+        671
+      ],
+      "pad_a": [
+        1,
+        1
+      ],
+      "pad_b": [
+        1,
+        1
+      ]
+    }
+  ],
+  "marginal_ir_env": {
+    "bytes": 3305,
+    "nvars": 49,
+    "envp_stack_bytes": 3697,
+    "tuning_vars": {
+      "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
+    },
+    "repo_path_bytes": 48,
+    "domain": "Comparable ONLY against a record with the same `envp_stack_bytes` (= bytes + 8*nvars), the same `tuning_vars` and the same `repo_path_bytes`. That is a NECESSARY condition, not a proved sufficient one: `bytes` alone was believed sufficient and TASK_114 falsified it at +-7 Ir/call. argv beyond the repo prefix, and anything else on the initial stack, are not recorded here. When the three differ, compare `kernel_exclusive_ir` in results/pNN-*.json instead -- structurally immune, 0 of 288 triples moved."
+  },
+  "marginal_ir_per_call": {
+    "c-clang/O0/isolated/small.bin": 3149.37,
+    "c-clang/O0/isolated/large.bin": 17452.34,
+    "c-clang/O0/isolated/d_ir_d_work": 4.056429381735678,
+    "c-clang/O0/whole/small.bin": 3145.29,
+    "c-clang/O0/whole/large.bin": 17448.56,
+    "c-clang/O0/whole/d_ir_d_work": 4.056514463981849,
+    "c-clang/O3/isolated/small.bin": 1453.73,
+    "c-clang/O3/isolated/large.bin": 7935.88,
+    "c-clang/O3/isolated/d_ir_d_work": 1.8383862733976175,
+    "c-clang/O3/whole/small.bin": 1408.18,
+    "c-clang/O3/whole/large.bin": 7486.6,
+    "c-clang/O3/whole/d_ir_d_work": 1.723885422575156,
+    "c-clang-h/O0/isolated/small.bin": 3151.37,
+    "c-clang-h/O0/isolated/large.bin": 17454.34,
+    "c-clang-h/O0/isolated/d_ir_d_work": 4.056429381735678,
+    "c-clang-h/O0/whole/small.bin": 3147.29,
+    "c-clang-h/O0/whole/large.bin": 17450.56,
+    "c-clang-h/O0/whole/d_ir_d_work": 4.056514463981849,
+    "c-clang-h/O3/isolated/small.bin": 1451.11,
+    "c-clang-h/O3/isolated/large.bin": 7933.34,
+    "c-clang-h/O3/isolated/d_ir_d_work": 1.8384089619965969,
+    "c-clang-h/O3/whole/small.bin": 1405.8,
+    "c-clang-h/O3/whole/large.bin": 7484.14,
+    "c-clang-h/O3/whole/d_ir_d_work": 1.723862733976177,
+    "c-gcc/O0/isolated/small.bin": 4039.04,
+    "c-gcc/O0/isolated/large.bin": 22657.46,
+    "c-gcc/O0/isolated/d_ir_d_work": 5.28032331253545,
+    "c-gcc/O0/whole/small.bin": 4039.04,
+    "c-gcc/O0/whole/large.bin": 22657.46,
+    "c-gcc/O0/whole/d_ir_d_work": 5.28032331253545,
+    "c-gcc/O3/isolated/small.bin": 1952.75,
+    "c-gcc/O3/isolated/large.bin": 10864.2,
+    "c-gcc/O3/isolated/d_ir_d_work": 2.5273539421440727,
+    "c-gcc/O3/whole/small.bin": 1953.34,
+    "c-gcc/O3/whole/large.bin": 10863.6,
+    "c-gcc/O3/whole/d_ir_d_work": 2.5270164492342597,
+    "c-gcc-h/O0/isolated/small.bin": 4041.04,
+    "c-gcc-h/O0/isolated/large.bin": 22659.46,
+    "c-gcc-h/O0/isolated/d_ir_d_work": 5.28032331253545,
+    "c-gcc-h/O0/whole/small.bin": 4041.04,
+    "c-gcc-h/O0/whole/large.bin": 22659.46,
+    "c-gcc-h/O0/whole/d_ir_d_work": 5.28032331253545,
+    "c-gcc-h/O3/isolated/small.bin": 1954.47,
+    "c-gcc-h/O3/isolated/large.bin": 10866.36,
+    "c-gcc-h/O3/isolated/d_ir_d_work": 2.5274787294384575,
+    "c-gcc-h/O3/whole/small.bin": 1953.54,
+    "c-gcc-h/O3/whole/large.bin": 10863.68,
+    "c-gcc-h/O3/whole/d_ir_d_work": 2.526982416335791,
+    "safe_naive/O0/isolated/small.bin": 17742.84,
+    "safe_naive/O0/isolated/large.bin": 121911.36,
+    "safe_naive/O0/isolated/d_ir_d_work": 29.542972206466253,
+    "safe_naive/O0/whole/small.bin": 17742.84,
+    "safe_naive/O0/whole/large.bin": 121911.36,
+    "safe_naive/O0/whole/d_ir_d_work": 29.542972206466253,
+    "safe_naive/O3/isolated/small.bin": 1656.95,
+    "safe_naive/O3/isolated/large.bin": 10951.38,
+    "safe_naive/O3/isolated/d_ir_d_work": 2.6359699376063523,
+    "safe_naive/O3/whole/small.bin": 1643.03,
+    "safe_naive/O3/whole/large.bin": 10837.93,
+    "safe_naive/O3/whole/d_ir_d_work": 2.607742484401588,
+    "safe_tuned/O0/isolated/small.bin": 8837.85,
+    "safe_tuned/O0/isolated/large.bin": 59172.03,
+    "safe_tuned/O0/isolated/d_ir_d_work": 14.275150311968236,
+    "safe_tuned/O0/whole/small.bin": 8837.85,
+    "safe_tuned/O0/whole/large.bin": 59172.03,
+    "safe_tuned/O0/whole/d_ir_d_work": 14.275150311968236,
+    "safe_tuned/O3/isolated/small.bin": 1495.98,
+    "safe_tuned/O3/isolated/large.bin": 10149.34,
+    "safe_tuned/O3/isolated/d_ir_d_work": 2.454157685762904,
+    "safe_tuned/O3/whole/small.bin": 1478.3,
+    "safe_tuned/O3/whole/large.bin": 10131.74,
+    "safe_tuned/O3/whole/d_ir_d_work": 2.4541803743618833,
+    "unsafe/O0/isolated/small.bin": 10193.33,
+    "unsafe/O0/isolated/large.bin": 68074.39,
+    "unsafe/O0/isolated/d_ir_d_work": 16.41550198525241,
+    "unsafe/O0/whole/small.bin": 10193.33,
+    "unsafe/O0/whole/large.bin": 68074.39,
+    "unsafe/O0/whole/d_ir_d_work": 16.41550198525241,
+    "unsafe/O3/isolated/small.bin": 1566.56,
+    "unsafe/O3/isolated/large.bin": 10623.5,
+    "unsafe/O3/isolated/d_ir_d_work": 2.5686159954622805,
+    "unsafe/O3/whole/small.bin": 1547.14,
+    "unsafe/O3/whole/large.bin": 10604.07,
+    "unsafe/O3/whole/d_ir_d_work": 2.5686131593874078,
+    "verus/O0/isolated/small.bin": 10202.16,
+    "verus/O0/isolated/large.bin": 68074.39,
+    "verus/O0/isolated/d_ir_d_work": 16.412997731140102,
+    "verus/O0/whole/small.bin": 10202.16,
+    "verus/O0/whole/large.bin": 68074.39,
+    "verus/O0/whole/d_ir_d_work": 16.412997731140102,
+    "verus/O3/isolated/small.bin": 1575.39,
+    "verus/O3/isolated/large.bin": 10623.5,
+    "verus/O3/isolated/d_ir_d_work": 2.566111741349972,
+    "verus/O3/whole/small.bin": 1558.29,
+    "verus/O3/whole/large.bin": 10606.46,
+    "verus/O3/whole/d_ir_d_work": 2.5661287577992056
+  },
+  "verus": {
+    "verus.rs": {
+      "verified": 10,
+      "errors": 0,
+      "pinned": 10,
+      "tcb_items": [
+        {
+          "name": "get_unchecked",
+          "attr": "verifier::external_body",
+          "body_lines": 1,
+          "line": 235
+        },
+        {
+          "name": "vget_unchecked",
+          "attr": "verifier::external_body",
+          "body_lines": 1,
+          "line": 262
+        },
+        {
+          "name": "vset_unchecked",
+          "attr": "verifier::external_body",
+          "body_lines": 1,
+          "line": 293
+        },
+        {
+          "name": "vcopy_unchecked",
+          "attr": "verifier::external_body",
+          "body_lines": 3,
+          "line": 332
+        },
+        {
+          "name": "load_input",
+          "attr": "verifier::external_body",
+          "body_lines": 4,
+          "line": 383
+        },
+        {
+          "name": "emit",
+          "attr": "verifier::external_body",
+          "body_lines": 1,
+          "line": 395
+        }
+      ],
+      "axiom_decls": [],
+      "global_decls": []
+    }
+  },
+  "verified_call_site": {
+    "main": 5,
+    "kernel": 2
+  },
+  "clause_deletion": {
+    "verus.rs": {
+      "control_verified": 10,
+      "mutants": [
+        {
+          "item": "main",
+          "kind": "assert(false) probe",
+          "clause": null,
+          "verified": 9,
+          "errors": 1
+        },
+        {
+          "item": "get_unchecked",
+          "kind": "trusted",
+          "clause": "r == v@[i as int]",
+          "verified": 9,
+          "errors": 1
+        },
+        {
+          "item": "vget_unchecked",
+          "kind": "trusted",
+          "clause": "r == v@[i as int]",
+          "verified": 9,
+          "errors": 1
+        },
+        {
+          "item": "vset_unchecked",
+          "kind": "trusted",
+          "clause": "final(v)@ == old(v)@.update(i as int, x)",
+          "verified": 9,
+          "errors": 1
+        },
+        {
+          "item": "vcopy_unchecked",
+          "kind": "trusted",
+          "clause": "final(v)@.len() == old(v)@.len()",
+          "verified": 9,
+          "errors": 1
+        },
+        {
+          "item": "vcopy_unchecked",
+          "kind": "trusted",
+          "clause": "forall|j: int| 0 <= j < n ==> final(v)@[j] == s@[from + j]",
+          "verified": 9,
+          "errors": 1
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "r == recv_fold(buf@, off as int, len as int)",
+          "verified": 9,
+          "errors": 1
+        }
+      ]
+    }
+  },
+  "requires_strength": {
+    "verus.rs": {
+      "control_verified": 10,
+      "mutants": [
+        {
+          "item": "get_unchecked",
+          "kind": "trusted",
+          "clause": "i < v@.len()",
+          "test": "tautology",
+          "tactic": "nonlinear_arith",
+          "tactics_ran": [
+            null,
+            "nonlinear_arith"
+          ],
+          "tactics_inapplicable": [
+            "bit_vector"
+          ],
+          "verified": 11,
+          "errors": 1,
+          "verdict": "not a tautology"
+        },
+        {
+          "item": "vget_unchecked",
+          "kind": "trusted",
+          "clause": "i < v@.len()",
+          "test": "tautology",
+          "tactic": "nonlinear_arith",
+          "tactics_ran": [
+            null,
+            "nonlinear_arith"
+          ],
+          "tactics_inapplicable": [
+            "bit_vector"
+          ],
+          "verified": 11,
+          "errors": 1,
+          "verdict": "not a tautology"
+        },
+        {
+          "item": "vset_unchecked",
+          "kind": "trusted",
+          "clause": "i < old(v)@.len()",
+          "test": "tautology",
+          "tactic": null,
+          "tactics_ran": [
+            null
+          ],
+          "tactics_inapplicable": [
+            "nonlinear_arith",
+            "bit_vector"
+          ],
+          "verified": 10,
+          "errors": 1,
+          "verdict": "not a tautology"
+        },
+        {
+          "item": "vcopy_unchecked",
+          "kind": "trusted",
+          "clause": "n <= old(v)@.len()",
+          "test": "tautology",
+          "tactic": null,
+          "tactics_ran": [
+            null
+          ],
+          "tactics_inapplicable": [
+            "nonlinear_arith",
+            "bit_vector"
+          ],
+          "verified": 10,
+          "errors": 1,
+          "verdict": "not a tautology"
+        },
+        {
+          "item": "vcopy_unchecked",
+          "kind": "trusted",
+          "clause": "from + n <= s@.len()",
+          "test": "tautology",
+          "tactic": "nonlinear_arith",
+          "tactics_ran": [
+            null,
+            "nonlinear_arith"
+          ],
+          "tactics_inapplicable": [
+            "bit_vector"
+          ],
+          "verified": 11,
+          "errors": 1,
+          "verdict": "not a tautology"
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "off + len <= buf@.len()",
+          "test": "tautology",
+          "tactic": "nonlinear_arith",
+          "tactics_ran": [
+            null,
+            "nonlinear_arith"
+          ],
+          "tactics_inapplicable": [
+            "bit_vector"
+          ],
+          "verified": 11,
+          "errors": 1,
+          "verdict": "not a tautology"
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "off + len <= buf@.len()",
+          "test": "deletion",
+          "verified": 9,
+          "errors": 1
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "16 <= len",
+          "test": "tautology",
+          "tactic": "bit_vector",
+          "tactics_ran": [
+            null,
+            "nonlinear_arith",
+            "bit_vector"
+          ],
+          "tactics_inapplicable": [],
+          "verified": 11,
+          "errors": 2,
+          "verdict": "not a tautology"
+        },
+        {
+          "item": "kernel",
+          "kind": "verified",
+          "clause": "16 <= len",
+          "test": "deletion",
+          "verified": 9,
+          "errors": 1
+        }
+      ]
+    }
+  },
+  "verified_twins": {
+    "verus.rs": {
+      "twins": [
+        {
+          "trusted": "get_unchecked",
+          "twin": "slb_twin_get_unchecked",
+          "signature_identical": true,
+          "requires": [
+            "i < v@.len()"
+          ],
+          "ensures": [
+            "r == v@[i as int]"
+          ],
+          "body_lines": 1,
+          "vacuity_probe": {
+            "per_conjunct": [
+              {
+                "conjunct": "i < v@.len()",
+                "verified": 14,
+                "errors": 1
+              }
+            ],
+            "load_bearing": 1,
+            "conjuncts": 1
+          }
+        },
+        {
+          "trusted": "vget_unchecked",
+          "twin": "slb_twin_vget_unchecked",
+          "signature_identical": true,
+          "requires": [
+            "i < v@.len()"
+          ],
+          "ensures": [
+            "r == v@[i as int]"
+          ],
+          "body_lines": 1,
+          "vacuity_probe": {
+            "per_conjunct": [
+              {
+                "conjunct": "i < v@.len()",
+                "verified": 14,
+                "errors": 1
+              }
+            ],
+            "load_bearing": 1,
+            "conjuncts": 1
+          }
+        },
+        {
+          "trusted": "vset_unchecked",
+          "twin": "slb_twin_vset_unchecked",
+          "signature_identical": true,
+          "requires": [
+            "i < old(v)@.len()"
+          ],
+          "ensures": [
+            "final(v)@ == old(v)@.update(i as int, x)"
+          ],
+          "body_lines": 1,
+          "vacuity_probe": {
+            "per_conjunct": [
+              {
+                "conjunct": "i < old(v)@.len()",
+                "verified": 14,
+                "errors": 1
+              }
+            ],
+            "load_bearing": 1,
+            "conjuncts": 1
+          }
+        },
+        {
+          "trusted": "vcopy_unchecked",
+          "twin": "slb_twin_vcopy_unchecked",
+          "signature_identical": true,
+          "requires": [
+            "n <= old(v)@.len()",
+            "from + n <= s@.len()"
+          ],
+          "ensures": [
+            "final(v)@.len() == old(v)@.len()",
+            "forall|j: int| 0 <= j < n ==> final(v)@[j] == s@[from + j]"
+          ],
+          "body_lines": 17,
+          "vacuity_probe": {
+            "per_conjunct": [
+              {
+                "conjunct": "n <= old(v)@.len()",
+                "verified": 14,
+                "errors": 1
+              },
+              {
+                "conjunct": "from + n <= s@.len()",
+                "verified": 14,
+                "errors": 1
+              }
+            ],
+            "load_bearing": 2,
+            "conjuncts": 2
+          }
+        }
+      ],
+      "verified": 15,
+      "errors": 0,
+      "without_twins": 10
+    }
+  },
+  "verus_exit_anomalies": [],
+  "proof_domain": {
+    "adversarial-neg.bin": {
+      "calls": 64,
+      "requires_ok": true,
+      "ensures_checked": 64
+    },
+    "adversarial-nowin.bin": {
+      "calls": 0,
+      "requires_ok": true,
+      "ensures_checked": 0
+    },
+    "adversarial-short.bin": {
+      "calls": 0,
+      "requires_ok": true,
+      "ensures_checked": 0
+    },
+    "adversarial-trunc.bin": {
+      "calls": 64,
+      "requires_ok": true,
+      "ensures_checked": 64
+    },
+    "large.bin": {
+      "calls": 12000,
+      "requires_ok": true,
+      "ensures_checked": 128
+    },
+    "small.bin": {
+      "calls": 25000,
+      "requires_ok": true,
+      "ensures_checked": 128
+    }
+  },
+  "driver_loops": {
+    "c/main.c": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "safe_naive.rs": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "safe_tuned.rs": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "unsafe.rs": {
+      "statements": 12,
+      "matches_pin": true
+    },
+    "verus.rs": {
+      "statements": 12,
+      "matches_pin": true
+    }
+  },
+  "adversarial": {
+    "adversarial-neg.bin/c-gcc": [
+      {
+        "exit": -6,
+        "stdout": "",
+        "stderr": "malloc(): invalid size (unsorted)",
+        "signal": 6,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": true
+      }
+    ],
+    "adversarial-neg.bin/c-clang": [
+      {
+        "exit": -6,
+        "stdout": "",
+        "stderr": "malloc(): invalid size (unsorted)",
+        "signal": 6,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": true
+      }
+    ],
+    "adversarial-neg.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "2718404719748941824",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-neg.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "2718404719748941824",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-neg.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "2718404719748941824",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-neg.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "2718404719748941824",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-neg.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "1176667978365039616",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": true
+      }
+    ],
+    "adversarial-neg.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "1176667978365039616",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": true
+      }
+    ],
+    "adversarial-nowin.bin/c-gcc": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-nowin.bin/c-clang": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-nowin.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-nowin.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-nowin.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-nowin.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-nowin.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-nowin.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "0",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "0",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-short.bin/c-gcc": [
+      {
+        "exit": 5,
+        "stdout": "",
+        "stderr": "slb: /home/apt/repos_common/sec-ladder/.temp/php-root/patterns/ph29-recvfrom-alloc/inputs/adversarial-short.bin: payload",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 5,
+        "model_stdout": "",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-short.bin/c-clang": [
+      {
+        "exit": 5,
+        "stdout": "",
+        "stderr": "slb: /home/apt/repos_common/sec-ladder/.temp/php-root/patterns/ph29-recvfrom-alloc/inputs/adversarial-short.bin: payload",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 5,
+        "model_stdout": "",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-short.bin/safe_naive": [
+      {
+        "exit": 5,
+        "stdout": "",
+        "stderr": "slb: /home/apt/repos_common/sec-ladder/.temp/php-root/patterns/ph29-recvfrom-alloc/inputs/adversarial-short.bin: payload",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 5,
+        "model_stdout": "",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-short.bin/safe_tuned": [
+      {
+        "exit": 5,
+        "stdout": "",
+        "stderr": "slb: /home/apt/repos_common/sec-ladder/.temp/php-root/patterns/ph29-recvfrom-alloc/inputs/adversarial-short.bin: payload",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 5,
+        "model_stdout": "",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-short.bin/unsafe": [
+      {
+        "exit": 5,
+        "stdout": "",
+        "stderr": "slb: /home/apt/repos_common/sec-ladder/.temp/php-root/patterns/ph29-recvfrom-alloc/inputs/adversarial-short.bin: payload",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 5,
+        "model_stdout": "",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-short.bin/verus": [
+      {
+        "exit": 5,
+        "stdout": "",
+        "stderr": "slb: /home/apt/repos_common/sec-ladder/.temp/php-root/patterns/ph29-recvfrom-alloc/inputs/adversarial-short.bin: payload",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 5,
+        "model_stdout": "",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-short.bin/c-gcc-h": [
+      {
+        "exit": 5,
+        "stdout": "",
+        "stderr": "slb: /home/apt/repos_common/sec-ladder/.temp/php-root/patterns/ph29-recvfrom-alloc/inputs/adversarial-short.bin: payload",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 5,
+        "model_stdout": "",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-short.bin/c-clang-h": [
+      {
+        "exit": 5,
+        "stdout": "",
+        "stderr": "slb: /home/apt/repos_common/sec-ladder/.temp/php-root/patterns/ph29-recvfrom-alloc/inputs/adversarial-short.bin: payload",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 5,
+        "model_stdout": "",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-trunc.bin/c-gcc": [
+      {
+        "exit": -6,
+        "stdout": "",
+        "stderr": "malloc(): invalid size (unsorted)",
+        "signal": 6,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": true
+      }
+    ],
+    "adversarial-trunc.bin/c-clang": [
+      {
+        "exit": -6,
+        "stdout": "",
+        "stderr": "malloc(): invalid size (unsorted)",
+        "signal": 6,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": true
+      }
+    ],
+    "adversarial-trunc.bin/safe_naive": [
+      {
+        "exit": 0,
+        "stdout": "2718404719748941824",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-trunc.bin/safe_tuned": [
+      {
+        "exit": 0,
+        "stdout": "2718404719748941824",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-trunc.bin/unsafe": [
+      {
+        "exit": 0,
+        "stdout": "2718404719748941824",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-trunc.bin/verus": [
+      {
+        "exit": 0,
+        "stdout": "2718404719748941824",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": false
+      }
+    ],
+    "adversarial-trunc.bin/c-gcc-h": [
+      {
+        "exit": 0,
+        "stdout": "1176667978365039616",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": true
+      }
+    ],
+    "adversarial-trunc.bin/c-clang-h": [
+      {
+        "exit": 0,
+        "stdout": "1176667978365039616",
+        "stderr": "",
+        "signal": null,
+        "cells": [
+          "O0/isolated",
+          "O0/whole",
+          "O3/isolated",
+          "O3/whole"
+        ],
+        "model_exit": 0,
+        "model_stdout": "2718404719748941824",
+        "hung": false,
+        "diverges": true
+      }
+    ]
+  },
+  "sanitizer": {
+    "adversarial-neg.bin": {
+      "exit": 1,
+      "expected_exit": 0,
+      "expect": "fires",
+      "fired": true,
+      "diagnostic": "================================================================= ==3858784==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058 at pc 0x564cd50f5f13 bp 0x7ffd496d8a00 sp 0x7ffd496d81a8 WRITE of size 4 at 0x503000000058 thread T0 #0 0x564cd50f5f12 in __interceptor_memcpy (/home/a",
+      "declared_hang": false,
+      "hung": false,
+      "stdout": "",
+      "model_stdout": "2718404719748941824"
+    },
+    "adversarial-nowin.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "stdout": "0",
+      "model_stdout": "0"
+    },
+    "adversarial-short.bin": {
+      "exit": 5,
+      "expected_exit": 5,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "slb: /home/apt/repos_common/sec-ladder/.temp/php-root/patterns/ph29-recvfrom-alloc/inputs/adversarial-short.bin: payload_len 4654 exceeds file size",
+      "declared_hang": false,
+      "hung": false,
+      "stdout": "",
+      "model_stdout": ""
+    },
+    "adversarial-trunc.bin": {
+      "exit": 1,
+      "expected_exit": 0,
+      "expect": "fires",
+      "fired": true,
+      "diagnostic": "================================================================= ==3858789==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058 at pc 0x560d97e57f13 bp 0x7ffd922f9f80 sp 0x7ffd922f9728 WRITE of size 4 at 0x503000000058 thread T0 #0 0x560d97e57f12 in __interceptor_memcpy (/home/a",
+      "declared_hang": false,
+      "hung": false,
+      "stdout": "",
+      "model_stdout": "2718404719748941824"
+    },
+    "large.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "stdout": "3996271157387841948",
+      "model_stdout": "3996271157387841948"
+    },
+    "small.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "stdout": "5917653902369662825",
+      "model_stdout": "5917653902369662825"
+    }
+  },
+  "sanitizer_hardened": {
+    "adversarial-neg.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "1176667978365039616",
+      "model_stdout": "2718404719748941824"
+    },
+    "adversarial-nowin.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "0",
+      "model_stdout": "0"
+    },
+    "adversarial-short.bin": {
+      "exit": 5,
+      "expected_exit": 5,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "slb: /home/apt/repos_common/sec-ladder/.temp/php-root/patterns/ph29-recvfrom-alloc/inputs/adversarial-short.bin: payload_len 4654 exceeds file size",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "",
+      "model_stdout": ""
+    },
+    "adversarial-trunc.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": true,
+      "stdout": "1176667978365039616",
+      "model_stdout": "2718404719748941824"
+    },
+    "large.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": false,
+      "stdout": "3996271157387841948",
+      "model_stdout": "3996271157387841948"
+    },
+    "small.bin": {
+      "exit": 0,
+      "expected_exit": 0,
+      "expect": "clean",
+      "fired": false,
+      "diagnostic": "",
+      "declared_hang": false,
+      "hung": false,
+      "adversarial": false,
+      "stdout": "5917653902369662825",
+      "model_stdout": "5917653902369662825"
+    }
+  },
+  "miri": {
+    "pair": "unsafe vs verus",
+    "identity_o3": "exact",
+    "inherits_proof": true,
+    "trusted_items": {
+      "verus.rs": [
+        "get_unchecked",
+        "vcopy_unchecked",
+        "vget_unchecked",
+        "vset_unchecked"
+      ]
+    },
+    "axiom_decls": {},
+    "miriflags": null,
+    "miriflags_removed_ambient": null,
+    "miri_version": "rustc 1.99.0-nightly (d453bdd8f 2026-08-14)",
+    "required_because": [
+      "this pattern has 4 trusted item(s) {'verus.rs': ['get_unchecked', 'vcopy_unchecked', 'vget_unchecked', 'vset_unchecked']} whose `ensures` need not be COMPLETE with respect to the unchecked operations their bodies perform (TASK_009_REVIEW x4)",
+      "spec.md sets miri.required"
+    ],
+    "required": true,
+    "ran": true,
+    "available": true,
+    "sysroot": "/home/apt/.cache/miri",
+    "probe_iters": 4,
+    "runs": [
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-neg.bin",
+        "exit": 0,
+        "expected_exit": 0,
+        "ub": false,
+        "leak": false,
+        "seconds": 0.1,
+        "stdout": "1046656",
+        "model_stdout": "1046656",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-nowin.bin",
+        "exit": 0,
+        "expected_exit": 0,
+        "ub": false,
+        "leak": false,
+        "seconds": 0.1,
+        "stdout": "0",
+        "model_stdout": "0",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-short.bin",
+        "exit": 5,
+        "expected_exit": 5,
+        "ub": false,
+        "leak": false,
+        "seconds": 0.1,
+        "stdout": "",
+        "model_stdout": "",
+        "stderr": "slb: /home/apt/repos_common/sec-ladder/.temp/php-root/.temp/check/ph29/miri/miri.adversarial-short.bin: payload_len 4654 exceeds file size"
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "adversarial-trunc.bin",
+        "exit": 0,
+        "expected_exit": 0,
+        "ub": false,
+        "leak": false,
+        "seconds": 0.2,
+        "stdout": "1046656",
+        "model_stdout": "1046656",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "large.bin",
+        "exit": 0,
+        "expected_exit": 0,
+        "ub": false,
+        "leak": false,
+        "seconds": 0.2,
+        "stdout": "1724022857024",
+        "model_stdout": "1724022857024",
+        "stderr": ""
+      },
+      {
+        "source": "unsafe.rs",
+        "input": "small.bin",
+        "exit": 0,
+        "expected_exit": 0,
+        "ub": false,
+        "leak": false,
+        "seconds": 0.2,
+        "stdout": "492576600256",
+        "model_stdout": "492576600256",
+        "stderr": ""
+      }
+    ]
+  },
+  "published_table": {
+    "table": "results/tables/ph29-recvfrom-alloc.md",
+    "contract_sha256": "28a92facffb331484bd1e708e8a1c6696b27b479c91d976515a8ec01dbb6bcf6",
+    "cited": [
+      "28a92facffb3"
+    ],
+    "verdict": "FRESH"
+  },
+  "table_render": {
+    "table": "results/tables/ph29-recvfrom-alloc.md",
+    "renders_to": "results/tables/ph29-recvfrom-alloc.md",
+    "render_sha256": "0b905c7d731028815e07e2df59f1efd5921627f219a19815d7afa24cba920bbb",
+    "published_sha256": "0b905c7d731028815e07e2df59f1efd5921627f219a19815d7afa24cba920bbb",
+    "verdict": "FRESH"
+  },
+  "controls_json": {},
+  "failures": [],
+  "notes": [],
+  "loud": [
+    {
+      "section": "doc-citation-other",
+      "message": "4 line citation(s) into harness modules other than `check.py`. NOT failed: these sit in measurement-hashed files, so re-citing them by function costs a re-measure (RECAP queue item 38). Cite the FUNCTION when one of these files is next re-measured anyway: patterns/ph29-recvfrom-alloc/c/emalloc_shim.h:117 -> build.py:163-165 . patterns/ph29-recvfrom-alloc/c/emalloc_shim.h:133 -> build.py:167 . patterns/ph29-recvfrom-alloc/c/emalloc_shim.h:492 -> build.py:168-171 . patterns/ph29-recvfrom-alloc/c/kernel_hardened.c:66 -> build.py:163-165"
+    },
+    {
+      "section": "idiom-forbidden",
+      "message": "idiom.forbidden[0] has NOT ONE backticked spelling, so the enforced audit never ranges over it and its share of the 0 hits above is vacuous: the addition computed in anything wider than a long, or reordered. \u26a0\u26a0 THIS ENTRY OPENED WITH THE EXPRESSION IN BACKTICKS AND THE GATE REFUSED THE ROW FOR IT -- . Backtick the spelling if it has one (p09 shipped 5 entries and 0 audited spellings; TASK_038_REVIEW) -- and if it has none, because the entry forbids a STRUCTURE rather than a token (p05's 'a running row pointer'), say so in `why`: this line is then permanent and correct, and it is what stops the pattern's `ok` above from reading as enforcement it does not have."
+    },
+    {
+      "section": "idiom-forbidden",
+      "message": "idiom.forbidden[1] has NOT ONE backticked spelling, so the enforced audit never ranges over it and its share of the 0 hits above is vacuous: a capacity passed alongside the request. emalloc receives to_read + 1 and nothing that says how big the block it returns actually is; handing this kernel both n. Backtick the spelling if it has one (p09 shipped 5 entries and 0 audited spellings; TASK_038_REVIEW) -- and if it has none, because the entry forbids a STRUCTURE rather than a token (p05's 'a running row pointer'), say so in `why`: this line is then permanent and correct, and it is what stops the pattern's `ok` above from reading as enforcement it does not have."
+    },
+    {
+      "section": "tcb-unsafe",
+      "message": "verus.rs:293 `vset_unchecked`'s `requires` constrains nothing about ['x'], which its trusted body uses. spec.md justifies it: `streamsfuncs.c:332`'s `read_buf[recvd] = '\\0'`. `x: u8` is a PURE VALUE and needs no precondition; the unchecked operation's definedness depends on `i` being in bounds and on nothing about the byte written. The `ensures` names the WHOLE new state, `old(v)@.update(i, x)`, not just `v@[i] == x`: an `ensures` naming only the written element would let a body that also clobbered `v[i + 1]` through, which `.memory/04-verus.md` records as the most dangerous vacuity mode."
+    },
+    {
+      "section": "clause-mut",
+      "message": "verus.rs vcopy_unchecked ensures[1] carries a top-level `forall` binder, whose body runs to the end of the clause, so this stage refused to split it into conjuncts and deleted it whole. A redundant conjunct inside it would be undetectable here: forall|j: int| 0 <= j < n ==> final(v)@[j] == s@[from + j]"
+    }
+  ],
+  "blocked": [],
+  "verdict": "PASS",
+  "complete_run": true,
+  "invocation": "ph29"
+}

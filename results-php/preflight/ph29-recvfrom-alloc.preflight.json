@@ -1,0 +1,670 @@
+{
+  "row": "ph29-recvfrom-alloc",
+  "runs": [
+    {
+      "row": "ph29-recvfrom-alloc",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph29-recvfrom-alloc: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph29-recvfrom-alloc: ext/standard/streamsfuncs.c, main/streams/transports.c, Zend/zend_alloc.c are in the manifest (b08f942de907, 8986d50853f6, fb4215f19dc2)",
+        "  ph29-recvfrom-alloc: OK  ext/standard/streamsfuncs.c:300-345  1072 bytes  sha256 b1d9da603abb3423  tier=narrowed",
+        "  ph29-recvfrom-alloc: OK+1 main/streams/transports.c:381-392  340 bytes  sha256 24d45e6a3409c2d7  -- \u26a0\u26a0 WHAT `:323` ACTUALLY CALLS, AND IT DECIDES HOW MANY BYTES ARE WRITT",
+        "  ph29-recvfrom-alloc: OK+2 Zend/zend_alloc.c:128-137  248 bytes  sha256 c33f1b65573dd18d  -- \u26a0\u26a0\u26a0 TRUNCATION T1 ITSELF, AND IT IS NOT IN `c/kernel.c` -- IT IS IN `c",
+        "  ph29-recvfrom-alloc: per-span overlap: span0 13% (4/30), span1 0% (0/9), span2 0% (0/4)  -- the UNION is what is reported below, and it is what 3 cited spans oblige the row to",
+        "  ph29-recvfrom-alloc: kernel overlap 9% (4/43 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph29-recvfrom-alloc: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (9% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph29-recvfrom-alloc: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph29-recvfrom-alloc: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH29_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "build",
+      "gate_argv": [
+        "--tool",
+        "build",
+        "ph29-recvfrom-alloc",
+        "--all"
+      ],
+      "tool_argv": [
+        "ph29-recvfrom-alloc",
+        "--all"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph29-recvfrom-alloc",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph29-recvfrom-alloc: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph29-recvfrom-alloc: ext/standard/streamsfuncs.c, main/streams/transports.c, Zend/zend_alloc.c are in the manifest (b08f942de907, 8986d50853f6, fb4215f19dc2)",
+        "  ph29-recvfrom-alloc: OK  ext/standard/streamsfuncs.c:300-345  1072 bytes  sha256 b1d9da603abb3423  tier=narrowed",
+        "  ph29-recvfrom-alloc: OK+1 main/streams/transports.c:381-392  340 bytes  sha256 24d45e6a3409c2d7  -- \u26a0\u26a0 WHAT `:323` ACTUALLY CALLS, AND IT DECIDES HOW MANY BYTES ARE WRITT",
+        "  ph29-recvfrom-alloc: OK+2 Zend/zend_alloc.c:128-137  248 bytes  sha256 c33f1b65573dd18d  -- \u26a0\u26a0\u26a0 TRUNCATION T1 ITSELF, AND IT IS NOT IN `c/kernel.c` -- IT IS IN `c",
+        "  ph29-recvfrom-alloc: per-span overlap: span0 13% (4/30), span1 0% (0/9), span2 0% (0/4)  -- the UNION is what is reported below, and it is what 3 cited spans oblige the row to",
+        "  ph29-recvfrom-alloc: kernel overlap 9% (4/43 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph29-recvfrom-alloc: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (9% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph29-recvfrom-alloc: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph29-recvfrom-alloc: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH29_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "ph29-recvfrom-alloc"
+      ],
+      "tool_argv": [
+        "ph29-recvfrom-alloc"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph29-recvfrom-alloc",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph29-recvfrom-alloc: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph29-recvfrom-alloc: ext/standard/streamsfuncs.c, main/streams/transports.c, Zend/zend_alloc.c are in the manifest (b08f942de907, 8986d50853f6, fb4215f19dc2)",
+        "  ph29-recvfrom-alloc: OK  ext/standard/streamsfuncs.c:300-345  1072 bytes  sha256 b1d9da603abb3423  tier=narrowed",
+        "  ph29-recvfrom-alloc: OK+1 main/streams/transports.c:381-392  340 bytes  sha256 24d45e6a3409c2d7  -- \u26a0\u26a0 WHAT `:323` ACTUALLY CALLS, AND IT DECIDES HOW MANY BYTES ARE WRITT",
+        "  ph29-recvfrom-alloc: OK+2 Zend/zend_alloc.c:128-137  248 bytes  sha256 c33f1b65573dd18d  -- \u26a0\u26a0\u26a0 TRUNCATION T1 ITSELF, AND IT IS NOT IN `c/kernel.c` -- IT IS IN `c",
+        "  ph29-recvfrom-alloc: per-span overlap: span0 20% (6/30), span1 0% (0/9), span2 0% (0/4)  -- the UNION is what is reported below, and it is what 3 cited spans oblige the row to",
+        "  ph29-recvfrom-alloc: kernel overlap 14% (6/43 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph29-recvfrom-alloc: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (14% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph29-recvfrom-alloc: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph29-recvfrom-alloc: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH29_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "build",
+      "gate_argv": [
+        "--tool",
+        "build",
+        "ph29-recvfrom-alloc",
+        "--all"
+      ],
+      "tool_argv": [
+        "ph29-recvfrom-alloc",
+        "--all"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph29-recvfrom-alloc",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph29-recvfrom-alloc: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph29-recvfrom-alloc: ext/standard/streamsfuncs.c, main/streams/transports.c, Zend/zend_alloc.c are in the manifest (b08f942de907, 8986d50853f6, fb4215f19dc2)",
+        "  ph29-recvfrom-alloc: OK  ext/standard/streamsfuncs.c:300-345  1072 bytes  sha256 b1d9da603abb3423  tier=narrowed",
+        "  ph29-recvfrom-alloc: OK+1 main/streams/transports.c:381-392  340 bytes  sha256 24d45e6a3409c2d7  -- \u26a0\u26a0 WHAT `:323` ACTUALLY CALLS, AND IT DECIDES HOW MANY BYTES ARE WRITT",
+        "  ph29-recvfrom-alloc: OK+2 Zend/zend_alloc.c:128-137  248 bytes  sha256 c33f1b65573dd18d  -- \u26a0\u26a0\u26a0 TRUNCATION T1 ITSELF, AND IT IS NOT IN `c/kernel.c` -- IT IS IN `c",
+        "  ph29-recvfrom-alloc: per-span overlap: span0 20% (6/30), span1 0% (0/9), span2 0% (0/4)  -- the UNION is what is reported below, and it is what 3 cited spans oblige the row to",
+        "  ph29-recvfrom-alloc: kernel overlap 14% (6/43 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph29-recvfrom-alloc: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (14% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph29-recvfrom-alloc: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph29-recvfrom-alloc: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH29_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "ph29-recvfrom-alloc"
+      ],
+      "tool_argv": [
+        "ph29-recvfrom-alloc"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph29-recvfrom-alloc",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph29-recvfrom-alloc: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph29-recvfrom-alloc: ext/standard/streamsfuncs.c, main/streams/transports.c, Zend/zend_alloc.c are in the manifest (b08f942de907, 8986d50853f6, fb4215f19dc2)",
+        "  ph29-recvfrom-alloc: OK  ext/standard/streamsfuncs.c:300-345  1072 bytes  sha256 b1d9da603abb3423  tier=narrowed",
+        "  ph29-recvfrom-alloc: OK+1 main/streams/transports.c:381-392  340 bytes  sha256 24d45e6a3409c2d7  -- \u26a0\u26a0 WHAT `:323` ACTUALLY CALLS, AND IT DECIDES HOW MANY BYTES ARE WRITT",
+        "  ph29-recvfrom-alloc: OK+2 Zend/zend_alloc.c:128-137  248 bytes  sha256 c33f1b65573dd18d  -- \u26a0\u26a0\u26a0 TRUNCATION T1 ITSELF, AND IT IS NOT IN `c/kernel.c` -- IT IS IN `c",
+        "  ph29-recvfrom-alloc: per-span overlap: span0 20% (6/30), span1 0% (0/9), span2 0% (0/4)  -- the UNION is what is reported below, and it is what 3 cited spans oblige the row to",
+        "  ph29-recvfrom-alloc: kernel overlap 14% (6/43 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph29-recvfrom-alloc: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (14% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph29-recvfrom-alloc: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph29-recvfrom-alloc: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH29_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "report",
+      "gate_argv": [
+        "--tool",
+        "report",
+        "ph29-recvfrom-alloc"
+      ],
+      "tool_argv": [
+        "ph29-recvfrom-alloc"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph29-recvfrom-alloc",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph29-recvfrom-alloc: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph29-recvfrom-alloc: ext/standard/streamsfuncs.c, main/streams/transports.c, Zend/zend_alloc.c are in the manifest (b08f942de907, 8986d50853f6, fb4215f19dc2)",
+        "  ph29-recvfrom-alloc: OK  ext/standard/streamsfuncs.c:300-345  1072 bytes  sha256 b1d9da603abb3423  tier=narrowed",
+        "  ph29-recvfrom-alloc: OK+1 main/streams/transports.c:381-392  340 bytes  sha256 24d45e6a3409c2d7  -- \u26a0\u26a0 WHAT `:323` ACTUALLY CALLS, AND IT DECIDES HOW MANY BYTES ARE WRITT",
+        "  ph29-recvfrom-alloc: OK+2 Zend/zend_alloc.c:128-137  248 bytes  sha256 c33f1b65573dd18d  -- \u26a0\u26a0\u26a0 TRUNCATION T1 ITSELF, AND IT IS NOT IN `c/kernel.c` -- IT IS IN `c",
+        "  ph29-recvfrom-alloc: per-span overlap: span0 20% (6/30), span1 0% (0/9), span2 0% (0/4)  -- the UNION is what is reported below, and it is what 3 cited spans oblige the row to",
+        "  ph29-recvfrom-alloc: kernel overlap 14% (6/43 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph29-recvfrom-alloc: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (14% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph29-recvfrom-alloc: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph29-recvfrom-alloc: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH29_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph29-recvfrom-alloc"
+      ],
+      "tool_argv": [
+        "ph29-recvfrom-alloc"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 1
+    },
+    {
+      "row": "ph29-recvfrom-alloc",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph29-recvfrom-alloc: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph29-recvfrom-alloc: ext/standard/streamsfuncs.c, main/streams/transports.c, Zend/zend_alloc.c are in the manifest (b08f942de907, 8986d50853f6, fb4215f19dc2)",
+        "  ph29-recvfrom-alloc: OK  ext/standard/streamsfuncs.c:300-345  1072 bytes  sha256 b1d9da603abb3423  tier=narrowed",
+        "  ph29-recvfrom-alloc: OK+1 main/streams/transports.c:381-392  340 bytes  sha256 24d45e6a3409c2d7  -- \u26a0\u26a0 WHAT `:323` ACTUALLY CALLS, AND IT DECIDES HOW MANY BYTES ARE WRITT",
+        "  ph29-recvfrom-alloc: OK+2 Zend/zend_alloc.c:128-137  248 bytes  sha256 c33f1b65573dd18d  -- \u26a0\u26a0\u26a0 TRUNCATION T1 ITSELF, AND IT IS NOT IN `c/kernel.c` -- IT IS IN `c",
+        "  ph29-recvfrom-alloc: per-span overlap: span0 20% (6/30), span1 0% (0/9), span2 0% (0/4)  -- the UNION is what is reported below, and it is what 3 cited spans oblige the row to",
+        "  ph29-recvfrom-alloc: kernel overlap 14% (6/43 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph29-recvfrom-alloc: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (14% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph29-recvfrom-alloc: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph29-recvfrom-alloc: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH29_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph29-recvfrom-alloc"
+      ],
+      "tool_argv": [
+        "ph29-recvfrom-alloc"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    }
+  ]
+}
