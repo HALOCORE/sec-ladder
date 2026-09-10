@@ -1,5 +1,23 @@
 # TASK_PHP_028 — discharge the spellings debt on `ph03`, `ph16` and `ph29`
 
+> ✅✅ **REPORTED 2026-09-10. `ph16` IS DISCHARGED; `ph03` AND `ph29` ARE NOT.**
+> `TASK_PHP_028_REPORT.md`. One row took the whole task, which §4.2 authorised
+> and which was the right call. **`fixed-R4 bound −1.22 %` · `cheapest-found
+> in-contract −1.42 %` (`r3_split_at`)**, per-call statistic, both labelled, no
+> pair interval, no rung re-shipped.
+>
+> ⭐⭐ **§4.1 IS ANSWERED AND THE HYPOTHESIS IS REFUTED: on `ph16` the negative
+> spread is a RESULT, not a spelling artefact.** The R4 side is **degenerate** —
+> four respellings all dearer or byte-identical, **including `r4x_subslice`,
+> which is R3's own spelling (+1.80 %)** — and the mirror control settles it:
+> `r3_absindex` (R3 given R4's signature) is **byte-identical to
+> `safe_naive.rs`** at **+33.07 %**. **The subslice is worth −24.9 % in safe
+> Rust and +1.8 % in unsafe Rust, so the two rungs are cheapest under DIFFERENT
+> spellings and R3's minimum sits under R4's.** ⚠ **n = 1. Not an effect.**
+>
+> ⚠ **The remaining two rows need their own task**, and it must carry §3.3's
+> correction below: **`ph03` is searchable and `ph29`'s audit would be VACUOUS.**
+
 ⚠⚠ **SCOPE GREW ON 2026-09-10 AND THE TITLE USED TO SAY TWO ROWS.** `TASK_PHP_027`
 built `ph29`. **THREE of the four built rows now owe this** — ⚠ **but NOT for the
 same reason, and an earlier draft of this line said they did.** Re-derived from
@@ -135,9 +153,33 @@ whole point of the exercise.
    what `TASK_PHP_025` did and it was the right call. ⭐ **Prefer `ph16` or `ph29`
    first**, because they carry §4.1's question; `ph03` is the one that may not be
    searchable at all (§4.3).
-3. ⚠⚠ **That searching is even well-defined on `ph03`.** ⚠ **`ph03`'s
-   declaration backticks nothing**, so `spellings` is 0 and admission is decided
-   by prose plus one grep — the exact condition that made PAT's `p05` audit
-   **unable to settle its own row**. **If `ph03` cannot be searched without first
-   pinning spellings in its contract, say so and STOP** — that is a `spec.md`
-   change inside a hashed block and it is the manager's call, not yours.
+3. ⚠⚠⚠ **THIS ITEM NAMED THE WRONG ROW. CORRECTED 2026-09-10 BY `_028`, AND
+   VERIFIED BY THE MANAGER FROM THE GATE RECORDS.** It used to read *"`ph03`'s
+   declaration backticks nothing, so `spellings` is 0 … if `ph03` cannot be
+   searched without first pinning spellings in its contract, say so and STOP."*
+
+   **That sentence is about PAT's `p05`, not `ph03`** — `ph16`'s own hashed
+   `why` quotes it verbatim about `p05`, and `check.py` prints it on every
+   `ph16` run, which is where I picked it up and mis-transcribed the subject.
+   Measured, `.idiom_audit` in `results-php/gate/` and `results/gate/`:
+
+   ```
+   p05-index-flatten      spellings  0   forbidden  0   <- the row the sentence is about
+   ph00-smoke             spellings  0   forbidden  0
+   ph03-uudecode-bound    spellings 11   forbidden  6   <- SEARCHABLE, no spec.md edit
+   ph16-fdset-index       spellings 23   forbidden 10
+   ph29-recvfrom-alloc    spellings  4   forbidden  4   <- ⚠⚠ ALL FORBIDDEN, ZERO REQUIRED
+   ```
+
+   ⚠⚠ **The real hazard is `ph29`, and it is WORSE than the one described.**
+   `ph03` searches fine. On `ph29` every spelling is `forbidden` and none is
+   required, so **a `spellings.py` cloned from `ph07` would pass every candidate
+   while checking nothing** — a **vacuous validator that reports success**,
+   which is `PROTOCOL_PHP.md` §H's exact target and F52's family. **`ph29` is
+   the row that needs the manager's `spec.md` call, and it must be made before
+   a follow-up task touches that row.**
+
+   ⭐ **The lesson is rule 14 again, in the direction that is hardest to catch:
+   I copied a TRUE sentence onto the WRONG SUBJECT.** Both halves looked
+   verified — the sentence really is in the tree, and `spellings: 0` really did
+   happen — so nothing about the claim reads as invented.

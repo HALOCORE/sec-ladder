@@ -167,7 +167,7 @@ corpus's**. `echoes` is a reading throughout this file (§0.3, §9.4) — for th
 | ph61 | temporal | container doubles under a raw interior pointer the caller holds | verbatim | I10/O1, I10/O3 | CRASH-155, CRASH-075, CRASH-081, CRASH-083, CRASH-117 | p25 | catalogued |
 | ph62 | temporal | the same growth, with the interior pointer cached across a callback | verbatim | I10/O1, I10/O3 | CRASH-046, CRASH-070 | p25 | catalogued |
 | ph63 | temporal | the cursor type IS a bare node pointer, held across user code | narrowed | I10/O1, I10/O3 | CRASH-002, CRASH-022, CRASH-040 | p28 | catalogued |
-| ph64 | temporal | the callee unlinks and frees the very element the loop holds | verbatim | I10/O1 | CRASH-086 | p28 | catalogued |
+| ph64 | temporal | the callee unlinks and frees the very element the loop holds | narrowed | I10/O1 | CRASH-086 | p28 | catalogued |
 | ph65 | temporal | a back-reference table retains pointers the parser has freed | modelled | I5/O3, I5/O2 | CRASH-121, CRASH-118 | p27 | catalogued |
 | ph66 | temporal | a numeric bucket's key is never compared; hash equality is identity | verbatim | I7/O2, I7/O3 | LOGIC-001 | p22 | catalogued |
 | ph67 | temporal | the destructor runs while the bucket is still linked and advertised | verbatim | I10/O1, I5/O1 | CRASH-160, CRASH-154 | p28 | catalogued |
@@ -792,12 +792,45 @@ One family, four sites, catalogued as **one** row (§3.1 exact-duplication kill 
 ▸ blob: an operation stream; the callback is kernel-supplied.
 ⚠ risk: `zend_hash` is a self-contained container and lifts whole; only the zval payload and the `zend_call_function` wrapper come off.
 
-**ph64 · the callee unlinks the element the loop holds** — `Zend/zend_llist.c` (`zend_llist_apply`) · CRASH-086 · `verbatim` · I10/O1 · echoes p28
+**ph64 · the callee unlinks the element the loop holds** — `Zend/zend_llist.c` (`zend_llist_apply`) · CRASH-086 · `narrowed` (⚠ was `verbatim`; see correction (2) below) · I10/O1 · echoes p28
 `for (element = l->head; element; element = element->next) func(element->data)` — with **no protection against `func` unlinking `element`**. `user_tick_function_call` is such a `func`: its callback may call `unregister_tick_function`, which `zend_llist_del_element`s and frees the element the loop is standing on. FAULT: `ext/standard/basic_functions.c:2135 tick_fe->calling = 0;` — a **write** through the freed element.
 ▸ trigger: a tick function that unregisters itself.
 ▸ benign: ordinary tick dispatch; `u64` = fold of the invoked ids + `(allocs, frees)`.
 ▸ blob: a registration/unregistration stream.
 ⚠ risk: `zend_llist.c` is **317** lines with an inline `char data[1]` payload and `zend_llist_apply` is eight lines (`:186-193`). The **write after free** is the interesting half; an extraction that only reads understates it.
+
+⚠⚠⚠ **TWO CORRECTIONS, MEASURED AT `TASK_PHP_031` AND LANDED 2026-09-10 — READ
+THEM BEFORE BUILDING THIS ROW.**
+
+**(1) ⚠⚠ THE `u64` ABOVE MEASURES NOTHING.** *"Fold of the invoked ids +
+`(allocs, frees)`"* is **bit-identical between R1 and R1h on this row's own
+trigger**: the request is 39 bytes → `REAL_SIZE` 40 → `cache_index 5 < 11`, so
+the freed block is **cached and its payload is untouched**, and the loop walks
+the same ids in the same order either way. **Measured over 8 scenarios × 2 rungs
+on gcc/clang × `-O0`/`-O3`, forked so SEGV is an outcome, with 3 must-NOT-fire.**
+✅ **Two oracles that DO separate the rungs**: `php_shim_tally()` **with**
+`l->count` (`147 869 856` vs `147 772 514`, count 2 vs 3); or **one same-class
+`emalloc` inside the callback**, after which **R1 SIGSEGVs at all three
+`DEL_LLIST_ELEMENT` arms and R1h is clean.** ⭐ **This is F46's class — the
+mechanism sentence above holds and the `▸ trigger`/`▸ benign` line did not — and
+it is the first temporal instance.**
+
+**(2) ⚠ TIER: `verbatim` ABOVE IS WRONG FOR THE ROW; IT IS `narrowed`.** The
+8-line `zend_llist_apply` is the **defect**, not the **extraction**: the faithful
+chain is **~140 lines across five frames**, because the free is only reachable
+through the tick registry. ⭐ **`verbatim` is right about the FILE and wrong
+about the ROW** — open item 21's class exactly. **Part A is corrected to
+`narrowed`.** ⚠ A tier is a **cost statement, never a filter**; no row's
+admission moves.
+
+⭐ **R1h is settled**: `562f886ecb14` (Antony Dovgal, 2007-04-10), **three
+artefacts inside the commit** — bug #41037 in the subject, the NEWS line it
+adds, and `bug41037.phpt`. ⚠⚠ **The repair is at a THIRD function,
+`user_tick_function_compare`**, neither of the two sites above: it makes the
+comparison fail for the entry being executed, so the **free becomes
+unreachable**. Its predicate is `tick_fe1->calling`, i.e. **the callee's own
+state variable**, which is why this is **ONE row** and not two. Full brief:
+`.tasks-php/TASK_PHP_031_REPORT.md` §6.
 
 ### E2 — released, then still named
 

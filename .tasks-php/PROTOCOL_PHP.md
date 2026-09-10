@@ -470,6 +470,43 @@ unboundable one — the fix was a substitution, in one call — but it is only
 with the commit id in `spec.md`. The PAT programme has to argue its
 hand-written hardening is fair; here we do not.
 
+### ⚠ WHICH `fix_commit`, WHEN A ROW'S IDS NAME SEVERAL — the §F5 spelling
+
+⚠⚠ **UNREVIEWED. MANAGER CONSTRUCTION, 2026-09-10, LANDED WITHOUT A SECOND PAIR
+OF EYES.** `RECAP_PHP.md` F48 and open item 41 are the standing record that I
+have twice taken one party's construction into a standing document unattacked,
+and that the rule it replaced arrived the same way. **Give this to the next
+reviewer whose task touches R1h. If the reasoning below is wrong, it is one
+subsection and it comes back out.**
+
+**R1h is the `fix_commit` of the id whose `c_file_line` the row's kernel
+EXTRACTS.** Singular. A kernel extracts **one** site (`PLAN_PHP.md` §3
+criterion 3 — flat blob in, `u64` out); that site is one id's `c_file_line`;
+that id has one `fix_commit`.
+
+**A row's OTHER ids name other functions, and their commits are evidence about
+SIBLING SITES THE ROW DOES NOT PRICE** — F50's census channel, open items 49 and
+50 — **not about R1h.** ⚠ **Nothing here licenses dropping them**: the row still
+cites every id it claims, and `coverage.py` still has to resolve them.
+
+⚠ **Why not the union of the commits**: it ships a configuration **upstream never
+shipped as one change**, and this whole section rests on R1h being *real upstream
+code*. F43's lesson is that what upstream **kept** is the stronger citation; a
+union is neither committed nor kept.
+
+⚠⚠ **Whether those N ids belong in ONE ROW is a DIFFERENT QUESTION, decided by
+§G1, and it is open item 35 — not this one.** Measured on all 30 rows whose ids
+name several commits: at `file:line` **29 of 30** have every id at a distinct
+line, and by **enclosing function 24 of 30**, so **no row is "one site upstream
+patched N times"** and option (a) always has a spelling. ⭐ **Conflating the rung
+question with the catalogue question is what made this look like the largest
+unmade decision on the PHP side for as long as it did.**
+
+⚠ **It applies to 30 of 102 rows and the load is NOT uniform** — **21 of 31
+temporal (68 %)**, 6 of 29 type, **3 of 42 spatial (7 %)**. All four built rows
+are spatial and none is among the 30, **so this rule went four builds without
+being needed. Do not read that as four builds of evidence for it.**
+
 ⚠ **An upstream fix is not automatically correct.** The earlier attempt
 measured one that, backported, still left a reachable wild write in the arm it
 does not guard. **That is a result, and one of the strongest a row can carry.

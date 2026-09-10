@@ -14,7 +14,7 @@ verdict is the commit the corpus column names.**
 
 | | |
 |---|---|
-| `ph73` | **NOT one R1h. FIVE corpus ids, FIVE DISTINCT `fix_commit`s, in FOUR files, spanning 2004-12-17 → 2008-10-26.** All five are located, all five pinned to a tag pair. |
+| `ph73` | **NOT one R1h. FIVE corpus ids, FIVE DISTINCT `fix_commit`s, in ~~FOUR~~ FIVE files, spanning 2004-12-17 → 2008-10-26.** All five are located, all five pinned to a tag pair. ⚠ **`FOUR` corrected to `FIVE` by the manager, 2026-09-10 — see the addendum at the foot of this report.** |
 | `ph21` | **The named commit is refuted by its own pre-image bytes.** R1h is `a4d2f0430723` (2006-08-10), decided by a **NEWS entry in `php-5.2.0`** and by the fact that the 5.1.0→5.2.0 diff of the function *is* its hunk and nothing else. |
 
 ⚠⚠ **Open item 45's premise needs correcting, and the correction is more useful
@@ -717,3 +717,39 @@ landed, not now.
 ⚠ Per `CLAUDE.md` rule 1 the fetched blobs are re-derivable and the generator
 (`fetch_tags.sh`, `idspread.py`) is the evidence that stays; nothing here is a
 binary and nothing needs deleting.
+
+---
+
+## ⚠ MANAGER ADDENDUM, 2026-09-10 — the headline says FOUR files and it is FIVE
+
+`§0`'s summary row read *"FIVE corpus ids, FIVE DISTINCT `fix_commit`s, in **FOUR
+files**"*. Re-derived twice from the corpus index, mechanically:
+
+```
+CRASH-052  Zend/zend_execute.c:1138            zend_fetch_property_address_read
+CRASH-051  Zend/zend_object_handlers.c:524     zend_std_call_user_call
+CRASH-027  Zend/zend_execute_API.c:881         zend_lookup_class
+CRASH-032  Zend/zend_objects.c:34              zend_objects_destroy_object
+CRASH-100  ext/standard/streamsfuncs.c:728     user_space_stream_notifier
+```
+
+**Five distinct files and five distinct functions.** (Enclosing functions
+resolved against the pinned tarball by `.temp/mgr168/enclosing_fn.py`, whose
+selftest calibrates on the `_safe_emalloc`/`_ecalloc` pair F7 caught the manager
+confusing.)
+
+✅ **NOTHING ELSE IN THIS REPORT MOVES.** The conclusion — *"a single `ph73` row
+cannot ship a single sha-pinned `kernel_hardened.c`"* — is unaffected, and all
+five per-id R1h verdicts and tag pins stand as written. ⭐ **The conclusion is in
+fact slightly STRONGER at five files than at four.**
+
+⚠ **This is `RECAP_PHP.md`'s oldest standing lesson landing on a report that is
+otherwise exact: *the citation and the story about it are two separate claims,
+and running the grep does not check the prose.*** The five citations were all
+correct; only the count of them was wrong.
+
+⭐ **And this report ANSWERED open item 48 from the other side, before the item
+was decided.** *"A single row cannot ship a single `kernel_hardened.c`"* and
+§F5's new spelling (*R1h is the fix of the id whose site the kernel extracts*)
+are one statement seen from two directions: **a row pricing five sites cannot
+have one R1h; a row extracting one always can.** See retired item 48 and F69.

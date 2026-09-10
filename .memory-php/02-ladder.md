@@ -232,6 +232,43 @@
   per-row spelling artefact than one row was. ⚠ **`ph03` is POSITIVE and belongs
   to the other case** — it owes the search because it is unbounded on both
   sides, not because its sign is odd. **`TASK_PHP_028` is how we find out.**
-  ▶ **`TASK_PHP_028` discharges all THREE rows; it is written and not
-  dispatched.** **3 of 4 built rows are unbounded in both directions** — this is
-  the largest standing threat to the programme's headline quantity.
+
+  > ⚠⚠⚠ **FLAG — NOT A FINDING (rule 9). `TASK_PHP_028` HAS REPORTED ON `ph16`
+  > AND IS UNREVIEWED.** Recorded here because the paragraph above states the
+  > question as open and it is answered for one of the three rows.
+  > `RECAP_PHP.md` **F67**; `.tasks-php/TASK_PHP_028_REPORT.md`.
+  >
+  > **`ph16` IS DISCHARGED.** `fixed-R4 bound` **−1.22 %** · `cheapest-found
+  > in-contract` **−1.42 %** (`r3_split_at`), per-call statistic, **both
+  > labelled, no pair interval, no rung re-shipped.** ✅ Manager re-verified:
+  > `check.py: PASS`, brackets `66/0` and `10/0`, no re-measure.
+  >
+  > ⭐⭐ **AND THE SPREAD IS A *RESULT*, NOT A SPELLING ARTEFACT.** The R4 side
+  > is **degenerate** — four respellings of the very index the mechanism blames
+  > are all dearer or byte-identical, **including `r4x_subslice`, which is R3's
+  > own spelling, at +1.80 %.** The **mirror control** settles it: `r3_absindex`
+  > (R3 given R4's signature) is **byte-identical to `safe_naive.rs`** at
+  > **+33.07 %**. **So the subslice is worth −24.9 % in safe Rust and +1.8 % in
+  > unsafe Rust: the two rungs are cheapest under DIFFERENT spellings, and R3's
+  > minimum sits under R4's.**
+  >
+  > ⚠⚠ **STILL n = 1 FOR THIS EXPLANATION.** `ph29`'s negative spread is
+  > **unexplained** — nothing has been searched on that row — so *"two rows,
+  > same sign"* above stands as stated and the mechanism behind it is
+  > established on **one** of them.
+  > ⚠ **`ph29` cannot simply be cloned into**: its `.idiom_audit` is
+  > `spellings: 4, forbidden: 4, required: 0`, so a `spellings.py` copied from
+  > `ph07` would **pass every candidate while checking nothing**
+  > (`RECAP_PHP.md` open item 51 — a manager `spec.md` call, owed first).
+  > ⚠ **`ph03` (+12.19 %) is searchable with no `spec.md` edit** —
+  > `spellings: 11`, 6 forbidden. **`TASK_PHP_028.md` §4.3 said otherwise and
+  > named the wrong row** (F70).
+  >
+  > ⚠ **Which statistic a bound is quoted in is UNDECIDED across rows**: `ph07`
+  > is published from the **marginal** and this from the **per-call**, and on
+  > `ph16` they differ by **0.72 pp — 59 % of the figure.** Open item 52.
+
+  ▶ **`ph03` and `ph29` REMAIN UNDISCHARGED and need their own task.**
+  **2 of 4 built rows are still unbounded in both directions** — ⚠ this line
+  said **3 of 4** until `TASK_PHP_028` reported — and it remains the largest
+  standing threat to the programme's headline quantity.

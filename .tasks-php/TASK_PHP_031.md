@@ -6,7 +6,7 @@
 worked, and the template for *"R1h stated with the artefact that decides it."*
 
 ⚠⚠ **THIS IS A HUNT AND A PREP TASK, NOT A BUILD.** Do **not** create
-`patterns-php/ph64-*/`. Do **not** run a gate on a new row. What you deliver is
+`patterns-php/ph64-<slug>/`. Do **not** run a gate on a new row. What you deliver is
 an **answer** and a **build brief**, so that the build task after this one does
 not stall the way `TASK_PHP_015` did.
 
