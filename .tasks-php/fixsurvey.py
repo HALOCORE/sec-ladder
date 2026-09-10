@@ -11,8 +11,9 @@ This asks that question for every row, mechanically:
 Output: .temp/mgr/batch/fixsurvey.json  (+ a markdown table on stdout)
 Patches cached under .temp/mgr/batch/patches/ so re-runs cost no network.
 
-    python3 .temp/mgr/fixsurvey.py            # fetch what is missing, report
-    python3 .temp/mgr/fixsurvey.py --offline  # report from cache only
+    python3 .tasks-php/fixsurvey.py             # fetch what is missing, report
+    python3 .tasks-php/fixsurvey.py --offline   # report from cache only
+    python3 .tasks-php/fixsurvey.py --selftest  # §H negatives; no network
 
 ⚠ This answers "same file?", NOT "is this the commit that removes the 5.0.0
 defect?" -- F38 half 2 showed 2 of 4 checked commits are LATER fixes, and only a
@@ -28,7 +29,9 @@ DELAY = 0.7          # be polite; ~142 fetches
 OFFLINE = "--offline" in sys.argv
 
 
-def load_corpus():
+def load_corpus(with_merged=True):
+    """`with_merged=False` is NOT a mode anyone should run -- it exists only so
+    --selftest can rebuild the blind index and show the answer moves (§H)."""
     rows = list(csv.DictReader(open(CSV, encoding="utf-8", errors="replace")))
     idx = {}
     for r in rows:
@@ -36,7 +39,62 @@ def load_corpus():
             v = (r.get(k) or "").strip()
             if v:
                 idx.setdefault(v, r)
+        # ⚠ THE THIRD NAMESPACE. 22 corpus ids -- every one a V5C -- appear
+        # ONLY inside `merged_members`, semicolon-separated, and are absent
+        # from all three columns above. Indexing only those three made ph94
+        # and ph95 vanish from this survey with `unmapped: 0` still printed.
+        # Same blindness previously found and fixed in coverage.py; this is
+        # the THIRD instance of it, so treat the column list as a known trap.
+        if with_merged:
+            for v in re.split(r"[;,\s]+", (r.get("merged_members") or "").strip()):
+                if v:
+                    idx.setdefault(v, r)
     return idx
+
+
+def selftest():
+    """§H: this file is a VALIDATOR, so it ships with a must-fire and a
+    must-NOT-fire case. The must-fire REBUILDS THE BLIND INDEX -- it changes the
+    setup's one arbitrary constant (the column list) and checks the answer
+    moves, which is the F52 discipline. A test that only ran the fixed path
+    would pass just as happily against a no-op patch."""
+    cat, seen = catalogue_rows()
+    ok = True
+
+    blind, sighted = load_corpus(with_merged=False), load_corpus()
+    lost = sorted((ph for ph in cat if not any(blind.get(c) for c in cat[ph])
+                   and any(sighted.get(c) for c in cat[ph])),
+                  key=lambda s: int(s[2:]))
+    print("MUST-FIRE   index without `merged_members` loses these rows entirely:")
+    print(f"            {lost}")
+    if lost:
+        print("            ✅ fires -- the blind index drops rows, so the fix is load-bearing")
+    else:
+        print("            ❌ DID NOT FIRE: no row depends on `merged_members`, so either")
+        print("               the corpus changed or this test no longer tests anything")
+        ok = False
+
+    orphan = sorted((ph for ph in cat if not any(sighted.get(c) for c in cat[ph])),
+                    key=lambda s: int(s[2:]))
+    print("MUST-NOT-FIRE  with the full index, rows whose ids resolve to nothing:")
+    print(f"            {orphan}")
+    if orphan:
+        print("            ❌ FIRED: a row is still unreachable -- a FOURTH namespace?")
+        ok = False
+    else:
+        print("            ✅ silent -- every catalogued row reaches the corpus index")
+
+    missing = [ph for ph in seen if ph not in cat]
+    print(f"MUST-NOT-FIRE  catalogue rows carrying no id at all: {missing}")
+    if missing:
+        print("            ❌ FIRED")
+        ok = False
+    else:
+        print("            ✅ silent")
+
+    print(f"\nselftest: {'PASS' if ok else 'FAIL'}   "
+          f"({len(seen)} catalogue rows, {len(cat)} with an id)")
+    return 0 if ok else 1
 
 
 def catalogue_rows():
@@ -100,6 +158,17 @@ def main():
     res, unmapped, unfetched = {}, [r for r in seen if r not in cat], []
 
     for ph in sorted(cat, key=lambda s: int(s[2:])):
+        # ⚠ A row whose ids ALL fail to resolve used to `continue` silently and
+        # never enter `res` -- so the headline counted the survivors as if they
+        # were the population, while `unmapped` (which measures something else
+        # entirely: no id ON THE CATALOGUE LINE) still read 0. A dropped row now
+        # ships as an UNRESOLVED verdict, because the whole point of this survey
+        # is that "no fix found" and "never looked" must not print the same.
+        if not any(idx.get(c) for c in cat[ph]):
+            res.setdefault(ph, []).append(
+                {"row": ph, "id": "+".join(cat[ph]), "sha": "", "defect_file": "",
+                 "history_status": "", "verdict": "UNRESOLVED"})
+            continue
         for cid in cat[ph]:
             r = idx.get(cid)
             if not r:
@@ -131,11 +200,21 @@ def main():
     flat = [x for v in res.values() for x in v]
     same = [x for x in flat if x.get("verdict") == "same-file"]
     other = [x for x in flat if x.get("verdict") == "OTHER-FILE"]
-    print(f"catalogued rows with a corpus id: {len(res)}   "
-          f"unmapped: {len(unmapped)} {unmapped}")
+    unres = [x for x in flat if x.get("verdict") == "UNRESOLVED"]
+    # ⚠ Three DIFFERENT populations, printed apart on purpose. `seen` is every
+    # phNN in the catalogue; `unmapped` is those with no id on the line at all;
+    # UNRESOLVED is those with an id that the corpus index cannot find.
+    print(f"catalogue rows: {len(seen)}   with an id on the line: {len(cat)}   "
+          f"unmapped (no id): {len(unmapped)} {unmapped}")
     print(f"resolved: {len(same) + len(other)}   same-file: {len(same)}   "
           f"OTHER-FILE: {len(other)}   unfetched: {len(unfetched)}   "
-          f"no-sha: {len([x for x in flat if x.get('verdict') == 'NO-SHA'])}")
+          f"no-sha: {len([x for x in flat if x.get('verdict') == 'NO-SHA'])}   "
+          f"UNRESOLVED: {len(unres)}")
+    if unres:
+        print("\n⚠⚠ ROWS WHOSE IDS THE CORPUS INDEX CANNOT FIND -- these are NOT "
+              "rows without a fix, they are rows NOBODY LOOKED UP:")
+        for x in sorted(unres, key=lambda r: int(r["row"][2:])):
+            print(f"   {x['row']:6} {x['id']}")
     print("\n⚠ ROWS WHOSE FIX IS IN A DIFFERENT FILE FROM THE DEFECT "
           "(the ph07 shape -- a function-name search cannot find these):\n")
     print("| row | id | sha | defect file | fix touches | subject |")
@@ -151,4 +230,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(selftest() if "--selftest" in sys.argv else main())
