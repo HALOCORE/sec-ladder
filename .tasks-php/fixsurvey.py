@@ -114,6 +114,27 @@ def selftest():
     return 0 if ok else 1
 
 
+def _defect_file(cell):
+    """The file a `c_file_line` cell is really about.
+
+    ⚠ This was `cell.split(":")[0]`, and TASK_PHP_030 found the one cell that
+    defeats it: CRASH-112 (row ph72) is
+
+        ext/standard/uuencode.c:0|ext/standard/user_filters.c:140
+
+    -- two files, `|`-separated, and the FIRST one carries the line-number
+    SENTINEL `:0`. The naive split returned `uuencode.c`, so the row looked like
+    the ph07 shape (fix in a different file) when it is nothing of the kind.
+    Exactly one corpus cell has each of `:0` and `|` today, and it is this one --
+    but a sentinel that silently mis-files a row is worth handling by rule, not
+    by luck."""
+    parts = [p.strip() for p in cell.split("|") if p.strip()]
+    real = [p for p in parts
+            if not re.search(r":0\s*$", p)]        # drop line-number sentinels
+    chosen = (real or parts or [""])[0]
+    return chosen.split(":")[0].strip()
+
+
 def catalogue_rows():
     """phNN -> [corpus ids], from Part A. Rows whose id cell does not parse are
     reported rather than dropped (F38's coverage note)."""
@@ -191,7 +212,7 @@ def main():
             if not r:
                 continue
             sha = (r.get("fix_commit") or "").strip()
-            defect_file = (r.get("c_file_line") or "").split(":")[0].strip()
+            defect_file = _defect_file(r.get("c_file_line") or "")
             rec = {"row": ph, "id": cid, "sha": sha, "defect_file": defect_file,
                    "history_status": (r.get("history_status") or "").strip()}
             if not re.fullmatch(r"[0-9a-f]{11,40}", sha):
@@ -260,6 +281,14 @@ def main():
     print("  (these owe an R1h decision BEFORE a build task, not inside one)")
     for ph, n, s in sorted(spread, key=lambda t: (-t[2], int(t[0][2:])))[:12]:
         print(f"   {ph:6} {n} ids -> {s} distinct fix commits")
+
+    # ⚠ This survey answers "same file?" and RANKS. It never excludes anything.
+    # The decisive test lives next door and is deliberately NOT run here: it has
+    # to sha256+gunzip the 5.6 MB tarball (2.2 s vs this file's 0.1 s) and would
+    # make a dependency-free lookup fail on a box where that tarball was cleaned.
+    print("\n⚠ NONE of the above EXCLUDES a commit -- it only ranks. For the "
+          "decisive test\n  (is the 5.0.0 text even in the commit's PRE-IMAGE?) "
+          "run:\n      python3 .tasks-php/preimage_screen.py")
     print("\n⚠ ROWS WHOSE FIX IS IN A DIFFERENT FILE FROM THE DEFECT "
           "(the ph07 shape -- a function-name search cannot find these):\n")
     print("| row | id | sha | defect file | fix touches | subject |")
