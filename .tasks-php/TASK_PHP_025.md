@@ -37,9 +37,12 @@ static int stream_array_to_fd_set(zval *stream_array, fd_set *fds, php_socket_t 
 			FD_SET(this_fd, fds);          /* :541 -- nothing tests this_fd < FD_SETSIZE */
 ```
 
-`fds` is **the caller's**: `fd_set rfds, wfds, efds;` at `:657` in
-`PHP_FUNCTION(stream_select)`. ✅ **Confirmed exactly**, including that
-`TASK_PHP_020_REPORT.md:131`'s `:658` is off by one and harmless.
+`fds` is **the caller's**: `fd_set rfds, wfds, efds;` at `:658` in
+`PHP_FUNCTION(stream_select)`. ⚠⚠ **THIS FILE ORIGINALLY SAID `:657` AND CALLED
+`TASK_PHP_020_REPORT.md:131`'s `:658` "off by one and harmless". `_020` WAS
+RIGHT, THE ERROR WAS THE MANAGER'S, AND `TASK_PHP_025` CAUGHT IT** — I mis-read
+my own `sed -n '655,660p'`, whose fourth line is 658. **The correction was
+inverted, which is worse than the drift it claimed to fix** (F56).
 
 **Machine facts, measured** (`.temp/mgr166/fdfacts.c`): `FD_SETSIZE 1024`,
 `sizeof(fd_set) 128` bytes, index 4096 → word 64 → **byte offset 512, past the

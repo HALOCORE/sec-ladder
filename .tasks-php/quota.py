@@ -118,7 +118,9 @@ for f, rs in famrows.items():
     elif nb == 1: st, need = 'OWES 1', 1
     else:         st, need = 'open',   0     # open until a row moves no answer; cap 4
     owed += need
-    mark = '  <== both built rows' if nb >= 2 else ''
+    # ⚠ this used to read '<== both built rows', which was true only while the
+    # tree had exactly two. Name the rows instead of counting them.
+    mark = ('  <== ' + ', '.join(r for r in rs if r in built)) if nb >= 2 else ''
     print(f'  {f:<4} {len(rs):>3}  {nb:>5}  {st:<7}  {famname.get(f,"?")[:44]}{mark}')
 
 print(f'\n  minimum rows still owed to reach 2/family: {owed}')

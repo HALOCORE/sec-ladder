@@ -98,7 +98,7 @@ corpus's**. `echoes` is a reading throughout this file (§0.3, §9.4) — for th
 | ph13 | spatial | base + attacker 32-bit offset, lower-bounded only | narrowed | I1/O1 | CRASH-136 | — | catalogued |
 | ph14 | spatial | the overflowed product is used in its own bound check | narrowed | I11/O1 | CRASH-134 | p13 | catalogued |
 | ph15 | spatial | ⚠ **MECHANISM REFUTED — see below. Do not build.** | — | I1/O1 | CRASH-096 | p24 | **unresolved** |
-| ph16 | spatial | bit-set index straight from input, past an on-stack `fd_set` | verbatim | I1/O2 | CRASH-098 | p02 | catalogued |
+| ph16 | spatial | bit-set index straight from input, past an on-stack `fd_set` | narrowed | I1/O2 | CRASH-098 | p02 | **BUILT** |
 | ph17 | spatial | code point over 0xFF sets a bit past a fixed-size bitset | narrowed | I1/O2 | CRASH-127 | p02 | catalogued |
 | ph18 | spatial | sizing sum wraps; the pad loop that follows has no bound | verbatim | I11/O1, I11/O2 | CRASH-001, CRASH-011 | p13 | catalogued |
 | ph19 | spatial | `count*(width-1)+base` wraps in `int`, emit pass unbounded | verbatim | I11/O1 | CRASH-006 | p13 | catalogued |
@@ -340,7 +340,7 @@ The only bound on `offset` is `if (len && offset >= s1_len)`, and its **first co
 ▸ blob: haystack bytes + a length field + needle bytes.
 ⚠ risk: **the harmful step is NOT in the stream layer** — that is where CRASH-097/098 were said to die. It is a 24-line `static inline` in a Zend header and is blob-pure.
 
-**ph16 · `FD_SET` past an on-stack `fd_set`** — `ext/standard/streamsfuncs.c:541` · CRASH-098 · `verbatim` · I1/O2 · echoes p02
+**ph16 · `FD_SET` past an on-stack `fd_set`** — `ext/standard/streamsfuncs.c:541` · CRASH-098 · `narrowed` · I1/O2 · echoes p02 · ✅ **BUILT, `TASK_PHP_025`**
 `FD_SET(this_fd, fds)` with `fds` an `fd_set` in the **caller's** frame and `this_fd` unchecked against `FD_SETSIZE`. ✅ Measured (`.temp/php11/fdset_probe.c`): `FD_SET` is a pure bit-set macro over the `fd_set` object and **never consults the fd table** — index 4096 into a 128-byte `fd_set` writes at byte offset 512 with only fds 0,1,2 open and no `RLIMIT_NOFILE` change.
 ▸ trigger: any index ≥ 1024 from the blob.
 ▸ benign: in-range indices set and read back; `u64` = fold of the set bits.

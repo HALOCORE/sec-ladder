@@ -1,0 +1,891 @@
+From 99e290f882c9116e74418b9271a75d557533c4f5 Mon Sep 17 00:00:00 2001
+From: Wez Furlong <wez@php.net>
+Date: Fri, 17 Sep 2004 12:44:56 +0000
+Subject: [PATCH] Fix for Bug #24189: possibly unsafe select(2) usage. We avoid
+ the problem by using poll(2).
+
+On systems without poll(2) (older bsd-ish systems, and win32), we emulate
+poll(2) using select(2) and check for valid descriptors before attempting
+to access them via the descriptor sets.
+
+If an out-of-range descriptor is detected, an E_WARNING is raised suggesting
+that PHP should be recompiled with a larger FD_SETSIZE (and also with a
+suggested value).
+
+Most uses of select(2) in the source are to poll a single descriptor, so
+a couple of handy wrapper functions have been added to make this easier.
+
+A configure option --enable-fd-setsize has been added to both the unix and
+win32 builds; on unix we default to 16384 and on windows we default to 256.
+Windows FD_SETSIZE imposes a limit on the maximum number of descriptors that
+can be select()ed at once, whereas the unix FD_SETSIZE limit is based on the
+highest numbered descriptor; 256 should be plenty for PHP scripts under windows
+(the default OS setting is 64).
+
+The win32 specific parts are untested; will do that now.
+---
+ configure.in                |  16 +++++
+ ext/ftp/ftp.c               |  47 ++------------
+ ext/openssl/xp_ssl.c        |  87 ++++++++++++--------------
+ ext/soap/php_http.c         |  12 ++--
+ ext/sockets/sockets.c       |   6 +-
+ ext/standard/streamsfuncs.c |  38 ++++++++++--
+ main/network.c              | 120 ++++++++++++++++++++++++++++++------
+ main/php_network.h          |  98 +++++++++++++++++++++++++++++
+ main/streams/xp_socket.c    |  61 +++++-------------
+ win32/build/config.w32      |   6 ++
+ 10 files changed, 323 insertions(+), 168 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 9271a7a115da..53fb324f0b12 100644
+--- a/configure.in
++++ b/configure.in
+@@ -569,6 +569,9 @@ AC_CACHE_CHECK([for getaddrinfo], ac_cv_func_getaddrinfo,
+   AC_TRY_RUN([
+ #include <netdb.h>
+ #include <sys/types.h>
++#ifndef AF_INET
++# include <sys/socket.h>
++#endif
+ int main(void) {
+   struct addrinfo *ai, *pai, hints;
+ 
+@@ -789,6 +792,19 @@ if test "$PHP_IPV6" != "no" && test "$ac_cv_ipv6_support" = yes; then
+   AC_DEFINE(HAVE_IPV6,1,[Whether to enable IPv6 support])
+ fi
+ 
++AC_MSG_CHECKING([how big to make fd sets])
++AC_ARG_ENABLE(fd-setsize,
++[  --enable-fd-setsize     Set size of descriptor sets],[
++  if test "x$enableval" != "xyes"; then
++    CPPFLAGS="$CPPFLAGS -DFD_SETSIZE=$enableval"
++    AC_MSG_RESULT(using $enableval)
++  else
++    AC_MSG_RESULT(using system default)
++  fi
++],[
++  AC_MSG_RESULT(using system default)
++])
++
+ AC_MSG_CHECKING([whether to enable versioning])
+ AC_ARG_ENABLE(versioning,
+ [  --enable-versioning     Export only required symbols.
+diff --git a/ext/ftp/ftp.c b/ext/ftp/ftp.c
+index 687dd19f0c08..8e5e746e0d11 100644
+--- a/ext/ftp/ftp.c
++++ b/ext/ftp/ftp.c
+@@ -1236,19 +1236,11 @@ ftp_getresp(ftpbuf_t *ftp)
+ int
+ my_send(ftpbuf_t *ftp, php_socket_t s, void *buf, size_t len)
+ {
+-	fd_set		write_set;
+-	struct timeval	tv;
+ 	int		n, size, sent;
+ 
+ 	size = len;
+ 	while (size) {
+-		tv.tv_sec = ftp->timeout_sec;
+-		tv.tv_usec = 0;
+-
+-		FD_ZERO(&write_set);
+-		FD_SET(s, &write_set);
+-
+-		n = select(s + 1, NULL, &write_set, NULL, &tv);
++		n = php_pollfd_for_ms(s, POLLOUT, ftp->timeout_sec * 1000);
+ 
+ 		if (n < 1) {
+ 
+@@ -1288,17 +1280,9 @@ my_send(ftpbuf_t *ftp, php_socket_t s, void *buf, size_t len)
+ int
+ my_recv(ftpbuf_t *ftp, php_socket_t s, void *buf, size_t len)
+ {
+-	fd_set		read_set;
+-	struct timeval	tv;
+ 	int		n, nr_bytes;
+ 
+-	tv.tv_sec = ftp->timeout_sec;
+-	tv.tv_usec = 0;
+-
+-	FD_ZERO(&read_set);
+-	FD_SET(s, &read_set);
+-
+-	n = select(s + 1, &read_set, NULL, NULL, &tv);
++	n = php_pollfd_for_ms(s, PHP_POLLREADABLE, ftp->timeout_sec * 1000);
+ 	if (n < 1) {
+ #if !defined(PHP_WIN32) && !(defined(NETWARE) && defined(USE_WINSOCK))
+ 		if (n == 0) {
+@@ -1328,16 +1312,9 @@ my_recv(ftpbuf_t *ftp, php_socket_t s, void *buf, size_t len)
+ int
+ data_available(ftpbuf_t *ftp, php_socket_t s)
+ {
+-	fd_set		read_set;
+-	struct timeval	tv;
+ 	int		n;
+ 
+-	tv.tv_sec = 0;
+-	tv.tv_usec = 1;
+-
+-	FD_ZERO(&read_set);
+-	FD_SET(s, &read_set);
+-	n = select(s + 1, &read_set, NULL, NULL, &tv);
++	n = php_pollfd_for_ms(s, PHP_POLLREADABLE, 1000);
+ 	if (n < 1) {
+ #if !defined(PHP_WIN32) && !(defined(NETWARE) && defined(USE_WINSOCK))
+ 		if (n == 0) {
+@@ -1355,16 +1332,9 @@ data_available(ftpbuf_t *ftp, php_socket_t s)
+ int
+ data_writeable(ftpbuf_t *ftp, php_socket_t s)
+ {
+-	fd_set		write_set;
+-	struct timeval	tv;
+ 	int		n;
+ 
+-	tv.tv_sec = 0;
+-	tv.tv_usec = 1;
+-
+-	FD_ZERO(&write_set);
+-	FD_SET(s, &write_set);
+-	n = select(s + 1, NULL, &write_set, NULL, &tv);
++	n = php_pollfd_for_ms(s, POLLOUT, 1000);
+ 	if (n < 1) {
+ #ifndef PHP_WIN32
+ 		if (n == 0) {
+@@ -1383,16 +1353,9 @@ data_writeable(ftpbuf_t *ftp, php_socket_t s)
+ int
+ my_accept(ftpbuf_t *ftp, php_socket_t s, struct sockaddr *addr, socklen_t *addrlen)
+ {
+-	fd_set		accept_set;
+-	struct timeval	tv;
+ 	int		n;
+ 
+-	tv.tv_sec = ftp->timeout_sec;
+-	tv.tv_usec = 0;
+-	FD_ZERO(&accept_set);
+-	FD_SET(s, &accept_set);
+-
+-	n = select(s + 1, &accept_set, NULL, NULL, &tv);
++	n = php_pollfd_for_ms(s, PHP_POLLREADABLE, ftp->timeout_sec * 1000);
+ 	if (n < 1) {
+ #if !defined(PHP_WIN32) && !(defined(NETWARE) && defined(USE_WINSOCK))
+ 		if (n == 0) {
+diff --git a/ext/openssl/xp_ssl.c b/ext/openssl/xp_ssl.c
+index 9bb0fad3fe17..4d5f590babc1 100644
+--- a/ext/openssl/xp_ssl.c
++++ b/ext/openssl/xp_ssl.c
+@@ -235,9 +235,7 @@ static int php_openssl_sockop_close(php_stream *stream, int close_handle TSRMLS_
+ {
+ 	php_openssl_netstream_data_t *sslsock = (php_openssl_netstream_data_t*)stream->abstract;
+ #ifdef PHP_WIN32
+-	fd_set wrfds, efds;
+ 	int n;
+-	struct timeval timeout;
+ #endif
+ 	if (close_handle) {
+ 		if (sslsock->ssl_active) {
+@@ -248,7 +246,7 @@ static int php_openssl_sockop_close(php_stream *stream, int close_handle TSRMLS_
+ 			SSL_free(sslsock->ssl_handle);
+ 			sslsock->ssl_handle = NULL;
+ 		}
+-		if (sslsock->s.socket != -1) {
++		if (sslsock->s.socket != SOCK_ERR) {
+ #ifdef PHP_WIN32
+ 			/* prevent more data from coming in */
+ 			shutdown(sslsock->s.socket, SHUT_RD);
+@@ -260,19 +258,11 @@ static int php_openssl_sockop_close(php_stream *stream, int close_handle TSRMLS_
+ 			 * but at the same time avoid hanging indefintely.
+ 			 * */
+ 			do {
+-				FD_ZERO(&wrfds);
+-				FD_SET(sslsock->s.socket, &wrfds);
+-				efds = wrfds;
+-
+-				timeout.tv_sec = 0;
+-				timeout.tv_usec = 5000; /* arbitrary */
+-
+-				n = select(sslsock->s.socket + 1, NULL, &wrfds, &efds, &timeout);
++				n = php_pollfd_for_ms(sslsock->s.socket, POLLOUT, 500);
+ 			} while (n == -1 && php_socket_errno() == EINTR);
+ #endif
+-
+ 			closesocket(sslsock->s.socket);
+-			sslsock->s.socket = -1;
++			sslsock->s.socket = SOCK_ERR;
+ 		}
+ 	}
+ 
+@@ -512,47 +502,48 @@ static int php_openssl_sockop_set_option(php_stream *stream, int option, int val
+ 				char buf;
+ 				int alive = 1;
+ 
+-				if (sslsock->s.timeout.tv_sec == -1) {
+-					tv.tv_sec = FG(default_socket_timeout);
++				if (value == -1) {
++					if (sslsock->s.timeout.tv_sec == -1) {
++						tv.tv_sec = FG(default_socket_timeout);
++						tv.tv_usec = 0;
++					} else {
++						tv = sslsock->s.timeout;
++					}
+ 				} else {
+-					tv = sslsock->s.timeout;
++					tv.tv_sec = value;
++					tv.tv_usec = 0;
+ 				}
+ 
+ 				if (sslsock->s.socket == -1) {
+ 					alive = 0;
+-				} else {
+-					FD_ZERO(&rfds);
+-					FD_SET(sslsock->s.socket, &rfds);
+-
+-					if (select(sslsock->s.socket + 1, &rfds, NULL, NULL, &tv) > 0 && FD_ISSET(sslsock->s.socket, &rfds)) {
+-						if (sslsock->ssl_active) {
+-							int n;
+-
+-							do {
+-								n = SSL_peek(sslsock->ssl_handle, &buf, sizeof(buf));
+-								if (n <= 0) {
+-									int err = SSL_get_error(sslsock->ssl_handle, n);
+-
+-									if (err == SSL_ERROR_SYSCALL) {
+-										alive = php_socket_errno() == EAGAIN;
+-										break;
+-									}
+-
+-									if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
+-										/* re-negotiate */
+-										continue;
+-									}
+-
+-									/* any other problem is a fatal error */
+-									alive = 0;
++				} else if (php_pollfd_for(sslsock->s.socket, PHP_POLLREADABLE|POLLPRI, &tv) > 0) {
++					if (sslsock->ssl_active) {
++						int n;
++
++						do {
++							n = SSL_peek(sslsock->ssl_handle, &buf, sizeof(buf));
++							if (n <= 0) {
++								int err = SSL_get_error(sslsock->ssl_handle, n);
++
++								if (err == SSL_ERROR_SYSCALL) {
++									alive = php_socket_errno() == EAGAIN;
++									break;
+ 								}
+-								/* either peek succeeded or there was an error; we
+-								 * have set the alive flag appropriately */
+-								break;
+-							} while (1);
+-						} else if (0 == recv(sslsock->s.socket, &buf, sizeof(buf), MSG_PEEK) && php_socket_errno() != EAGAIN) {
+-							alive = 0;
+-						}
++
++								if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
++									/* re-negotiate */
++									continue;
++								}
++
++								/* any other problem is a fatal error */
++								alive = 0;
++							}
++							/* either peek succeeded or there was an error; we
++							 * have set the alive flag appropriately */
++							break;
++						} while (1);
++					} else if (0 == recv(sslsock->s.socket, &buf, sizeof(buf), MSG_PEEK) && php_socket_errno() != EAGAIN) {
++						alive = 0;
+ 					}
+ 				}
+ 				return alive ? PHP_STREAM_OPTION_RETURN_OK : PHP_STREAM_OPTION_RETURN_ERR;
+diff --git a/ext/soap/php_http.c b/ext/soap/php_http.c
+index b4f9c2351a56..9c4d47624c37 100644
+--- a/ext/soap/php_http.c
++++ b/ext/soap/php_http.c
+@@ -32,21 +32,19 @@ static int get_http_headers(php_stream *socketd,char **response, int *out_size T
+ static int stream_alive(php_stream *stream  TSRMLS_DC)
+ {
+ 	int socket;
+-	fd_set rfds;
+-	struct timeval tv;
+ 	char buf;
+ 
++	/* maybe better to use:
++	 * php_stream_set_option(stream, PHP_STREAM_OPTION_CHECK_LIVENESS, 0, NULL)
++	 * here instead */
++
+ 	if (stream == NULL || stream->eof || php_stream_cast(stream, PHP_STREAM_AS_FD_FOR_SELECT, (void**)&socket, 0) != SUCCESS) {
+ 		return FALSE;
+ 	}
+ 	if (socket == -1) {
+ 		return FALSE;
+ 	} else {
+-		FD_ZERO(&rfds);
+-		FD_SET(socket, &rfds);
+-		tv.tv_sec = 0;
+-		tv.tv_usec = 0;
+-		if (select(socket + 1, &rfds, NULL, NULL, &tv) > 0 && FD_ISSET(socket, &rfds)) {
++		if (php_pollfd_for_ms(socket, PHP_POLLREADABLE, 0) > 0) {
+ 			if (0 == recv(socket, &buf, sizeof(buf), MSG_PEEK) && php_socket_errno() != EAGAIN) {
+ 				return FALSE;
+ 			}
+diff --git a/ext/sockets/sockets.c b/ext/sockets/sockets.c
+index 8f2a329c3538..c9ac0b5dc85a 100644
+--- a/ext/sockets/sockets.c
++++ b/ext/sockets/sockets.c
+@@ -533,7 +533,7 @@ static int php_sock_array_to_fd_set(zval *sock_array, fd_set *fds, PHP_SOCKET *m
+ 		php_sock = (php_socket*) zend_fetch_resource(element TSRMLS_CC, -1, le_socket_name, NULL, 1, le_socket);
+ 		if (!php_sock) continue; /* If element is not a resource, skip it */
+ 
+-		FD_SET(php_sock->bsd_socket, fds);
++		PHP_SAFE_FD_SET(php_sock->bsd_socket, fds);
+ 		if (php_sock->bsd_socket > *max_fd) {
+ 			*max_fd = php_sock->bsd_socket;
+ 		}
+@@ -560,7 +560,7 @@ static int php_sock_array_from_fd_set(zval *sock_array, fd_set *fds TSRMLS_DC)
+ 		php_sock = (php_socket*) zend_fetch_resource(element TSRMLS_CC, -1, le_socket_name, NULL, 1, le_socket);
+ 		if (!php_sock) continue; /* If element is not a resource, skip it */
+ 
+-		if (FD_ISSET(php_sock->bsd_socket, fds)) {
++		if (PHP_SAFE_FD_ISSET(php_sock->bsd_socket, fds)) {
+ 			/* Add fd to new array */
+ 			zend_hash_next_index_insert(new_hash, (void *)element, sizeof(zval *), (void **)&dest_element);
+ 			if (dest_element) zval_add_ref(dest_element);
+@@ -605,6 +605,8 @@ PHP_FUNCTION(socket_select)
+ 		RETURN_FALSE;
+ 	}
+ 
++	PHP_SAFE_MAX_FD(max_fd, 0); /* someone needs to make this look more like stream_socket_select */
++
+ 	/* If seconds is not set to null, build the timeval, else we wait indefinitely */
+ 	if (sec != NULL) {
+ 		zval tmp;
+diff --git a/ext/standard/streamsfuncs.c b/ext/standard/streamsfuncs.c
+index d26d6174c273..5b7a2bf209f0 100644
+--- a/ext/standard/streamsfuncs.c
++++ b/ext/standard/streamsfuncs.c
+@@ -217,7 +217,7 @@ PHP_FUNCTION(stream_socket_accept)
+ 
+ 	if (peername) {
+ 		zval_dtor(peername);
+-		ZVAL_STRING(peername, "", 1);
++		ZVAL_STRING(peername, NULL, 0);
+ 	}
+ 
+ 	if (0 == php_stream_xport_accept(stream, &clistream,
+@@ -237,6 +237,10 @@ PHP_FUNCTION(stream_socket_accept)
+ 	if (errstr) {
+ 		efree(errstr);
+ 	}
++
++	if (peername && Z_STRVAL_P(peername) == NULL) {
++		ZVAL_STRING(peername, "", 1);
++	}
+ }
+ /* }}} */
+ 
+@@ -543,7 +547,9 @@ static int stream_array_to_fd_set(zval *stream_array, fd_set *fds, php_socket_t
+ 		 * is not displayed.
+ 		 * */
+ 		if (SUCCESS == php_stream_cast(stream, PHP_STREAM_AS_FD_FOR_SELECT | PHP_STREAM_CAST_INTERNAL, (void*)&this_fd, 1) && this_fd >= 0) {
+-			FD_SET(this_fd, fds);
++			
++			PHP_SAFE_FD_SET(this_fd, fds);
++
+ 			if (this_fd > *max_fd) {
+ 				*max_fd = this_fd;
+ 			}
+@@ -579,7 +585,7 @@ static int stream_array_from_fd_set(zval *stream_array, fd_set *fds TSRMLS_DC)
+ 		 * is not displayed.
+ 		 */
+ 		if (SUCCESS == php_stream_cast(stream, PHP_STREAM_AS_FD_FOR_SELECT | PHP_STREAM_CAST_INTERNAL, (void*)&this_fd, 1) && this_fd >= 0) {
+-			if (FD_ISSET(this_fd, fds)) {
++			if (PHP_SAFE_FD_ISSET(this_fd, fds)) {
+ 				zend_hash_next_index_insert(new_hash, (void *)elem, sizeof(zval *), (void **)&dest_elem);
+ 				if (dest_elem) {
+ 					zval_add_ref(dest_elem);
+@@ -664,6 +670,7 @@ PHP_FUNCTION(stream_select)
+ 	int				max_fd = 0;
+ 	int				retval, sets = 0;
+ 	long			usec = 0;
++	int				set_count, max_set_count = 0;
+ 
+ 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "a!a!a!z!|l", &r_array, &w_array, &e_array, &sec, &usec) == FAILURE)
+ 		return;
+@@ -672,15 +679,34 @@ PHP_FUNCTION(stream_select)
+ 	FD_ZERO(&wfds);
+ 	FD_ZERO(&efds);
+ 
+-	if (r_array != NULL) sets += stream_array_to_fd_set(r_array, &rfds, &max_fd TSRMLS_CC);
+-	if (w_array != NULL) sets += stream_array_to_fd_set(w_array, &wfds, &max_fd TSRMLS_CC);
+-	if (e_array != NULL) sets += stream_array_to_fd_set(e_array, &efds, &max_fd TSRMLS_CC);
++	if (r_array != NULL) {
++		set_count = stream_array_to_fd_set(r_array, &rfds, &max_fd TSRMLS_CC);
++		if (set_count > max_set_count)
++			max_set_count = set_count;
++		sets += set_count;
++	}
++	
++	if (w_array != NULL) {
++		set_count = stream_array_to_fd_set(w_array, &wfds, &max_fd TSRMLS_CC);
++		if (set_count > max_set_count)
++			max_set_count = set_count;
++		sets += set_count;
++	}
++
++	if (e_array != NULL) {
++		set_count = stream_array_to_fd_set(e_array, &efds, &max_fd TSRMLS_CC);
++		if (set_count > max_set_count)
++			max_set_count = set_count;
++		sets += set_count;
++	}
+ 
+ 	if (!sets) {
+ 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "No stream arrays were passed");
+ 		RETURN_FALSE;
+ 	}
+ 
++	PHP_SAFE_MAX_FD(max_fd, max_set_count);
++
+ 	/* If seconds is not set to null, build the timeval, else we wait indefinitely */
+ 	if (sec != NULL) {
+ 		convert_to_long_ex(&sec);
+diff --git a/main/network.c b/main/network.c
+index 1de7ff98c4a5..86d71cd14db1 100644
+--- a/main/network.c
++++ b/main/network.c
+@@ -295,9 +295,6 @@ PHPAPI int php_network_connect_socket(php_socket_t sockfd,
+ 	int error = 0;
+ 	socklen_t len;
+ 	int ret = 0;
+-	fd_set rset;
+-	fd_set wset;
+-	fd_set eset;
+ 
+ 	SET_SOCKET_BLOCKING_MODE(sockfd, orig_flags);
+ 	
+@@ -325,18 +322,11 @@ PHPAPI int php_network_connect_socket(php_socket_t sockfd,
+ 		goto ok;
+ 	}
+ 
+-	FD_ZERO(&rset);
+-	FD_ZERO(&eset);
+-	FD_SET(sockfd, &rset);
+-	FD_SET(sockfd, &eset);
+-
+-	wset = rset;
+-
+-	if ((n = select(sockfd + 1, &rset, &wset, &eset, timeout)) == 0) {
++	if ((n = php_pollfd_for(sockfd, PHP_POLLREADABLE|POLLOUT, timeout)) == 0) {
+ 		error = PHP_TIMEOUT_ERROR_VALUE;
+ 	}
+ 
+-	if(FD_ISSET(sockfd, &rset) || FD_ISSET(sockfd, &wset)) {
++	if (n > 0) {
+ 		len = sizeof(error);
+ 		/*
+ 		   BSD-derived systems set errno correctly
+@@ -692,21 +682,17 @@ PHPAPI php_socket_t php_network_accept_incoming(php_socket_t srvsock,
+ 		TSRMLS_DC)
+ {
+ 	php_socket_t clisock = -1;
+-	fd_set rset;
+ 	int error = 0, n;
+ 	php_sockaddr_storage sa;
+ 	socklen_t sl;
+-
+-	FD_ZERO(&rset);
+-	FD_SET(srvsock, &rset);
+ 		
+-	n = select(srvsock + 1, &rset, NULL, NULL, timeout);
++	n = php_pollfd_for(srvsock, PHP_POLLREADABLE, timeout);
+ 
+ 	if (n == 0) {
+ 		error = PHP_TIMEOUT_ERROR_VALUE;
+ 	} else if (n == -1) {
+ 		error = php_socket_errno();
+-	} else if (FD_ISSET(srvsock, &rset)) {
++	} else {
+ 		sl = sizeof(sa);
+ 
+ 		clisock = accept(srvsock, (struct sockaddr*)&sa, &sl);
+@@ -1026,6 +1012,104 @@ PHPAPI int php_set_sock_blocking(int socketd, int block TSRMLS_DC)
+       return ret;
+ }
+ 
++PHPAPI void _php_emit_fd_setsize_warning(int max_fd)
++{
++	TSRMLS_FETCH();
++
++#ifdef PHP_WIN32
++	php_error_docref(NULL TSRMLS_CC, E_WARNING,
++		"PHP needs to be recompiled with a larger value of FD_SETSIZE.\n"
++		"If this binary is from an official www.php.net package, file a bug report\n"
++		"at http://bugs.php.net, including the following information:\n"
++		"FD_SETSIZE=%d, but you are using %d.\n"
++		" --enable-fd-setsize=%d is recommended, but you may want to set it\n"
++		"to match to maximum number of sockets each script will work with at\n"
++		"one time, in order to avoid seeing this error again at a later date.",
++		FD_SETSIZE, max_fd, (max_fd + 128) & ~127);
++#else
++	php_error_docref(NULL TSRMLS_CC, E_WARNING,
++		"You MUST recompile PHP with a larger value of FD_SETSIZE.\n"
++		"It is set to %d, but you have descriptors numbered at least as high as %d.\n"
++		" --enable-fd-setsize=%d is recommended, but you may want to set it\n"
++		"to equal the maximum number of open files supported by your system,\n"
++		"in order to avoid seeing this error again at a later date.",
++		FD_SETSIZE, max_fd, (max_fd + 1024) & ~1023);
++#endif
++}
++
++#if defined(PHP_USE_POLL_2_EMULATION)
++
++/* emulate poll(2) using select(2), safely. */
++
++PHPAPI int php_poll2(php_pollfd *ufds, unsigned int nfds, int timeout)
++{
++	fd_set rset, wset, eset;
++	php_socket_t max_fd = SOCK_ERR;
++	unsigned int i, n;
++	struct timeval tv;
++	
++	/* check the highest numbered descriptor */
++	for (i = 0; i < nfds; i++) {
++		if (ufds[i].fd > max_fd)
++			max_fd = ufds[i].fd;
++	}
++
++	PHP_SAFE_MAX_FD(max_fd, nfds + 1);
++
++	FD_ZERO(&rset);
++	FD_ZERO(&wset);
++	FD_ZERO(&eset);
++
++	for (i = 0; i < nfds; i++) {
++		if (ufds[i].fd >= FD_SETSIZE) {
++			/* unsafe to set */
++			ufds[i].revents = POLLNVAL;
++			continue;
++		}
++		if (ufds[i].events & PHP_POLLREADABLE) {
++			FD_SET(ufds[i].fd, &rset);
++		}
++		if (ufds[i].events & POLLOUT) {
++			FD_SET(ufds[i].fd, &wset);
++		}
++		if (ufds[i].events & POLLPRI) {
++			FD_SET(ufds[i].fd, &eset);
++		}
++	}
++
++	if (timeout >= 0) {
++		tv.tv_sec = timeout / 1000;
++		tv.tv_usec = (timeout - (tv.tv_sec * 1000)) * 1000;
++	}
++
++	n = select(max_fd + 1, &rset, &wset, &eset, timeout >= 0 ? &tv : NULL);
++
++	if (n >= 0) {
++		for (i = 0; i < nfds; i++) {
++			if (ufds[i].fd >= FD_SETSIZE) {
++				continue;
++			}
++
++			ufds[i].revents = 0;
++
++			if (FD_ISSET(ufds[i].fd, &rset)) {
++				/* could be POLLERR or POLLHUP but can't tell without probing */
++				ufds[i].revents |= POLLIN;
++			}
++			if (FD_ISSET(ufds[i].fd, &wset)) {
++				ufds[i].revents |= POLLOUT;
++			}
++			if (FD_ISSET(ufds[i].fd, &eset)) {
++				ufds[i].revents |= POLLPRI;
++			}
++		}
++	}
++
++	return n;
++}
++
++#endif
++
+ 
+ /*
+  * Local variables:
+diff --git a/main/php_network.h b/main/php_network.h
+index 3d791e8fa73d..d88fbc890dfe 100644
+--- a/main/php_network.h
++++ b/main/php_network.h
+@@ -106,6 +106,104 @@ typedef int php_socket_t;
+ # define SOCK_RECV_ERR -1
+ #endif
+ 
++/* uncomment this to debug poll(2) emulation on systems that have poll(2) */
++/* #define PHP_USE_POLL_2_EMULATION 1 */
++
++#if defined(HAVE_SYS_POLL_H) && defined(HAVE_POLL)
++# include <sys/poll.h>
++typedef struct pollfd php_pollfd;
++#else
++typedef struct _php_pollfd {
++	php_socket_t fd;
++	short events;
++	short revents;
++} php_pollfd;
++
++PHPAPI int php_poll2(php_pollfd *ufds, unsigned int nfds, int timeout);
++
++# define POLLIN      0x0001    /* There is data to read */
++# define POLLPRI     0x0002    /* There is urgent data to read */
++# define POLLOUT     0x0004    /* Writing now will not block */
++# define POLLERR     0x0008    /* Error condition */
++# define POLLHUP     0x0010    /* Hung up */
++# define POLLNVAL    0x0020    /* Invalid request: fd not open */
++
++# ifndef PHP_USE_POLL_2_EMULATION
++#  define PHP_USE_POLL_2_EMULATION 1
++# endif
++#endif
++
++#define PHP_POLLREADABLE	(POLLIN|POLLERR|POLLHUP)
++
++#ifndef PHP_USE_POLL_2_EMULATION
++# define php_poll2(ufds, nfds, timeout)		poll(ufds, nfds, timeout)
++#endif
++
++/* timeval-to-timeout (for poll(2)) */
++static inline int php_tvtoto(struct timeval *timeouttv)
++{
++	if (timeouttv) {
++		return (timeouttv->tv_sec * 1000) + (timeouttv->tv_usec / 1000);
++	}
++	return -1;
++}
++
++/* hybrid select(2)/poll(2) for a single descriptor.
++ * timeouttv follows same rules as select(2), but is reduced to millisecond accuracy.
++ * Returns 0 on timeout, -1 on error, or the event mask (ala poll(2)).
++ */
++static inline int php_pollfd_for(php_socket_t fd, int events, struct timeval *timeouttv)
++{
++	php_pollfd p;
++	int n;
++
++	p.fd = fd;
++	p.events = events;
++	p.revents = 0;
++
++	n = php_poll2(&p, 1, php_tvtoto(timeouttv));
++
++	if (n > 0) {
++		return p.revents;
++	}
++
++	return n;
++}
++
++static inline int php_pollfd_for_ms(php_socket_t fd, int events, int timeout)
++{
++	php_pollfd p;
++	int n;
++
++	p.fd = fd;
++	p.events = events;
++	p.revents = 0;
++
++	n = php_poll2(&p, 1, timeout);
++
++	if (n > 0) {
++		return p.revents;
++	}
++
++	return n;
++}
++
++/* emit warning and suggestion for unsafe select(2) usage */
++PHPAPI void _php_emit_fd_setsize_warning(int max_fd);
++
++#ifdef PHP_WIN32
++/* it is safe to FD_SET too many fd's under win32; the macro will simply ignore
++ * descriptors that go beyond the default FD_SETSIZE */
++# define PHP_SAFE_FD_SET(fd, set)	FD_SET(fd, set)
++# define PHP_SAFE_FD_ISSET(fd, set)	FD_ISSET(fd, set)
++# define PHP_SAFE_MAX_FD(m, n)		do { if (n + 1 >= FD_SETSIZE) { _php_emit_fd_setsize_warning(n); }} while(0)
++#else
++# define PHP_SAFE_FD_SET(fd, set)	do { if (fd < FD_SETSIZE) FD_SET(fd, set); } while(0)
++# define PHP_SAFE_FD_ISSET(fd, set)	((fd < FD_SETSIZE) && FD_ISSET(fd, set))
++# define PHP_SAFE_MAX_FD(m, n)		do { if (m >= FD_SETSIZE) { _php_emit_fd_setsize_warning(m); m = FD_SETSIZE - 1; }} while(0)
++#endif
++
++
+ #define PHP_SOCK_CHUNK_SIZE	8192
+ 
+ #ifdef HAVE_SOCKADDR_STORAGE
+diff --git a/main/streams/xp_socket.c b/main/streams/xp_socket.c
+index aa143f4ab28e..746a9348c4fb 100644
+--- a/main/streams/xp_socket.c
++++ b/main/streams/xp_socket.c
+@@ -47,11 +47,17 @@ static size_t php_sockop_write(php_stream *stream, const char *buf, size_t count
+ {
+ 	php_netstream_data_t *sock = (php_netstream_data_t*)stream->abstract;
+ 	int didwrite;
++	struct timeval *ptimeout;
+ 
+ 	if (sock->socket == -1) {
+ 		return 0;
+ 	}
+ 
++	if (sock->timeout.tv_sec == -1)
++		ptimeout = NULL;
++	else
++		ptimeout = &sock->timeout;
++
+ retry:
+ 	didwrite = send(sock->socket, buf, count, 0);
+ 
+@@ -60,24 +66,12 @@ static size_t php_sockop_write(php_stream *stream, const char *buf, size_t count
+ 		char *estr;
+ 
+ 		if (sock->is_blocked && err == EWOULDBLOCK) {
+-			fd_set fdw, tfdw;
+ 			int retval;
+-			struct timeval timeout, *ptimeout;
+ 
+-			FD_ZERO(&fdw);
+-			FD_SET(sock->socket, &fdw);
+ 			sock->timeout_event = 0;
+ 
+-			if (sock->timeout.tv_sec == -1)
+-				ptimeout = NULL;
+-			else
+-				ptimeout = &timeout;
+-
+ 			do {
+-				tfdw = fdw;
+-				timeout = sock->timeout;
+-
+-				retval = select(sock->socket + 1, NULL, &tfdw, NULL, ptimeout);
++				retval = php_pollfd_for(sock->socket, POLLOUT, ptimeout);
+ 
+ 				if (retval == 0) {
+ 					sock->timeout_event = 1;
+@@ -111,29 +105,22 @@ static size_t php_sockop_write(php_stream *stream, const char *buf, size_t count
+ 
+ static void php_sock_stream_wait_for_data(php_stream *stream, php_netstream_data_t *sock TSRMLS_DC)
+ {
+-	fd_set fdr, tfdr;
+ 	int retval;
+-	struct timeval timeout, *ptimeout;
++	struct timeval *ptimeout;
+ 
+ 	if (sock->socket == -1) {
+ 		return;
+ 	}
+ 	
+-	FD_ZERO(&fdr);
+-	FD_SET(sock->socket, &fdr);
+ 	sock->timeout_event = 0;
+ 
+ 	if (sock->timeout.tv_sec == -1)
+ 		ptimeout = NULL;
+ 	else
+-		ptimeout = &timeout;
+-
++		ptimeout = &sock->timeout;
+ 
+ 	while(1) {
+-		tfdr = fdr;
+-		timeout = sock->timeout;
+-
+-		retval = select(sock->socket + 1, &tfdr, NULL, NULL, ptimeout);
++		retval = php_pollfd_for(sock->socket, PHP_POLLREADABLE, ptimeout);
+ 
+ 		if (retval == 0)
+ 			sock->timeout_event = 1;
+@@ -178,14 +165,12 @@ static int php_sockop_close(php_stream *stream, int close_handle TSRMLS_DC)
+ {
+ 	php_netstream_data_t *sock = (php_netstream_data_t*)stream->abstract;
+ #ifdef PHP_WIN32
+-	fd_set wrfds, efds;
+ 	int n;
+-	struct timeval timeout;
+ #endif
+ 
+ 	if (close_handle) {
+ 
+-		if (sock->socket != -1) {
++		if (sock->socket != SOCK_ERR) {
+ #ifdef PHP_WIN32
+ 			/* prevent more data from coming in */
+ 			shutdown(sock->socket, SHUT_RD);
+@@ -197,19 +182,11 @@ static int php_sockop_close(php_stream *stream, int close_handle TSRMLS_DC)
+ 			 * but at the same time avoid hanging indefintely.
+ 			 * */
+ 			do {
+-				FD_ZERO(&wrfds);
+-				FD_SET(sock->socket, &wrfds);
+-				efds = wrfds;
+-
+-				timeout.tv_sec = 0;
+-				timeout.tv_usec = 5000; /* arbitrary */
+-
+-				n = select(sock->socket + 1, NULL, &wrfds, &efds, &timeout);
++				n = php_pollfd_for_ms(sock->socket, POLLOUT, 500);
+ 			} while (n == -1 && php_socket_errno() == EINTR);
+ #endif
+-
+ 			closesocket(sock->socket);
+-			sock->socket = -1;
++			sock->socket = SOCK_ERR;
+ 		}
+ 
+ 	}
+@@ -274,7 +251,6 @@ static int php_sockop_set_option(php_stream *stream, int option, int value, void
+ 	switch(option) {
+ 		case PHP_STREAM_OPTION_CHECK_LIVENESS:
+ 			{
+-				fd_set rfds;
+ 				struct timeval tv;
+ 				char buf;
+ 				int alive = 1;
+@@ -293,14 +269,9 @@ static int php_sockop_set_option(php_stream *stream, int option, int value, void
+ 
+ 				if (sock->socket == -1) {
+ 					alive = 0;
+-				} else {
+-					FD_ZERO(&rfds);
+-					FD_SET(sock->socket, &rfds);
+-
+-					if (select(sock->socket + 1, &rfds, NULL, NULL, &tv) > 0 && FD_ISSET(sock->socket, &rfds)) {
+-						if (0 == recv(sock->socket, &buf, sizeof(buf), MSG_PEEK) && php_socket_errno() != EAGAIN) {
+-							alive = 0;
+-						}
++				} else if (php_pollfd_for(sock->socket, PHP_POLLREADABLE|POLLPRI, &tv) > 0) {
++					if (0 == recv(sock->socket, &buf, sizeof(buf), MSG_PEEK) && php_socket_errno() != EAGAIN) {
++						alive = 0;
+ 					}
+ 				}
+ 				return alive ? PHP_STREAM_OPTION_RETURN_OK : PHP_STREAM_OPTION_RETURN_ERR;
+diff --git a/win32/build/config.w32 b/win32/build/config.w32
+index 015e121c18e1..1bb0d0e9e6e5 100644
+--- a/win32/build/config.w32
++++ b/win32/build/config.w32
+@@ -215,11 +215,17 @@ AC_DEFINE('HAVE_GETADDRINFO', main_network_has_ipv6);
+ AC_DEFINE('HAVE_GAI_STRERROR', main_network_has_ipv6);
+ AC_DEFINE('HAVE_IPV6', main_network_has_ipv6);
+ 
++/* this allows up to 256 sockets to be select()ed in a single
++ * call to select(), instead of the usual 64 */
++ARG_ENABLE('fd-setsize', "Set maximum number of sockets for select(2)", "256");
++AC_DEFINE('FD_SETSIZE', PHP_FD_SETSIZE);
++
+ ARG_ENABLE("memory-limit", "Enable memory limit checking code", "no");
+ 
+ AC_DEFINE('MEMORY_LIMIT', PHP_MEMORY_LIMIT == "yes" ? 1 : 0);
+ 
+ AC_DEFINE('HAVE_USLEEP', 1);
++AC_DEFINE('HAVE_STRCOLL', 1);
+ 
+ /* For snapshot builders, where can we find the additional
+  * files that make up the snapshot template? */
