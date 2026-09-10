@@ -452,35 +452,69 @@ measurement refuted.
 
 ---
 
-## §11 Tree state
+## §11 Tree state, and a CONCURRENCY EVENT AFTER I FINISHED
 
-`git status --porcelain`, nothing staged, nothing committed:
+⚠⚠ **Between my last gate run and this line, someone else ran
+`harness-php/gate.py ph29` — the SHORT name — and then staged the row.** It is
+not mine: all five of my runs used the full row name, which the logs show
+(`grep -ao "check.py ph29[a-z-]*" .temp/php27/1[4-7]-gate*.log` →
+`check.py ph29-recvfrom-alloc`, three times). The other run started
+`Thu Sep 10 06:38:54 2026` and I waited it out rather than touching anything
+while it held the row (`PROTOCOL.md` rule 11's shape, from the other side).
+
+✅ **It reproduces my verdict exactly**, which is the useful part — an
+independent invocation, by another actor, on the same tree:
 
 ```
- M results-php/preflight/_norow.preflight.json
-?? patterns-php/ph29-recvfrom-alloc/          (23 files git would add)
-?? results-php/gate/ph29-recvfrom-alloc.json
-?? results-php/ph29-recvfrom-alloc.json
-?? results-php/preflight/ph29-recvfrom-alloc.preflight.json
-?? results-php/tables/ph29-recvfrom-alloc.md
-?? .tasks-php/TASK_PHP_027_REPORT.md
+results-php/gate/ph29-recvfrom-alloc.json
+  contract    28a92facffb3      (= spec.md's, = the published table's)
+  failures    0
+  complete    True
+  invocation  ph29              <- was `ph29-recvfrom-alloc` in my run
 ```
 
-23 files under the row would be added; `inputs/*.bin` and `__pycache__/` are
-gitignored, verified with `git check-ignore -v`.
+✅ **Bracket re-taken after it, unchanged: `66/0` and `10/0`, everything FRESH.**
+✅ `python3 harness-php/gate.py --audit` → `preflight coverage: complete`, rc 0.
+
+⚠⚠ **BUT IT LEFT A SECOND WRONGLY-KEYED PREFLIGHT, AND THIS IS `RECAP_PHP.md`
+F55 FIRING FOR THE THIRD TIME.** The preflight record is keyed by the name
+typed, not the row it resolved to:
+
+```
+results-php/preflight/ph29-recvfrom-alloc.preflight.json   row key ph29-recvfrom-alloc   7 runs   STAGED
+results-php/preflight/ph29.preflight.json                  row key ph29                  1 run    NOT staged
+results-php/preflight/ph07.preflight.json                  (also not mine)                        NOT staged
+```
+
+⚠ **So the gate record that is staged was WRITTEN by the `ph29` invocation,
+whose preflight is in the file that is NOT staged.** The audit still passes,
+because my own 7-run `ph29-recvfrom-alloc.preflight.json` certifies the same
+tree and IS staged — but the pairing a reader would infer is not the pairing
+that happened. **Manager: decide whether `ph29.preflight.json` and
+`ph07.preflight.json` should be committed, deleted, or merged, before the
+commit. I did not touch either.**
+
+`git status --porcelain` at the time of writing — **the staging is the
+manager's, not mine; I ran no `git add`**:
+
+```
+A  patterns-php/ph29-recvfrom-alloc/…            (23 files)
+A  results-php/gate/ph29-recvfrom-alloc.json
+A  results-php/ph29-recvfrom-alloc.json
+A  results-php/preflight/ph29-recvfrom-alloc.preflight.json
+A  results-php/tables/ph29-recvfrom-alloc.md
+M  results-php/preflight/_norow.preflight.json
+?? results-php/preflight/ph07.preflight.json      <- not mine, not staged
+?? results-php/preflight/ph29.preflight.json      <- not mine, not staged
+```
+
+`inputs/*.bin` and `__pycache__/` are gitignored, verified with
+`git check-ignore -v`.
 
 ⚠ `_norow.preflight.json` is MODIFIED and that is the documented
 `PROTOCOL_PHP.md` §E behaviour — *"a FAILING run grows a COMMITTED file"*, and a
-`--check-stale` that reports STALE counts as one. It grew during the two
-mid-task staleness checks.
-
-⚠⚠ **NOT MINE, reported rather than touched:**
-`results-php/preflight/ph07.preflight.json` is untracked, and
-`.tasks-php/TASK_PHP_029_REPORT.md` / `TASK_PHP_030_REPORT.md` exist. I never
-ran anything against `ph07` and never wrote in `.tasks-php/` except my own
-report. ⚠ **The `ph07` file is F55's shape** — a preflight keyed by the short
-name someone typed rather than by the row it resolved to; there is already one
-wrongly-keyed duplicate committed. **The manager should look before committing.**
+`--check-stale` that reports STALE counts as one. It grew during the mid-task
+staleness checks.
 
 ---
 

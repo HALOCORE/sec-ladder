@@ -1343,7 +1343,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==3858784==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058 at pc 0x564cd50f5f13 bp 0x7ffd496d8a00 sp 0x7ffd496d81a8 WRITE of size 4 at 0x503000000058 thread T0 #0 0x564cd50f5f12 in __interceptor_memcpy (/home/a",
+      "diagnostic": "================================================================= ==3864887==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058 at pc 0x56112f0fbf13 bp 0x7ffd023357c0 sp 0x7ffd02334f68 WRITE of size 4 at 0x503000000058 thread T0 #0 0x56112f0fbf12 in __interceptor_memcpy (/home/a",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1376,7 +1376,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==3858789==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058 at pc 0x560d97e57f13 bp 0x7ffd922f9f80 sp 0x7ffd922f9728 WRITE of size 4 at 0x503000000058 thread T0 #0 0x560d97e57f12 in __interceptor_memcpy (/home/a",
+      "diagnostic": "================================================================= ==3864892==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058 at pc 0x55e073273f13 bp 0x7ffd0e1ccc30 sp 0x7ffd0e1cc3d8 WRITE of size 4 at 0x503000000058 thread T0 #0 0x55e073273f12 in __interceptor_memcpy (/home/a",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1512,7 +1512,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "1046656",
         "model_stdout": "1046656",
         "stderr": ""
@@ -1622,5 +1622,5 @@
   "blocked": [],
   "verdict": "PASS",
   "complete_run": true,
-  "invocation": "ph29"
+  "invocation": "ph29-recvfrom-alloc"
 }
