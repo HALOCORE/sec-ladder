@@ -64,11 +64,11 @@ MATCHABILITY
 
 USAGE
 -----
-    python3 .temp/php30/preimage_screen.py --selftest     # §H, no network
-    python3 .temp/php30/preimage_screen.py --all          # every resolved record
-    python3 .temp/php30/preimage_screen.py --row ph21     # one row
-    python3 .temp/php30/preimage_screen.py --all --json OUT.json
-    python3 .temp/php30/preimage_screen.py --all --no-file-restrict   # control
+    python3 .tasks-php/preimage_screen.py --selftest     # §H, no network
+    python3 .tasks-php/preimage_screen.py --all          # every resolved record
+    python3 .tasks-php/preimage_screen.py --row ph21     # one row
+    python3 .tasks-php/preimage_screen.py --all --json OUT.json
+    python3 .tasks-php/preimage_screen.py --all --no-file-restrict   # control
 """
 import argparse, hashlib, importlib.util, json, os, re, sys, tarfile
 
