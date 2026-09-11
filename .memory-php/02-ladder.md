@@ -252,14 +252,17 @@
   > unsafe Rust: the two rungs are cheapest under DIFFERENT spellings, and R3's
   > minimum sits under R4's.**
   >
-  > ⚠⚠ **STILL n = 1 FOR THIS EXPLANATION.** `ph29`'s negative spread is
-  > **unexplained** — nothing has been searched on that row — so *"two rows,
-  > same sign"* above stands as stated and the mechanism behind it is
-  > established on **one** of them.
+  > ⚠⚠ **STILL n = 1 FOR THIS EXPLANATION — AND THE THIRD FLAG BELOW CONFIRMS
+  > IT RATHER THAN EXTENDING IT.** `ph29` has since been searched on both sides
+  > (`TASK_PHP_035`) and is **NOT** this mechanism: same spelling cheapest on
+  > both sides, R4 **not** degenerate. **F67 stays n = 1.**
   > ⚠ **`ph29` cannot simply be cloned into**: its `.idiom_audit` is
   > `spellings: 4, forbidden: 4, required: 0`, so a `spellings.py` copied from
   > `ph07` would **pass every candidate while checking nothing**
   > (`RECAP_PHP.md` open item 51 — a manager `spec.md` call, owed first).
+  > ✅ **BOTH SENTENCES ARE NOW HISTORY**: item 51 is **closed**, the audit reads
+  > **12 / 4 / 8**, and the debt is **discharged**. Kept because the *reason* the
+  > clone would have been vacuous is the durable part.
   > ⚠ **`ph03` (+12.19 %) is searchable with no `spec.md` edit** —
   > `spellings: 11`, 6 forbidden. **`TASK_PHP_028.md` §4.3 said otherwise and
   > named the wrong row** (F70).
@@ -293,12 +296,56 @@
   > column each is quoted in** — which is open item 52's question arriving on a
   > second row, from a different direction.
 
-  ▶ **`ph03`, `ph29` AND `ph64` REMAIN UNDISCHARGED and need their own task.**
-  **3 of 5 built rows are unbounded in both directions** — ⚠ this line said
-  **3 of 4** until `TASK_PHP_028` reported, then **2 of 4**, and `ph64` takes it
-  back up — and it remains the largest standing threat to the programme's
-  headline quantity. ⚠ **`ph29` is BLOCKED**: its `.idiom_audit` is
-  `spellings: 4, forbidden: 4, required: 0`, so a cloned `spellings.py` would
-  pass every candidate while checking nothing (open item 51). **`ph03`
+  > ⚠⚠⚠ **THIRD FLAG — NOT A FINDING (rule 9). `TASK_PHP_033` REPAIRED `ph29`'s
+  > DECLARATION AND `TASK_PHP_035` DISCHARGED ITS SPELLINGS DEBT. BOTH ARE
+  > UNREVIEWED.** `RECAP_PHP.md` **F72–F79**. Manager-verified from
+  > `results-php/gate/` and from `controls/spellings.json`, not from the reports.
+  >
+  > ⚠ **THE `4 / 4 / 0` AUDIT NUMBERS ABOVE ARE STALE, TWICE OVER.** Item 51 is
+  > **closed**: the declaration now pins **`spellings: 12`, forbidden 4,
+  > required 8**, `present 22`, `required_pins_nothing 0`. And the item's own
+  > framing was half wrong — **`required` CANNOT fail the gate BY DESIGN**
+  > (its scope lives in English; `idiom_audit`'s docstring argues it at length)
+  > while `forbidden_hits` does. What was really wrong is that **nothing
+  > positive was pinned**, so the admissible class was **undecidable by grep**.
+  >
+  > ⭐⭐⭐ **AND THE HEADLINE: `ph29`'s R4 ENDPOINT IS *NOT* DEGENERATE — THE
+  > FIRST ROW IN EITHER PROGRAMME WHERE IT MOVES.** `r4_fold_iter` has a Verus
+  > twin that **verifies (10/0, no `assume`, no new trusted item, no
+  > `is not supported`) AND compiles to a byte-identical kernel** (209 insn,
+  > `d71669d3c0e6`, exec == twin). `r4_endpoint_degenerate: false`.
+  > **A1, `Ir`/call, `small.bin`:** `fixed-R4 bound` **−6.06 %**; R3-side span
+  > **−6.06 % .. +5.08 %**; `r4_fold_iter` **−5.63 %**, admissible and cheaper;
+  > `r4_fold_slice` a byte-identical tie; `r4_head_array` out of contract.
+  >
+  > ⚠⚠ **THIS IS A COUNTEREXAMPLE TO `.memory/02-bench-rules.md` REASON 2's
+  > PREMISE**, *"the R4 side is chained to the prover … so it usually cannot
+  > move"*. ✅ **The RULE — never re-ship a rung for a cheaper spelling — is
+  > untouched and in fact VINDICATED**: a cost-selected R4 would have shrunk
+  > this row's published gap by **5.63 pp**. ⚠ That is a PAT-side memory and it
+  > is **not edited from here**; it is reported.
+  >
+  > ⚠⚠ **`ph29` IS NOT `ph16`'s F67 MECHANISM, SO F67 STAYS n = 1.** F67 is
+  > *two rungs cheapest under DIFFERENT spellings, with a degenerate R4*. Here
+  > the **same** spelling is cheapest on both sides and R4 is **not**
+  > degenerate. The mirror is symmetric — R4's fold in R3 gives −0.38 %, R3's in
+  > R4 gives −5.63 % — so **neither rung's `unsafe`-ness contributes measurably
+  > to this row's gap.**
+  >
+  > ⚠⚠⚠ **AND OPEN ITEM 52 GETS SHARPER, ON A NEW AXIS.** `r3_copy_loop` is
+  > **`+5.08 %` on A1 and `−0.99 %` on the slope — the two DISAGREE ON SIGN**,
+  > on an in-contract R3 variant. ⚠ **This is a disagreement WITHIN family A**
+  > (per-call vs per-window-byte), not the A-vs-B one F74 measured, and its
+  > driver is the **fixed per-call cost** — `r3_copy_loop`'s is **105.35**
+  > against R4ship's **45.19** — **not callee share.** ▶ **F74's
+  > `|Δinside_share| ≤ 0.02` rule does not cover this case and must not be
+  > quoted as if it did.**
+
+  ▶ **`ph03` AND `ph64` REMAIN UNDISCHARGED and need their own task.**
+  **2 of 5 built rows are unbounded in both directions** — ⚠ this line said
+  **3 of 4** until `TASK_PHP_028` reported, then **2 of 4**, `ph64` took it back
+  up to **3 of 5**, and `TASK_PHP_035` brings it down again — and it remains the
+  largest standing threat to the programme's headline quantity. ⚠ **`ph29` was
+  BLOCKED on open item 51 and is no longer**; both halves are done. **`ph03`
   (`spellings: 11`) and `ph64` (`spellings: 13`, 6 forbidden) are both
   searchable today.**
