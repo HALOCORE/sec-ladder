@@ -1,0 +1,300 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns-php/ph29-recvfrom-alloc/controls/spellings.py --verus",
+    "note": "The pin covers the two rung sources the variants are derived from, verus.rs (the R4 admissibility half -- BOTH halves of it: the twin must verify AND compile to the same kernel), spec.md (the declaration the audit runs against), inputs/gen.py (the corpus every number is measured over) and this script. It does NOT cover results-php/ph29-recvfrom-alloc.json: stage 3 compares against that record at run time and prints the delta, which is a stronger check than a hash of it."
+  },
+  "measured_utc": "2026-09-11T05:54:46Z",
+  "derived_from_sha256": {
+    "patterns/ph29-recvfrom-alloc/safe_tuned.rs": "ac8e84a7653be6b96f0f3776af24be8c8e78c3b6d38eee7c8a4b2709b33e9907",
+    "patterns/ph29-recvfrom-alloc/unsafe.rs": "bb1c9e48af4bd95f7f03cd89ff8c2410ec322060ff586d6f6ace1d5aefece1c3",
+    "patterns/ph29-recvfrom-alloc/verus.rs": "5ebc37500853348cbc3775e997f69c179abefb41429470c0a9c6a931ecd2893b",
+    "patterns/ph29-recvfrom-alloc/spec.md": "9452bbd9628444bf81fc61b9033f9208b4792630673d4a7d429961d70b3bf190",
+    "patterns/ph29-recvfrom-alloc/inputs/gen.py": "b4579a235250e9d2f789e019626dec9d294d46122cf4315238f059310deec917",
+    "patterns/ph29-recvfrom-alloc/controls/spellings.py": "2e537fa854358a4dbe61fb0f4aa628b4f62327524f7bf2a6aad72f38435af1ee"
+  },
+  "probes": [
+    {
+      "input": "small.bin",
+      "stride": 550,
+      "n_iters": 25000
+    },
+    {
+      "input": "large.bin",
+      "stride": 4076,
+      "n_iters": 12000
+    }
+  ],
+  "tie_pct": 0.05,
+  "verus_checked": true,
+  "identity_checked": "verifies AND byte-identical kernel at O3/isolated",
+  "statistic": "A1 = kernel_exclusive_ir / n_iters on the SHIPPED inputs -- harness/measure.py::_sum_rows itself, IMPORTED and not transcribed -- so stage 3 compares against results-php/ph29-recvfrom-alloc.json directly. The two-point slope (Ir per window byte) is also recorded, because ph07 and ph16 publish it; the two DISAGREE on this row by about one point and neither is wrong.",
+  "headline_statistic": "ir_per_call_small",
+  "reproduces_shipped_record": true,
+  "r4_endpoint_degenerate": false,
+  "variants": [
+    {
+      "side": "R3",
+      "name": "v0_shipped",
+      "why": "the shipped R3, unmodified",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[1] `vset_unchecked(&mut read_buf, recvd, 0)`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 218,
+      "kernel_fingerprint": "fed2bdbf41eb",
+      "answers": {
+        "adversarial-neg.bin": "2718404719748941824",
+        "adversarial-nowin.bin": "0",
+        "adversarial-short.bin": "",
+        "adversarial-trunc.bin": "2718404719748941824",
+        "large.bin": "3996271157387841948",
+        "small.bin": "5917653902369662825"
+      },
+      "ir_per_call_small": 937.64116,
+      "ir_per_call_large": 6649.0805,
+      "ir_per_window_byte": 1.6198069597277367,
+      "fixed_per_call": 46.74733214974481,
+      "pct_vs_r4ship_a1": -6.055115252769373,
+      "pct_vs_r4ship_slope": -6.505399240263264
+    },
+    {
+      "side": "R3",
+      "name": "r3_fold_index",
+      "why": "\u2b50 THE MIRROR CONTROL. R4's INDEX-WALK fold, spelled safely: `read_buf[i]` in a `while` instead of a `for` over a subslice iterator. This is R2's own fold. If the R3/R4 gap is the fold spelling, this is where R3 loses it",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[1] `vset_unchecked(&mut read_buf, recvd, 0)`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 199,
+      "kernel_fingerprint": "dbfd867a9ba1",
+      "answers": {
+        "adversarial-neg.bin": "2718404719748941824",
+        "adversarial-nowin.bin": "0",
+        "adversarial-short.bin": "",
+        "adversarial-trunc.bin": "2718404719748941824",
+        "large.bin": "3996271157387841948",
+        "small.bin": "5917653902369662825"
+      },
+      "ir_per_call_small": 994.31284,
+      "ir_per_call_large": 7103.253583333333,
+      "ir_per_window_byte": 1.7325413339005482,
+      "fixed_per_call": 41.41510635469854,
+      "pct_vs_r4ship_a1": -0.377021464702371,
+      "pct_vs_r4ship_slope": 0.0015831145707965598
+    },
+    {
+      "side": "R3",
+      "name": "r3_fold_fold",
+      "why": "`.iter().fold(..)` instead of a `for` over `.iter()` -- the same traversal written as a combinator. \u26a0 NOT free: two spellings a reader would call the same thing are ~6 % apart",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[1] `vset_unchecked(&mut read_buf, recvd, 0)`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 200,
+      "kernel_fingerprint": "5fef264578b5",
+      "answers": {
+        "adversarial-neg.bin": "2718404719748941824",
+        "adversarial-nowin.bin": "0",
+        "adversarial-short.bin": "",
+        "adversarial-trunc.bin": "2718404719748941824",
+        "large.bin": "3996271157387841948",
+        "small.bin": "5917653902369662825"
+      },
+      "ir_per_call_small": 994.72468,
+      "ir_per_call_large": 7103.69375,
+      "ir_per_window_byte": 1.7325493675553034,
+      "fixed_per_call": 41.82252784458319,
+      "pct_vs_r4ship_a1": -0.3357580656699545,
+      "pct_vs_r4ship_slope": 0.0020468138650053206
+    },
+    {
+      "side": "R3",
+      "name": "r3_copy_loop",
+      "why": "R2's byte copy loop instead of `copy_from_slice`. A calibration LOSER: a search with no losing entry is one nobody can calibrate",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[1] `vset_unchecked(&mut read_buf, recvd, 0)`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 236,
+      "kernel_fingerprint": "10c4ee77ba68",
+      "answers": {
+        "adversarial-neg.bin": "2718404719748941824",
+        "adversarial-nowin.bin": "0",
+        "adversarial-short.bin": "",
+        "adversarial-trunc.bin": "2718404719748941824",
+        "large.bin": "3996271157387841948",
+        "small.bin": "5917653902369662825"
+      },
+      "ir_per_call_small": 1048.75288,
+      "ir_per_call_large": 7096.827083333334,
+      "ir_per_window_byte": 1.7152791274342976,
+      "fixed_per_call": 105.34935991113639,
+      "pct_vs_r4ship_a1": 5.077478083327944,
+      "pct_vs_r4ship_slope": -0.9947844415147291
+    },
+    {
+      "side": "R3",
+      "name": "r3_head_shift",
+      "why": "R2's shift-loop header decode instead of `from_le_bytes`. Prices the FIXED per-call term rather than the marginal",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[1] `vset_unchecked(&mut read_buf, recvd, 0)`"
+      ],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 236,
+      "kernel_fingerprint": "8e28d056f4e4",
+      "answers": {
+        "adversarial-neg.bin": "2718404719748941824",
+        "adversarial-nowin.bin": "0",
+        "adversarial-short.bin": "",
+        "adversarial-trunc.bin": "2718404719748941824",
+        "large.bin": "3996271157387841948",
+        "small.bin": "5917653902369662825"
+      },
+      "ir_per_call_small": 954.02944,
+      "ir_per_call_large": 6665.684833333334,
+      "ir_per_window_byte": 1.619868234070713,
+      "fixed_per_call": 63.101911261107944,
+      "pct_vs_r4ship_a1": -4.4131277403980675,
+      "pct_vs_r4ship_slope": -6.501862510038116
+    },
+    {
+      "side": "R4",
+      "name": "v0_shipped",
+      "why": "the shipped R4, unmodified",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 183,
+      "kernel_fingerprint": "05d6b672b204",
+      "answers": {
+        "adversarial-neg.bin": "2718404719748941824",
+        "adversarial-nowin.bin": "0",
+        "adversarial-short.bin": "",
+        "adversarial-trunc.bin": "2718404719748941824",
+        "large.bin": "3996271157387841948",
+        "small.bin": "5917653902369662825"
+      },
+      "ir_per_call_small": 998.0758,
+      "ir_per_call_large": 7106.919833333333,
+      "ir_per_window_byte": 1.7325139062204578,
+      "fixed_per_call": 45.19315157874814,
+      "pct_vs_r4ship_a1": 0.0,
+      "pct_vs_r4ship_slope": 0.0,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 10 verified, 0 errors",
+      "identity_exact": true,
+      "verus_kernel_insns": 183,
+      "verus_kernel_fingerprint": "05d6b672b204"
+    },
+    {
+      "side": "R4",
+      "name": "r4_fold_iter",
+      "why": "\u2b50\u2b50 R3's `for` over `read_buf[0..recvd].iter()`, put into R4. It replaces `vget_unchecked`'s ONLY call site with a checked slice index, so it is cheaper AND one trusted call site smaller. Written `0..recvd` because `RangeTo` has no spec at the pinned vstd and the two spellings are byte-identical machine code",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 209,
+      "kernel_fingerprint": "d71669d3c0e6",
+      "answers": {
+        "adversarial-neg.bin": "2718404719748941824",
+        "adversarial-nowin.bin": "0",
+        "adversarial-short.bin": "",
+        "adversarial-trunc.bin": "2718404719748941824",
+        "large.bin": "3996271157387841948",
+        "small.bin": "5917653902369662825"
+      },
+      "ir_per_call_small": 941.89548,
+      "ir_per_call_large": 6653.313166666667,
+      "ir_per_window_byte": 1.61980081868028,
+      "fixed_per_call": 51.00502972584604,
+      "pct_vs_r4ship_a1": -5.628863058296768,
+      "pct_vs_r4ship_slope": -6.505753699031805,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 10 verified, 0 errors",
+      "identity_exact": true,
+      "verus_kernel_insns": 209,
+      "verus_kernel_fingerprint": "d71669d3c0e6"
+    },
+    {
+      "side": "R4",
+      "name": "r4_fold_slice",
+      "why": "the index walk kept, but read through a `&[u8]` from `as_slice()` with the EXISTING trusted `get_unchecked` instead of `vget_unchecked` on the `Vec`. If free, it is a smaller trusted surface at the same price",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [],
+      "in_contract": true,
+      "built": true,
+      "kernel_insns": 183,
+      "kernel_fingerprint": "05d6b672b204",
+      "answers": {
+        "adversarial-neg.bin": "2718404719748941824",
+        "adversarial-nowin.bin": "0",
+        "adversarial-short.bin": "",
+        "adversarial-trunc.bin": "2718404719748941824",
+        "large.bin": "3996271157387841948",
+        "small.bin": "5917653902369662825"
+      },
+      "ir_per_call_small": 998.0758,
+      "ir_per_call_large": 7106.919833333333,
+      "ir_per_window_byte": 1.7325139062204578,
+      "fixed_per_call": 45.19315157874814,
+      "pct_vs_r4ship_a1": 0.0,
+      "pct_vs_r4ship_slope": 0.0,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 10 verified, 0 errors",
+      "identity_exact": true,
+      "verus_kernel_insns": 183,
+      "verus_kernel_fingerprint": "05d6b672b204"
+    },
+    {
+      "side": "R4",
+      "name": "r4_head_array",
+      "why": "R3's `from_le_bytes` header decode in R4, replacing eight `get_unchecked` + shift + or. \u26a0 EXPECTED INADMISSIBLE and priced anyway: `../spec.md`'s own hashed `why` records `from_le_bytes` as `is not supported` at the pinned vstd, which is what forces a NEW TRUSTED ITEM",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [],
+      "in_contract": false,
+      "built": true,
+      "kernel_insns": 173,
+      "kernel_fingerprint": "cf1c7d5c1aee",
+      "answers": {
+        "adversarial-neg.bin": "2718404719748941824",
+        "adversarial-nowin.bin": "0",
+        "adversarial-short.bin": "",
+        "adversarial-trunc.bin": "2718404719748941824",
+        "large.bin": "3996271157387841948",
+        "small.bin": "5917653902369662825"
+      },
+      "ir_per_call_small": 989.09308,
+      "ir_per_call_large": 7097.808166666667,
+      "ir_per_window_byte": 1.7324773359803367,
+      "fixed_per_call": 36.23054521081485,
+      "pct_vs_r4ship_a1": -0.9000037872874959,
+      "pct_vs_r4ship_slope": -0.002110819427754379,
+      "verus_verifies": false,
+      "verus_msg": "DISQUALIFIED -- is not supported: error: `core::num::impl&%9::from_le_bytes` is not supported (note: you may be able to add a Verus specification to this function with `assume_specification`) (note: the vstd library provides some spec",
+      "identity_exact": false
+    }
+  ],
+  "problems": [],
+  "invariant": "Every variant is in contract by harness/check.py::spelling_matches over EVERY backticked idiom entry, returns the shipped checksum on all six inputs, and is priced by harness/measure.py's own statistic on both shipped inputs. Every R4 variant additionally has its substitution applied to verus.rs, is put through Verus, and has its twin's kernel fingerprinted against the exec variant's -- spec.md pins `identity: unsafe == verus, O3 exact` and BOTH halves are checked. TWO numbers ship, labelled: the fixed-R4 bound and the R3-side span. NO PAIR INTERVAL."
+}

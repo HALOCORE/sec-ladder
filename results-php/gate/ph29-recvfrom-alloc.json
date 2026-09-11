@@ -158,7 +158,7 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
     "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
-    "patterns/ph29-recvfrom-alloc/NOTES.md": "bbc3f1a8ad761caf6a340a68eee75a466c8aa3d4aca38ac6b41b484f2787c514",
+    "patterns/ph29-recvfrom-alloc/NOTES.md": "6d42013da14b41ad1d672772a13437fd0e529dd28e760d908218d51bc5960e7c",
     "patterns/ph29-recvfrom-alloc/README.md": "c3bec74ff2ea1adc6ceb2dfae745e481c005e3f21120912bec77cbc978a7ad1f",
     "patterns/ph29-recvfrom-alloc/c/emalloc_shim.h": "aa9abf48535e8df93c9398e96c044697a784d73c40d7a7ccc830b5ee308c378f",
     "patterns/ph29-recvfrom-alloc/c/kernel.c": "e573fa2222df64095e646ca2bd7c0452dddb73db3f11888481c1b05e59c2dab7",
@@ -174,6 +174,7 @@
     "patterns/ph29-recvfrom-alloc/controls/negatives.py": "b526c620b4fecfd0f2e912bac11b03668c66e20a4ab4a47f6859af58c3786591",
     "patterns/ph29-recvfrom-alloc/controls/oracle.c": "56ba375246d788b5d3d4ed1a7c004dc900b23e865ab0f95124a1c96da15a54d6",
     "patterns/ph29-recvfrom-alloc/controls/oracle.py": "fd9f64e9a00c47a72a367415bd1826a82b6a2686bbbd39f78795d7f690938982",
+    "patterns/ph29-recvfrom-alloc/controls/spellings.py": "2e537fa854358a4dbe61fb0f4aa628b4f62327524f7bf2a6aad72f38435af1ee",
     "patterns/ph29-recvfrom-alloc/inputs/gen.py": "b4579a235250e9d2f789e019626dec9d294d46122cf4315238f059310deec917",
     "patterns/ph29-recvfrom-alloc/model.py": "47a04eff7d3176dcaaf7c77e391eccdd22a8228b54ed53547823d14767d0a66e",
     "patterns/ph29-recvfrom-alloc/safe_naive.rs": "f7cda41d92e94e8dd53e424110f8618e94e9b18d64e1d2fa8ab939d4a1a135f4",
@@ -1356,7 +1357,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==429313==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058 at pc 0x565318ebbf13 bp 0x7ffe404ea790 sp 0x7ffe404e9f38 WRITE of size 4 at 0x503000000058 thread T0 #0 0x565318ebbf12 in __interceptor_memcpy (/home/ap",
+      "diagnostic": "================================================================= ==461891==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058 at pc 0x559408476f13 bp 0x7ffc9d588b50 sp 0x7ffc9d5882f8 WRITE of size 4 at 0x503000000058 thread T0 #0 0x559408476f12 in __interceptor_memcpy (/home/ap",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1389,7 +1390,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==429319==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058 at pc 0x55e94f008f13 bp 0x7ffce05b31b0 sp 0x7ffce05b2958 WRITE of size 4 at 0x503000000058 thread T0 #0 0x55e94f008f12 in __interceptor_memcpy (/home/ap",
+      "diagnostic": "================================================================= ==461896==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058 at pc 0x555e4d648f13 bp 0x7ffc00438030 sp 0x7ffc004377d8 WRITE of size 4 at 0x503000000058 thread T0 #0 0x555e4d648f12 in __interceptor_memcpy (/home/ap",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1607,7 +1608,9 @@
     "published_sha256": "25f0ae3d717e71b27346c30d52d2c636320b2cff37142e3e25ba9cbe074fbf57",
     "verdict": "FRESH"
   },
-  "controls_json": {},
+  "controls_json": {
+    "spellings.json": "FRESH"
+  },
   "failures": [],
   "notes": [],
   "loud": [

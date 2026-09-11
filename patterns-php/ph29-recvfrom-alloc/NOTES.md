@@ -17,9 +17,13 @@ keeps the newline before the closing fence; the obvious spelling hashes one byte
 less and gives a different number for every pattern in the tree
 (`PROTOCOL_PHP.md` §E).
 
-⚠ **IT HAS MOVED TWICE AND HERE IS EACH MOVE**, because a disclosure a
+⚠ **IT HAS MOVED SIX TIMES AND HERE IS EACH MOVE**, because a disclosure a
 reviewer trusts *instead of* re-checking is worse than useless if it is
-incomplete (`PROTOCOL.md` rule 6).
+incomplete (`PROTOCOL.md` rule 6). ⚠ **This line said TWICE until
+`TASK_PHP_035` and the table under it already listed five**; the count was
+never re-read when moves 3, 4 and 5 were appended. That is the disclosure
+failing in exactly the way the sentence it sits in warns about, and it is
+recorded rather than quietly corrected.
 
 | | what moved |
 |---|---|
@@ -29,6 +33,7 @@ incomplete (`PROTOCOL.md` rule 6).
 | `bb7fbb617e94d1f8…` | a twelfth `divergences` entry, for the `emalloc`/`efree` `#define` redirect — §11a |
 | `5765a3cd4a94e1fa…` | the two per-language `idiom.required` entries lost their `why` key (the gate's schema admits only `c` and `rust`, and text under an unknown key **pins nothing**), and `vcopy_unchecked` lost a non-load-bearing `ensures` clause — §11d |
 | `28a92facffb33148…` | `idiom.forbidden[0]` stopped backticking the expression it protects, and `forbidden[2]`/`[3]` gained one genuinely-absent banned token each — §12 items −3 and −2 |
+| `a5dfc7d473a22325…` | `idiom.required[0..3]` were backticked in both language keys, with two respellings (`.wrapping_add(1)` for the R4/R5-only `tr.wrapping_add(1)`, and `read_buf[recvd] =` for a span whose character literal the matcher blanks), and `required[0]`/`[1]` gained the English they had never carried — `TASK_PHP_033` |
 
 **Move 4 is the gate's**, not mine, and both halves of it are the gate finding
 a declaration that pinned nothing: a `why` key the idiom schema does not read,
@@ -39,7 +44,29 @@ PLT entry, so the two cells must differ in relocation bytes. **The record says
 need. **Move 3 ADDS a divergence entry** rather than withdrawing one, for a
 `#define` redirect that made two cited lines verbatim.
 
-⚠ **No move touched a `required`, a `forbidden` or the `idiom.why` prose.**
+⚠⚠ **MOVE 6 IS MOVE 4's UNFINISHED HALF, AND NOTHING COULD SEE IT.** Move 4
+folded a `why` key into the `c`/`rust` strings because *"the gate's schema
+admits only `c` and `rust`, and text under an unknown key pins nothing"*.
+⭐ **It folded the two entries that HAD a `why` and left the two that did
+not** — on the committed `spec.md`, `required[2]` and `required[3]` carried
+byte-identical prose tails across both language keys (the signature of one
+`why` folded into two strings) while `required[0]` and `required[1]` were bare
+20/18- and 22/39-byte spans with no English at all. **Nothing caught that for
+five moves**, and the reason generalises past this row: `idiom.required` is a
+JSON object whose schema is **CLOSED**, whose extra keys are **SILENT in the
+audit**, and whose misuse is only visible in a count that **reads fine when it
+is zero** — `required` is given no verdict and `spellings: 0` prints as a clean
+number rather than as an absence. Three people have now put prose somewhere the
+schema does not read it (a `why` key, a `note` key) or taken prose out to fix
+that and not put it back. The repair is not a new gate check: it is one
+sentence inside each entry, which `required[0]` and `required[1]` now carry —
+*an entry with no English declares a spelling and says neither what it binds nor
+what it is required for.* A reader who meets that sentence cannot write the next
+bare span.
+
+⚠ **No move BEFORE move 6 touched a `required`, a `forbidden` or the
+`idiom.why` prose**; move 6 touches `required` and leaves `forbidden`'s
+spellings and `idiom.why` alone.
 Moves 1 and 2 are declarations a measurement refuted — the direction rule 6's
 addendum asks for; move 3 is the ledger growing, which is the direction §A2
 wants (an entry cannot be quietly withdrawn, and this one was quietly
@@ -478,11 +505,13 @@ a `pNN` figure, and forbids differencing two php runs taken in two shells):
 ⚠⚠⚠ **`R3ship − R4ship` IS NEGATIVE, SO NO FIGURE IN THIS ROW IS A
 `fixed-R4 bound`.** Safe-tuned measures **6.1 % / 6.4 % CHEAPER than unsafe**.
 That is `ph16`'s situation exactly (`.memory-php/02-ladder.md`), and whether it
-is a real non-monotone ladder or a spelling artefact is **unknown**, because
-`controls/spellings.py` was not built. ▶ **THE DEBT IS DECLARED, NOT
-DISCHARGED**: `TASK_PHP_027` §5 rules `controls/spellings.py` out of this task
-and `TASK_PHP_028` discharges it across `ph03` + `ph16`; **ph29 now makes three
-rows owing it and is the second whose R3−R4 gap is negative.**
+is a real non-monotone ladder or a spelling artefact was **unknown** while
+`controls/spellings.py` was not built. ▶ **THE DEBT WAS DECLARED HERE AND IS
+DISCHARGED BY `TASK_PHP_035`**: `TASK_PHP_027` §5 ruled the control out of the
+build task and `TASK_PHP_028` discharged it across `ph03` + `ph16`; this row's
+control now ships, and §8b is its answer. The sentence above stands unaltered
+because it was true when it was written and the count it gives (three rows
+owing) was right at the time.
 
 ⚠⚠ **TWO THINGS IN THAT TABLE ARE NOT SAFETY EFFECTS AND WILL BE MISREAD AS
 SUCH.**
@@ -511,6 +540,81 @@ shows it: `c-gcc` runs 39.3 M `Ir` at stride 550 × 25 000 calls and 120.8 M at
 stride 4076 × 12 000 calls, i.e. **1 571 `Ir`/call at 550 B and 10 067 at
 4076 B** — an 6.4× rise for a 7.4× rise in work, the shortfall being the fixed
 term.
+
+### §8b ⭐⭐ THE ANSWER, AND IT IS THE OPPOSITE OF `ph07`'s AND `ph16`'s
+
+`controls/spellings.py` + `controls/spellings.json`, nine variants, every one
+passing the token audit and returning the shipped checksum on all six inputs,
+priced by
+`harness/measure.py`'s own statistic and reproducing all four shipped cells to
+**0.0000 %**.
+
+⚠ **THE SPREAD IS A SPELLING EFFECT AND THE SPELLING IS THE FOLD.** Put R4's
+index walk into R3 and R3 measures **−0.38 %** against `R4ship` instead of
+−6.06 %; put R3's `for` over a subslice iterator into R4 and R4 measures
+**−5.63 %**. Neither rung's `unsafe`-ness contributes anything measurable to
+this row's R3/R4 gap. ⚠ And `.iter().fold(..)` is **not** the same spelling as
+a `for` over `.iter()`: it measures `R4ship` exactly.
+
+⚠⚠⚠ **AND THE R4 SIDE OF THIS ROW WAS UNSEARCHED.** `r4_fold_iter` — R3's fold
+put into R4 — has a Verus twin that **verifies, 10 verified / 0 errors, with no
+new trusted item**, and whose `kernel` is **byte-identical** to the unsafe
+variant's (209 instructions, both), so `identity: unsafe == verus, O3 exact`
+would hold for it. It is **5.63 % cheaper than the shipped R4** and it replaces
+`vget_unchecked`'s **only** call site with a checked slice index, so it is
+**cheaper AND one trusted call site smaller**. ⚠ **That second half is a
+stronger claim than the price and it is stated separately from it.**
+
+⚠ **THE SHIPPED RUNG DOES NOT MOVE.** `.memory/02-bench-rules.md` holds R4
+fixed by fiat — chosen by idiom, before measurement — and that fiat is exactly
+what makes `R3ship − R4ship` a bound at all. What the finding moves is what the
+number may be **called**: it is a bound over an endpoint that had never been
+searched, and `ph07` and `ph16` each searched theirs and found it degenerate.
+`ph29` is the first php row where it is not.
+
+⚠ `r4_fold_slice` — the index walk read through a `&[u8]` and the existing
+trusted `get_unchecked` instead of `vget_unchecked` on the `Vec` — also
+verifies and is **byte-identical to the shipped R4** (183 instructions,
+`05d6b672b204`). ⚠⚠ **BUT IT MOVES A CALL SITE RATHER THAN REMOVING ONE, AND
+THE TWO CANDIDATES MUST NOT BE CREDITED WITH THE SAME PROPERTY.** Counted on
+the twins:
+
+| | `vget_unchecked` | `get_unchecked` | total unchecked reads |
+|---|---:|---:|---:|
+| `verus.rs`, shipped | 1 | 13 | **14** |
+| `r4_fold_iter` twin | 0 | 13 | **13** — one FEWER |
+| `r4_fold_slice` twin | 0 | 14 | **14** — MOVED |
+
+Both leave trusted item 2 (`vget_unchecked`) unused, which is worth saying;
+only `r4_fold_iter` reduces the total. ⚠ Neither removes the *declaration*, so
+the TCB item count stays at 6 in both — what changes is how many call sites
+rest on it, and that is the quantity `ph07`'s `r4_index0` result is about.
+
+`r4_head_array` is the one refusal and it is the documented one:
+`from_le_bytes` is **`is not supported`** at the pinned vstd, which is what
+forces a new trusted item. The control reproduces that error text rather than
+inheriting `spec.md`'s claim of it.
+
+⚠⚠ **WHICH STATISTIC, BECAUSE TWO DISAGREE HERE AND NEITHER IS WRONG.** The
+headline above is **A1**, `kernel_exclusive_ir / n_iters` on `small.bin` — the
+statistic the table in §8 already publishes. The two-point slope (`Ir` per
+window byte), which `ph07` and `ph16` headline, puts the same candidate at
+**−6.51 %** rather than −5.63 %, because the two fold spellings differ in their
+**fixed per-call term** as well as in their marginal. Quote one, name it, and do
+not average them. ⚠ `r3_copy_loop` is the case that makes the choice matter:
+**+5.08 %** on A1 and **−0.99 %** on the slope — the two columns do not even
+agree on its SIGN.
+
+**TWO NUMBERS SHIP, LABELLED, AND THERE IS NO THIRD:**
+
+| | |
+|---|---|
+| `fixed-R4 bound` | `R3ship − R4ship` = **−6.06 %** (937.6 vs 998.1 `Ir`/call, `small.bin`), both endpoints held by fiat |
+| R3-side span | cheapest-found **−6.06 %** (`v0_shipped`) .. dearest-found **+5.08 %** (`r3_copy_loop`), in contract, `small.bin` |
+
+⚠⚠ **NO PAIR INTERVAL.** `min(R3 found) − min(R4 found)` differences two upper
+bounds and bounds nothing in either direction; `ph03`'s hashed `why` retracts
+that construction in terms.
 
 ---
 
@@ -936,9 +1040,15 @@ not the gate's — and that is why the pair is shipped.
 
 ## §14 What is NOT here
 
-* **`controls/spellings.py`** — ruled out of this task by `TASK_PHP_027` §5 and
-  owed by `TASK_PHP_028`. §8 declares the debt. ⚠ **Three of four built rows
-  now owe it.**
+* ~~**`controls/spellings.py`**~~ — **it is here now.** Ruled out of the build
+  task by `TASK_PHP_027` §5, owed by `TASK_PHP_028`, declared as a debt by §8
+  and **discharged by `TASK_PHP_035`**; §8b is the answer. ⚠ What is still NOT
+  here is a **third input shape**: the slope is a two-point fit exactly as
+  `ph07` and `ph16` compute it, and §8b's two columns disagree because that fit
+  has a fixed term this row's candidates move.
+* **A C-side spelling search.** Every variant in `controls/spellings.json` is
+  Rust. The C rungs' 27.9 % gcc/clang spread (§8) is not a spelling result and
+  nothing here turns it into one.
 * **A comparison with any `pNN` figure.** `.memory-php/03-numbers.md` forbids
   it; nothing here does it.
 * **A claim that the corpus's `crashes_pristine_5_0_0` column says anything.**
