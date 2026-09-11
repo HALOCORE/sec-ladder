@@ -47,24 +47,24 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ROWS BUILT 5 -- ph03+ph07 (S1), ph16 (S2), ph29 (S3) spatial, ⭐ ph64 the
         FIRST TEMPORAL. TYPE still ZERO. .memory-php/ is AUTHORITATIVE.
-NEXT    NOTHING RUNNING; _032 LANDED+VERIFIED (PASS, verus 39/0, 66/0 + 12/0).
-        ▶ ph45 = 1st TYPE row: 5 lines, ZERO zval/Zend includes -> SIDESTEPS F24.
-        ⚠ item 51 BEFORE touching ph29. THEN spellings: ph03+ph29+ph64 all owe it.
-⚠ NEW   F71 ⭐⭐⭐ ROW 5: safe Rust makes this a WRONG ANSWER, not a panic -- the safe
-        port is an index arena and `wf` holds with the fix DELETED. 7h GREEN FIRST
-        TRY. Oracle bit-identical 213/213. ASan category REPRODUCED. ⚠⚠ 60% of the
-        C rung is libc -> item 54. F66-F70: ph64 R1h; ph16 -1.22% is a RESULT;
-        ⚠ CITE 26/43 NOT 33; item 48 DECIDED; ⚠⚠ F70 a TRUE sentence, WRONG row.
-⚠ OWED  item 51: ph29's spellings audit is VACUOUS (4/4 forbidden, 0 required) --
-        MANAGER spec.md call. ⚠ SPREAD ph03 +12.19 · ph16 -1.22 · ph29 -6.06 ·
-        ph64 +17.08 = 2 POS / 2 NEG; "safe-tuned cheaper" is 2 of 4, NOT a trend.
+NEXT    ⚠⚠ TWO RUNNING (2026-09-11): _033 EDITS+RE-GATES ph29 (rule 11 -- do NOT
+        touch it); _034 hunts ph45's R1h, read-only. ▶ ph45 = 1st TYPE row, 5
+        lines, 0 zval + NO Zend include -> SIDESTEPS F24; ⚠ its fix is a
+        compiler-WARNING commit (F45's shape), so the HUNT comes first.
+⚠ NEW   F72 item 51 DECIDED: ph29's `required` is SPELLINGS WITH TICKS DROPPED (7
+        of 8 pin) -- 2 need RESPELLING, 1 owes English; buys the SPREAD SEARCH,
+        NOT a check (required CANNOT fail, by design). F73 ⚠⚠ a spelling holding a
+        CHAR LITERAL can NEVER match: LATENT 0/33 PAT + 0/6 PHP -> NEVER WRITE ONE.
+⚠ OWED  SPREAD ph03 +12.19 · ph16 -1.22 · ph29 -6.06 · ph64 +17.08 = 2 POS/2 NEG,
+        so "safe-tuned cheaper" is 2 of 4, NOT a trend. THEN ph03+ph64 spellings
+        (searchable today), D11, item 54.
 ⚠ TRAPS `grep -a` ALWAYS (blind to 41 corpus files); ask about a FUNCTION, not text.
         ⚠⚠ A PROBE WHOSE SETUP ENCODES THE ANSWER evaluates fine and is WRONG --
         EIGHT shapes, the 8th MINE; too-clean is the only warning (F52/F70).
 BAR     C-SIDE ONLY: nothing Rust/Verus/Miri/cost kills a row; patterns-php/ is
         FRESH. ⚠ .web/ is CONCURRENT -- NEVER `git add -A`.
 READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.md ·
-        F1-F71 · items 1-54. fixsurvey.py + preimage_screen.py have --selftest.
+        F1-F73 · items 1-56. fixsurvey.py + preimage_screen.py have --selftest.
 ```
 
 ---
@@ -178,7 +178,10 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > **F69 ⭐⭐ item 48 was TWO QUESTIONS WEARING ONE NUMBER, and §F5 was right** ·
 > **F70 ⚠⚠⚠ a TRUE SENTENCE ON THE WRONG SUBJECT, and nothing about it read as
 > invented** · **F71 ⭐⭐⭐ ROW 5 IS THE FIRST TEMPORAL ROW, and safe Rust turns the
-> defect into a WRONG ANSWER, not a panic**
+> defect into a WRONG ANSWER, not a panic** · **F72 ⭐⭐ item 51 DECIDED: `ph29`'s
+> `required` is SPELLINGS WITH THE TICKS DROPPED, and two of eight must NOT be
+> quoted as written** · **F73 ⚠⚠ a declared spelling containing a CHARACTER
+> LITERAL can never match — latent, 0 of 33 PAT and 0 of 6 PHP**
 >
 > ⚠ **This index stopped at F59 while F60–F65 existed** — `PROTOCOL.md` rule 13,
 > headers rot. **Extend it in the same edit that adds a finding.**
@@ -1344,6 +1347,101 @@ unsafe"* is **2 of 4, not a trend.** (b) **`_031` §4.3 is NOT measured** and is
 carried in `spec.md`/`NOTES.md` as an **OPEN ITEM, not a finding** — ⚠ **so
 `ph64` is NOT the fifth of five**; the fix-completeness tally reads **five rows,
 five different answers.**
+
+### F72 — ⭐⭐ ITEM 51 DECIDED: `ph29`'s `required` SIDE IS **SPELLINGS WITH THE TICKS DROPPED**, AND TWO OF THE EIGHT MUST NOT BE QUOTED AS WRITTEN
+
+Manager, `.temp/mgr169/NOTES.md` §1, three probes each `--selftest` PASS.
+⚠ **UNREVIEWED** (rule 9) — it is the manager's own measurement and is being
+executed by `TASK_PHP_033`, which may overturn it.
+
+**The question** was whether `ph29` pinning **zero** required tokens is a defect
+or a `p05`-style prose-only declaration — `patterns/p05-index-flatten` backticks
+nothing at all, ships, and is documented that way. **Decided: a defect.** ✅ **7 of 8
+leading spans already pin at least one rung**, so these were written as
+spellings and the quotes were simply dropped. And ⚠ **`ph29` is the only real
+PHP row pinning zero** — `ph03` 5, `ph07` 14, `ph16` 13, `ph64` 7, `ph29` **0**
+(`ph00-smoke`'s 0 is not a counter-example: relocated PAT calibration kernel, no
+PHP provenance, prices nothing).
+
+⚠⚠ **But the repair is NOT "add backticks", and that is the finding.**
+**`required[0]` and `required[1]` carry NO ENGLISH AT ALL** — a bare span per
+language and nothing else. `required` is given **no verdict by design**,
+precisely because *which rungs an entry binds lives in its English*. Quoting
+those two as written pins spellings the shipped tree **contradicts**:
+
+* `tr.wrapping_add(1)` pins a **BINDING NAME**. All four Rust rungs compute the
+  request, but the safe two spell `(to_read as u64).wrapping_add(1)`. Quoting
+  `tr.…` would put two rungs out of their own contract on a variable name —
+  **p17's whitespace disaster in a new costume**. ▶ `.wrapping_add(1)` pins all
+  four at one line each (100 / 64 / 88 / 450).
+* `vset_unchecked(…)` is **genuinely unsafe-side** — the safe rungs spell the
+  **checked** `read_buf[recvd as usize] = 0`. No shared span exists and
+  per-language keys cannot say it (both are Rust), so ▶ **the entry owes a
+  sentence**, or the record carries two absences no reader can adjudicate.
+
+⭐ **The falsifiable prediction** (`ph29_predict.py` runs the *shipped*
+`idiom_audit` on an *in-memory* edit): `spellings` 4 → **12**, `pairs` 12 → **36**,
+`present` 0 → **22**, `required_pins_nothing` **0**, `required_absent` 0 → **2**,
+`forbidden_hits` **0**. The naive all-eight edit gives `present 20`,
+`absent 4` and one dead pin.
+
+⚠ **What it buys, stated honestly: `required` CANNOT FAIL THE GATE and this does
+not change that.** It adds no check that can fail. It buys the **spread
+search** — the admissible class becomes grep-decidable — which is the whole
+reason item 51 blocked the spellings task, and the same limitation TASK_021
+recorded for `p05`. ▶ **`ph29` becomes *searchable*, not *enforced*.**
+
+⚠ Also owed in the same hashed block: `forbidden[0]` closes *"NOTE THE ABSENCE
+OF BACKTICKS throughout this entry and the three below"* — **false about its own
+scope**; `forbidden[2]` carries `` `calloc` `` and `forbidden[3]`
+`` `#undef _FORTIFY_SOURCE` ``.
+
+⭐⭐ **THE TRANSFERABLE LESSON — an over-correction crossed a polarity
+boundary.** `forbidden[0]` records at length that the gate refused this row
+**twice** for quoting the expression it was **protecting** (in a `forbidden`
+entry every tick is a ban). The lesson was written down — and then generalised
+one step too far, into `required`, where ticks are exactly what you want.
+⚠ **And the manager reproduced it while writing the task**: the first draft of
+`ph29_predict.py` put the old span *in backticks* into its explanatory tail,
+which would have added a second pin — including the dead char-literal one F73
+warns about. Caught before it ran. *A trap that bites the author, is documented
+at length by the author, and then bites the next reader of that documentation is
+a trap whose write-up is aimed at the wrong half.*
+
+### F73 — ⚠⚠ A DECLARED SPELLING CONTAINING A **CHARACTER LITERAL** CAN NEVER MATCH — LATENT TODAY, **0 of 33 PAT AND 0 of 6 PHP**
+
+Manager, `.temp/mgr169/charlit_reach.py` (`--selftest` PASS, 6 must-fire
+negatives; the detector is **differential** — it asks whether the *shipped*
+blanker changes the span, so it cannot drift from the matcher, and P3 confirms
+it does **not** trip on Rust lifetimes `&'a [u8]`).
+
+`exec_code` layer 1 blanks *"comments and string/char literals"*. For `"..."`
+that is right. For a **C character literal** — an executable operand, not text —
+the consequence is that the matcher never sees it:
+
+```
+c/kernel.c:247    read_buf[recvd] = '\0';     <- ph29 really does spell its own fault line
+exec_code         read_buf[recvd] =     ;     <- what spelling_matches is given
+```
+
+* in `required` it reports `pins nothing` — visible, but only to a reader who
+  knows to distrust it. **`ph29`'s `required[1].c` is exactly this**, and it
+  names the row's own fault line.
+* ⚠⚠ in `forbidden` it is **a ban that cannot fire**, and since TASK_068
+  `forbidden_hits` is the half that **FAILS** the gate — *a check that silently
+  cannot fail*, `PROTOCOL_PHP.md` §H's exact target, sitting inside the frozen
+  infrastructure.
+
+✅ **Reach measured: 0 affected spellings across 33 PAT rows and 6 PHP rows, 0 of
+them `forbidden`.** So it is **latent, not live** — and that is precisely what
+decides the repair: backticking `read_buf[recvd] = '\0'` would **create the
+first affected spelling in either programme**. ▶ Respell `read_buf[recvd] =`,
+which pins `kernel.c:247` and `hardened:175`, one line each.
+
+⚠⚠ **NOT a bug report against `harness/`, and no edit is proposed or wanted.**
+The blanking is deliberate and documented in `exec_code`'s own docstring;
+`exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
+WRITING rule: never backtick a span containing a character literal.**
 
 ### F66 — ⭐⭐⭐ `ph64`'s R1h: THE CLEANEST BACKPORT YET, THE REPAIR IS AT A **THIRD** SITE, AND THE CATALOGUE'S ORACLE **MEASURES NOTHING**
 
@@ -3330,7 +3428,9 @@ the wrong one.
 | ~~48~~ | ✅✅ **DECIDED 2026-09-10 — AND IT WAS TWO QUESTIONS WEARING ONE NUMBER. §F5's SINGULAR SPELLING IS CORRECT.** Was: *"§F5 has no spelling for a row with FIVE `fix_commit`s — 30 rows — and it is the largest unmade decision on the PHP side"* | **The spelling: R1h is the `fix_commit` of the id whose `c_file_line` the row's kernel EXTRACTS.** A kernel extracts **one** site (`PLAN_PHP.md` §3 criterion 3); that site is one id; that id has one fix. ✅ **Option (a) has a spelling on every one of the 30**, because the hypothesis that would have broken it — *one site upstream patched N times* — **is dead**: at `file:line` **29 of 30** rows have every id at a distinct line (`ph71` alone collides), and by **enclosing function against the pinned tarball, 24 of 30**. ❌ **Option (b), the union, is REFUSED** — it ships a configuration upstream never shipped as one change, and §C/F43 both rest on R1h being real upstream code, F43's whole lesson being that what upstream **kept** is the stronger citation. ➡ **Option (c), split, is NOT this item's business** — whether N ids belong in one row is a **catalogue** decision under §G1, answerable without reference to R1h, and it is **open item 35**. ⚠⚠ **Conflating the rung question with the catalogue question is what made this look unanswerable.** ⭐ **`_029` had already answered it from the other side** — *"a single `ph73` row cannot ship a single sha-pinned `kernel_hardened.c`"*, with a per-id R1h and tag pin for all five: a row pricing five sites cannot have one R1h, a row extracting one always can. ⚠ **Successor: the §F5 sentence itself, landed UNREVIEWED**; and §1b's residue goes to item 35, **not to a new number.** Evidence: `.temp/mgr168/{item48_decide,enclosing_fn,spread_axis,sha_norm}.py` + `.log`, all with `--selftest` |
 | 49 | ⭐ **THE `elsewhere` CHANNEL — 8 RECORDS WHERE THE CITED 5.0.0 TEXT IS IN A *DIFFERENT FILE OF THE SAME PATCH*** | `TASK_PHP_030` §6. `reg.c → ereg.c`, `zend_execute.c → zend_vm_def.h` (×4), `.re → .c`. ⚠ **This converts several bare `INAPPLICABLE`s into *"the code moved file, and the commit may well be the repair"*** — i.e. some of the 18 INAPPLICABLE records are not the `ph07` shape at all but a **rename/generation** boundary. ⚠ **`ph46`/CRASH-053 is flagged for the manager specifically.** Cheap to chase (`python3 .tasks-php/preimage_screen.py --row <row>`), and it strictly *reduces* the number of rows whose R1h looks unanswerable |
 | 50 | ⚠ **ITEM 46's RESIDUE: `PHP_SAFE_FD_ISSET` (THE **READ**) AND THE ~20 `poll(2)` CONVERSIONS ARE STILL UNPRICED** | ⚠⚠ **Item 46 is RETIRED because its premise undercounted**: F60. `99e290f882c9` carries **four** repair kinds and **`ph16` prices two** — guard (b) `PHP_SAFE_FD_SET` and guard (c) `PHP_SAFE_MAX_FD` — and `ph16`'s own `spec.md` had already censused the four **sites** and declined to adjudicate. **What is left is (2) the bounds-check on the READ (`streamsfuncs.c:577`, `sockets.c:563`) and (4) the poll conversion.** §G: the burden of showing SAME is **not discharged** — they share a **commit**, not a **fix**, and §G1 makes a distinct fix evidence for DIFFERENT. ⭐ **The `FD_ISSET` read is the stronger candidate** (different fault primitive, different oracle) **and `ext/sockets/` has ZERO rows** (F59). ⚠ A fifth cluster is untouched by the commit entirely: **15 sites in bundled FastCGI** — a provenance question before it is a row (`.tasks-php/probes/fdset_census.sh`; 47 sites / 11 files) |
-| 51 | ⚠⚠⚠ **`ph29`'s SPELLINGS AUDIT WOULD BE VACUOUS, AND A CLONED `spellings.py` WOULD REPORT SUCCESS WHILE CHECKING NOTHING** — ▶ **manager `spec.md` call, owed BEFORE any task touches `ph29`** | `_028`, ✅ manager-verified from `.idiom_audit` in the gate records: `p05` **0**, `ph00-smoke` **0**, `ph03` **11** (6 forbidden), `ph16` **23** (10), **`ph29` 4 — and all four are `forbidden`, with ZERO `required`.** So every candidate passes and nothing is pinned: **a validator that cannot fail**, which is `PROTOCOL_PHP.md` §H's exact target and F52's family. ⚠⚠ **This corrects `TASK_PHP_028.md` §4.3, which named `ph03`** — `ph03` searches fine and needs **no** `spec.md` edit. ⭐ **The lesson is rule 14 in its hardest direction: I copied a TRUE sentence onto the WRONG SUBJECT.** The sentence is `p05`'s, it really is in the tree (inside `ph16`'s hashed `why`, printed by `check.py` on every `ph16` run, which is where I picked it up), and `spellings: 0` really did happen — **so nothing about the claim read as invented.** ⚠ Pinning `required` spellings on `ph29` is a `spec.md` edit **inside a hashed block** and costs a `ph29` re-gate |
+| ~~51~~ | ✅✅ **DECIDED AND DISPATCHED — F72/F73, `TASK_PHP_033`.** The call: `ph29`'s `required` entries are **spellings with the ticks dropped**, not a `p05`-style prose-only declaration — **7 of 8 spans already pin a rung**. ⚠ **But the repair is not "add backticks"**: `required[0]`/`required[1]` carry **no English at all**, so two of the eight must be respelled (`.wrapping_add(1)`, not a binding name; `read_buf[recvd] =`, not a char literal) and one owes a scoping sentence. ⚠ **The original framing below is half wrong and is kept for the record**: `required` **cannot fail the gate BY DESIGN** (its scope lives in English — `idiom_audit`'s docstring argues it at length), while `forbidden_hits` **does** fail, so *"a validator that cannot fail"* named a deliberate asymmetry rather than a defect. What was really wrong is that ph29 pins **nothing positive at all**, which makes its admissible class **undecidable by grep** — ▶ so the edit buys the **spread search**, and `ph29` becomes *searchable*, not *enforced* | `_028`, ✅ manager-verified from `.idiom_audit` in the gate records: `p05` **0**, `ph00-smoke` **0**, `ph03` **11** (6 forbidden), `ph16` **23** (10), **`ph29` 4 — and all four are `forbidden`, with ZERO `required`.** So every candidate passes and nothing is pinned: **a validator that cannot fail**, which is `PROTOCOL_PHP.md` §H's exact target and F52's family. ⚠⚠ **This corrects `TASK_PHP_028.md` §4.3, which named `ph03`** — `ph03` searches fine and needs **no** `spec.md` edit. ⭐ **The lesson is rule 14 in its hardest direction: I copied a TRUE sentence onto the WRONG SUBJECT.** The sentence is `p05`'s, it really is in the tree (inside `ph16`'s hashed `why`, printed by `check.py` on every `ph16` run, which is where I picked it up), and `spellings: 0` really did happen — **so nothing about the claim read as invented.** ⚠ Pinning `required` spellings on `ph29` is a `spec.md` edit **inside a hashed block** and costs a `ph29` re-gate |
 | 52 | ⚠⚠ **WHICH STATISTIC "THE BOUND" MEANS IS UNDECIDED, AND THE TWO PUBLISHED ROWS USE DIFFERENT ONES** | `_028` §3. `ph07`'s bound is published from the **marginal** statistic and `ph16`'s from the **per-call** one, and on `ph16` they differ by **0.72 pp — 59 % of the figure** (`−1.22 %` per-call vs `−1.94 %` per window byte). ⚠ **So the two rows' bounds are not comparable as published**, which is exactly what `fixed-R4 bound` exists to prevent. ⚠ **Not a defect in either row** — both are internally consistent and `_028` shipped **all three** statistics precisely because they disagree. **What is owed is one sentence in `.memory/02-bench-rules.md` or `PROTOCOL_PHP.md` naming THE statistic a `fixed-R4 bound` is quoted in**, and a note on `ph07` if it is the one that moves. ⭐ **Cheap, and it gets more expensive with every row published** |
 | 53 | ⚠ **`ph16`'s `safe_naive.rs` AND `safe_tuned.rs` STATE THE WRONG MECHANISM IN COMMENTS, AND FIXING A COMMENT COSTS A 28-CELL RE-MEASURE** | `_028` §2, which **retracted `ph16`'s own `NOTES.md` §8b** and landed that retraction: the R2→R3 **guard** respelling emits **byte-identical machine code in both directions** (`r3_guard_r2`, `r2x_guard_r3`), so the gap is the **subslice + `chunks_exact`**, not the guard. ✅ **The engineer correctly did NOT touch the `.rs` files** — they are measure-pinned. ⚠ **Manager's call, and F15's shape exactly**: a prose fix costing a corpus-wide re-measure, whose stated mitigation is already protocol — **batch it, never land it alone** (`PROTOCOL.md` rule 6). ⭐ **Do it the next time `ph16` is re-measured for a substantive reason**, and not before |
 | 54 | ⚠⚠ **`PROTOCOL_PHP.md` §B2's "REPRODUCE THE ALLOCATOR TALLY ARITHMETICALLY" IS FREE ONLY AT O(1) ALLOCATIONS PER CALL, AND `ph64` IS THE FIRST ROW WHERE IT IS O(n)** | F71, `TASK_PHP_032` §5, **UNREVIEWED — and the engineer flagged the alternative for a reviewer to push back on, which is the right shape.** §B forbids a Rust rung from linking the shim, so on `ph64` the **C rung allocates `2n+2` blocks per call and the Rust rungs count**: **60 % of the C's instructions are in libc `malloc`/`free`.** ⚠⚠ **So the C-vs-Rust column on this row is not a safety comparison** — it is largely a comparison of an allocator against arithmetic. ✅ **Not a defect in the row**: the engineer took the *"say so loudly"* option and every figure is published in `marginal_ir_per_call`. ⚠ **What is owed is a §B2 condition naming the O(1) precondition**, and a decision on what a row does when it does not hold. ⭐ **It gets worse, not better, with the temporal axis** — intrusive containers allocate per element, and `.memory-php/01-extraction.md`'s F1 says the temporal defects live in exactly those containers |
+| 55 | ⚠⚠ **F73'S WRITING RULE HAS NO HOME THAT IS NOT HASHED** — *"never backtick a span containing a character literal"* | F73. The natural place is the **named-spelling standard**, but that paragraph lives **inside every pattern's `why`, i.e. inside `contract_sha256`**, and it is byte-identical across six patterns — so writing one sentence into it costs a **six-row re-gate on the PHP side and 33 on PAT**. ⚠ The rule is real and cheap to state and there is **nowhere cheap to state it**. Candidate homes, none chosen: `PROTOCOL_PHP.md` §H (php-only, so PAT authors never see it); `.memory-php/` (authoritative but php-only, and needs review first); a `harness/` docstring (**forbidden — hashed**). ⭐ **The general shape is worth more than this instance**: a convention that binds BOTH programmes has no unhashed shared surface, which is why `CLAUDE.md`'s top table exists and why it keeps growing |
+| 56 | ⚠ **A BARE-IDENTIFIER PIN IS A WEAK PIN, AND NOTHING MEASURES PIN QUALITY** | F72. `ph29`'s `required[3].rust` is `real_size`, which occurs **3–7 times per rung** — it pins *"this name occurs"*, not a construction. Compare `.wrapping_add(1)` and `emalloc(to_read + 1)`, which pin **exactly one line per rung**. ⚠ `idiom_audit` reports `pins_nothing` and `absent` but has **no notion of how tightly a present pin binds**, so a one-line pin and a seven-hit identifier are indistinguishable in the record. ✅ **Not a defect in `ph29`** — the entry's English carries the §B1.3 argument and the pin is honest; `TASK_PHP_033` is told explicitly not to strengthen it. ▶ Open: is hit-count-per-rung worth reporting beside each present pin, and **would it be a number nobody acts on** — the exact trap `idiom_audit`'s own docstring records about the printed `2` that moved nothing for three tasks |
