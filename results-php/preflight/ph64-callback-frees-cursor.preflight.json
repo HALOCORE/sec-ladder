@@ -1,0 +1,563 @@
+{
+  "row": "ph64-callback-frees-cursor",
+  "runs": [
+    {
+      "row": "ph64-callback-frees-cursor",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph64-callback-frees-cursor: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph64-callback-frees-cursor: Zend/zend_llist.c, Zend/zend_llist.h, Zend/zend_llist.h, Zend/zend_llist.c, Zend/zend_llist.c, Zend/zend_llist.c, Zend/zend_llist.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c are in the manifest (fd73a78aa166, 9b8bd2495cf3, 9b8bd2495cf3, fd73a78aa166, fd73a78aa166, fd73a78aa166, fd73a78aa166, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0)",
+        "  ph64-callback-frees-cursor: OK  Zend/zend_llist.c:186-193  209 bytes  sha256 fce26e38389ba9fb  tier=narrowed",
+        "  ph64-callback-frees-cursor: OK+1 Zend/zend_llist.h:25-29  188 bytes  sha256 c171e96160689855  -- `zend_llist_element`. \u26a0\u26a0 `next` IS AT OFFSET 0, so SITE L's read-after",
+        "  ph64-callback-frees-cursor: OK+2 Zend/zend_llist.h:37-45  213 bytes  sha256 c0e8e19b6f9a810a  -- `zend_llist` -- `head`/`tail`/`count`/`size`/`dtor`/`persistent`. `cou",
+        "  ph64-callback-frees-cursor: OK+3 Zend/zend_llist.c:26-34  228 bytes  sha256 fbbb2fb69b643cd4  -- `zend_llist_init`. Lifted verbatim; it is where `persistent = 0` and t",
+        "  ph64-callback-frees-cursor: OK+4 Zend/zend_llist.c:37-52  340 bytes  sha256 6b80ae8a75f75862  -- `zend_llist_add_element` -- the `pemalloc(sizeof(zend_llist_element) +",
+        "  ph64-callback-frees-cursor: OK+5 Zend/zend_llist.c:73-104  747 bytes  sha256 b714ec3184afe1e0  -- \u26a0\u26a0 THE FREE SITE. `DEL_LLIST_ELEMENT` (:73-88) and `zend_llist_del_ele",
+        "  ph64-callback-frees-cursor: OK+6 Zend/zend_llist.c:107-121  261 bytes  sha256 5e38ed5040949606  -- `zend_llist_destroy` -- what the kernel calls at the end of every call",
+        "  ph64-callback-frees-cursor: OK+7 ext/standard/basic_functions.c:154-158  120 bytes  sha256 b5f23b9dc0b83a10  -- `user_tick_function_entry` -- declares **`calling`**, which is SITE C'",
+        "  ph64-callback-frees-cursor: OK+8 ext/standard/basic_functions.c:2074-2082  241 bytes  sha256 a84dcb7e67109c37  -- `user_tick_function_dtor` -- what the free destroys BESIDES the elemen",
+        "  ph64-callback-frees-cursor: OK+9 ext/standard/basic_functions.c:2102-2137  1235 bytes  sha256 bacb13c0332f3ec4  -- \u26a0\u26a0\u26a0 SITE C. `user_tick_function_call`. The write-after-free is `:2135`",
+        "  ph64-callback-frees-cursor: OK+10 ext/standard/basic_functions.c:2139-2144  174 bytes  sha256 d64eae1b992514d1  -- `run_user_tick_functions`, the bridge. The `zend_llist_apply` call is ",
+        "  ph64-callback-frees-cursor: OK+11 ext/standard/basic_functions.c:2146-2161  538 bytes  sha256 a429912167dab97b  -- \u2b50\u2b50 WHERE R1h LANDS. `user_tick_function_compare`, and it is NEITHER th",
+        "  ph64-callback-frees-cursor: OK+12 ext/standard/basic_functions.c:2799-2835  944 bytes  sha256 a002a982f92b9262  -- `PHP_FUNCTION(register_tick_function)` -- `calling = 0` at `:2804`, th",
+        "  ph64-callback-frees-cursor: OK+13 ext/standard/basic_functions.c:2840-2862  574 bytes  sha256 ef14ca8cae07f307  -- `PHP_FUNCTION(unregister_tick_function)` -- THE TRIGGER'S ENTRY POINT.",
+        "  ph64-callback-frees-cursor: per-span overlap: span0 50% (2/4), span1 100% (5/5), span2 100% (9/9), span3 86% (6/7), span4 91% (10/11), span5 95% (19/20), span6 89% (8/9), span7 80% (4/5), span8 20% (1/5), span9 17% (4/24), span10 0% (0/3), span11 17% (2/12), span12 9% (2/22), span13 29% (4/14)  -- the UNION is what is reported below, and it is what 14 cited spans oblige the row to",
+        "  ph64-callback-frees-cursor: kernel overlap 50% (69/139 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph64-callback-frees-cursor: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph64-callback-frees-cursor: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH64_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "build",
+      "gate_argv": [
+        "--tool",
+        "build",
+        "ph64-callback-frees-cursor",
+        "--all"
+      ],
+      "tool_argv": [
+        "ph64-callback-frees-cursor",
+        "--all"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph64-callback-frees-cursor",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph64-callback-frees-cursor: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph64-callback-frees-cursor: Zend/zend_llist.c, Zend/zend_llist.h, Zend/zend_llist.h, Zend/zend_llist.c, Zend/zend_llist.c, Zend/zend_llist.c, Zend/zend_llist.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c are in the manifest (fd73a78aa166, 9b8bd2495cf3, 9b8bd2495cf3, fd73a78aa166, fd73a78aa166, fd73a78aa166, fd73a78aa166, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0)",
+        "  ph64-callback-frees-cursor: OK  Zend/zend_llist.c:186-193  209 bytes  sha256 fce26e38389ba9fb  tier=narrowed",
+        "  ph64-callback-frees-cursor: OK+1 Zend/zend_llist.h:25-29  188 bytes  sha256 c171e96160689855  -- `zend_llist_element`. \u26a0\u26a0 `next` IS AT OFFSET 0, so SITE L's read-after",
+        "  ph64-callback-frees-cursor: OK+2 Zend/zend_llist.h:37-45  213 bytes  sha256 c0e8e19b6f9a810a  -- `zend_llist` -- `head`/`tail`/`count`/`size`/`dtor`/`persistent`. `cou",
+        "  ph64-callback-frees-cursor: OK+3 Zend/zend_llist.c:26-34  228 bytes  sha256 fbbb2fb69b643cd4  -- `zend_llist_init`. Lifted verbatim; it is where `persistent = 0` and t",
+        "  ph64-callback-frees-cursor: OK+4 Zend/zend_llist.c:37-52  340 bytes  sha256 6b80ae8a75f75862  -- `zend_llist_add_element` -- the `pemalloc(sizeof(zend_llist_element) +",
+        "  ph64-callback-frees-cursor: OK+5 Zend/zend_llist.c:73-104  747 bytes  sha256 b714ec3184afe1e0  -- \u26a0\u26a0 THE FREE SITE. `DEL_LLIST_ELEMENT` (:73-88) and `zend_llist_del_ele",
+        "  ph64-callback-frees-cursor: OK+6 Zend/zend_llist.c:107-121  261 bytes  sha256 5e38ed5040949606  -- `zend_llist_destroy` -- what the kernel calls at the end of every call",
+        "  ph64-callback-frees-cursor: OK+7 ext/standard/basic_functions.c:154-158  120 bytes  sha256 b5f23b9dc0b83a10  -- `user_tick_function_entry` -- declares **`calling`**, which is SITE C'",
+        "  ph64-callback-frees-cursor: OK+8 ext/standard/basic_functions.c:2074-2082  241 bytes  sha256 a84dcb7e67109c37  -- `user_tick_function_dtor` -- what the free destroys BESIDES the elemen",
+        "  ph64-callback-frees-cursor: OK+9 ext/standard/basic_functions.c:2102-2137  1235 bytes  sha256 bacb13c0332f3ec4  -- \u26a0\u26a0\u26a0 SITE C. `user_tick_function_call`. The write-after-free is `:2135`",
+        "  ph64-callback-frees-cursor: OK+10 ext/standard/basic_functions.c:2139-2144  174 bytes  sha256 d64eae1b992514d1  -- `run_user_tick_functions`, the bridge. The `zend_llist_apply` call is ",
+        "  ph64-callback-frees-cursor: OK+11 ext/standard/basic_functions.c:2146-2161  538 bytes  sha256 a429912167dab97b  -- \u2b50\u2b50 WHERE R1h LANDS. `user_tick_function_compare`, and it is NEITHER th",
+        "  ph64-callback-frees-cursor: OK+12 ext/standard/basic_functions.c:2799-2835  944 bytes  sha256 a002a982f92b9262  -- `PHP_FUNCTION(register_tick_function)` -- `calling = 0` at `:2804`, th",
+        "  ph64-callback-frees-cursor: OK+13 ext/standard/basic_functions.c:2840-2862  574 bytes  sha256 ef14ca8cae07f307  -- `PHP_FUNCTION(unregister_tick_function)` -- THE TRIGGER'S ENTRY POINT.",
+        "  ph64-callback-frees-cursor: per-span overlap: span0 50% (2/4), span1 100% (5/5), span2 100% (9/9), span3 86% (6/7), span4 91% (10/11), span5 95% (19/20), span6 89% (8/9), span7 80% (4/5), span8 20% (1/5), span9 17% (4/24), span10 0% (0/3), span11 17% (2/12), span12 9% (2/22), span13 29% (4/14)  -- the UNION is what is reported below, and it is what 14 cited spans oblige the row to",
+        "  ph64-callback-frees-cursor: kernel overlap 50% (69/139 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph64-callback-frees-cursor: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph64-callback-frees-cursor: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH64_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "ph64-callback-frees-cursor"
+      ],
+      "tool_argv": [
+        "ph64-callback-frees-cursor"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph64-callback-frees-cursor",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph64-callback-frees-cursor: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph64-callback-frees-cursor: Zend/zend_llist.c, Zend/zend_llist.h, Zend/zend_llist.h, Zend/zend_llist.c, Zend/zend_llist.c, Zend/zend_llist.c, Zend/zend_llist.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c are in the manifest (fd73a78aa166, 9b8bd2495cf3, 9b8bd2495cf3, fd73a78aa166, fd73a78aa166, fd73a78aa166, fd73a78aa166, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0)",
+        "  ph64-callback-frees-cursor: OK  Zend/zend_llist.c:186-193  209 bytes  sha256 fce26e38389ba9fb  tier=narrowed",
+        "  ph64-callback-frees-cursor: OK+1 Zend/zend_llist.h:25-29  188 bytes  sha256 c171e96160689855  -- `zend_llist_element`. \u26a0\u26a0 `next` IS AT OFFSET 0, so SITE L's read-after",
+        "  ph64-callback-frees-cursor: OK+2 Zend/zend_llist.h:37-45  213 bytes  sha256 c0e8e19b6f9a810a  -- `zend_llist` -- `head`/`tail`/`count`/`size`/`dtor`/`persistent`. `cou",
+        "  ph64-callback-frees-cursor: OK+3 Zend/zend_llist.c:26-34  228 bytes  sha256 fbbb2fb69b643cd4  -- `zend_llist_init`. Lifted verbatim; it is where `persistent = 0` and t",
+        "  ph64-callback-frees-cursor: OK+4 Zend/zend_llist.c:37-52  340 bytes  sha256 6b80ae8a75f75862  -- `zend_llist_add_element` -- the `pemalloc(sizeof(zend_llist_element) +",
+        "  ph64-callback-frees-cursor: OK+5 Zend/zend_llist.c:73-104  747 bytes  sha256 b714ec3184afe1e0  -- \u26a0\u26a0 THE FREE SITE. `DEL_LLIST_ELEMENT` (:73-88) and `zend_llist_del_ele",
+        "  ph64-callback-frees-cursor: OK+6 Zend/zend_llist.c:107-121  261 bytes  sha256 5e38ed5040949606  -- `zend_llist_destroy` -- what the kernel calls at the end of every call",
+        "  ph64-callback-frees-cursor: OK+7 ext/standard/basic_functions.c:154-158  120 bytes  sha256 b5f23b9dc0b83a10  -- `user_tick_function_entry` -- declares **`calling`**, which is SITE C'",
+        "  ph64-callback-frees-cursor: OK+8 ext/standard/basic_functions.c:2074-2082  241 bytes  sha256 a84dcb7e67109c37  -- `user_tick_function_dtor` -- what the free destroys BESIDES the elemen",
+        "  ph64-callback-frees-cursor: OK+9 ext/standard/basic_functions.c:2102-2137  1235 bytes  sha256 bacb13c0332f3ec4  -- \u26a0\u26a0\u26a0 SITE C. `user_tick_function_call`. The write-after-free is `:2135`",
+        "  ph64-callback-frees-cursor: OK+10 ext/standard/basic_functions.c:2139-2144  174 bytes  sha256 d64eae1b992514d1  -- `run_user_tick_functions`, the bridge. The `zend_llist_apply` call is ",
+        "  ph64-callback-frees-cursor: OK+11 ext/standard/basic_functions.c:2146-2161  538 bytes  sha256 a429912167dab97b  -- \u2b50\u2b50 WHERE R1h LANDS. `user_tick_function_compare`, and it is NEITHER th",
+        "  ph64-callback-frees-cursor: OK+12 ext/standard/basic_functions.c:2799-2835  944 bytes  sha256 a002a982f92b9262  -- `PHP_FUNCTION(register_tick_function)` -- `calling = 0` at `:2804`, th",
+        "  ph64-callback-frees-cursor: OK+13 ext/standard/basic_functions.c:2840-2862  574 bytes  sha256 ef14ca8cae07f307  -- `PHP_FUNCTION(unregister_tick_function)` -- THE TRIGGER'S ENTRY POINT.",
+        "  ph64-callback-frees-cursor: per-span overlap: span0 50% (2/4), span1 100% (5/5), span2 100% (9/9), span3 86% (6/7), span4 91% (10/11), span5 95% (19/20), span6 89% (8/9), span7 80% (4/5), span8 20% (1/5), span9 17% (4/24), span10 0% (0/3), span11 17% (2/12), span12 9% (2/22), span13 29% (4/14)  -- the UNION is what is reported below, and it is what 14 cited spans oblige the row to",
+        "  ph64-callback-frees-cursor: kernel overlap 50% (69/139 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph64-callback-frees-cursor: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph64-callback-frees-cursor: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH64_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "report",
+      "gate_argv": [
+        "--tool",
+        "report",
+        "ph64-callback-frees-cursor"
+      ],
+      "tool_argv": [
+        "ph64-callback-frees-cursor"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph64-callback-frees-cursor",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph64-callback-frees-cursor: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph64-callback-frees-cursor: Zend/zend_llist.c, Zend/zend_llist.h, Zend/zend_llist.h, Zend/zend_llist.c, Zend/zend_llist.c, Zend/zend_llist.c, Zend/zend_llist.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c are in the manifest (fd73a78aa166, 9b8bd2495cf3, 9b8bd2495cf3, fd73a78aa166, fd73a78aa166, fd73a78aa166, fd73a78aa166, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0)",
+        "  ph64-callback-frees-cursor: OK  Zend/zend_llist.c:186-193  209 bytes  sha256 fce26e38389ba9fb  tier=narrowed",
+        "  ph64-callback-frees-cursor: OK+1 Zend/zend_llist.h:25-29  188 bytes  sha256 c171e96160689855  -- `zend_llist_element`. \u26a0\u26a0 `next` IS AT OFFSET 0, so SITE L's read-after",
+        "  ph64-callback-frees-cursor: OK+2 Zend/zend_llist.h:37-45  213 bytes  sha256 c0e8e19b6f9a810a  -- `zend_llist` -- `head`/`tail`/`count`/`size`/`dtor`/`persistent`. `cou",
+        "  ph64-callback-frees-cursor: OK+3 Zend/zend_llist.c:26-34  228 bytes  sha256 fbbb2fb69b643cd4  -- `zend_llist_init`. Lifted verbatim; it is where `persistent = 0` and t",
+        "  ph64-callback-frees-cursor: OK+4 Zend/zend_llist.c:37-52  340 bytes  sha256 6b80ae8a75f75862  -- `zend_llist_add_element` -- the `pemalloc(sizeof(zend_llist_element) +",
+        "  ph64-callback-frees-cursor: OK+5 Zend/zend_llist.c:73-104  747 bytes  sha256 b714ec3184afe1e0  -- \u26a0\u26a0 THE FREE SITE. `DEL_LLIST_ELEMENT` (:73-88) and `zend_llist_del_ele",
+        "  ph64-callback-frees-cursor: OK+6 Zend/zend_llist.c:107-121  261 bytes  sha256 5e38ed5040949606  -- `zend_llist_destroy` -- what the kernel calls at the end of every call",
+        "  ph64-callback-frees-cursor: OK+7 ext/standard/basic_functions.c:154-158  120 bytes  sha256 b5f23b9dc0b83a10  -- `user_tick_function_entry` -- declares **`calling`**, which is SITE C'",
+        "  ph64-callback-frees-cursor: OK+8 ext/standard/basic_functions.c:2074-2082  241 bytes  sha256 a84dcb7e67109c37  -- `user_tick_function_dtor` -- what the free destroys BESIDES the elemen",
+        "  ph64-callback-frees-cursor: OK+9 ext/standard/basic_functions.c:2102-2137  1235 bytes  sha256 bacb13c0332f3ec4  -- \u26a0\u26a0\u26a0 SITE C. `user_tick_function_call`. The write-after-free is `:2135`",
+        "  ph64-callback-frees-cursor: OK+10 ext/standard/basic_functions.c:2139-2144  174 bytes  sha256 d64eae1b992514d1  -- `run_user_tick_functions`, the bridge. The `zend_llist_apply` call is ",
+        "  ph64-callback-frees-cursor: OK+11 ext/standard/basic_functions.c:2146-2161  538 bytes  sha256 a429912167dab97b  -- \u2b50\u2b50 WHERE R1h LANDS. `user_tick_function_compare`, and it is NEITHER th",
+        "  ph64-callback-frees-cursor: OK+12 ext/standard/basic_functions.c:2799-2835  944 bytes  sha256 a002a982f92b9262  -- `PHP_FUNCTION(register_tick_function)` -- `calling = 0` at `:2804`, th",
+        "  ph64-callback-frees-cursor: OK+13 ext/standard/basic_functions.c:2840-2862  574 bytes  sha256 ef14ca8cae07f307  -- `PHP_FUNCTION(unregister_tick_function)` -- THE TRIGGER'S ENTRY POINT.",
+        "  ph64-callback-frees-cursor: per-span overlap: span0 50% (2/4), span1 100% (5/5), span2 100% (9/9), span3 86% (6/7), span4 91% (10/11), span5 95% (19/20), span6 89% (8/9), span7 80% (4/5), span8 20% (1/5), span9 17% (4/24), span10 0% (0/3), span11 17% (2/12), span12 9% (2/22), span13 29% (4/14)  -- the UNION is what is reported below, and it is what 14 cited spans oblige the row to",
+        "  ph64-callback-frees-cursor: kernel overlap 50% (69/139 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph64-callback-frees-cursor: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph64-callback-frees-cursor: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH64_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph64-callback-frees-cursor"
+      ],
+      "tool_argv": [
+        "ph64-callback-frees-cursor"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 1
+    },
+    {
+      "row": "ph64-callback-frees-cursor",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph64-callback-frees-cursor: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph64-callback-frees-cursor: Zend/zend_llist.c, Zend/zend_llist.h, Zend/zend_llist.h, Zend/zend_llist.c, Zend/zend_llist.c, Zend/zend_llist.c, Zend/zend_llist.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c, ext/standard/basic_functions.c are in the manifest (fd73a78aa166, 9b8bd2495cf3, 9b8bd2495cf3, fd73a78aa166, fd73a78aa166, fd73a78aa166, fd73a78aa166, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0, 1e0519b824f0)",
+        "  ph64-callback-frees-cursor: OK  Zend/zend_llist.c:186-193  209 bytes  sha256 fce26e38389ba9fb  tier=narrowed",
+        "  ph64-callback-frees-cursor: OK+1 Zend/zend_llist.h:25-29  188 bytes  sha256 c171e96160689855  -- `zend_llist_element`. \u26a0\u26a0 `next` IS AT OFFSET 0, so SITE L's read-after",
+        "  ph64-callback-frees-cursor: OK+2 Zend/zend_llist.h:37-45  213 bytes  sha256 c0e8e19b6f9a810a  -- `zend_llist` -- `head`/`tail`/`count`/`size`/`dtor`/`persistent`. `cou",
+        "  ph64-callback-frees-cursor: OK+3 Zend/zend_llist.c:26-34  228 bytes  sha256 fbbb2fb69b643cd4  -- `zend_llist_init`. Lifted verbatim; it is where `persistent = 0` and t",
+        "  ph64-callback-frees-cursor: OK+4 Zend/zend_llist.c:37-52  340 bytes  sha256 6b80ae8a75f75862  -- `zend_llist_add_element` -- the `pemalloc(sizeof(zend_llist_element) +",
+        "  ph64-callback-frees-cursor: OK+5 Zend/zend_llist.c:73-104  747 bytes  sha256 b714ec3184afe1e0  -- \u26a0\u26a0 THE FREE SITE. `DEL_LLIST_ELEMENT` (:73-88) and `zend_llist_del_ele",
+        "  ph64-callback-frees-cursor: OK+6 Zend/zend_llist.c:107-121  261 bytes  sha256 5e38ed5040949606  -- `zend_llist_destroy` -- what the kernel calls at the end of every call",
+        "  ph64-callback-frees-cursor: OK+7 ext/standard/basic_functions.c:154-158  120 bytes  sha256 b5f23b9dc0b83a10  -- `user_tick_function_entry` -- declares **`calling`**, which is SITE C'",
+        "  ph64-callback-frees-cursor: OK+8 ext/standard/basic_functions.c:2074-2082  241 bytes  sha256 a84dcb7e67109c37  -- `user_tick_function_dtor` -- what the free destroys BESIDES the elemen",
+        "  ph64-callback-frees-cursor: OK+9 ext/standard/basic_functions.c:2102-2137  1235 bytes  sha256 bacb13c0332f3ec4  -- \u26a0\u26a0\u26a0 SITE C. `user_tick_function_call`. The write-after-free is `:2135`",
+        "  ph64-callback-frees-cursor: OK+10 ext/standard/basic_functions.c:2139-2144  174 bytes  sha256 d64eae1b992514d1  -- `run_user_tick_functions`, the bridge. The `zend_llist_apply` call is ",
+        "  ph64-callback-frees-cursor: OK+11 ext/standard/basic_functions.c:2146-2161  538 bytes  sha256 a429912167dab97b  -- \u2b50\u2b50 WHERE R1h LANDS. `user_tick_function_compare`, and it is NEITHER th",
+        "  ph64-callback-frees-cursor: OK+12 ext/standard/basic_functions.c:2799-2835  944 bytes  sha256 a002a982f92b9262  -- `PHP_FUNCTION(register_tick_function)` -- `calling = 0` at `:2804`, th",
+        "  ph64-callback-frees-cursor: OK+13 ext/standard/basic_functions.c:2840-2862  574 bytes  sha256 ef14ca8cae07f307  -- `PHP_FUNCTION(unregister_tick_function)` -- THE TRIGGER'S ENTRY POINT.",
+        "  ph64-callback-frees-cursor: per-span overlap: span0 50% (2/4), span1 100% (5/5), span2 100% (9/9), span3 86% (6/7), span4 91% (10/11), span5 95% (19/20), span6 89% (8/9), span7 80% (4/5), span8 20% (1/5), span9 17% (4/24), span10 0% (0/3), span11 17% (2/12), span12 9% (2/22), span13 29% (4/14)  -- the UNION is what is reported below, and it is what 14 cited spans oblige the row to",
+        "  ph64-callback-frees-cursor: kernel overlap 50% (69/139 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph64-callback-frees-cursor: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph64-callback-frees-cursor: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH64_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph64-callback-frees-cursor"
+      ],
+      "tool_argv": [
+        "ph64-callback-frees-cursor"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    }
+  ]
+}
