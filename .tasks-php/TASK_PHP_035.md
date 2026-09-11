@@ -32,8 +32,10 @@ scope.** Say so if you find a disagreement.
 ⚠ **No `git add` / `git commit`.** Never touch `.web/` — a **concurrent session**
 edits it.
 ⚠⚠ **`TASK_PHP_034` IS RUNNING** — an `ph45` R1h hunt, read-only, reading the
-corpus and the pinned tarball. **Do not touch `patterns-php/ph45*` (it does not
-exist), the corpus, or `.temp/php34/`.**
+corpus and the pinned tarball. **Do not touch the corpus, `.temp/php34/`, or any
+`ph45` row directory** — that row is not built yet and this task does not open
+it. (Written without a path on purpose: a glob for a directory that does not
+exist is a citation `citecheck.py` rightly cannot resolve in a LIVE doc.)
 ⚠ Scratch under `.temp/php35/`. ⭐ **`.temp/php33/` holds `probe_b.py`, the nine
 variants, the disassembly and the five Verus logs — REUSE IT, do not re-derive.**
 ⚠ **`grep -a` ALWAYS** (F35). **No `until … sleep` poller loops** — foreground
