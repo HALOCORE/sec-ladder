@@ -167,7 +167,7 @@ corpus's**. `echoes` is a reading throughout this file (§0.3, §9.4) — for th
 | ph61 | temporal | container doubles under a raw interior pointer the caller holds | verbatim | I10/O1, I10/O3 | CRASH-155, CRASH-075, CRASH-081, CRASH-083, CRASH-117 | p25 | catalogued |
 | ph62 | temporal | the same growth, with the interior pointer cached across a callback | verbatim | I10/O1, I10/O3 | CRASH-046, CRASH-070 | p25 | catalogued |
 | ph63 | temporal | the cursor type IS a bare node pointer, held across user code | narrowed | I10/O1, I10/O3 | CRASH-002, CRASH-022, CRASH-040 | p28 | catalogued |
-| ph64 | temporal | the callee unlinks and frees the very element the loop holds | narrowed | I10/O1 | CRASH-086 | p28 | catalogued |
+| ph64 | temporal | the callee unlinks and frees the very element the loop holds | narrowed | I10/O1 | CRASH-086 | p28 | **BUILT** |
 | ph65 | temporal | a back-reference table retains pointers the parser has freed | modelled | I5/O3, I5/O2 | CRASH-121, CRASH-118 | p27 | catalogued |
 | ph66 | temporal | a numeric bucket's key is never compared; hash equality is identity | verbatim | I7/O2, I7/O3 | LOGIC-001 | p22 | catalogued |
 | ph67 | temporal | the destructor runs while the bucket is still linked and advertised | verbatim | I10/O1, I5/O1 | CRASH-160, CRASH-154 | p28 | catalogued |

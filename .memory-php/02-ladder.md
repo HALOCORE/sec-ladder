@@ -268,7 +268,37 @@
   > is published from the **marginal** and this from the **per-call**, and on
   > `ph16` they differ by **0.72 pp — 59 % of the figure.** Open item 52.
 
-  ▶ **`ph03` and `ph29` REMAIN UNDISCHARGED and need their own task.**
-  **2 of 4 built rows are still unbounded in both directions** — ⚠ this line
-  said **3 of 4** until `TASK_PHP_028` reported — and it remains the largest
-  standing threat to the programme's headline quantity.
+  > ⚠⚠⚠ **SECOND FLAG — NOT A FINDING (rule 9). `TASK_PHP_032` BUILT `ph64`,
+  > THE FIRST TEMPORAL ROW, AND IT IS UNREVIEWED.** `RECAP_PHP.md` **F71**.
+  >
+  > ⚠⚠ **THE "TWO ROWS, SAME SIGN" READING ABOVE IS NOW 2 OF 4 AND MUST NOT BE
+  > QUOTED AS A TREND.** `ph64` ships `fixed-R4 bound` **+17.08 % / +15.37 %**,
+  > **unsearched on both sides** — so it owes the same debt, and it **breaks the
+  > pair**:
+  >
+  > ```
+  > ph03  +12.19 %   POSITIVE      ph16   -1.22 %   NEGATIVE
+  > ph64  +17.08 %   POSITIVE      ph29   -6.06 %   NEGATIVE
+  > ```
+  >
+  > **Two positive, two negative, across three axes' worth of machinery.** ⭐ The
+  > `ph16` mechanism (F67 — the two rungs cheapest under *different* spellings)
+  > remains the only *explanation* anyone has, and it is established on **one**
+  > row.
+  >
+  > ⚠⚠ **AND `ph64`'s FIGURES ARE IN `marginal_ir_per_call`, NOT
+  > `kernel_exclusive_ir`** — on this row that column **hides the upstream fix
+  > entirely** (identical to the instruction for both C rungs) **and reverses R2
+  > vs R3.** ⚠ **Never difference two rows of a php table without checking which
+  > column each is quoted in** — which is open item 52's question arriving on a
+  > second row, from a different direction.
+
+  ▶ **`ph03`, `ph29` AND `ph64` REMAIN UNDISCHARGED and need their own task.**
+  **3 of 5 built rows are unbounded in both directions** — ⚠ this line said
+  **3 of 4** until `TASK_PHP_028` reported, then **2 of 4**, and `ph64` takes it
+  back up — and it remains the largest standing threat to the programme's
+  headline quantity. ⚠ **`ph29` is BLOCKED**: its `.idiom_audit` is
+  `spellings: 4, forbidden: 4, required: 0`, so a cloned `spellings.py` would
+  pass every candidate while checking nothing (open item 51). **`ph03`
+  (`spellings: 11`) and `ph64` (`spellings: 13`, 6 forbidden) are both
+  searchable today.**

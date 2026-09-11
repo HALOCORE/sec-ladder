@@ -45,26 +45,26 @@ between them read `CLAUDE.md`'s top table.
 ## ▶ START HERE — the next action, in ≤ 20 lines
 
 ```
-STATE   ROWS BUILT 4 -- ph03+ph07 (S1), ph16 (S2), ph29 (S3). ⚠⚠ ALL FOUR SPATIAL;
-        TYPE+TEMPORAL ZERO vs 60 of 102 catalogued. .memory-php/ is AUTHORITATIVE.
-NEXT    NOTHING RUNNING; _028/_031 LANDED+REVIEWED; 66/0, 10/0, ph16 gate PASS.
-        ▶ _032 BUILD ph64 -- WRITTEN; ITS SPEC IS _031's REPORT §6, DO NOT RESTATE.
-        THEN ph45 (1st TYPE row, 5 lines, no zval); THEN _028's 2 rows, item 51 1st.
-⚠ NEW   F66 ph64 R1h SETTLED (3 artefacts in-commit), repair at a THIRD site -> ONE
-        row, and ⚠⚠ the CATALOGUE's u64 oracle MEASURES NOTHING (F46's class).
-        F67 ph16 -1.22%/-1.42%: a RESULT -- the 2 rungs are cheapest under
-        DIFFERENT spellings (n=1; ph03 +12.2%). F68 NOT-THE-REPAIR proves nothing
-        for 17/43, ⚠ CITE 26/43 NOT 33. F69 ITEM 48 DECIDED, §F5 was right, spread
-        68% TEMPORAL. F70 ⚠⚠ a TRUE sentence on the WRONG row.
-⚠ OWED  item 51: ph29's spellings audit is VACUOUS (4/4 forbidden, 0 required).
-        MANAGER spec.md call, due BEFORE any task touches ph29.
+STATE   ROWS BUILT 5 -- ph03+ph07 (S1), ph16 (S2), ph29 (S3) spatial, ⭐ ph64 the
+        FIRST TEMPORAL. TYPE still ZERO. .memory-php/ is AUTHORITATIVE.
+NEXT    NOTHING RUNNING; _032 LANDED+VERIFIED (PASS, verus 39/0, 66/0 + 12/0).
+        ▶ ph45 = 1st TYPE row: 5 lines, ZERO zval/Zend includes -> SIDESTEPS F24.
+        ⚠ item 51 BEFORE touching ph29. THEN spellings: ph03+ph29+ph64 all owe it.
+⚠ NEW   F71 ⭐⭐⭐ ROW 5: safe Rust makes this a WRONG ANSWER, not a panic -- the safe
+        port is an index arena and `wf` holds with the fix DELETED. 7h GREEN FIRST
+        TRY. Oracle bit-identical 213/213. ASan category REPRODUCED. ⚠⚠ 60% of the
+        C rung is libc -> item 54. F66-F70: ph64 R1h; ph16 -1.22% is a RESULT;
+        ⚠ CITE 26/43 NOT 33; item 48 DECIDED; ⚠⚠ F70 a TRUE sentence, WRONG row.
+⚠ OWED  item 51: ph29's spellings audit is VACUOUS (4/4 forbidden, 0 required) --
+        MANAGER spec.md call. ⚠ SPREAD ph03 +12.19 · ph16 -1.22 · ph29 -6.06 ·
+        ph64 +17.08 = 2 POS / 2 NEG; "safe-tuned cheaper" is 2 of 4, NOT a trend.
 ⚠ TRAPS `grep -a` ALWAYS (blind to 41 corpus files); ask about a FUNCTION, not text.
         ⚠⚠ A PROBE WHOSE SETUP ENCODES THE ANSWER evaluates fine and is WRONG --
         EIGHT shapes, the 8th MINE; too-clean is the only warning (F52/F70).
 BAR     C-SIDE ONLY: nothing Rust/Verus/Miri/cost kills a row; patterns-php/ is
         FRESH. ⚠ .web/ is CONCURRENT -- NEVER `git add -A`.
 READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.md ·
-        F1-F70 · items 1-53. fixsurvey.py + preimage_screen.py have --selftest.
+        F1-F71 · items 1-54. fixsurvey.py + preimage_screen.py have --selftest.
 ```
 
 ---
@@ -177,7 +177,8 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > is not a proof of exclusion for 17 of 43, and F64's own figure was wrong** ·
 > **F69 ⭐⭐ item 48 was TWO QUESTIONS WEARING ONE NUMBER, and §F5 was right** ·
 > **F70 ⚠⚠⚠ a TRUE SENTENCE ON THE WRONG SUBJECT, and nothing about it read as
-> invented**
+> invented** · **F71 ⭐⭐⭐ ROW 5 IS THE FIRST TEMPORAL ROW, and safe Rust turns the
+> defect into a WRONG ANSWER, not a panic**
 >
 > ⚠ **This index stopped at F59 while F60–F65 existed** — `PROTOCOL.md` rule 13,
 > headers rot. **Extend it in the same edit that adds a finding.**
@@ -1261,6 +1262,88 @@ in is undecided across rows** (item 52).
 loudly only because stage 6 asserts the sum against `callgrind_annotate`. **Three
 of the four were in the reporting, not the numbers, and NONE was reachable
 through a gate run** (the gate hashes `controls/*.py` and never runs them).
+
+### F71 — ⭐⭐⭐ ROW 5 IS THE **FIRST TEMPORAL ROW**, AND SAFE RUST TURNS THE DEFECT INTO A **WRONG ANSWER**, NOT A PANIC
+
+`TASK_PHP_032`. **`patterns-php/ph64-callback-frees-cursor/`** — a walk whose
+cursor advances **after** a callback that may free the element it holds.
+✅ **Manager-verified from the record, not the prose**: `verdict PASS`, **0
+failures**, contract `7ec3fc87b309`, `verus.rs` **39 verified / 0 errors** (47
+under the twin), brackets **`66/0`** and **`12/0`** — `10` plus the row's two
+new measure records, exactly as predicted. Three gate rounds, **19 → 3 → 2 → 0**;
+the last two were the irreducible `[tables]` staleness of the
+`gate → report → gate` chain, which corrected itself.
+
+⭐⭐⭐ **THE LADDER RESULT, AND IT IS THE MOST INTERESTING ONE THE PROGRAMME HAS
+PRODUCED.** `zend_llist_element *next` is a **raw pointer**, and safe Rust
+cannot express that list without `Rc`, `RefCell` or raw pointers — so the
+faithful safe port is an **INDEX ARENA**, and **a dangling index is an ordinary
+in-bounds read of a slot that is still there.** ⭐ **That is, to the byte, what
+5.0.0's size-class cache does with the real block.** So **safe Rust does not
+turn this defect into a panic; it turns it into a WRONG ANSWER**, and what
+removes it is `562f886ecb14`'s **logical** invariant. `verus.rs` proves `wf`
+(every link NIL or in range, `next` ascends, `prev` descends) — **and `wf` holds
+with the guard DELETED.** ⚠⚠ **Memory safety and the upstream fix are ORTHOGONAL
+on this row, and only the value postcondition can see the difference.**
+⭐ **`CLAUDE.md` rule 6 in action: this is a FINDING, never a kill** — and it is
+the axis where that bias has done the most damage (six of ten refusals).
+
+⭐⭐ **STAGE 7h WAS GREEN FIRST TRY — a falsifiable prediction that held.** `_031`
+§6.4 measured R1h as changing nothing on the benign domain, and `TASK_PHP_032`
+was told to **stop and report rather than adjust the corpus** if 7h failed.
+⚠ `ph07` was rebuilt for exactly the opposite situation.
+
+⭐⭐ **F66's oracle finding CONFIRMED AT SCALE: 213 of 213.** The visit fold is
+bit-identical between R1 and R1h on every trigger window, because the freed
+39-byte element lands in `AG(cache)[5]` with its **payload intact**. The row
+folds `l->count`, the dtor count, the refusal count and the allocator tally
+instead, **and those move on all 213.** ⭐ The sharper half is
+`inputs/adversarial-reuse-*`: **one same-size-class `emalloc` in the same
+callback** LIFO-pops the freed element back out, and **R1 SIGSEGVs at all four
+`DEL_LLIST_ELEMENT` arms while R1h is clean.**
+
+⭐⭐ **FIDELITY REPRODUCES THE CORPUS'S OWN RECORDED CATEGORY.** On plain
+`malloc`/`free`: `heap-use-after-free`, **`WRITE of size 4`, frame #0 at
+`basic_functions.c:2135`** — `index.csv`'s cited line — frame #1 in
+`zend_llist_apply`. **Silent on the faithful cached allocator.** ⭐ Measured
+rather than quoted, which is what `crashes_pristine_5_0_0 = False` *means*.
+
+⚠⚠ **THE C-vs-RUST COLUMN ON THIS ROW IS NOT A SAFETY COMPARISON — AND THIS IS
+THE TRANSFERABLE PART.** §B forbids a Rust rung from linking the shim, so the C
+rung **allocates `2n+2` blocks per call** while the Rust rungs **count**:
+**60 % of the C's instructions are in libc `malloc`/`free`.**
+⭐ **`PROTOCOL_PHP.md` §B2's *"reproduce the tally arithmetically"* is free only
+while a row makes O(1) allocations per call, and `ph64` is the first php row
+where it is O(n).** → open item **54**.
+
+⚠⚠ **`kernel_exclusive_ir` IS WRONG HERE IN TWO DIRECTIONS**: it **hides
+`562f886ecb14` entirely** (identical to the instruction for both C rungs,
+because gcc keeps the guard's symbol out of line) **and it reverses R2 vs R3**
+(+2.9 % dearer vs −24.6 % cheaper on the marginal). Every published figure is in
+`marginal_ir_per_call`, following `p08`/`p11`. **R1h costs +15.98 Ir/call, flat
+in list length.**
+
+⭐ **Verus took no `rlimit`.** `kernel` would not verify at **600** as one
+function and verifies at the **default 10** once `run_spec` was made
+`#[verifier::opaque]`. **Raising the budget was tried first and did nothing** —
+worth knowing before anyone reaches for `#[verifier::rlimit]`.
+
+⚠ **TWO OF THE ENGINEER'S OWN DECLARED EXPECTATIONS WERE REFUTED BY ITS OWN
+CONTROLS, and both misses are recorded in the controls' headers rather than
+rewritten.** ⭐ The better one: the cached-`next` counterfactual is **NOT
+strictly weaker** — it removes **189/189** wild walks **and adds 196/196
+use-after-frees of the cursor's SUCCESSOR**. **The two hardenings are not
+ordered by strength**, which is a stronger finding than the one predicted.
+
+⚠ **DECLARED AND NOT DONE, and both are the right call.** (a) **No
+`controls/spellings.py`** — `ph64`'s `fixed-R4 bound` is **+17.08 % / +15.37 %**,
+**unsearched on both sides**, and ⚠⚠ **it BREAKS the `ph16`/`ph29` negative
+pair.** The spread table is now **`ph03` +12.19 · `ph16` −1.22 · `ph29` −6.06 ·
+`ph64` +17.08** — **two positive, two negative**, so *"safe-tuned cheaper than
+unsafe"* is **2 of 4, not a trend.** (b) **`_031` §4.3 is NOT measured** and is
+carried in `spec.md`/`NOTES.md` as an **OPEN ITEM, not a finding** — ⚠ **so
+`ph64` is NOT the fifth of five**; the fix-completeness tally reads **five rows,
+five different answers.**
 
 ### F66 — ⭐⭐⭐ `ph64`'s R1h: THE CLEANEST BACKPORT YET, THE REPAIR IS AT A **THIRD** SITE, AND THE CATALOGUE'S ORACLE **MEASURES NOTHING**
 
@@ -3250,3 +3333,4 @@ the wrong one.
 | 51 | ⚠⚠⚠ **`ph29`'s SPELLINGS AUDIT WOULD BE VACUOUS, AND A CLONED `spellings.py` WOULD REPORT SUCCESS WHILE CHECKING NOTHING** — ▶ **manager `spec.md` call, owed BEFORE any task touches `ph29`** | `_028`, ✅ manager-verified from `.idiom_audit` in the gate records: `p05` **0**, `ph00-smoke` **0**, `ph03` **11** (6 forbidden), `ph16` **23** (10), **`ph29` 4 — and all four are `forbidden`, with ZERO `required`.** So every candidate passes and nothing is pinned: **a validator that cannot fail**, which is `PROTOCOL_PHP.md` §H's exact target and F52's family. ⚠⚠ **This corrects `TASK_PHP_028.md` §4.3, which named `ph03`** — `ph03` searches fine and needs **no** `spec.md` edit. ⭐ **The lesson is rule 14 in its hardest direction: I copied a TRUE sentence onto the WRONG SUBJECT.** The sentence is `p05`'s, it really is in the tree (inside `ph16`'s hashed `why`, printed by `check.py` on every `ph16` run, which is where I picked it up), and `spellings: 0` really did happen — **so nothing about the claim read as invented.** ⚠ Pinning `required` spellings on `ph29` is a `spec.md` edit **inside a hashed block** and costs a `ph29` re-gate |
 | 52 | ⚠⚠ **WHICH STATISTIC "THE BOUND" MEANS IS UNDECIDED, AND THE TWO PUBLISHED ROWS USE DIFFERENT ONES** | `_028` §3. `ph07`'s bound is published from the **marginal** statistic and `ph16`'s from the **per-call** one, and on `ph16` they differ by **0.72 pp — 59 % of the figure** (`−1.22 %` per-call vs `−1.94 %` per window byte). ⚠ **So the two rows' bounds are not comparable as published**, which is exactly what `fixed-R4 bound` exists to prevent. ⚠ **Not a defect in either row** — both are internally consistent and `_028` shipped **all three** statistics precisely because they disagree. **What is owed is one sentence in `.memory/02-bench-rules.md` or `PROTOCOL_PHP.md` naming THE statistic a `fixed-R4 bound` is quoted in**, and a note on `ph07` if it is the one that moves. ⭐ **Cheap, and it gets more expensive with every row published** |
 | 53 | ⚠ **`ph16`'s `safe_naive.rs` AND `safe_tuned.rs` STATE THE WRONG MECHANISM IN COMMENTS, AND FIXING A COMMENT COSTS A 28-CELL RE-MEASURE** | `_028` §2, which **retracted `ph16`'s own `NOTES.md` §8b** and landed that retraction: the R2→R3 **guard** respelling emits **byte-identical machine code in both directions** (`r3_guard_r2`, `r2x_guard_r3`), so the gap is the **subslice + `chunks_exact`**, not the guard. ✅ **The engineer correctly did NOT touch the `.rs` files** — they are measure-pinned. ⚠ **Manager's call, and F15's shape exactly**: a prose fix costing a corpus-wide re-measure, whose stated mitigation is already protocol — **batch it, never land it alone** (`PROTOCOL.md` rule 6). ⭐ **Do it the next time `ph16` is re-measured for a substantive reason**, and not before |
+| 54 | ⚠⚠ **`PROTOCOL_PHP.md` §B2's "REPRODUCE THE ALLOCATOR TALLY ARITHMETICALLY" IS FREE ONLY AT O(1) ALLOCATIONS PER CALL, AND `ph64` IS THE FIRST ROW WHERE IT IS O(n)** | F71, `TASK_PHP_032` §5, **UNREVIEWED — and the engineer flagged the alternative for a reviewer to push back on, which is the right shape.** §B forbids a Rust rung from linking the shim, so on `ph64` the **C rung allocates `2n+2` blocks per call and the Rust rungs count**: **60 % of the C's instructions are in libc `malloc`/`free`.** ⚠⚠ **So the C-vs-Rust column on this row is not a safety comparison** — it is largely a comparison of an allocator against arithmetic. ✅ **Not a defect in the row**: the engineer took the *"say so loudly"* option and every figure is published in `marginal_ir_per_call`. ⚠ **What is owed is a §B2 condition naming the O(1) precondition**, and a decision on what a row does when it does not hold. ⭐ **It gets worse, not better, with the temporal axis** — intrusive containers allocate per element, and `.memory-php/01-extraction.md`'s F1 says the temporal defects live in exactly those containers |
