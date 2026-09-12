@@ -406,8 +406,30 @@
   > `1.0` everywhere.
   >
   > ⭐ **AND THE SIGN: ON `ph45` AND `ph64` THE PROVED RUNG IS CHEAPER THAN THE
-  > UNSAFE ONE** — Δnopad `−2` and `−1`, family A `−0.0383 %` and `−0.0067 %`,
-  > **with no search at all**. Nothing is violated; both rows pin `differ`.
+  > UNSAFE ONE** — Δnopad `−2` and `−1`, family A `−0.0383 %` and `−0.0067 %`
+  > ⚠ (**`small.bin`**; on `large.bin` the same two cells read **−0.0054 %** and
+  > **−0.0009 %**, **7× apart**), **with no search at all**. Nothing is
+  > violated; both rows pin `differ`. ⚠⚠ **THIS LINE CARRIED THE TWO FIGURES
+  > UNLABELLED** — `TASK_PHP_037` §9.3 flagged it, `RECAP_PHP.md:2120` was
+  > corrected and **this layer was not**, which is `check.py`'s own *⚠⚠⚠ DO NOT
+  > MAX IT OVER INPUT* landing inside the finding that quotes it approvingly.
+  >
+  > ⭐⭐ **AND THE SENSITIVITY HALF FOR FAMILY B, WHICH THIS SECTION NEVER
+  > MEASURED** (`.tasks-php/php_null.py`, `--selftest` PASS, 12 negatives;
+  > ⚠ UNREVIEWED, manager, 2026-09-12). On the same four cells: **A resolves the
+  > static difference to the instruction while `|B/A|` is 49.6×–393.9×**, and it
+  > is **0.2×–3.0×** at every large-Δ cell (`ph03`/`ph07`/`ph16`/`ph45`/`ph64` at
+  > `-O0`, Δnopad `+17`…`−170`). ▶ **A clean regime separation with no overlap:
+  > B loses a SMALL code difference completely, and small-Δ is exactly where a
+  > `fixed-R4 bound` operates.** ⚠ **B is not "wrong"** — it is a whole-program
+  > slope, so its true value is not `−2`; the defensible statement is that **at
+  > most `|Δnopad|` Ir/call of B's reading can be the code change**, so on
+  > `ph45/O3/large` at least **785.86 of 787.86** is something else. ⚠ **The
+  > MAGNITUDE ratio separates by regime; the SIGN does not** — 5 of 9 cells
+  > disagree in sign, 3 of 4 small-Δ against 2 of 5 large-Δ. ⛔ **Family C's
+  > sensitivity is UNMEASURED**; on `ph03/small` C reads `+265.924` against B's
+  > `+266.000` on a **byte-identical** pair, so the prediction is that C fails
+  > this regime too — **which is what open item 62 must test FIRST.**
   >
   > ⚠⚠⚠ **AND IT WIDENS THE R4 SEARCH THIS SECTION IS ABOUT.** The shared `why`
   > block argues R4 admissibility **from the identity pin** — *"All six patterns
@@ -473,8 +495,18 @@
   > restatement of a definition mistaken for a measurement.
   > `RECAP_PHP.md` **F83–F87**, `.temp/mgr172/NOTES.md`, probes
   > `identity_null.py` · `inclusive_ir.py` · `bc_sweep.py` · `flip_exact.py`,
-  > all `--selftest` PASS. ⚠ **And `.temp/mgr172/STATISTIC-DECISION-DRAFT.md`
-  > IS AN UNREVIEWED PROPOSAL — it must not enter this file until reviewed.**
+  > all `--selftest` PASS. ⚠ **The statistic decision is
+  > `.tasks-php/STATISTICS_001.md`, WHICH IS COMMITTED AND MARKED NOT
+  > AUTHORITATIVE — it must not enter this file until reviewed.** ⓘ This line
+  > used to cite that file's **gitignored predecessor draft** (named in
+  > `STATISTICS_001.md`'s own header), i.e. **the authoritative layer rested on
+  > a gitignored draft** — open item **65**'s defect, live. Re-pointed at the
+  > committed successor for free. ⚠ The old path is **not repeated here**, so
+  > `citecheck.py` stays quiet on a citation that is deliberately historical.
+  > ⚠⚠ **`STATISTICS_001 §6`'s first clause is itself FALSE and staged for
+  > correction**: `PROTOCOL_PHP.md` is in **no** digest, so writing a rule there
+  > costs nothing; only the shared `idiom.why` (in `contract_sha256`) costs a
+  > six-row re-gate.
   >
   > ⭐⭐⭐ **`ph45`'s R4 ENDPOINT MOVES AND SO DOES ITS R3 — THE FIRST ROW WHERE
   > BOTH DO.** `r4_buf_slice_inline` is **−23.47 %** whole-program with a twin
@@ -514,8 +546,17 @@
   > CERTIFY A AT ANY THRESHOLD. There is no shortcut: PUBLISH BOTH, LABELLED,
   > ALWAYS.**
   >
-  > ⚠⚠⚠ **F85 IS THE ONE THAT MATTERS AND IT IS UNREVIEWED: 28 of the 38 sign
-  > flips are CROSS-LANGUAGE, and on `ph29` they SURVIVE family C.** A says C is
+  > ⚠⚠⚠ **F85 IS THE ONE THAT MATTERS: 29 of the 38 sign flips are
+  > CROSS-LANGUAGE, and 28 OF THE 29 SURVIVE family C** — `ph03` 6/6, `ph07`
+  > 6/6, `ph29` 16/16 survive, `ph00` 0/1 REFUTED (`TASK_PHP_038` §1.1, which
+  > adjudicated all 29 and not the 12 the manager had). ⚠⚠ **THIS SENTENCE SAID
+  > `28 of the 38` AND `UNREVIEWED`, AND BOTH WERE STALE while the paragraph
+  > above beginning *"the cross-language flip count is 29, not 28"* ALREADY
+  > RECORDED THE FIX** (cited by its text, not a line number, because the
+  > numbers move) — **a correction landed as a new paragraph instead of applied
+  > to the sentence it corrects, so this file stated both numbers at once and
+  > THIS is the layer that outranks
+  > `RECAP_PHP.md`.** A says C is
   > **+33 %** dearer than naive safe Rust; **B, C and W1 all say ~1 % CHEAPER**,
   > agreeing to ~2 pp. **That is the difference between *"safe Rust is a third
   > cheaper than C here"* and *"they are the same"* — this programme's central
