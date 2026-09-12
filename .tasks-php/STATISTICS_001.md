@@ -156,9 +156,32 @@ cross-language — `0.07 pp` against `8.63 pp`, same row, same nine draws.**
 published draw is **inside** the range, so **item 66 answered NO** and B's
 disqualification rests on **F84's observation alone**.
 
-▶ **THE OPEN QUESTION, and it is cheap:** item **68** — widen `probe_iters` on
-**one** row, re-gate, measure what moves. **If the cross-language spread
-collapses, B needs no replacement and item 62 stops being a precondition.**
+> ## ⛔⛔⛔ ANSWERED 2026-09-12 — **NO**, AND §5 IS SETTLED AGAINST F90
+>
+> `TASK_PHP_039` (F92, F93) measured the width→spread law with `K = 8` and the
+> `n`-range held fixed at every width. **The exponent is `≈ −0.5` on both rows**
+> — six fits in `[−0.649, −0.405]`, all inside the estimator's calibrated −0.5
+> band and above the −1 band's upper edge. ▶ **The lever is real and FAR TOO
+> WEAK**: 1 % of `ph29`'s `+14.3 %` effect needs `W ≈ 6 474–17 321`, a **22–58×**
+> gate stage. ⭐ **And F93 adds a bias the lever cannot reach at all** — `ph29`'s
+> pin is a **`+6.9σ` start-of-run transient**, and widening keeps `lo = 100`, so
+> it keeps the transient *inside* the span.
+> ▶ ✅ **`TASK_PHP_038` §6's ruling STANDS: the second column is family C (item
+> 62). F90 is REFUTED on its operative half.**
+> ⚠⚠ **AND ONE THING NEITHER SIDE HAD (F91): TEST C's SENSITIVITY, NOT JUST ITS
+> NULL.** `|B/A|` is **49.6–393.9×** where the R4/R5 kernels differ by 1–2
+> instructions, and **0.2–3.0×** where they differ by tens. **C's is unmeasured
+> and predicted to fail the same regime** (`ph03/small`: C `+265.924` vs B
+> `+266.000`, on a **byte-identical** pair). ▶ ⭐⭐ **If it does, then §4's rule
+> is OVER-BROAD: C is the second column CROSS-LANGUAGE, and A stands ALONE
+> same-language — which is `check.py`'s own operative rule and item 72.**
+> ⓘ ✅ `ph64`'s B1 headline is **safe**: `0.0087 pp` off the 6400-iteration mean
+> on a `+17.08 %` effect, 64× F89's sample.
+
+▶ **THE ORIGINAL OPEN QUESTION, left as written:** item **68** — widen
+`probe_iters` on **one** row, re-gate, measure what moves. **If the
+cross-language spread collapses, B needs no replacement and item 62 stops being
+a precondition.**
 ⚠ Costs: `probe_iters` is inside `contract_sha256`, so **one re-gate per row**
 (7 PHP, 33 PAT), it moves every `marginal_ir_per_call`, and B needs **two** runs
 so width 500 is ~5× the callgrind time. ⓘ **PAT publishes in A and may not need
@@ -173,7 +196,22 @@ file.**
   labelled column. ⚠ Their `NOTES.md` are in the **gate** digest and **not** the
   measurement digest, so restating costs **one re-gate per row and no
   re-measure**.
-* ⚠⚠ **`PROTOCOL_PHP.md` §B2 and the shared `why` block are HASHED** — writing
-  this rule into either is a **six-row PHP re-gate**. That is item **55**'s shape
-  and item **61**'s, and it is why this file is in `.tasks-php/` and not in a
-  pattern's contract.
+* ⛔⛔⛔ **THIS BULLET WAS HALF FALSE AND IT PRICED A DECISION. CORRECTED
+  2026-09-12.** It said *"`PROTOCOL_PHP.md` §B2 **and** the shared `why` block
+  are HASHED — writing this rule into either is a six-row PHP re-gate."*
+  **Measured, from `check.py::read_contract` and the gate records:**
+
+  | surface | in a digest? | cost of one sentence |
+  |---|---|---|
+  | the ```` slb-contract ```` block — incl. **`idiom.why`** (15 028 B on `ph64`), `collapse.probe_iters`, `identity` | ✅ **`contract_sha256`** = `sha256` of **that block and nothing else** | **one re-gate per row** |
+  | **`.tasks-php/PROTOCOL_PHP.md`** | ⛔ **IN NO DIGEST AT ALL** | ⭐ **FREE** |
+
+  ✅ **Verified, not inferred**: `ph64`'s `contract_sha256` recomputed from its
+  own block — `7ec3fc87b309…` — **matches the committed record exactly**; and
+  `66/0` / `14/0` immediately after editing `PROTOCOL_PHP.md` confirm the second
+  row. ▶ **So the `why` half is RIGHT (item 61 still costs a six-row re-gate)
+  and the `§B2` half is WRONG — I collapsed two surfaces into one sentence, and
+  items 54 and 55 were deferred for THREE ROUNDS on a cost that does not
+  exist.** ✅ **Both are now DISCHARGED, for free, in `PROTOCOL_PHP.md` §B1a and
+  §H1.** ⭐ **And this file could itself move into `PROTOCOL_PHP.md` at no gate
+  cost** — the obstacle is rule 9's review, not a digest.
