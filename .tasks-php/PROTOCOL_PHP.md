@@ -243,6 +243,64 @@ claim that needs a **differential test**, not a comment.
    makes call *N* depend on call *N−1* and destroys the marginal-`Ir`
    subtraction every number rests on.
 
+### B1a. ⚠⚠⚠ B1.2 IS FREE ONLY AT **O(1) ALLOCATIONS PER KERNEL CALL** — and what a row does when it is not
+
+> ⚠ **UNREVIEWED (rule 9), manager, 2026-09-12.** Discharges `RECAP_PHP.md` open
+> item **54**, which has stood since F71. ⓘ The item cites *"§B2"*; the rule it
+> constrains is **§B1.2**, so it is written here. ⭐ **And it costs NOTHING to
+> write**: measured, `.tasks-php/PROTOCOL_PHP.md` is in **no digest** — not
+> `contract_sha256` (which is `sha256` of the ```` slb-contract ```` block and
+> nothing else, `check.py::read_contract`) and not `source_sha256` (40 paths,
+> none of them this file). **The item was deferred for three rounds on a
+> six-row-re-gate cost that does not exist.**
+
+**THE PRECONDITION.** §B1.2 says *"fold `php_shim_tally()` into the kernel's
+`u64`"*, and §B forbids a Rust rung from linking the shim — so a Rust rung
+**reproduces the tally arithmetically**. ⚠ **That is free only while the number
+of allocations per kernel call is O(1) in the input.** Then the Rust rung
+computes a bounded count and the two rungs' allocator work is comparable.
+
+**WHEN IT IS O(n) IT STOPS BEING FREE, AND `ph64` IS THE FIRST ROW WHERE IT IS.**
+`ph64` allocates **`2n+2` blocks per call** and **60 % of the C rung's
+instructions are in libc `malloc`/`free`** (F71, `TASK_PHP_032` §5). ▶ **So the
+C-vs-Rust column on that row is not a safety comparison — it is largely a
+comparison of an allocator against arithmetic.**
+
+**THE DECISION — what a row does when the precondition does not hold.**
+
+1. ⛔⛔⛔ **IT IS NOT A REFUSAL, AND THIS IS NOT NEGOTIABLE.** Admission is
+   decided **solely on the C program** (`CLAUDE.md` rule 6, `RECAP_PHP.md`
+   finding 53). *"There is no cost gradient"*, *"the column is not a safety
+   comparison"* and *"the Rust rung cannot reproduce it cheaply"* are **FINDINGS,
+   NEVER KILLS.** This bias has produced **six real refusals out of ten**.
+2. **The row DECLARES the allocation order in `spec.md`** — the per-call
+   allocation count as a function of the input — in a `provenance.divergences`
+   entry or the `collapse.note`. **Declared, so a reader does not have to
+   re-derive it from `c/kernel.c`.**
+3. ⚠ **Every CROSS-LANGUAGE figure on such a row is labelled as including
+   allocator work**, and **the row publishes no bare C-vs-Rust headline without
+   that label.** ✅ `ph64` already took this option — *"say so loudly"* — and
+   every figure is published in `marginal_ir_per_call`.
+4. ⭐⭐ **AND THE POSITIVE HALF, WHICH THE ITEM DID NOT STATE: THE ROW STILL
+   PRICES THE SAFETY STRATEGY.** R2-vs-R3 and R4-vs-R5 **allocate identically**,
+   so the allocator term **cancels** in a same-language ratio. ▶ **The
+   `fixed-R4 bound` is UNAFFECTED; it is the cross-language column that carries
+   the caveat, and only that one.**
+
+⭐⭐⭐ **THAT IS THE SAME AXIS THE STATISTIC THREAD ARRIVED AT INDEPENDENTLY.**
+F89 measured the draw cancelling in a same-language ratio (**0.07 pp**) and not
+cross-language (**8.63 pp**) — *"because the C rung allocates `2n+2` per call and
+scales differently"*, i.e. **this rule's mechanism, measured.** And
+`TASK_PHP_038` §1.5 ruled cross-language callee work **rung-attributable**.
+▶ **Two threads, two methods, one boundary: same-language comparisons are clean;
+cross-language ones must say what they include.**
+
+⚠ **IT GETS WORSE ON THE TEMPORAL AXIS, NOT BETTER.** Intrusive containers
+allocate **per element**, and `.memory-php/01-extraction.md`'s F1 says the
+temporal defects live in exactly those containers. ▶ **Expect the precondition
+to fail on most `E*` rows**, so a row that satisfies it is the exception worth
+remarking on, not the rule.
+
 ### B2. ⚠ The shim is a HEADER, and the row must symlink it into `c/`
 
 `harness/build.py:163-165` compiles **exactly three translation units** and
@@ -1015,3 +1073,46 @@ good repairs happened to have*, never a **landing condition**. It is one now.
 human trusts — `harness-php/{gate,provenance}.py`, a row's `controls/*.py`, the
 manager's checkers in `.tasks-php/`. **It is not a rule about commits**, and it
 binds the manager exactly as it binds an engineer.
+
+### H1. ⛔ NEVER BACKTICK A SPELLING THAT CONTAINS A **CHARACTER LITERAL** — it is a check that cannot fail
+
+> ⚠ **UNREVIEWED (rule 9), manager, 2026-09-12.** Discharges `RECAP_PHP.md` open
+> item **55**. ⭐ **The item's cost objection was FALSE** — it said *"the rule is
+> real and cheap to state and there is **nowhere cheap to state it**"*, on the
+> premise that `PROTOCOL_PHP.md` is hashed. **Measured: this file is in no
+> digest** (not `contract_sha256`, which is the ```` slb-contract ```` block and
+> nothing else; not `source_sha256`'s 40 paths). Editing it stales nothing —
+> confirmed by `66/0` and `14/0` immediately after this edit.
+
+**THE RULE.** In `idiom.required` or `idiom.forbidden`, a declared spelling must
+not contain a C character literal. `exec_code`'s layer 1 blanks *"comments and
+string/char literals"*, so the matcher is handed
+`read_buf[recvd] =     ;` where the source says
+`read_buf[recvd] = '\0';` — **the operand is gone before matching begins.**
+
+| where | consequence |
+|---|---|
+| `required` | reports `pins nothing` — visible, but only to a reader who already distrusts it. ⚠ **`ph29`'s `required[1].c` is exactly this, and it names the row's own fault line** |
+| ⛔⛔ `forbidden` | **a ban that CANNOT FIRE.** Since `TASK_068` `forbidden_hits` is the half that **FAILS** the gate ▶ **so this is §H's own target — a check that silently cannot fail — sitting inside frozen infrastructure** |
+
+**THE REPAIR IS A RESPELLING, NOT A HARNESS EDIT.** Drop the literal and pin the
+prefix: `read_buf[recvd] =` pins `kernel.c:247` and `hardened:175`, **one line
+each**. ⛔ **No `harness/` change is proposed or wanted** — the blanking is
+deliberate and documented in `exec_code`'s own docstring, and `exec_code` is
+hashed.
+
+✅ **LATENT, NOT LIVE: 0 affected spellings across 33 PAT rows and 6 PHP rows, 0
+of them `forbidden`** (F73, `.temp/mgr169/charlit_reach.py`, `--selftest` PASS,
+6 must-fire negatives; the detector is **differential** — it asks whether the
+shipped blanker changes the span, so it cannot drift from the matcher).
+⭐⭐ **AND THAT IS WHY THIS IS A WRITING RULE AND NOT A REPAIR TASK: backticking
+`read_buf[recvd] = '\0'` would CREATE the first affected spelling in either
+programme.** The rule exists to stop the first one, not to clean up after it.
+
+⚠ **SCOPE, ACCEPTED RATHER THAN SOLVED.** This is php-only, so a PAT author
+never sees it — item 55's real objection, and it stands. It is accepted because
+the reach is **0 of 33 PAT**, so there is nothing for a PAT author to repair
+today; and because the one surface that binds both programmes unhashed is
+`CLAUDE.md`'s top table, which is reserved for conventions that have actually
+bitten. ▶ **If a PAT row ever ships a backticked character literal, that is the
+moment this moves — and `charlit_reach.py` is the check that would say so.**
