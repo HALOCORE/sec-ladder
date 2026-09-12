@@ -1,0 +1,195 @@
+From be8daf1f47faeb4d142535d393095904648216e7 Mon Sep 17 00:00:00 2001
+From: Dmitry Stogov <dmitry@php.net>
+Date: Wed, 12 Mar 2008 10:32:12 +0000
+Subject: [PATCH] Optimized ZEND_FETCH_CLASS + ZEND_ADD_INTERFACE into single
+ ZEND_ADD_INTERFACE opcode
+
+---
+ NEWS                   |  2 ++
+ Zend/zend_compile.c    | 22 ++++--------
+ Zend/zend_vm_def.h     |  4 +--
+ Zend/zend_vm_execute.h | 80 +++++++++++++++++++++---------------------
+ 4 files changed, 50 insertions(+), 58 deletions(-)
+
+diff --git a/NEWS b/NEWS
+index 8dba72fb30b4..98ed364031c5 100644
+--- a/NEWS
++++ b/NEWS
+@@ -88,6 +88,8 @@ PHP                                                                        NEWS
+     ZEND_HANDLE_EXCEPTION opcode in the end. (Dmitry)
+   . Optimized require_once() and include_once() by eliminating fopen(3) on
+     second usage. (Dmitry)
++  . Optimized ZEND_FETCH_CLASS + ZEND_ADD_INTERFACE into single
++    ZEND_ADD_INTERFACE opcode (Dmitry)
+ - Improved php.ini handling: (Jani)
+   . Added ".htaccess" style user-defined php.ini files support for CGI/FastCGI
+   . Added support for special [PATH=/opt/httpd/www.example.com/] and
+diff --git a/Zend/zend_compile.c b/Zend/zend_compile.c
+index 96af432ac699..f755097564fc 100644
+--- a/Zend/zend_compile.c
++++ b/Zend/zend_compile.c
+@@ -3261,35 +3261,25 @@ void zend_do_end_class_declaration(znode *class_token, znode *parent_token TSRML
+ 
+ void zend_do_implements_interface(znode *interface_name TSRMLS_DC)
+ {
+-	znode interface_node;
+ 	zend_op *opline;
+ 
+-	zend_do_fetch_class(&interface_node, interface_name TSRMLS_CC);
+-	switch (interface_node.u.EA.type) {
++	switch (zend_get_class_fetch_type(Z_STRVAL(interface_name->u.constant), Z_STRLEN(interface_name->u.constant))) {
+ 		case ZEND_FETCH_CLASS_SELF:
+-			zend_error(E_COMPILE_ERROR, "Cannot use 'self' as interface name as it is reserved");
+-			break;
+ 		case ZEND_FETCH_CLASS_PARENT:
+-			zend_error(E_COMPILE_ERROR, "Cannot use 'parent' as interface name as it is reserved");
+-			break;
+ 		case ZEND_FETCH_CLASS_STATIC:
+-			zend_error(E_COMPILE_ERROR, "Cannot use 'static' as interface name as it is reserved");
++			zend_error(E_COMPILE_ERROR, "Cannot use '%s' as interface name as it is reserved", Z_STRVAL(interface_name->u.constant));
+ 			break;
+ 		default:
+-			if (CG(active_op_array)->last > 0) {
+-				opline = &CG(active_op_array)->opcodes[CG(active_op_array)->last-1];
+-				if (opline->opcode == ZEND_FETCH_CLASS) {
+-					opline->extended_value = (opline->extended_value & ~ZEND_FETCH_CLASS_MASK) | ZEND_FETCH_CLASS_INTERFACE;
+-				}
+-			}
+ 			break;
+ 	}
+ 
+ 	opline = get_next_op(CG(active_op_array) TSRMLS_CC);
+ 	opline->opcode = ZEND_ADD_INTERFACE;
+ 	opline->op1 = CG(implementing_class);
+-	opline->op2 = interface_node;
+-	opline->extended_value = CG(active_class_entry)->num_interfaces++;
++	zend_resolve_class_name(interface_name, &opline->extended_value, 0 TSRMLS_CC);
++	opline->extended_value = (opline->extended_value & ~ZEND_FETCH_CLASS_MASK) | ZEND_FETCH_CLASS_INTERFACE;
++	opline->op2 = *interface_name;
++	CG(active_class_entry)->num_interfaces++;
+ }
+ 
+ 
+diff --git a/Zend/zend_vm_def.h b/Zend/zend_vm_def.h
+index 7202dee6a594..19deb943fbcb 100644
+--- a/Zend/zend_vm_def.h
++++ b/Zend/zend_vm_def.h
+@@ -4008,11 +4008,11 @@ ZEND_VM_HANDLER(0, ZEND_NOP, ANY, ANY)
+ 	ZEND_VM_NEXT_OPCODE();
+ }
+ 
+-ZEND_VM_HANDLER(144, ZEND_ADD_INTERFACE, ANY, ANY)
++ZEND_VM_HANDLER(144, ZEND_ADD_INTERFACE, ANY, CONST)
+ {
+ 	zend_op *opline = EX(opline);
+ 	zend_class_entry *ce = EX_T(opline->op1.u.var).class_entry;
+-	zend_class_entry *iface = EX_T(opline->op2.u.var).class_entry;
++	zend_class_entry *iface = zend_fetch_class(Z_STRVAL(opline->op2.u.constant), Z_STRLEN(opline->op2.u.constant), opline->extended_value TSRMLS_CC);
+ 
+ 	if (!(iface->ce_flags & ZEND_ACC_INTERFACE)) {
+ 		zend_error_noreturn(E_ERROR, "%s cannot implement %s - it is not an interface", ce->name, iface->name);
+diff --git a/Zend/zend_vm_execute.h b/Zend/zend_vm_execute.h
+index bc864c858309..824c003a7a8e 100644
+--- a/Zend/zend_vm_execute.h
++++ b/Zend/zend_vm_execute.h
+@@ -498,21 +498,6 @@ static int ZEND_NOP_SPEC_HANDLER(ZEND_OPCODE_HANDLER_ARGS)
+ 	ZEND_VM_NEXT_OPCODE();
+ }
+ 
+-static int ZEND_ADD_INTERFACE_SPEC_HANDLER(ZEND_OPCODE_HANDLER_ARGS)
+-{
+-	zend_op *opline = EX(opline);
+-	zend_class_entry *ce = EX_T(opline->op1.u.var).class_entry;
+-	zend_class_entry *iface = EX_T(opline->op2.u.var).class_entry;
+-
+-	if (!(iface->ce_flags & ZEND_ACC_INTERFACE)) {
+-		zend_error_noreturn(E_ERROR, "%s cannot implement %s - it is not an interface", ce->name, iface->name);
+-	}
+-
+-	zend_do_implement_interface(ce, iface TSRMLS_CC);
+-
+-	ZEND_VM_NEXT_OPCODE();
+-}
+-
+ static int ZEND_HANDLE_EXCEPTION_SPEC_HANDLER(ZEND_OPCODE_HANDLER_ARGS)
+ {
+ 	zend_uint op_num = EG(opline_before_exception)-EG(active_op_array)->opcodes;
+@@ -775,6 +760,21 @@ static int ZEND_CONT_SPEC_CONST_HANDLER(ZEND_OPCODE_HANDLER_ARGS)
+ 	ZEND_VM_JMP(EX(op_array)->opcodes + el->cont);
+ }
+ 
++static int ZEND_ADD_INTERFACE_SPEC_CONST_HANDLER(ZEND_OPCODE_HANDLER_ARGS)
++{
++	zend_op *opline = EX(opline);
++	zend_class_entry *ce = EX_T(opline->op1.u.var).class_entry;
++	zend_class_entry *iface = zend_fetch_class(Z_STRVAL(opline->op2.u.constant), Z_STRLEN(opline->op2.u.constant), opline->extended_value TSRMLS_CC);
++
++	if (!(iface->ce_flags & ZEND_ACC_INTERFACE)) {
++		zend_error_noreturn(E_ERROR, "%s cannot implement %s - it is not an interface", ce->name, iface->name);
++	}
++
++	zend_do_implement_interface(ce, iface TSRMLS_CC);
++
++	ZEND_VM_NEXT_OPCODE();
++}
++
+ static int ZEND_FETCH_CLASS_SPEC_TMP_HANDLER(ZEND_OPCODE_HANDLER_ARGS)
+ {
+ 	zend_op *opline = EX(opline);
+@@ -32965,31 +32965,31 @@ void zend_init_opcodes_handlers(void)
+   	ZEND_NULL_HANDLER,
+   	ZEND_NULL_HANDLER,
+   	ZEND_NULL_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
+-  	ZEND_ADD_INTERFACE_SPEC_HANDLER,
++  	ZEND_ADD_INTERFACE_SPEC_CONST_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_ADD_INTERFACE_SPEC_CONST_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_ADD_INTERFACE_SPEC_CONST_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_ADD_INTERFACE_SPEC_CONST_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_ADD_INTERFACE_SPEC_CONST_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_NULL_HANDLER,
++  	ZEND_NULL_HANDLER,
+   	ZEND_NULL_HANDLER,
+   	ZEND_NULL_HANDLER,
+   	ZEND_NULL_HANDLER,
