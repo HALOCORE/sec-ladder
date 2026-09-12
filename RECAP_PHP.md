@@ -47,24 +47,24 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 6 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
         ph45 TYPE. ALL THREE AXES OPEN. .memory-php/ is AUTHORITATIVE.
-NEXT    NOTHING RUNNING. _039 LANDED + manager-verified. ⛔ ITEM 68 ANSWERED
-        **NO** -- DO NOT SPEND THE RE-GATE. ▶ `_040` IS WRITTEN, DISPATCH IT:
-        ROW 7 (ph52/ph53, T3). ⭐ THE STATISTIC THREAD IS 7 TASKS AND 0 ROWS.
-        THEN item 62 (family C) -- test its NULL *and* its SENSITIVITY (F91).
-⚠ NEW   F92 ⛔ exponent ~-0.5 on BOTH rows: widening probe_iters is HOPELESS.
-        F93 ⭐⭐⭐ ph29's PIN IS A START-OF-RUN TRANSIENT (+6.9s, decays with n) so
-        widening does not CONVERGE -- ph64's B1 HEADLINE IS SAFE, 0.0087pp.
-        F91 ⭐⭐⭐ |B/A| is 50-394x small-delta, 0.2-3.0x large: B LOSES A SMALL
+NEXT    NOTHING RUNNING. _039 + _040 BOTH LANDED + manager-verified.
+        ▶ BUILD ROW 7 = `ph53` (T3, first row in that family). ITS R1h IS
+        `d09cdd9f71f3`, NOT the catalogue's sha, which is REFUTED (F94).
+        BRIEF IS WRITTEN: `TASK_PHP_040_REPORT.md` §5. ⚠ declare `narrowed`
+        not `verbatim` (75); the catalogue's `u64` is ADDRESS-DEPENDENT (74).
+⚠ NEW   F94 ⭐⭐⭐ ph53's R1h CONVERTS A WILD DEREF INTO A **NULL** DEREF and adds
+        no guard -- one hunk, two severities, a shape no built row has.
+        F95 the screen's 43 EXCLUSIONS ARE 25; its soundness test PROMOTED AN
+        EXCLUSION TO A PROOF (1/170, repaired). F92 ⛔ item 68 answered NO.
+        F91 ⭐⭐⭐ |B/A| 50-394x small-delta vs 0.2-3.0x large: B LOSES A SMALL
         CODE DIFFERENCE. ▶ AXIS = SAME-LANGUAGE (A) vs CROSS-LANGUAGE (not A).
-⚠ WRONG MY F90 REFUTED by F92 -- EIGHTH in this thread; F91's probe made TWO
+⚠ WRONG MY F90 REFUTED by F92 -- EIGHTH in this thread. F91's probe made TWO
         scoping errors, the 2nd the one MY OWN F82 forbids. 0 arithmetic.
-⚠ TRAPS `grep -a` ALWAYS (blind to 41 corpus files). A PROBE WHOSE SETUP ENCODES
-        THE ANSWER evaluates fine and is WRONG. ⚠⚠ A CORRECTION LANDED AS A NEW
-        PARAGRAPH LEAVES THE OLD NUMBER IN PLACE (item 73).
-BAR     C-SIDE ONLY: nothing Rust/Verus/Miri/cost kills a row; patterns-php/ is
-        FRESH. ⚠ .web/ is CONCURRENT -- NEVER `git add -A`.
-READ    .memory-php/ · PROTOCOL_PHP.md §B1a+§H1 (NEW) · CATALOGUE.md · F1-F93 ·
-        items 1-73 · STATISTICS_001.md (§6 clause 1 is FALSE, see item 54).
+⚠ TRAPS `grep -a` ALWAYS (41 corpus files). A PROBE WHOSE SETUP ENCODES THE
+        ANSWER is WRONG. A CORRECTION APPENDED LEAVES THE OLD NUMBER (73, x2).
+BAR     C-SIDE ONLY: nothing Rust/Verus/Miri/cost kills a row (ph52's `0.00%`
+        R1h is a RESULT, 76). ⚠ .web/ is CONCURRENT -- NEVER `git add -A`.
+READ    .memory-php/ · PROTOCOL_PHP.md §B1a+§H1 · F1-F95 · items 1-76 · 62 NEXT.
 ```
 
 ---
@@ -220,7 +220,15 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > operative half** ·
 > **F93 ⭐⭐⭐ on `ph29` the shipped pin is a START-OF-RUN TRANSIENT, not a draw
 > (`+6.9σ`, decaying with `n`) — so widening does not even converge; and
-> `ph64`'s B1 HEADLINE IS SAFE to `0.0087 pp`, 64× F89's sample**
+> `ph64`'s B1 HEADLINE IS SAFE to `0.0087 pp`, 64× F89's sample** ·
+> **F94 ⭐⭐⭐ ROW 7 IS `ph53`: the catalogue's fix_commit is REFUTED (the cited
+> line dies at `php-5.0.5`, 2y9m before it), the real R1h is FOUND at
+> `d09cdd9f71f3`, and it converts a WILD deref into a NULL deref — one hunk,
+> two severities, a shape no built row has** ·
+> **F95 ⭐⭐⭐ the pre-image screen's 43 EXCLUSIONS ARE 25 (item D11's third
+> label landed), and its soundness test was PROMOTING AN EXCLUSION TO A PROOF —
+> reach 1 of 170, repaired, with the regression negative in the COMMITTED
+> suite because the finding probe stops firing once the defect is gone**
 >
 > ⚠ **This index stopped at F59 while F60–F65 existed** — `PROTOCOL.md` rule 13,
 > headers rot. **Extend it in the same edit that adds a finding.**
@@ -1232,10 +1240,15 @@ line-level pre-image screen can find a fix of this shape.** ✅ **Confirmed
 mechanically: `defect_file ∈ patch_files` for 17 of 17 non-decisive records,
 zero exceptions**, so the whole non-decisive population is **same-file /
 different-function**: `INAPPLICABLE`'s mechanism one granularity down.
-▶ **The repair is a third label, `INAPPLICABLE-SAME-FILE`, with must-fire
-negatives (`ph64` out, `ph21` stays)** — the ingredients are in every record and
-**only the label is wrong.** ⚠ And the docstring calls the current label *"a
-PROOF OF EXCLUSION"*; fix it in the same edit.
+▶ ✅✅ **LANDED AT `TASK_PHP_040` §4 (F95), WITH SIX NEGATIVES — and the 17
+records that moved are EXACTLY this list, reproduced by a different route.**
+`170 records · NOT-THE-REPAIR 25 + INAPPLICABLE-SAME-FILE 18 = 43`, 0 partition
+violations; the docstring's *"PROOF OF EXCLUSION"* qualified **in the same
+edit** as asked. ⛔⛔ **AND ANSWERING *"does either row exercise it?"* EXPOSED A
+SOUNDNESS DEFECT ONE LAYER DOWN** — `same_function` was naming a function the
+hunk does not touch, promoting an exclusion to a **proof** on 1 of 170 records.
+**Repaired by the manager; 25 exclusions, not 26, and not 43.** ▶ **See F95.**
+**The original ask:**
 
 ⚠⚠ **F64's `33/43` IS NOT REPRODUCIBLE — the tool says `26/43`, and the
 predicate is provably identical** (`decisive == (bracketed or same_function)`,
@@ -1514,6 +1527,161 @@ which pins `kernel.c:247` and `hardened:175`, one line each.
 The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
+
+### F95 — ⭐⭐⭐ THE PRE-IMAGE SCREEN'S **43 EXCLUSIONS ARE 25**, AND ITS SOUNDNESS TEST WAS **PROMOTING AN EXCLUSION TO A PROOF**
+
+`TASK_PHP_040` §4 (item **D11**, closed) **plus a manager repair.**
+⚠ **UNREVIEWED** (rule 9). ✅ **Manager-verified: `--selftest` PASS, brackets
+`66/0` and `14/0`, and `preimage_screen.py` is in no digest** (`grep -arn
+'preimage_screen' harness/*.py harness-php/*.py common*/ *.py` → 0), so none of
+this costs a re-gate.
+
+⭐ **THE THIRD LABEL LANDED, AND IT REPARTITIONS RATHER THAN RECLASSIFIES.**
+`INAPPLICABLE-SAME-FILE` splits the 43 the old `NOT-THE-REPAIR` carried:
+
+```
+170 records · NOT-THE-REPAIR 25 + INAPPLICABLE-SAME-FILE 18 = 43
+             · CANDIDATE 106 · INAPPLICABLE 18 · 0 partition violations
+```
+
+⭐ **The 17 records that moved are EXACTLY `TASK_PHP_031` §7.1's hand-built
+list** — `ph18 ph32 ph39×2 ph46 ph48 ph61 ph63×2 ph64 ph65 ph71 ph75 ph77×2
+ph79 ph80` — **an independent reproduction of that census by a different
+route.** ⚠ **`NOT-THE-REPAIR` now means exactly *decisive exclusion*, and
+`⭐ CITE 25 EXCLUSIONS, NOT 43` is printed BY THE TOOL** rather than remembered,
+which is the figure F64 and F68 kept getting wrong.
+
+⭐⭐ **AND THE ENGINEER FOUND N2 BY MEASURING THE CHANGE'S IMPACT BEFORE MAKING
+IT**, not by running the suite afterwards and retuning: the bogus-span negative
+asserted `verdict == "NOT-THE-REPAIR"` and **the new label would have broken
+it**, so it was **widened, with the reason in a comment**, to *"moved out of
+`CANDIDATE`"* — which is what that negative was always testing. ⚠ **Six
+header/arithmetic rots it created by adding a fifth ground-truth record were
+repaired in the same edit** (`PROTOCOL.md` rule 13).
+❌ **The refuted `.phpt` signal is now written into the docstring WITH its
+53 %/46 %/45 % numbers**, so the next reader who has the idea meets the
+refutation instead of re-running it.
+
+### ⛔⛔ AND THE DEFECT ONE LAYER DOWN: `same_function` NAMED A FUNCTION THE HUNK DOES NOT TOUCH
+
+**Found by `_040` §4.3 while answering *"does either of my rows exercise the new
+label?"*, and DELIBERATELY NOT LANDED there** — out of that task's scope, with
+the repair, a detector and four passing negatives handed to the manager.
+
+`same_function` trusts the trailing text of `@@ -a,b +c,d @@ <ctx>`, and git's
+`xfuncname` picks `<ctx>` by scanning **backwards from the hunk's FIRST line**.
+Measured on `be8daf1f47fa` against its own parent tree (`1dc76c81013f6067`):
+
+| | |
+|---|---|
+| hunk header | `@@ -3261,35 +3261,25 @@ void zend_do_end_class_declaration(…)` |
+| `zend_do_end_class_declaration` | **3215–3259** |
+| `zend_do_implements_interface` | **3262–3293** |
+| the hunk's pre-image | **3261–3295**, and **line 3261 is BLANK** |
+
+▶ ⛔ **The hunk contains ZERO lines of the function it is labelled with — not
+one context line — and all 16 removals are in the next function. The screen
+printed *"the commit's window PROVABLY REACHES the site (DECISIVE)"*.**
+⚠⚠ **A FALSE PROMOTION OF AN EXCLUSION TO A PROOF IS THE ONE DIRECTION THIS
+SCREEN MAY NOT FAIL IN**, which is why this is a soundness fix and not a
+refinement. ⭐ **Reach 1 of 170, and it is `ph53` — whose `decisive` rested on
+`same_function` ALONE** (`bracketed=False`), so the flag had no second support.
+
+✅✅ **REPAIRED BY THE MANAGER.** The rule: **the matched hunk must contain no
+function-definition header before its first changed line** — the label must
+describe the **edited** region, not the hunk's first byte. **Reach 1 → 0**; the
+partition moves **26/17 → 25/18** exactly as predicted; `ph53` becomes the 18th
+`INAPPLICABLE-SAME-FILE`. ⭐ **Its verdict as an EXCLUSION was never in doubt** —
+the text proof stands and the tag walk settles it independently — **only its
+label was wrong.** ⭐⭐ **And it is `INAPPLICABLE-SAME-FILE`'s OWN ARRIVAL that
+made the repair safe: before today, demoting `ph53` would have moved it from one
+wrong label to another.**
+
+⚠⚠ **THREE THINGS THE REPAIR ITSELF NEEDED, AND TWO ARE LESSONS:**
+
+1. ⭐⭐ **`N11`, the regression negative, IS IN THE COMMITTED SUITE AND NOT IN
+   `.temp/`.** Once the guard landed, the original probe's must-fire case
+   **correctly stopped firing** — the defect is gone — **so it cannot guard the
+   fix, and deleting the guard would have passed silently.** `N11` asserts both
+   directions: `ph53` must **not** count (with the `crossed_into` diagnostic
+   naming `void zend_do_implements_interface(…)`) and **`ph21` must still**, or
+   the guard has retracted a *sound* exclusion. ▶ **A detector for a defect and
+   a regression test against its return are not the same artefact**, and only
+   the second belongs in the suite.
+2. ⛔ **`N10e` PRINTED *"and it is 26/17, which is F68's own measured split"* AS
+   A LITERAL, so my own fix left a validator contradicting its own data** —
+   **open item 73's class, inside the tool, within an hour of my opening it.**
+   Computed now.
+3. The top docstring's *"NOT repaired here … read `NOT-THE-REPAIR` as 25 proofs
+   plus one known misfiling"* was **updated in place, not appended to** — item
+   73's habit, applied.
+
+### F94 — ⭐⭐⭐ ROW 7's R1h: THE CATALOGUE'S `ph53` SHA IS **REFUTED**, THE REAL ONE IS **FOUND**, AND IT CONVERTS A WILD DEREF INTO A **NULL** DEREF
+
+`TASK_PHP_040`. ⚠ **UNREVIEWED** (rule 9). ✅ **Manager-verified from the fetched
+patch and an independent tag walk**, not from the report.
+
+| row | sha | verdict |
+|---|---|---|
+| **`ph52`** | `7412202c43e7` (2006) | ✅ **CONFIRMED** — screen `CANDIDATE` 1/1, the cited `zval_dtor(expr_copy);` is **unique** in 5.0.0's `Zend/zend.c`; present at `php-5.0.0`, at the commit's parent and **still at `php-5.1.6`** (never merged to `PHP_5_1`), gone at the commit and `php-5.2.x` |
+| ⛔ **`ph53`** | `be8daf1f47fa` (2008) | ⛔ **REFUTED TWICE INDEPENDENTLY** — screen `NOT-THE-REPAIR` 0/2, **and** the cited `erealloc` line survives `php-5.0.1`–`php-5.0.4` and is **gone at `php-5.0.5`**, **2 years 9 months before** the commit |
+| ⭐⭐ **`ph53`** | **`d09cdd9f71f34deab4b99f4e63523fb94164a724`** (Dmitry Stogov, **2005-06-08**, *"Fixed valgrind errors"*) | ⭐ **FOUND**, bisected from the one-release bracket. **1 file, 1 hunk, 2 insertions / 1 deletion**, screen `CANDIDATE` with the hit on the **primary** cited line, and it **`patch -p1`es onto the pristine tarball at ZERO FUZZ, exit 0** (offset −14) |
+
+**The whole of `ph53`'s R1h, verified byte for byte by the manager:**
+
+```diff
+-  ce->interfaces = (zend_class_entry **) erealloc(ce->interfaces, sizeof(zend_class_entry *)*ce->num_interfaces);
++  ce->interfaces = (zend_class_entry **) emalloc(sizeof(zend_class_entry *)*ce->num_interfaces);
++  memset(ce->interfaces, 0, sizeof(zend_class_entry *)*ce->num_interfaces);
+```
+
+⭐⭐⭐ **AND IT DOES NOT REMOVE THE FAULT — ONE HUNK, TWO SEVERITIES, AND NO
+BUILT ROW CARRIES THIS SHAPE.** At `php-5.0.5` the consumers get **no guard**, so
+zeroing converts a **CWE-824 wild dereference** at `zend_operators.c:1534-1535`
+into a **deterministic NULL dereference**, and makes the compare-only sink at
+`zend_compile.c:1951` return a **correct answer** (NULL never equals a live
+entry). ▶ **That is `PROTOCOL_PHP.md` §C's *"report it, don't repair it"* case,
+and it is a genuinely new R1h shape** — every built row's R1h either adds a
+check or removes a line.
+
+⚠ **AND TWO THINGS THE `fix_commit` COLUMN DOES NOT SAY ABOUT `ph52`, EITHER:**
+its patch **does not apply** to pristine 5.0.0 — the `if (EG(exception))` guard
+had become an unconditional `zend_error`, so **R1h is a hand backport of one
+line** (⚠ manager-confirmed: exact apply **fails**, and at `--fuzz 3` `patch`
+reports *"Reversed (or previously applied) patch detected! Assuming -R"*) — and
+**in 2006 the defect is WIDER than 5.0.0's**, so the one deletion covers both.
+
+### ▶ ROW 7 IS **`ph53`**, AND THE RECOMMENDATION DOES NOT REST ON THE TIE-BREAK
+
+The task's tie-break (`verbatim` over `narrowed`) points there, **and the
+engineer refused to let it rest on that, because it judged BOTH declared tiers
+optimistic** (→ item **75**). Three measured reasons agree:
+
+1. **`ph53`'s R1h applies mechanically; `ph52`'s is a reconstruction.**
+2. ⭐ **`ph53`'s R1h costs an O(n) `memset` ON THE BENIGN PATH; `ph52`'s touches
+   only an error arm the benign corpus never runs** — so `ph52`'s R1h column is
+   **predicted `0.00 %`.** → item **76**.
+3. **`ph53` has a fidelity anchor** — `crashes_pristine = True`, ASan,
+   wild-pointer-deref — **where `ph52` is `n/a (non-crash class)`.**
+
+✅ **NO KILL ON `ph52`**: its R1h is now **settled**, and **a vacuous R1h column
+is itself a publishable result**, not a disqualification (`CLAUDE.md` rule 6).
+
+⭐⭐ **AND THE R5 SHAPE IS ALREADY SETTLED FROM THE PINNED vstd, WHICH IS THE
+EXPENSIVE THING TO GET WRONG.** `MaybeUninit::{new, uninit, assume_init,
+assume_init_ref, assume_init_mut}` **ARE specified** in
+`~/tools/verus/vstd/std_specs/maybe_uninit.rs` — so R5's obligation is literally
+**`v[i].mem_contents().is_init()` with NO hand-rolled ghost state.**
+⛔ **But `MaybeUninit::write`, `assume_init_read`, `Vec::set_len` and
+`spare_capacity_mut` have NO spec**, which **constrains R4's shape** before a
+line is written. ⚠⚠ **That grep is `std_specs/` and not `vstd/<mod>.rs`** —
+`CLAUDE.md`'s twice-burned warning, heeded. ⓘ R2 is predicted to be **PHP
+5.2.0's upstream repair reinvented by the type system**; labelled a prediction.
+
+⛔ **AND A CATALOGUE DEFECT THE BRIEF HAD TO FIX: `u64 = fold of the interface
+pointers read` CANNOT BE THE `u64`** — it is **address-dependent**, so it would
+differ between rungs for reasons no rung chose. Replaced with an
+index/id/count fold. → item **74**.
 
 ### F93 — ⭐⭐⭐ ON `ph29` THE SHIPPED PIN IS NOT A DRAW, IT IS A **START-OF-RUN TRANSIENT** — SO WIDENING DOES NOT EVEN CONVERGE
 
@@ -3009,10 +3177,10 @@ find a fix of this shape.** ✅ Confirmed mechanically by the manager:
 `defect_file ∈ patch_files` for **17 of 17** non-decisive records, zero
 exceptions, so the whole non-decisive population is **same-file /
 different-function** — `INAPPLICABLE`'s mechanism one granularity down.
-▶ **The repair is a third label, `INAPPLICABLE-SAME-FILE`, landing with must-fire
-negatives (`ph64` out, `ph21` stays); the ingredients are already in every
-record and only the label is wrong.** ⚠ **Fix the docstring in the same edit —
-it calls the current label *"a PROOF OF EXCLUSION"*.**
+▶ ✅✅ **LANDED AT `TASK_PHP_040` §4 (F95)** — six negatives, `25 + 18 = 43`, 0
+partition violations, docstring qualified in the same edit, and the 17 movers
+reproduce this census exactly. ⛔ **Plus a soundness defect it exposed in
+`same_function`, repaired by the manager.** ▶ **F95.** **The original ask:**
 ❌ **A manager-proposed extra signal is REFUTED and must not be added**: scoring
 a bug-numbered `.phpt` in `patch_files` as evidence of a repair gives
 **53 % / 46 % / 45 %** across non-decisive exclusions, decisive exclusions and
@@ -4753,7 +4921,7 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 ## Open items — carried, not closed
 
 ⚠ **THE NUMBERS HAVE GAPS AND THAT IS CORRECT — DO NOT "REPAIR" THEM.**
-**70 rows present, numbered 1 → 73, with 45–47 REMOVED ENTIRELY** and
+**73 rows present, numbered 1 → 76, with 45–47 REMOVED ENTIRELY** and
 **4, 7, 10, 12, 18–25, 27, 31 and 48 retired IN PLACE as `~~N~~`**; no number is
 ever reused. ⚠ **Two conventions coexist on purpose** — a retirement whose
 *reasoning* is worth keeping stays as a struck row, and one whose successor
@@ -4865,3 +5033,6 @@ the wrong one.
 | 71 | ⓘ **ADJACENT: THE MEASUREMENT RUN MAY ALREADY CONTAIN THE POPULATION SLOPE, FOR FREE** | `TASK_PHP_039` §13.8, **reported and explicitly not proposed.** `measure.py` already runs every cell at the row's full `n_iters` (**25 000** on `ph29`/`ph03`, **1 500** on `ph64`), so a whole-program slope between a cheap small `n` and *that* run would be the population mean at almost no extra callgrind cost — **which is exactly what F93 had to spend 396 profiles to get.** ⛔⛔ **WHOLLY UNTESTED, AND IT TOUCHES FROZEN CODE**: `measure.py::callgrind_ir` records **exclusive** `Ir` for two needles and **may record no whole-program total at all**; adding one is a `harness/` edit = **33 PAT + 7 PHP re-gate** and a full re-measure. ▶ **Check whether the total is already there before considering anything else** — if it is, this is free; if not, it is the most expensive idea on this list |
 | 72 | ⚠⚠ **`STATISTICS_001 §4`'s RULE IS OVER-BROAD, AND NARROWING A PUBLISHED RULE NEEDS REVIEW** | F91. §4 says **publish both, labelled, ALWAYS**. ▶ **F91's regime measurement says A ALONE SUFFICES where the comparison does not cross languages** — `|B/A|` is **49.6–393.9×** at every small-Δ cell, so no callee-inclusive statistic can resolve a 1–2-instruction difference, and `check.py`'s own operative rule says the same with a 66-cell census behind it. ⚠ **Narrowing is not a free edit**: rule 9 (F91 is unreviewed), and it changes what **every** row publishes. ⛔ **And it must NOT be narrowed into *"A always"*** — cross-language the callee work **is** the effect (`_038` §1.5), which is F85. ▶ **Two regimes, named, with the `Δnopad` calibration and its stated limit** (that count exists only for the `unsafe vs verus` pair). ⓘ **`STATISTICS_001.md` is in `.tasks-php/` and in no digest, so the edit itself is free** — the cost is the review |
 | 73 | ⚠⚠⚠ **A CORRECTION CAN LAND IN `RECAP_PHP.md` AND NOT IN `.memory-php/` — AND `.memory-php/` OUTRANKS IT. NO CHECK CATCHES THIS** | Manager, 2026-09-12, found doing F91's rule-9 check. **Two live instances, both now fixed**: `02-ladder.md` said *"28 of the 38 sign flips"* while **`:446` of the same file** already recorded *"29, not 28"*; and it carried F82's family-A percentages **unlabelled per input** where `RECAP_PHP.md:2120` labels them and flags the defect. ⭐⭐ **THE SHAPE: a correction was landed as a NEW PARAGRAPH instead of APPLIED TO THE SENTENCE IT CORRECTS**, so the authoritative layer stated both numbers at once and a reader who stops at the first gets the superseded one **from the layer that supersedes everything.** ⚠ **It is the INVERSE of ordinary staleness** — the correction exists, it is just not where the authority is — and it is the second half of the size box's own *"THE LESSON IS THE PROPAGATION, NOT THE ARITHMETIC"*, which tracked a **wrong** number forward; this is a **right** number that did not propagate. ⓘ ⛔ **A checker was prototyped and NOT shipped, on a measurement**: the corpus's correction idiom is `X, not Y`, and over the whole authoritative layer that gives **1 idiom hit · 2 survivals · 1 real defect · 1 false positive** — it catches **1 of the 2** instances, because F82's unlabelled percentages are not written in that form at all. **A validator finding half of a two-member class at 50 % precision does not earn §H's landing cost today**; the measured reach is recorded so a later task decides with a number. ▶ **What is owed is a HABIT, not a tool: apply a correction to the sentence, in every layer that carries it** |
+| 74 | ⛔ **`CATALOGUE.md`'s `u64` FOR `ph53` IS ADDRESS-DEPENDENT AND CANNOT BE THE `u64`** | F94, `TASK_PHP_040` §5. The entry says *`u64` = fold of the interface pointers read*. ⛔ **Pointers are addresses**, so that fold differs between rungs — and between runs — **for reasons no rung chose**, which is exactly what the cross-rung checksum exists to rule out. ✅ **Caught by the build brief before a line was written**, and replaced with an index/id/count fold. ⚠ **The row-7 build will ship the correct one, so nothing is blocked** — what is owed is the **catalogue** correction, because the next reader of that entry gets the wrong instruction. ⭐ **And ask the general question once**: `grep -a` the other 101 rows' `u64` lines for *pointer*, *address* and *ptr* — **if `ph53` is not the only one, this is a catalogue-wide defect and not a row's footnote** |
+| 75 | ⚠⚠ **BOTH ROW-7 CANDIDATES' DECLARED TIERS ARE OPTIMISTIC, AND THE ENGINEER SAID SO UNPROMPTED** | F94, `TASK_PHP_040` §5.1. `CATALOGUE.md` declares `ph53` **`verbatim`**; the engineer would declare **`narrowed`**, because the mechanism needs **three frames in two files** (`zend_compile.c:2571` + `:2591` + `zend_operators.c:1534-1535`) and a `verbatim` claim is about a span that lifts byte-identically. ⚠ It judged **`ph52`'s optimistic too.** ▶ **The question is whether `tier` is SYSTEMATICALLY optimistic across the catalogue**, because `tier` is *"a COST STATEMENT, NEVER A FILTER"* (§0.2) and an optimistic cost statement mis-prices every future row's build. ⭐ **Two of two examined are wrong in the same direction**, which is the shape of a rule, not a coincidence — and it is `F81`'s shape exactly (*"measured NOTHING on 2 rows of 2 tested"*). ⓘ Cheap to test: `tier` is declared in each row's `spec.md` **inside the hashed block**, so re-declaring one costs a re-gate — **but MEASURING the mismatch costs nothing** |
+| 76 | ⭐ **`ph52`'s R1h COLUMN IS PREDICTED `0.00 %`, AND THAT IS A RESULT, NOT A DISQUALIFICATION** | F94. Its R1h deletes one `zval_dtor` from an **error arm the benign corpus never runs**, so R1h should price **identically to R1** on every benign input — where `ph53`'s R1h costs an **O(n) `memset` on the benign path.** ⚠⚠ **The temptation is to read a `0.00 %` R1h column as *"the row measures nothing"* and drop the row. ⛔ THAT IS THE ADMISSION-BAR BIAS** (`CLAUDE.md` rule 6, finding 53): *"no column moves"* is a **FINDING, NEVER A KILL.** ▶ ⭐ **What it actually says is worth publishing: the upstream fix for a whole CLASS of defect — the unreached error path — is FREE, and the ladder can say so with a number.** ⓘ **UNTESTED**, and it is a *prediction* by the engineer, labelled as one. It becomes measurable the moment either row is built, so **batch the check with whichever is built second** |
