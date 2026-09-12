@@ -11,12 +11,12 @@
 have ZERO rows.** The last row landed at `_036`; `_037`, `_038` and `_039` are
 **three consecutive tasks with no row in them.**
 
-⭐ **And a row is affordable.** Measured (`.temp/mgr174/task_cost.py`): of 39
-task files, **19 are one-time** (Phase 0, the mining wave, the catalogue) and
-**18 are row-attributable over 6 rows = 3.0 tasks per row**, matching
-`PLAN_PHP.md` §8's PAT figure. ⚠ **`RECAP_PHP.md` currently says 6.2 and
-rising; that is `total/rows` and it is the wrong quantity** — the correction is
-staged in `.temp/mgr174/NOTES.md` §6. **Do not quote the 6.2.**
+⭐ **And a row is affordable.** Measured — **run it yourself:
+`python3 .tasks-php/task_cost.py`.** Of 40 task files, **19 are one-time**
+(Phase 0, the mining wave, the catalogue) and **18 are row-attributable over 6
+rows = 3.0 tasks per row**, matching `PLAN_PHP.md` §8's PAT figure. ⓘ **The
+`6.2 … and RISING` this document used to carry was `total/rows` — the wrong
+quantity, and `RECAP_PHP.md`'s tasks cell is now corrected.**
 
 **Both candidates are in `T3 — initialised before read`, which has 0 built
 rows**, and both extend the **type** axis, which has exactly one (`ph45`, `T1`).
@@ -199,8 +199,14 @@ ROW** — it settles provenance and writes a brief. **No gate run, no `spec.md`.
 ✅ **You MAY edit `.tasks-php/preimage_screen.py`** for §3, **with negatives**
 (§H). Other writes go to `.temp/php40/`.
 ⚠ **No `git add` / `git commit`.** Never touch `.web/`.
-ⓘ `TASK_PHP_039` may still be running; it touches **only** `.temp/php39/` and
-its own report, so there is no overlap. **Do not read or modify its files.**
+ⓘ **`TASK_PHP_039` HAS LANDED** — report committed, findings **F92**/**F93**.
+⛔ **Nothing in it bears on your task**: it answered item 68 **NO** (so the
+`probe_iters` re-gate is not happening) and it built no row. **You do not need
+to read it, and you should not read the statistic thread (F74, F80, F82–F93) at
+all** — it is seven tasks deep, it is about which column a BUILT row publishes
+in, and it has no bearing on an R1h hunt. ⭐ **Your reading is the START HERE
+box, `CATALOGUE.md`'s `T3` section, `PROTOCOL_PHP.md` §C/§F5/§H, and
+`FIXSURVEY_001.md`.**
 
 **Bracket**: `harness/measure.py --check-stale` → **`66/0`** and
 `harness-php/gate.py --tool measure --check-stale` → **`14/0`**, **first and
