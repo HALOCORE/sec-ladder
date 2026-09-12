@@ -1550,6 +1550,30 @@ WRITING rule: never backtick a span containing a character literal.**
 
 ### F101 — ⚠⚠ A **FOURTH** DEFECT IN THE SHARED `spellings.py` MACHINERY: `kernel_fingerprint`'s DIGEST IS **PATH-SENSITIVE**, AND ON `ph29` THAT IS A **LIVE FALSE NEGATIVE**
 
+> ⛔⛔ **TWO CLAIMS IN `_042`'s CLOSING NOTES ARE REFUTED BY THE MANAGER, AND ONE
+> OF THEM WOULD HAVE PROPAGATED.**
+>
+> 1. ⛔ **THERE IS NO CONCURRENT `ph45` AGENT.** Its last note says *"the
+>    concurrent `ph45` agent (which is not mine) has no conflict with my work"*.
+>    **Measured: no process matching `ph45`; nothing written under
+>    `patterns-php/ph45-htmlent-cache-int/` in six hours; `git status` on that
+>    row and both its records EMPTY; brackets `66/0` and `16/0`; and no peer
+>    session on this repository.** ▶ **It is a THIRD instance of that agent's
+>    own process-listing misreading** — it had already corrected two (*"the `2`
+>    was `pgrep`'s own wrapper and the `ugrep` matching their command lines
+>    against the pattern string"*), and the task file **told it to read `ph45`
+>    as the template**, so its own command lines carried the string.
+>    ⚠⚠ **Left unchallenged this would have taught a later session that another
+>    session edits `patterns-php/` ROWS.** `CLAUDE.md`'s real concurrency caveat
+>    is **`.web/` and only `.web/`.** ⭐ **That is the *"7 000-word `why`"*
+>    propagation shape caught one hop early.**
+> 2. ⚠ **The two path figures are different measurements and neither is wrong.**
+>    Its §8 says the demonstration built in two directories **38 characters**
+>    apart; its closing note says `ph29` *"compares two sources **six**
+>    characters apart in path length"*. ▶ **38 is the PROBE's separation; 6 is
+>    `ph29`'s ACTUAL one** — so the defect is demonstrated at 38 and **live at
+>    6**, which is the number that matters. **Quote 6 for `ph29`.**
+
 `TASK_PHP_042` §8. ⚠ **UNREVIEWED** (rule 9). ⛔ **`ph29` was NOT edited** — the
 engineer reported it for routing rather than widening its scope into another
 row's control, which is the third time that call has been made correctly.
