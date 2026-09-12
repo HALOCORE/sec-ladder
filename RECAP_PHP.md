@@ -47,15 +47,15 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 6 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
         ph45 TYPE. ALL THREE AXES OPEN. .memory-php/ is AUTHORITATIVE.
-NEXT    NOTHING RUNNING; _033/_034/_035/_036 LANDED+VERIFIED from the record.
-        ▶ TASK_PHP_037 IS WRITTEN AND READY: ph45's R4 search (item 58), batched
-        with item 59. THEN item 57, D11, 54. F82 WIDENED it -- see below.
-⚠ NEW   F82 ⭐⭐⭐ F74's NULL CONTROL HAD AN UNCHECKED PREMISE -- `identity` is
-        `exact` at O3 on 4/7 PHP + 28/33 PAT, not 39. ✅ EVERY F74 NUMBER SURVIVES
-        BUT A NULL CONTROL IS ONE-SIDED: a statistic hard-wired to 0 aces every
-        null. SENSITIVITY measured: A resolves 2 insn/call EXACTLY on 2 inputs.
-        ⚠⚠⚠ item 61: the shared `why` argues R4 admissibility from `O3 exact`,
-        FALSE on 3/6 rows -> ph45's R4 need NOT be byte-identical to its R5.
+NEXT    ⚠ TASK_PHP_037 IS RUNNING: ph45's R4 search (item 58) + item 59 + owed
+        prose, ONE gate run. F82/item 61 WIDENED it -- ph45 pins `differ`, so its
+        R4 need NOT be byte-identical to its R5. THEN item 57, 62, D11, 54.
+⚠ NEW   F83 ⭐⭐⭐ F74's "NULL" WAS MEASURING REAL WORK -- family C (kernel
+        INCLUSIVE Ir) reproduces B's +266.000 as +265.924 on ph03/small and
+        EXACTLY on large, by 2 INDEPENDENT METHODS. So B's defect is ATTRIBUTION
+        NOT NOISE, and a confound does not shrink with measurement. F74's ADVICE
+        SURVIVES on a better reason -- but F74 is now CORRECTED 3x IN 3 ROUNDS
+        and NEVER ONCE ON ARITHMETIC. F82 + items 61/62: see the index.
 ⚠ OWED  SPREAD (A1) ph03 +12.19 · ph16 -1.22 · ph29 -6.06 · ph64 +17.47 = 2/2;
         ph45 A1 +0.37% but WHOLE-PROGRAM -3.06% -- publish BOTH, labelled.
 ⚠ TRAPS `grep -a` ALWAYS (blind to 41 corpus files); ask about a FUNCTION, not text.
@@ -64,7 +64,7 @@ NEXT    NOTHING RUNNING; _033/_034/_035/_036 LANDED+VERIFIED from the record.
 BAR     C-SIDE ONLY: nothing Rust/Verus/Miri/cost kills a row; patterns-php/ is
         FRESH. ⚠ .web/ is CONCURRENT -- NEVER `git add -A`.
 READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.md ·
-        F1-F82 · items 1-61. fixsurvey.py + preimage_screen.py have --selftest.
+        F1-F83 · items 1-62. fixsurvey.py + preimage_screen.py have --selftest.
 ```
 
 ---
@@ -196,7 +196,11 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > control machinery, found by its own negatives, one LATENT in `ph16`** ·
 > **F82 ⭐⭐⭐ F74's null control had an UNCHECKED PREMISE — every number
 > survives, but a null control is ONE-SIDED and family A's SENSITIVITY is now
-> measured: 2 instructions/call, resolved exactly, on two inputs**
+> measured: 2 instructions/call, resolved exactly, on two inputs** ·
+> **F83 ⭐⭐⭐ and the null was MEASURING REAL WORK — B's defect is ATTRIBUTION,
+> not noise, and a confound does not shrink with measurement; family C
+> (inclusive) dominates B and solves nothing, because attribution belongs to the
+> COMPARISON. F74 corrected 3× in 3 rounds, never once on arithmetic**
 >
 > ⚠ **This index stopped at F59 while F60–F65 existed** — `PROTOCOL.md` rule 13,
 > headers rot. **Extend it in the same edit that adds a finding.**
@@ -1491,6 +1495,102 @@ The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
 
+### F83 — ⭐⭐⭐ F74's NULL WAS **MEASURING REAL WORK**, SO B's DEFECT IS **ATTRIBUTION, NOT NOISE** — AND A CONFOUND DOES NOT SHRINK WITH MEASUREMENT
+
+Manager, `.temp/mgr172/NOTES.md` §7, probe `inclusive_ir.py` (`--selftest`
+**PASS, 6 must-fire negatives**). ⚠ **UNREVIEWED** (rule 9).
+
+**F82 asked whether the null's premise held. It did not ask the obvious next
+question — whether the NONZERO READING IS REAL.** It is.
+
+A **third statistic** is computable from the same profiles and **without
+touching frozen code**, because the pinned valgrind 3.27.1 ships
+`callgrind_annotate --inclusive=yes` (`measure.py::callgrind_ir` records
+**exclusive** only, for two needles): **family C = `kernel` INCLUSIVE `Ir`, the
+kernel's whole CALL TREE, from ONE run.**
+
+**`ph03-uudecode-bound`, `unsafe` vs `verus`, O3/isolated — and the two kernels
+share `md5_fn` `338505795ee18db952aafcdaec522df4`, byte-identical, not merely
+equal in count:**
+
+| input | **A** exclusive | **C** inclusive | **B** slope |
+|---|---|---|---|
+| `small.bin` | **0** | **+265.924/call** `+3.6581 %` | **+266.000/call** `+3.6522 %` |
+| `large.bin` | **0** | **−31.000/call** | **−31.000/call** |
+
+⭐⭐⭐ **B AND C AGREE TO 0.03 % ON `small` AND EXACTLY ON `large`, BY TWO
+INDEPENDENT METHODS** (a two-run slope against a one-run call tree). **So
+`+3.65 %` — the number F74 calls the PHP programme's worst null — IS NOT NOISE.
+It is real work, measured twice.**
+
+⚠ **The environment is ruled out, and it had to be**, because `check.py`
+documents a mechanism that would explain it away — *"the environment block
+shifts the stack pointer → a per-call stack array's alignment → a different tail
+in `__memset_avx2_unaligned_erms`"*, ±7, **between two runs of the SAME build**.
+One binary, **three** environment sizes spanning 4 000 bytes: kernel inclusive
+is **181 733 873 at every one, spread 0** (negative **N6**).
+⚠ **The work is LOCATED**: **+205.94/call** in one unnamed `libc.so.6` function
+and **+56.98** in a second, both **local** symbols the dynamic table does not
+name — nearest exported are `__default_morecore` (+2912) and `timer_settime`
+(+3488), offsets far too large to be those. `__default_morecore` is in
+`malloc.c`, which puts the cost in the **allocator**. ⚠ **A region, not a
+function name** — without libc debug symbols it cannot be named and the probe
+does not pretend to.
+
+⭐⭐ **SO THE DEFECT IN FAMILY B IS NOT NOISE, IT IS ATTRIBUTION.** The kernels
+are **byte-identical**, so neither rung's code can have caused a 3.66 %
+allocator difference. B charges the rung for work the rung did not do.
+⚠⚠ **That is a CONFOUND, and unlike noise a confound DOES NOT SHRINK WITH MORE
+MEASUREMENT** — which is exactly why calling it noise mattered.
+✅ **F74's practical advice — headline family A, name the statistic — SURVIVES.
+Its stated reason is replaced by a stronger one.**
+
+⚠ **AND THE PAT CELL SPLITS THE DIFFERENCE, SO BOTH READINGS WERE PARTLY
+RIGHT.** `p25-realloc-growth/large.bin`: **C +167.872** against **B +269.520**,
+agreeing to only **37.71 %**. Of the worst null in either programme, ~**62 % is
+real call-tree work** and ~**+101.65/call is a method artefact of the slope**.
+⚠⚠ **I have NOT identified the residual and am not inventing a mechanism for
+it** — that is F72, where my stated cause was a story and `_033` produced git
+evidence against it. ⓘ `p25/small` reads **0 on all three** — the control.
+
+⚠ **SCOPE: ATTRIBUTION IS A PROPERTY OF THE COMPARISON, NOT OF THE STATISTIC.**
+On a **C-vs-Rust** comparison callee work often **is** rung-attributable —
+`ph64`'s C rung really does call `malloc` `2n+2` times per call, **60 %** of its
+instructions in libc (F71, item **54**). The confound is specific to
+comparisons where the two rungs' own code is identical or nearly so, **which is
+precisely why the R4/R5 pair was picked as a null** and precisely where the
+confound is largest relative to signal.
+
+⚠⚠ **AND I GOT FAMILY C WRONG ON THE FIRST PASS, WHICH IS THIS FINDING'S OWN
+LESSON LANDING ON ITSELF.** I wrote that C has *"A's attributability and B's
+coverage"*, making it the statistic the project wants. **False** — the allocator
+work **is** in the call tree, so C includes it and reads B's number. Corrected:
+
+| | coverage | slope artefact | **attributable** |
+|---|---|---|---|
+| **A** | ⚠ kernel only — misses 91–94 % on `ph45` | none | ✅ yes |
+| **C** | ✅ whole call tree | ✅ **none** — one run | ❌ **no** |
+| **B** | ✅ whole program | ⚠ **`+101.65/call`** on `p25/large` | ❌ no |
+
+▶ **C strictly DOMINATES B** — same coverage, one fewer error source — **and no
+statistic here solves attribution**, because it is not a property of a column.
+⭐ **That is why `ph45` publishing "both families, labelled" is the right answer
+rather than a compromise.** → **item 62.**
+
+⭐⭐⭐ **THE META-OBSERVATION, AND IT IS THE PART WORTH KEEPING: F74 HAS NOW BEEN
+CORRECTED THREE TIMES IN THREE ROUNDS.**
+
+| | what was wrong | found by |
+|---|---|---|
+| **F80** | the **rule** (one condition) | `ph45`, the very next row built |
+| **F82** | the **premise** (never checked per row) | reading a gate record for another purpose |
+| **F83** | the **mechanism** (*"noise"*) | a second, independent measurement |
+
+⚠⚠ **F74 was published from ONE script reading ONE field, and not one of its
+three errors was arithmetic.** Every one was found by bringing a **second
+method** to bear on the same quantity. ▶ **A statistic's own null is not enough
+evidence about a statistic.**
+
 ### F82 — ⭐⭐⭐ F74's NULL CONTROL HAD AN **UNCHECKED PREMISE**, AND THE HALF IT NEVER MEASURED IS THE HALF THAT MATTERS
 
 Manager, `.temp/mgr172/NOTES.md`, probe `identity_null.py` (`--selftest` **PASS,
@@ -1755,8 +1855,15 @@ mixed A1 and B1 and was FAITHFUL in doing so — the rows themselves disagree.**
 exact` pins R4 and R5 **byte-identical**, so **`verus − unsafe` has a known true
 value of exactly 0** — a null control on every row, which nobody had read as one:
 
-> ⚠⚠⚠ **CORRECTED IN PLACE BY F82 — THE SENTENCE ABOVE IS THE PREMISE AND IT WAS
-> NEVER CHECKED PER ROW.** `identity` is `exact` at O3 on only **4 of 7 PHP** and
+> ⚠⚠⚠ **CORRECTED IN PLACE TWICE — BY F82 (the premise) AND BY F83 (the
+> mechanism). READ BOTH BEFORE QUOTING ANYTHING BELOW.** ⭐⭐ **F83 is the one
+> that matters: the nonzero readings below are REAL WORK, not noise** — family C
+> (`kernel` inclusive `Ir`, an independent method) reproduces B's `+266.000` as
+> `+265.924` on `ph03/small` and matches it **exactly** on `large`. **B's defect
+> is ATTRIBUTION, not noise**, and the advice below survives on a better reason.
+>
+> ⚠⚠⚠ **AND THE SENTENCE ABOVE IS THE PREMISE, WHICH WAS NEVER CHECKED PER
+> ROW.** `identity` is `exact` at O3 on only **4 of 7 PHP** and
 > **28 of 33 PAT** rows. ✅ **Every number in this section survives** — the right
 > predicate is `Δnopad == 0`, not the level, and under it **all 33 PAT rows are
 > true nulls**; `ph03` really is `exact`. ⚠ But **`ph45` and `ph64` are NOT nulls
@@ -3926,3 +4033,4 @@ the wrong one.
 | 59 | ⚠ **A SIGNED OVERFLOW AT `mbfilter_htmlent.c:193`, IN `ph45`'s OWN FUNCTION, UNTRACED TO ANY FIX** | F80, `_036`'s own find, **reported and not pursued** — the right call, since chasing it was outside a build task's scope. ⚠ It is **inside the function `ph45` extracts**, so it is not merely adjacent: the row's benign corpus must be shown not to evaluate it (F46's UB-free-trigger rule), and `_036` does not say whether that was checked. ▶ **Ask that question before `ph45`'s next re-gate.** ⓘ Distinct from the **stack OOB write at `:123`** in the *encode* half (F75), which is also uncatalogued and which the row deliberately does not lift |
 | 60 | ⚠ **`harness/check.py`'s NULL-CONTROL TABLE JUSTIFIES ITS WORST CELL WITH BYTE-IDENTITY THAT THE ROW'S OWN PIN DENIES — PAT-SIDE, FOR ROUTING** | F82. The docstring is **more careful than my probe was** — it corrects the table for **mode**, **opt level** and **input**, and warns *⚠⚠⚠ A NULL IS A PROPERTY OF A CELL. DO NOT MAX IT OVER MODE, OVER LEVEL, OR OVER INPUT.* ⚠ It does not correct for the **identity level**: its worst quoted cell, **`p25 large +269.52`**, is on the row pinned `` `O0: norel`, `O3: norel` ``, while the table is justified by *"`identity` forces R4's and R5's kernels to agree byte for byte."* ✅ **The number is RIGHT and the justification is WRONG** — p25 rescues it by a different route its own identity note records (189 non-pad instructions and identical byte count in both cells). ⚠⚠ **`harness/` is FROZEN**: one sentence costs a 33-pattern re-gate, and `results/SYNTHESIS.md` is the PAT-side authority, not this file. ▶ **Reported, NOT fixed.** ⭐ The general shape is the same as F82's own: **a correct number whose stated reason is false survives every check, because checks test numbers** |
 | 61 | ⚠⚠⚠ **THE SHARED `why` BLOCK ARGUES R4 ADMISSIBILITY FROM AN ANTECEDENT THAT IS FALSE ON THREE OF SIX PHP ROWS** | F82. The block — **byte-identical across all six PHP rows and all 33 PAT rows** — says *"All six patterns pin `identity: unsafe == verus, O3 exact`, so an R4 is not merely a program that MAY use `unsafe`: it is a program that must have a byte-identical R5 twin that Verus verifies."* ⚠ **`ph07` pins `norel`, `ph45` and `ph64` pin `differ`.** It is **PAT-side boilerplate carried into a programme where it does not hold**, and it is the step by which `.memory/01-ladder.md` disqualifies unverifiable R4 candidates — so on those three rows **that disqualification has no stated basis**. ▶ **Consequence, and it is a widening not a defect**: an R4 candidate on `ph45`/`ph64`/`ph07` need only **verify**, not compile byte-identically, so their R4 searches are **wider than `ph29`'s** and F77's method is not the binding constraint. **Already written into item 58's task file as a premise to re-derive.** ⚠ Fixing the sentence is a **six-row PHP re-gate** (it is inside `contract_sha256`) — item 55's shape exactly, and the same open question: a convention binding both programmes has no unhashed shared home |
+| 62 | ⭐⭐ **FAMILY C — `kernel` INCLUSIVE `Ir` — STRICTLY DOMINATES FAMILY B AND IS NOT BUILT** | F83, `.temp/mgr172/inclusive_ir.py`. `callgrind_annotate --inclusive=yes` is in the **pinned** valgrind 3.27.1, so the kernel's whole **call tree** is computable **from ONE run** and **without touching frozen code** — `measure.py::callgrind_ir` records exclusive only, for two needles. ✅ **Same coverage as B with one fewer error source**: on `p25/large` B carries **+101.65 `Ir`/call** that C does not, and on `ph03` the two agree to **0.03 %** and **exactly**. ⚠⚠ **It solves NOTHING about attribution** — the allocator work *is* in the call tree, so C includes it and reads B's number; **I drafted the opposite claim and had to retract it inside the same finding.** ▶ Buildable as a **php-side control**: six PAT patterns' `controls/` already call `objdump` directly, so one calling `callgrind_annotate` is the same shape, and `controls/*.py` costs **one gate re-run and no re-measure**. ⚠ **Its own null must be measured before it is believed** — C is *attributable*, not *clean*. ⚠ Not started because `TASK_PHP_037` is running and **one agent works at a time** |
