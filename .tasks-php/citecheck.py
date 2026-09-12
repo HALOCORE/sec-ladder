@@ -22,6 +22,13 @@ BENIGN = {
     'patterns-php/shared', 'patterns-php/shared/x.h', 'common-php/x.h',
     'patterns-php/.ph07-wip', 'patterns-php/.ph93',   # hypothetical rows (F16/F24)
     '.temp/san_tests',                      # lives in php-in-safe-rust/ -- item 32a
+    # ⭐ A LIVE TASK FILE NAMING ITS OWN DELIVERABLE. `_042` §6.1 requires
+    # `ph53`'s `controls/spellings.py` to be CREATED, so citing it is a FORWARD
+    # pointer, not rot -- the same class as the `_REPORT.md` a task file names
+    # before writing it. ⚠ Left as a path rather than a clever predicate because
+    # the alternative is a heuristic over task titles; it goes INERT the moment
+    # the file exists, and a stale BENIGN entry costs nothing.
+    'patterns-php/ph53-iface-tail-uninit/controls/spellings.py',
 }
 
 DOCS = ['RECAP_PHP.md', 'PLAN_PHP.md', 'CLAUDE.md',

@@ -58,7 +58,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-ROWS = ["ph03", "ph07", "ph16", "ph29", "ph64", "ph45"]   # in BUILD order
+ROWS = ["ph03", "ph07", "ph16", "ph29", "ph64", "ph45", "ph53"]  # BUILD order
 
 # ---------------------------------------------------------------------------
 # THE CLASSIFICATION. `ONCE` = paid once for the programme. A dict = the row
@@ -102,7 +102,8 @@ CLASS = {
     #    over BUILT rows. ⭐ But it must be REPORTED, not hidden: a growing
     #    PENDING pile makes the marginal figure understate. `N8` bounds it.
     "040": "PENDING",          # R1h hunt + build brief for row 7 (ph52/ph53)
-    "041": "PENDING",          # BUILD row 7 = ph53
+    "041": {"ph53": 1.0},      # BUILD row 7 = ph53 -- row LANDED, so charged
+    "042": {"ph53": 1.0},      # search ph53's endpoints + its batched debt
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them
@@ -266,12 +267,20 @@ def selftest():
           f"(the only REBUILT row) before running; if it were a recent row the "
           f"flat trend would be luck")
 
-    # N7 ⚠ reproduce the PUBLISHED figure from its own definition, so the thing
-    #    being corrected is the thing that was written.
-    check("N7", abs(len(ids) / len(ROWS) - 6.5) < 0.5,
-          f"total/rows = {len(ids)}/{len(ROWS)} = {len(ids) / len(ROWS):.2f}, "
-          f"which is the 6.2-class figure RECAP publishes (it used 37 reported "
-          f"tasks -> 6.17; 39 files -> 6.50; both are 'the total-cost ratio')")
+    # N7 ⚠⚠ THE TWO QUANTITIES MUST MATERIALLY DIFFER, or this file has nothing
+    #    to say. ⛔ ITS FIRST VERSION PINNED `total/rows ~ 6.5` AS A LITERAL --
+    #    "reproduce the published figure" -- and it went STALE within the hour,
+    #    twice: 39 files -> 6.50, 40 -> 6.67, 41 -> 6.83, then 42 files over 7
+    #    rows -> 6.00. `RECAP_PHP.md` open item 73's class, in a validator, for
+    #    the third time in one session (see also `preimage_screen.py`'s N10e).
+    #    ▶ The CHECKABLE claim is the RATIO of the two quantities, which is
+    #    scale-free: the total-cost figure must be at least 1.5x the marginal
+    #    one, or the correction this file exists to make is not worth making.
+    pub = len(ids) / len(ROWS)
+    check("N7", pub >= 1.5 * marg,
+          f"total/rows = {len(ids)}/{len(ROWS)} = {pub:.2f} is at least 1.5x "
+          f"the marginal {marg:.2f} ({pub / marg:.2f}x), so the two quantities "
+          f"answer materially different questions -- computed, NOT pinned")
 
     # N8 ⚠⚠ THE PENDING PILE MUST STAY SMALL, or the marginal figure quietly
     #    understates: every PENDING task is real cost waiting for a row to land
