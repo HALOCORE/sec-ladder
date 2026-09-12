@@ -59,7 +59,7 @@ Every delta below is a difference between rungs that are meant to be spellings o
 
 ### Spelling audit (stage `0b`, reporting only)
 
-Measured by the gate, not by this file — from `results/gate/ph53-iface-tail-uninit.json`, contract `7013be6f7c1c`.
+Measured by the gate, not by this file — from `results/gate/ph53-iface-tail-uninit.json`, contract `c41ffad2b795`.
 
 `15` backticked spelling(s) over `6` rung(s) → **46** (spelling, rung) pair(s), **20** present — not the product, because a per-language entry is read against its own language's rungs only. Matching is `check.spelling_matches`: comments, string literals and Verus ghost clauses blanked, then all whitespace deleted.
 
@@ -78,7 +78,7 @@ Measured by the gate, not by this file — from `results/gate/ph53-iface-tail-un
 
 ## What the gate said out loud (reporting only)
 
-From `results/gate/ph53-iface-tail-uninit.json` — the `loud` and `controls_json` keys, at contract `7013be6f7c1c`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above. The run's **verdict** is deliberately not printed here: it is an output of the same gate run that checks this table is current (stage `9c`), and rendering it made the table an input to its own checker — see `read_gate_loud`. Read the verdict from `results/gate/ph53-iface-tail-uninit.json`.
+From `results/gate/ph53-iface-tail-uninit.json` — the `loud` and `controls_json` keys, at contract `c41ffad2b795`. **These did not fail the gate and are not defects**; they are the conditions `check.py` refuses to be silent about. Each one is a caveat on a number below or on the declaration above. The run's **verdict** is deliberately not printed here: it is an output of the same gate run that checks this table is current (stage `9c`), and rendering it made the table an input to its own checker — see `read_gate_loud`. Read the verdict from `results/gate/ph53-iface-tail-uninit.json`.
 
 - **`doc-citation-other`** — 3 line citation(s) into harness modules other than `check.py`. NOT failed: these sit in measurement-hashed files, so re-citing them by function costs a re-measure (RECAP queue item 38). Cite the FUNCTION when one of these files is next re-measured anyway: patterns/ph53-iface-tail-uninit/c/emalloc_shim.h:117 -> build.py:163-165 . patterns/ph53-iface-tail-uninit/c/emalloc_shim.h:133 -> build.py:167 . patterns/ph53-iface-tail-uninit/c/emalloc_shim.h:492 -> build.py:168-171
 - **`idiom-forbidden`** — idiom.forbidden[2] has NOT ONE backticked spelling, so the enforced audit never ranges over it and its share of the 0 hits above is vacuous: A NULL TEST, AN EMPTINESS TEST OR ANY OTHER GUARD INSIDE EITHER CONSUMER'S SCAN LOOP IN EITHER C KERNEL. Upstream added none -- that is the row's headline -- an. Backtick the spelling if it has one (p09 shipped 5 entries and 0 audited spellings; TASK_038_REVIEW) -- and if it has none, because the entry forbids a STRUCTURE rather than a token (p05's 'a running row pointer'), say so in `why`: this line is then permanent and correct, and it is what stops the pattern's `ok` above from reading as enforcement it does not have.

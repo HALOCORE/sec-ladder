@@ -180,15 +180,28 @@ def selftest():
             fails.append(tag)
 
     print('SELFTEST -- the row-scope extension')
-    # N1 MUST-FIRE: the citation that motivated the extension is FOUND and is
-    #    classified row-specific, not inherited.
-    hit = [(d, q) for d, q, _ in rowwarn if 'php41' in q and 'ph53' in d]
-    ck('N1', hit,
-       f'ph53 spec.md/NOTES.md `.temp/php41/...` found as ROW-SPECIFIC: {hit}')
-    # N1b MUST-FIRE: and specifically inside the HASHED spec.md, which is the
-    #     part that costs a re-gate.
-    ck('N1b', any(d.endswith('spec.md') for d, _ in hit),
-       'at least one is in spec.md (hashed), not only NOTES.md')
+    # N1 MUST-FIRE: the CAPABILITY, not a specific instance.
+    # ⚠⚠ ITS FIRST VERSION ASSERTED `ph53`'s `.temp/php41/...` citation IS FOUND
+    #    -- and `TASK_PHP_042` REPAIRED that citation, so the negative that
+    #    proved the defect existed could no longer fire. Same shape as
+    #    `preimage_screen.py`'s finding probe: A DETECTOR FOR A DEFECT AND A
+    #    REGRESSION TEST AGAINST ITS RETURN ARE NOT THE SAME ARTEFACT, and only
+    #    the second belongs in a suite. ▶ Restated as the capability (the scan
+    #    reaches a HASHED `spec.md` at all) plus N1c, the regression test for
+    #    that repair.
+    hashed = [(d, q) for d, q, _ in rowwarn if d.endswith('spec.md')]
+    ck('N1', hashed,
+       f'the scan reaches row `spec.md` contracts: {len(hashed)} row-specific '
+       f'`.temp/` citation(s) inside a HASHED contract, e.g. {hashed[:2]}')
+    # N1b MUST-FIRE: and `NOTES.md` too, or half the surface is unscanned.
+    ck('N1b', [(d, q) for d, q, _ in rowwarn if d.endswith('NOTES.md')],
+       'the scan also reaches row `NOTES.md`, not only `spec.md`')
+    # N1c ⭐ THE REGRESSION TEST for `_042`'s repair (F99 discharged on ph53).
+    #     MUST-NOT-FIRE: if a `ph53` citation ever comes back, this fails.
+    back = [(d, q) for d, q, _ in rowwarn if 'ph53' in d]
+    ck('N1c', not back,
+       f'`ph53` carries NO row-specific `.temp/` citation -- `_042` repaired it '
+       f'and it has not come back: {back}')
     # N2 MUST-FIRE: the shared-block PAT citations are classified INHERITED. If
     #    they were not, the row report would be 3x7 entries of noise and the
     #    real one would be invisible -- which is the failure mode this split

@@ -10,7 +10,7 @@
     "large.bin",
     "small.bin"
   ],
-  "contract_sha256": "7013be6f7c1cb70da7568716e7eef71908fd109332f64cf76cf769ba063a9d97",
+  "contract_sha256": "c41ffad2b795767b221141f4f2332a68a9800eb79c594997ae474d46795dbe80",
   "run_timeout_s": {},
   "expected_hang": [],
   "idiom": {
@@ -190,8 +190,8 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
     "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
-    "patterns/ph53-iface-tail-uninit/NOTES.md": "3da5dfa7425f51f7355a368fc0e165b7b0c494a69278b605ec6381233a112692",
-    "patterns/ph53-iface-tail-uninit/README.md": "d772d5ba5ec8e2407141af335f25cbfaba364d6c8f7c1f0601e0a5c5c2b79f8a",
+    "patterns/ph53-iface-tail-uninit/NOTES.md": "dfe3970f3e1226c426159fc4b9e97c63c1908b9f9eeaebd1f6ad9b25656e98e0",
+    "patterns/ph53-iface-tail-uninit/README.md": "9d4f2fc7b636387cd3808fe666633157c808d1b73c15dc47d964fdf0fc8c8adc",
     "patterns/ph53-iface-tail-uninit/c/emalloc_shim.h": "aa9abf48535e8df93c9398e96c044697a784d73c40d7a7ccc830b5ee308c378f",
     "patterns/ph53-iface-tail-uninit/c/kernel.c": "c79733f78565a0745c405b7899dadd4e38f0167032953e2ad7d00a5659fded28",
     "patterns/ph53-iface-tail-uninit/c/kernel.h": "f679cf57515d9bc0257255a8db1fdb7d04899b03f6ef99ff96a1f718ffda2aa4",
@@ -199,17 +199,21 @@
     "patterns/ph53-iface-tail-uninit/c/main.c": "f3793dd92f05dc036c0bd1d12bcd7e97841d9640fdcfd89e8e126e85ec094ca8",
     "patterns/ph53-iface-tail-uninit/controls/be8daf1f47fa.patch": "42190b44ad8068c3de0c117ad1a22ce67ba791059c8478c55f4ab9b4c54b04f2",
     "patterns/ph53-iface-tail-uninit/controls/d09cdd9f71f3.patch": "4f97b625fc9772d68da84902302fc27febaafcd20d7b8b995a5b68e4c04582ee",
+    "patterns/ph53-iface-tail-uninit/controls/mu_ref.rs": "c78aec3a726da7216a1b349d675c0874cf377b2f7caf0fb59d9fa56572fc0748",
+    "patterns/ph53-iface-tail-uninit/controls/mu_ref_cmp.rs": "5c370939bd7e0a294a936f281d87e6d0ca5fbfd3961f606edd4f991721118cd8",
+    "patterns/ph53-iface-tail-uninit/controls/mu_ref_exec.rs": "cd9751644dc97a8436ac922c10cefc9623c13556d5a327a4f725c02a63d9a896",
     "patterns/ph53-iface-tail-uninit/controls/mu_unwrapped.rs": "779a3b23ef12527b35bca3b1dc2622660b819f53ad0b1f75e5cbf696771edd15",
     "patterns/ph53-iface-tail-uninit/controls/negatives.py": "0a223e8ed0da470ab3235c655a18dc336adaa983b7073d4366a5d9dc5834ffe4",
     "patterns/ph53-iface-tail-uninit/controls/r1h_consumers.py": "99bc18d6e78c8fb5e5736b96e753f7b0b1377938682b187fd4a8cb3e389ddd57",
     "patterns/ph53-iface-tail-uninit/controls/r4_nowitness.rs": "128dee0ec591e561c97c38c5b46cc4807bea63b85e18f897a44a322fe3f35fb8",
+    "patterns/ph53-iface-tail-uninit/controls/spellings.py": "f78d361f8e7b10762d759512822e0c2b8ca030a9d66fce432456a5556a606519",
     "patterns/ph53-iface-tail-uninit/controls/wild_choice.c": "6672f3af1b574471e71f4a8c0887dad7bfead089855adbff46b82eac26ab256f",
     "patterns/ph53-iface-tail-uninit/controls/wild_choice.py": "2a0fb1846ec37806c93460940dfaccdc0174b0010f2efb85dfa302d417a30980",
     "patterns/ph53-iface-tail-uninit/inputs/gen.py": "e5f69d4188acf25e01af86f75d28b9cef95e4811c7789b2eb509d6631346993b",
     "patterns/ph53-iface-tail-uninit/model.py": "eda0731fd52482e758aa43b0f36cef0db49ed33941c9731ba473ea92a51ff549",
     "patterns/ph53-iface-tail-uninit/safe_naive.rs": "ae9d463ab7f08dde6c3c2dc63a5aa2a17ebe0f6c0a8133c63bf776bf5ee1d29a",
     "patterns/ph53-iface-tail-uninit/safe_tuned.rs": "ae6707af5b62a387dd343ae2f11e57e5eb78cc9b6f99b43db8e9252c1650a955",
-    "patterns/ph53-iface-tail-uninit/spec.md": "82cca3ce9cd5ab38601ed8919977ddb1ce4a594ba27fd6c160c166e96d66caa3",
+    "patterns/ph53-iface-tail-uninit/spec.md": "d67240517c729f8103407fe96547405284ca18964ee4913f4820fd3e5d0364be",
     "patterns/ph53-iface-tail-uninit/unsafe.rs": "f509176cc89dbeffbaac6d0b42f4ebc1fb6c56e24d069f3f66678c21ca6878dd",
     "patterns/ph53-iface-tail-uninit/verus.rs": "532d0ca8ccd71a90e01c68bd4191a7cd9dd0cb465bb17ea9a6a36077e7b322b5",
     "verus_run.py": "5d1b8b2446fa14865b546217a6f2bd7c22e9e5b3fa48fb57ea043aa91eb7f766"
@@ -285,9 +289,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3294,
+    "bytes": 3305,
     "nvars": 49,
-    "envp_stack_bytes": 3686,
+    "envp_stack_bytes": 3697,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -1738,20 +1742,22 @@
   },
   "published_table": {
     "table": "results/tables/ph53-iface-tail-uninit.md",
-    "contract_sha256": "7013be6f7c1cb70da7568716e7eef71908fd109332f64cf76cf769ba063a9d97",
+    "contract_sha256": "c41ffad2b795767b221141f4f2332a68a9800eb79c594997ae474d46795dbe80",
     "cited": [
-      "7013be6f7c1c"
+      "c41ffad2b795"
     ],
     "verdict": "FRESH"
   },
   "table_render": {
     "table": "results/tables/ph53-iface-tail-uninit.md",
     "renders_to": "results/tables/ph53-iface-tail-uninit.md",
-    "render_sha256": "3c8f7358331dfa858162c4f5acfba1c96da0da548debdcc47a3f3793f2f64faf",
-    "published_sha256": "3c8f7358331dfa858162c4f5acfba1c96da0da548debdcc47a3f3793f2f64faf",
+    "render_sha256": "f8b30e28f8c0f738abfc1a28d1c49eb0dc503b15af46819c0a42303538d7cbf7",
+    "published_sha256": "f8b30e28f8c0f738abfc1a28d1c49eb0dc503b15af46819c0a42303538d7cbf7",
     "verdict": "FRESH"
   },
-  "controls_json": {},
+  "controls_json": {
+    "spellings.json": "FRESH"
+  },
   "failures": [],
   "notes": [],
   "loud": [

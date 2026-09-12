@@ -71,16 +71,31 @@ search: `−1.253 %` A1. Third row in the corpus where that happens; `NOTES.md`
 | `controls/negatives.py` | four must-fire Verus mutants, TWO must-NOT-fire, four Miri arms, the witness's cost, and a guarded kernel fingerprint |
 | `controls/mu_unwrapped.rs` | ⭐ the obligation **unwrapped** — the same `MaybeUninit` operations with **no trusted item at all**, letting vstd's own spec carry it, 7/0. It is what stands in for `slot_read_unchecked`'s twin, which cannot exist (`NOTES.md` §11.5) |
 | `controls/r4_nowitness.rs` | the faithful unsafe port — **a control, never a rung** |
+| `controls/spellings.py` `.json` | ⭐⭐ **the endpoint search: 20 variants, BOTH endpoints move** — `NOTES.md` §8j. Run it with `--verus` or its R4 column means nothing |
+| `controls/mu_ref.rs` `mu_ref_cmp.rs` `mu_ref_exec.rs` | ⭐ **open item 79 measured** — the `MaybeUninit<&Iface>` representation: the half that verifies (8/0), the half Verus REFUSES, and the exec rung that prices it (+1.79 %). `NOTES.md` §8k |
 | `NOTES.md` | the measurements and the four trusted-item arguments |
 
 ## ⚠ What this row does not have
 
-* **No `controls/spellings.py`.** The R3 and R4 endpoints are **UNSEARCHED**,
-  so every figure in `NOTES.md` §8c is a `fixed-R4 bound` over an unsearched
-  endpoint and must be quoted as one. `ph03`, `ph45` and `ph64` carry the same
-  debt; this row makes it **4 of 7**. ⭐ The named candidate for a cheaper R4 is
-  a **`u32` bitmask witness** — `n_decl ≤ 16` fits in one word — and `NOTES.md`
-  §8e is the number it has to beat.
+* ⭐⭐ **BOTH ENDPOINTS ARE NOW SEARCHED AND BOTH MOVE** (`controls/spellings.py`,
+  20 variants, `NOTES.md` §8j) — so this is no longer a gap, but the published
+  `fixed-R4 bound` **still holds both endpoints fixed BY FIAT**, which is what
+  makes it a bound, and it must be quoted as one. What the search adds:
+  `r3_chunks_mask` is **−32.08 %** against the shipped R3, `r4_bitmask` is
+  **−11.40 %** against the shipped R4, and **the ordering between the two sides
+  REVERSES** — an ordering, never an interval.
+  ⭐ **The cheaper R4 the row itself named and did not build is the one that
+  wins**: the `u32` bitmask witness, twin at 31/0 with two `by (bit_vector)`
+  lemmas and no new trusted item. ⭐⭐ **And `r4_bitmask_min` is cheaper AND has
+  one trusted accessor instead of four** (`external_body` items 3 against 6),
+  twin at 32/0.
+  ⛔ **Two mechanism claims in `NOTES.md` are REFUTED by that work** — §8c's
+  *"R3's scan loops vectorise"* and §8e's *"the reason is lost vectorisation"*.
+  Nothing vectorises inside a scan loop in any rung of this row; §8c and §8e
+  carry the corrections in place.
+* **No claim that the search is exhaustive.** 20 spellings shipped, 4 more priced
+  and dropped, and both of the levers found are LLVM heuristics.
+  `NOTES.md` §8j's closing paragraph lists what was not tried.
 * **No `adversarial-deref.bin`, and there cannot be one.** `check.py` stage 7h
   requires R1h clean on every input in `inputs/`, and the fix does not remove
   the fault, so the input that shows the row's headline would fail the gate.

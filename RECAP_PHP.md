@@ -47,24 +47,24 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 7 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
         ph45 (T1) + ph53 (T3) TYPE. 6 of 20 families. .memory-php/ AUTHORITATIVE.
-NEXT    NOTHING RUNNING. _039 + _040 + _041 ALL LANDED + manager-verified.
-        ▶ `_042` IS WRITTEN AND DISPATCHED: SEARCH ph53's BOTH ENDPOINTS,
-        batching items 80 + 79 + F99's citation into ONE re-gate. ⭐ CHOSEN over
-        item 62 because ph53's R3 came out DEAREST against a prediction of
-        CHEAPEST, and 2 of 2 rows properly searched had a MOVING endpoint.
-⚠ NEW   F96 ROW 7 BUILT, 3 OF 4 PREDICTIONS REFUTED -- R4 landed OUTSIDE BOTH
-        arms of the one that named its own falsifier. F97 ⭐⭐⭐ TWO SOUND GATE
-        RULES ARE JOINTLY UNSATISFIABLE for a MaybeUninit read; 7h FORBIDS the
-        input that shows this row's fault. F98 ⭐⭐⭐ a rung that REPRODUCES
-        cannot be VERIFIED (coverage is ATTACKER DATA), +21.8%.
-        F99 ⛔ item 65 is CORPUS-WIDE: 9 hashed `.temp/` cites, 3 ALREADY GONE.
+NEXT    NOTHING RUNNING. _039..._042 ALL LANDED + manager-verified.
+        ▶ BUILD ROW 8. ⭐ `ph52` IS CHEAPEST: R1h ALREADY SETTLED (F94), and
+        item 76 predicts a `0.00%` R1h column -- the first measurement that the
+        fix for an UNREACHED ERROR PATH IS FREE. ⚠ 33 owed, 14 of 20 families
+        empty, 2.86 tasks/row. ⛔ NOT item 62 (78 may narrow it).
+⚠ NEW   F100 ⭐⭐⭐ ph53's BOTH ENDPOINTS MOVE (2nd row ever), and the R3
+        PREDICTION'S MECHANISM WAS WRONG: nine window bounds checks, 281.8
+        Ir/call, BIGGER THAN THE R3-R4 GAP. `r4_bitmask_min` is CHEAPER *AND*
+        SMALLER-SURFACE -- ⚠⚠ its R4 half UNDECIDED on a pin that spells one
+        thing and argues another (83). ⭐ A1's SPREAD 39.9/45.3pp HERE vs
+        0.000000 ON ph45 (82). F101 kernel_fingerprint PATH-SENSITIVE (81).
 ⚠ WRONG MY F90 REFUTED by F92. F91's probe made TWO scoping errors, the 2nd the
-        one MY OWN F82 forbids. F87 under-attributed (F99). 0 arithmetic.
+        one MY OWN F82 forbids. F87 under-attributed (99) AND over-read (82).
 ⚠ TRAPS `grep -a` ALWAYS (41 corpus files). A PROBE WHOSE SETUP ENCODES THE
         ANSWER is WRONG. A CORRECTION APPENDED LEAVES THE OLD NUMBER (73, x3).
 BAR     C-SIDE ONLY: nothing Rust/Verus/Miri/cost kills a row -- "safe Rust
         can't express it" is F96's POINT. ⚠ .web/ CONCURRENT: NEVER `git add -A`.
-READ    .memory-php/ · PROTOCOL_PHP.md §B1a+§F6+§H1 · F1-F99 · items 1-80.
+READ    .memory-php/ · PROTOCOL_PHP.md §B1a+§F6+§H1 · F1-F101 · items 1-83.
 ```
 
 ---
@@ -240,7 +240,15 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > +21.8 %** ·
 > **F99 ⛔⛔⛔ item 65 is CORPUS-WIDE — 9 `.temp/` citations inside HASHED
 > contracts across 6 of 8 rows, ~90 in `NOTES.md`, and 3 ALREADY GONE; `ph53`
-> is the sixth row to do it and the only one that noticed**
+> is the sixth row to do it and the only one that noticed** ·
+> **F100 ⭐⭐⭐ `ph53`'s BOTH endpoints move; the R3 prediction's MECHANISM was
+> wrong (nine window bounds checks, 281.8 Ir/call, bigger than the whole R3−R4
+> gap); `r4_bitmask_min` is CHEAPER *AND* smaller-surface; and A1's spread is
+> 39.9/45.3 pp here against `0.000000` on `ph45`, so A1 is NOT insensitive to
+> respelling** ·
+> **F101 ⚠⚠ a FOURTH defect in the shared `spellings.py` machinery —
+> `kernel_fingerprint`'s digest is PATH-SENSITIVE, latent here and a LIVE false
+> negative on `ph29`, where byte-identity is a bar**
 >
 > ⚠ **This index stopped at F59 while F60–F65 existed** — `PROTOCOL.md` rule 13,
 > headers rot. **Extend it in the same edit that adds a finding.**
@@ -1539,6 +1547,148 @@ which pins `kernel.c:247` and `hardened:175`, one line each.
 The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
+
+### F101 — ⚠⚠ A **FOURTH** DEFECT IN THE SHARED `spellings.py` MACHINERY: `kernel_fingerprint`'s DIGEST IS **PATH-SENSITIVE**, AND ON `ph29` THAT IS A **LIVE FALSE NEGATIVE**
+
+`TASK_PHP_042` §8. ⚠ **UNREVIEWED** (rule 9). ⛔ **`ph29` was NOT edited** — the
+engineer reported it for routing rather than widening its scope into another
+row's control, which is the third time that call has been made correctly.
+
+**`kernel_fingerprint`'s digest is not comparable across build directories.**
+`r3_oprec_slice` built in two directories whose paths differ by **38
+characters** fingerprints differently. ▶ **So a comparison that should read
+*byte-identical* reads *different*.**
+
+⚠⚠ **LATENT on `ph53` and LIVE on `ph29`, and the difference is what the
+function is used FOR.** On `ph29` byte-identity **is a bar** — F77's
+`r4_fold_iter` is the finding *"verifies byte-identically and is 5.63 pp
+cheaper"*, and byte-identity is what licenses that sentence. ▶ **A
+path-sensitive digest there is a FALSE NEGATIVE on the one property the row's
+headline rests on.**
+
+⭐⭐ **THE PATTERN IS NOW FOUR GENERATIONS DEEP AND IT HAS A LAW.** Item **57**
+(`ph16`, 2 defects, 54 cases missed them) → item **63** (`ph29`'s
+`twin_identical`, 75 cases missed it) → `_037`'s find (128 cases caught it) →
+**this** (161 cases). ▶ ***A control cloned between rows carries its defects,
+and only the row that writes NEW negatives finds them*** — and the suite sizes
+say it is monotone: **54 → 75 → 128 → 161**, each finding what the smaller one
+could not. ⚠ **So the next row's suite should be expected to find a fifth.**
+→ item **81**.
+
+### F100 — ⭐⭐⭐ `ph53`'s **BOTH ENDPOINTS MOVE** (2nd row in either programme), THE R3 PREDICTION'S **MECHANISM** WAS WRONG, AND `r4_bitmask_min` IS **CHEAPER *AND* SMALLER-SURFACE**
+
+`TASK_PHP_042`. ⚠ **UNREVIEWED** (rule 9). ✅ **Manager-verified from
+`results-php/gate/` and `controls/spellings.json`, and SAYING WHICH** (F99's
+lesson): from the **gate record** — `verdict PASS-WITH-BLOCKED-ROWS`,
+`failures []`, `complete_run true`, `contract_sha256 c41ffad2b795`,
+`controls_json {"spellings.json": "FRESH"}`, `identity` `differ`/`differ` as
+pinned; from **`controls/spellings.json`** — `problems []`,
+`r3_endpoint_degenerate false`, `r4_endpoint_degenerate false`, 20 variants.
+**Brackets `66/0` and `16/0`, unmoved, re-run by me. ZERO re-measures** — `git
+status` over the seven measurement-digest row paths is empty, verified.
+
+| side | winner | **A1** | trusted call sites | accessors |
+|---|---|---|---|---|
+| **R3** | **`r3_chunks_mask`** | **−32.08 %** (W1 −28.71 %) | 0 | 0 |
+| **R4** | **`r4_bitmask`** | **−11.40 %** | 10 | 4 |
+| ⭐⭐ **R4** | **`r4_bitmask_min`** | **−3.12 %** | ⭐ **3** (vs **10**) | ⭐ **2** (vs **4**) |
+| the mirror | `r4_win_checked` | **+33.92 %** | 5 | — |
+
+> ### ⚠⚠⚠ THE R4 RESULT CARRIES ONE UNRESOLVED PIN QUESTION, AND THE ENGINEER LED WITH IT
+>
+> Both R4 winners record `required_absent: ["required[4] `wrote[i]`"]`, and the
+> engineer's **first** stated uncertainty is *"whether `required[4]`'s backticked
+> `wrote[i]` pins the witness REPRESENTATION — under that reading the R4
+> endpoint becomes degenerate."*
+>
+> ⛔ **I have READ THE PIN AND IT IS AMBIGUOUS AGAINST ITSELF.** Its backticked
+> spelling is `` `wrote[i]` `` — an indexed **byte array**. Its English says
+> *"THE ONE-BYTE-PER-SLOT WITNESS … it is what makes R4's unsafe read
+> DISCHARGEABLE"* — a **purpose**. ▶ **A `u32` bitmask satisfies the purpose
+> (twins `31/0` and `32/0`) and does NOT carry the spelling.**
+>
+> ▶ **MANAGER'S RULING: BOTH READINGS ARE REPORTED AND NEITHER IS QUIETLY
+> PICKED.** Under the pin's **English**, both endpoints move. Under its
+> **backticked spelling**, and F72's rule that these entries are *"SPELLINGS
+> WITH THE TICKS DROPPED"*, **the R4 endpoint is DEGENERATE.**
+> ⚠⚠ **The defect is in the PIN, not in the variants** — a pin whose spelling
+> and whose English bind different things — and **`required` is presence-only
+> and CANNOT FAIL THE GATE**, so nothing mechanical was ever going to decide it.
+> ⭐⭐ **That is F72 recurring at a new site and open item 56's prediction
+> coming true**: *"a bare-identifier pin is a weak pin, and nothing measures pin
+> quality."* → item **83**. **The R3 result is untouched by any of this.**
+
+⭐⭐⭐ **`r4_bitmask_min` IS CHEAPER *AND* SMALLER-SURFACE AT THE SAME TIME —
+twin `32/0`.** ⚠⚠ **AND IT IS ONLY FREE IN COMBINATION: all four reductions
+that keep the SHIPPED witness are DEARER** (+0.50 / +2.99 / +3.03 / +6.60 %).
+▶ **So *"a smaller trusted surface costs something"* is not a law — it is what
+you measure when you change ONE thing**, and `ph45`'s two dearer reductions
+(+4.07 %, +7.51 %) were that case, not this one.
+
+### ⛔⛔ THE R3 ANSWER: **THE PREDICTION'S MECHANISM WAS WRONG**, not the spelling
+
+The task asked which of two findings this was, and it is unambiguous.
+**`_040` §5.6's spelling IS what shipped** — push-as-you-go, and **both
+predicted deletions happened.** ▶ **The missed term is in the WINDOW READ, not
+the slot representation**: `rd32`/`rd64` index the window **nine times per op
+record**, and LLVM emits nine `cmp <threshold>,%r13 / je <panic>` pairs **before
+the first byte is read** — **281.8 `Ir`/call, 20.3 % of the rung, LARGER THAN
+THE WHOLE `270.7 Ir`/call R3−R4 GAP.** ⭐ **The mirror proves it in the other
+direction: `r4_win_checked` puts those checks back into R4 for `+33.92 %`.**
+
+⛔⛔ **AND IT REFUTES TWO COMMITTED MECHANISM CLAIMS AT INSTRUCTION LEVEL** —
+`ph53`'s `NOTES.md` §8c (*"R3's scan loops vectorise"*) and §8e (*"lost
+vectorisation"*). **R3 has 5 `xmm` and R4 has 23, and NONE executes more than
+once per call.** ✅ **Both struck IN PLACE** (item 73's habit). ⚠ **A fourth
+defect was in the engineer's own docstring, repeating the very mechanism this
+task refutes — found by re-reading its own prose, not by a check.**
+
+### ⭐⭐⭐ AND A RESULT THAT CONTRADICTS `ph45`: **A1's SPREAD IS 39.9 / 45.3 pp HERE, AGAINST `0.000000` THERE**
+
+`a1_spread_pp` = **R3 `39.899657`, R4 `45.313019`.** ⛔ **F87's headline on
+`ph45` was that A1's spread over nine searched variants was `0.000000` pp
+against `66.7` pp whole-program** — *"A1 does not move"*.
+▶ ⭐⭐ **SO A1 IS NOT INSENSITIVE TO RESPELLING. It was insensitive ON `ph45`,
+for a row-specific reason, and `ph45`'s contrast was a property of that row and
+not of the statistic.** ⚠⚠ **That matters beyond this row**: F91's regime
+argument is that A resolves small code differences *because* it is symbol-scoped
+— and here A resolves respellings to **40 pp**, which is the same property
+working, **while F87 read the same property as A being blind.** → item **82**.
+
+### ⭐ ITEM 79, MEASURED — and three of its four supports fall
+
+`+1.79 %` A1, **shipped checksum on all seven inputs**. ▶ **It drops the
+compare-only consumer, and ON THE VERUS SIDE ONLY.** Of `_041` §8.12's four
+stated supports: **`ptr::eq` DOES express it on the exec side**; the comparison
+**IS** specified (`vstd/raw_ptr.rs:221`, with a probe verifying against its
+`ensures`), and **what Verus refuses is the `&T → *const T` COERCION in both
+spellings**; and *"zero trusted items"* **is reachable only in a control.**
+✅ **Shipped as three arms** — `mu_ref_exec.rs` (cost), `mu_ref.rs` (**8/0**,
+the `p < MAXP` obligation gone) and `mu_ref_cmp.rs` (a **must-FIRE** refusal,
+and it fires). ⭐⭐ **So F97's *"two sound gate rules are jointly unsatisfiable"*
+is now a MEASURED FLOOR rather than an argument: ONE trusted accessor is
+reachable on either representation and ZERO is reachable only in a control.**
+
+### ⚠ THREE MORE THINGS IT MEASURED THAT ARE NOT ABOUT THIS ROW
+
+1. ⚠⚠ **OPEN ITEM 61's COUNT PREDATES `ph53`: it is 4 OF 8, NOT 3 OF 6.**
+   Measured over all eight php `spec.md`s: `O3` is `exact` on `ph00`/`ph03`/
+   `ph16`/`ph29`, **`norel` on `ph07`**, **`differ` on `ph45`/`ph53`/`ph64`.**
+   ⭐ **And `ph53`'s search was WIDER for exactly that reason** — an R4 candidate
+   here need only **verify**, which is what let nine twins in. **Item 61's
+   sentence is now false on half the corpus.**
+2. ⭐ **`_037`'s `#[inline(always)]` RULING HAS A SECOND DATA POINT AND IT POINTS
+   THE OTHER WAY**: `+0.09 %` and `0.00 %` here, against `ph45`'s **40 pp**.
+   ✅ **The ruling stands** — it was decided on corpus precedent (98 shipped
+   files), not on the size of the effect. ⚠ **But its STAKES were row-specific**,
+   and `_037` said *"a ruling against would have withdrawn result 1"*. **On this
+   row it would have withdrawn nothing.**
+3. ⭐ **`report.py::shout_section`'s mechanism confirmed on a second row**: a
+   `controls_json` entry prints a line only when its value is **not** `FRESH`,
+   so a STALE sidecar **adds** a line and a FRESH one adds none — which is why
+   the documented chain is **sidecar → gate → `report.py` → gate** and why one
+   final round sufficed after a docstring-only edit. **That prediction was made
+   before the run and held.**
 
 ### F99 — ⛔⛔⛔ ITEM 65 IS **CORPUS-WIDE AND STRUCTURAL**: **9 `.temp/` CITATIONS INSIDE HASHED CONTRACTS, 6 OF 8 ROWS, AND 3 ALREADY GONE**
 
@@ -5121,7 +5271,7 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 ## Open items — carried, not closed
 
 ⚠ **THE NUMBERS HAVE GAPS AND THAT IS CORRECT — DO NOT "REPAIR" THEM.**
-**77 rows present, numbered 1 → 80, with 45–47 REMOVED ENTIRELY** and
+**80 rows present, numbered 1 → 83, with 45–47 REMOVED ENTIRELY** and
 **4, 7, 10, 12, 18–25, 27, 31 and 48 retired IN PLACE as `~~N~~`**; no number is
 ever reused. ⚠ **Two conventions coexist on purpose** — a retirement whose
 *reasoning* is worth keeping stays as a struck row, and one whose successor
@@ -5217,10 +5367,10 @@ the wrong one.
 | ~~55~~ | ✅✅ **DISCHARGED 2026-09-12 — `PROTOCOL_PHP.md` §H1.** ⛔ **Its headline was FALSE**: *"the rule is real and cheap to state and there is **nowhere cheap to state it**"* — there is, and it is the file the item's own candidate list names. **See item 54 for the measurement.** ⭐ **And §H was not merely *a* candidate home — it is the home whose stated purpose this rule instantiates**: in `forbidden` a backticked character literal is **a ban that CANNOT FIRE**, which is §H's exact target. ⚠ **The php-only SCOPE objection stands and is ACCEPTED rather than solved**, with the condition that would move it: reach is **0 of 33 PAT**, so nothing is owed a PAT author today, and `charlit_reach.py` is the check that would say otherwise. **The original text:** | ⚠⚠ **F73'S WRITING RULE — ORIGINAL FRAMING** | F73. The natural place is the **named-spelling standard**, but that paragraph lives **inside every pattern's `why`, i.e. inside `contract_sha256`**, and it is byte-identical across six patterns — so writing one sentence into it costs a **six-row re-gate on the PHP side and 33 on PAT**. ⚠ The rule is real and cheap to state and there is **nowhere cheap to state it**. Candidate homes, none chosen: `PROTOCOL_PHP.md` §H (php-only, so PAT authors never see it); `.memory-php/` (authoritative but php-only, and needs review first); a `harness/` docstring (**forbidden — hashed**). ⭐ **The general shape is worth more than this instance**: a convention that binds BOTH programmes has no unhashed shared surface, which is why `CLAUDE.md`'s top table exists and why it keeps growing |
 | 56 | ⚠ **A BARE-IDENTIFIER PIN IS A WEAK PIN, AND NOTHING MEASURES PIN QUALITY** | F72. `ph29`'s `required[3].rust` is `real_size`, which occurs **3–7 times per rung** — it pins *"this name occurs"*, not a construction. Compare `.wrapping_add(1)` and `emalloc(to_read + 1)`, which pin **exactly one line per rung**. ⚠ `idiom_audit` reports `pins_nothing` and `absent` but has **no notion of how tightly a present pin binds**, so a one-line pin and a seven-hit identifier are indistinguishable in the record. ✅ **Not a defect in `ph29`** — the entry's English carries the §B1.3 argument and the pin is honest; `TASK_PHP_033` is told explicitly not to strengthen it. ▶ Open: is hit-count-per-rung worth reporting beside each present pin, and **would it be a number nobody acts on** — the exact trap `idiom_audit`'s own docstring records about the printed `2` that moved nothing for three tasks |
 | 57 | ⚠⚠ **`ph16`'s `controls/spellings.py` CARRIES TWO REAL DEFECTS, BOTH LATENT, AND FIXING THEM COSTS A `ph16` RE-GATE** | F79, `_035`, found by its own §H negatives and **guarded in `ph29`'s copy only**. (a) ⭐ **`kernel_fingerprint` returns `(0, 'd41d8cd98f00')` — the md5 of the EMPTY STRING — for a binary that does not exist**, because `disasm` ignores `objdump`'s return code, **so two missing binaries compare EQUAL on the one function whose job is to decide byte-identity.** (b) `disasm`'s needle is a **bare substring**, so a crate named `nokernel` fingerprints its own `main`. ✅ **Latent, not live, on `ph16`** — every call site there is downstream of a build whose success is checked — which is why `_035` correctly left it alone rather than widening its scope. ⚠ `controls/*.py` is in `source_sha256`, so the fix **costs a `ph16` re-gate**; batch it with any other `ph16` work. ⭐ **The general shape: a control cloned between rows carries its defects with it, and only the row that writes NEW negatives finds them** — `ph16`'s suite was 54 cases and did not catch these; `ph29`'s 75 did |
-| 58 | ⚠⚠ **THREE OF SIX BUILT ROWS HAVE AN UNSEARCHED R4 ENDPOINT, AND F77 JUST PROVED THAT MATTERS** | `ph03`, `ph64` and now `ph45` (F80). ⚠ Until `TASK_PHP_035` this debt looked cosmetic, because `ph07` and `ph16` both searched their R4 side and found it **degenerate**. ⭐⭐ **F77 killed that reading**: `ph29`'s `r4_fold_iter` verifies byte-identically and is **5.63 pp cheaper**, so a `fixed-R4 bound` over an *unsearched* endpoint is a bound over a number nobody has tried to move. ▶ **`ph45` is the cheapest of the three to search** (its `spellings.py` was never built, so there is no declaration repair to do first) and `ph03` is the oldest. ✅ **`ph45` WAS SEARCHED at `_037` (F87) and BOTH its endpoints moved.** ⚠⚠ **But the debt did not shrink: `ph53` shipped without a `spellings.py` too.** ▶ **Item 80 supersedes this line for the count and the ordering.** ⚠ Each costs a re-gate; **batch each row's owed prose fixes into the same run** — the lesson `TASK_PHP_033.md` learned by failing to |
+| 58 | ⚠⚠ **THREE OF SIX BUILT ROWS HAVE AN UNSEARCHED R4 ENDPOINT, AND F77 JUST PROVED THAT MATTERS** | `ph03`, `ph64` and now `ph45` (F80). ⚠ Until `TASK_PHP_035` this debt looked cosmetic, because `ph07` and `ph16` both searched their R4 side and found it **degenerate**. ⭐⭐ **F77 killed that reading**: `ph29`'s `r4_fold_iter` verifies byte-identically and is **5.63 pp cheaper**, so a `fixed-R4 bound` over an *unsearched* endpoint is a bound over a number nobody has tried to move. ▶ **`ph45` is the cheapest of the three to search** (its `spellings.py` was never built, so there is no declaration repair to do first) and `ph03` is the oldest. ✅ **`ph45` WAS SEARCHED at `_037` (F87) and BOTH its endpoints moved.** ⚠⚠ **But the debt did not shrink: `ph53` shipped without a `spellings.py` too.** ▶ ✅ **`ph53` WAS SEARCHED at `_042` and BOTH its endpoints move (F100), so the residue is now `ph03` and `ph64` — and 3 of 3 rows properly searched had a moving endpoint.** Item 80 carries the detail. ⚠ Each costs a re-gate; **batch each row's owed prose fixes into the same run** — the lesson `TASK_PHP_033.md` learned by failing to |
 | 59 | ⚠ **A SIGNED OVERFLOW AT `mbfilter_htmlent.c:193`, IN `ph45`'s OWN FUNCTION, UNTRACED TO ANY FIX** | F80, `_036`'s own find, **reported and not pursued** — the right call, since chasing it was outside a build task's scope. ⚠ It is **inside the function `ph45` extracts**, so it is not merely adjacent: the row's benign corpus must be shown not to evaluate it (F46's UB-free-trigger rule), and `_036` does not say whether that was checked. ▶ ✅✅ **ASKED AND ANSWERED — AT `TASK_PHP_037` §4, AND THE ITEM NEVER RECORDED THAT IT WAS CLOSED.** ⛔ **`inputs/gen.py` neither edited nor run** (`sys.dont_write_bytecode` set before import; all eight blobs re-hashed before and after, none moved). **TWO independent decoders sharing no constant**, agreeing on values, entity tables and `html_entity_chars`. ⭐⭐ **And decoder B tracks the accumulator in unbounded integers AND wrapped 32-bit SIMULTANEOUSLY — identical on both inputs**, which is the **direct** statement that `:193` never overflowed, **not an inference from a margin.** ⭐⭐⭐ **THE SENTENCE THAT MUST BE LANDED, because the margin alone reads as *"it cannot happen"*: the guard is NOT VACUOUS A PRIORI — the `buffull` arm permits a 13-DIGIT numeric body, `~7.4e12`, THREE ORDERS OF MAGNITUDE ABOVE `INT_MAX`. ▶ So `:193` CAN overflow; what keeps this corpus safe is the TOKEN GRAMMAR, not the arm bound.** ⓘ Manager re-read `:193` in the pristine tarball independently (`ent = ent*10 + (buffer[pos] - '0')`, no cap inside the loop) — a third confirmation. ▶ **OWED: PROSE ONLY.** `NOTES.md` is in the gate digest and **not** the measurement digest, so landing it costs **one `ph45` re-gate and no re-measure** — **batch with items 63 and 65.** **The original ask:** ⓘ Distinct from the **stack OOB write at `:123`** in the *encode* half (F75), which is also uncatalogued and which the row deliberately does not lift |
 | 60 | ⚠ **`harness/check.py`'s NULL-CONTROL TABLE JUSTIFIES ITS WORST CELL WITH BYTE-IDENTITY THAT THE ROW'S OWN PIN DENIES — PAT-SIDE, FOR ROUTING** | F82. The docstring is **more careful than my probe was** — it corrects the table for **mode**, **opt level** and **input**, and warns *⚠⚠⚠ A NULL IS A PROPERTY OF A CELL. DO NOT MAX IT OVER MODE, OVER LEVEL, OR OVER INPUT.* ⚠ It does not correct for the **identity level**: its worst quoted cell, **`p25 large +269.52`**, is on the row pinned `` `O0: norel`, `O3: norel` ``, while the table is justified by *"`identity` forces R4's and R5's kernels to agree byte for byte."* ✅ **The number is RIGHT and the justification is WRONG** — p25 rescues it by a different route its own identity note records (189 non-pad instructions and identical byte count in both cells). ⚠⚠ **`harness/` is FROZEN**: one sentence costs a 33-pattern re-gate, and `results/SYNTHESIS.md` is the PAT-side authority, not this file. ▶ **Reported, NOT fixed.** ⭐ The general shape is the same as F82's own: **a correct number whose stated reason is false survives every check, because checks test numbers** ⭐⭐ **AND F84 SUPPLIES THE MISSING MECHANISM FOR THE TABLE'S LARGEST CLASS.** That docstring records *"1.00 ≤ |null| < 2 in 35 cells, **34 of them exactly −1.00**"* without explaining the `−1.00`. ⛔ **I answered it wrongly and `TASK_PHP_038` §4.2 supplied the real one: it is exactly ONE INSTRUCTION PER KERNEL CALL IN `main`** — `main_exclusive_ir` Δ/n = **−1.0000** on `ph00` and `p11`, **already in every committed measurement record and needing no callgrind at all.** ⭐ **So the mechanism for `check.py`'s largest documented class IS now on file, just not the one I proposed** — and the routing item stands unchanged, since `harness/` is frozen either way |
-| 61 | ⚠⚠⚠ **THE SHARED `why` BLOCK ARGUES R4 ADMISSIBILITY FROM AN ANTECEDENT THAT IS FALSE ON THREE OF SIX PHP ROWS** | F82. The block — **byte-identical across all six PHP rows and all 33 PAT rows** — says *"All six patterns pin `identity: unsafe == verus, O3 exact`, so an R4 is not merely a program that MAY use `unsafe`: it is a program that must have a byte-identical R5 twin that Verus verifies."* ⚠ **`ph07` pins `norel`, `ph45` and `ph64` pin `differ`.** It is **PAT-side boilerplate carried into a programme where it does not hold**, and it is the step by which `.memory/01-ladder.md` disqualifies unverifiable R4 candidates — so on those three rows **that disqualification has no stated basis**. ⚠⚠⚠ **AND `TASK_PHP_037` MEASURED THE STRONGER FORM: the wider bar is NECESSARY here, not merely permitted. NO twin on `ph45` compiles byte-identically — INCLUDING THE SHIPPED RUNG'S OWN (318 instructions against 320) — so under the shared block's own admissibility argument THIS ROW HAS NO ADMISSIBLE R4, NOT EVEN THE ONE IT SHIPS.** My task file said *"need NOT"* (permission) and that understated it. ▶ An R4 candidate on `ph45`/`ph64`/`ph07` need only **verify**; their searches are **wider than `ph29`'s** and F77's method is not the binding constraint — **F87 result 1 is a direct consequence.** ⚠ Fixing the sentence is a **six-row PHP re-gate** (it is inside `contract_sha256`) — ✅ **and THAT HALF IS CONFIRMED: `idiom.why` really is in the contract, measured at 15 028 B on `ph64`.** ⛔ **But item 55's *"no unhashed shared home"* is WITHDRAWN — `PROTOCOL_PHP.md` is in no digest at all** (item 54), so **one** of the two surfaces is free and one is not, and `STATISTICS_001 §6` collapsed them into one false sentence. ⭐⭐ **AND F91 GIVES THESE ROWS A SECOND, INDEPENDENT CONSEQUENCE: they also have NO NULL CONTROL.** `ph45` and `ph64` fail F82's `Δnopad == 0 and Δbytes == 0` predicate at **every** cell, so the frozen harness's *"compare against that pattern's OWN R5 − R4 null before quoting it in a band"* **cannot be satisfied on them** — and **`ph64` is the one row whose headline is family B.** ⚠⚠ **THE COUNT DIFFERS BY PREDICATE AND BOTH ARE RIGHT: THIS ITEM'S ADMISSIBILITY ARGUMENT TURNS ON BYTE-IDENTITY, SO IT IS THREE ROWS (`ph07` `norel`); THE MEASUREMENT QUESTION TURNS ON THE COUNTS, SO IT IS TWO (`ph07` IS RESCUED).** ⛔ **Do not "reconcile" them** |
+| 61 | ⚠⚠⚠ **THE SHARED `why` BLOCK ARGUES R4 ADMISSIBILITY FROM AN ANTECEDENT THAT IS FALSE ON THREE OF SIX PHP ROWS** | F82. The block — **byte-identical across all six PHP rows and all 33 PAT rows** — says *"All six patterns pin `identity: unsafe == verus, O3 exact`, so an R4 is not merely a program that MAY use `unsafe`: it is a program that must have a byte-identical R5 twin that Verus verifies."* ⚠ **`ph07` pins `norel`, `ph45` and `ph64` pin `differ`.** It is **PAT-side boilerplate carried into a programme where it does not hold**, and it is the step by which `.memory/01-ladder.md` disqualifies unverifiable R4 candidates — so on those three rows **that disqualification has no stated basis**. ⚠⚠⚠ **AND `TASK_PHP_037` MEASURED THE STRONGER FORM: the wider bar is NECESSARY here, not merely permitted. NO twin on `ph45` compiles byte-identically — INCLUDING THE SHIPPED RUNG'S OWN (318 instructions against 320) — so under the shared block's own admissibility argument THIS ROW HAS NO ADMISSIBLE R4, NOT EVEN THE ONE IT SHIPS.** My task file said *"need NOT"* (permission) and that understated it. ▶ An R4 candidate on `ph45`/`ph64`/`ph07` need only **verify**; their searches are **wider than `ph29`'s** and F77's method is not the binding constraint — **F87 result 1 is a direct consequence.** ⚠ Fixing the sentence is a **six-row PHP re-gate** (it is inside `contract_sha256`) — ✅ **and THAT HALF IS CONFIRMED: `idiom.why` really is in the contract, measured at 15 028 B on `ph64`.** ⛔ **But item 55's *"no unhashed shared home"* is WITHDRAWN — `PROTOCOL_PHP.md` is in no digest at all** (item 54), so **one** of the two surfaces is free and one is not, and `STATISTICS_001 §6` collapsed them into one false sentence. ⭐⭐ **AND F91 GIVES THESE ROWS A SECOND, INDEPENDENT CONSEQUENCE: they also have NO NULL CONTROL.** `ph45` and `ph64` fail F82's `Δnopad == 0 and Δbytes == 0` predicate at **every** cell, so the frozen harness's *"compare against that pattern's OWN R5 − R4 null before quoting it in a band"* **cannot be satisfied on them** — and **`ph64` is the one row whose headline is family B.** ⚠⚠⚠ **AND THE COUNT PREDATES `ph53`: IT IS 4 OF 8, NOT 3 OF 6** (`TASK_PHP_042` §7.3, measured over all eight php `spec.md`s) — `O3` is `exact` on `ph00`/`ph03`/`ph16`/`ph29`, `norel` on `ph07`, **`differ` on `ph45`, `ph53` AND `ph64`.** ▶ **So the shared block's antecedent is now false on HALF the corpus**, and ⭐ **`ph53`'s search was WIDER for exactly that reason** — an R4 candidate there need only **verify**, which is what let nine twins in. ⚠⚠ **THE COUNT DIFFERS BY PREDICATE AND BOTH ARE RIGHT: THIS ITEM'S ADMISSIBILITY ARGUMENT TURNS ON BYTE-IDENTITY, SO IT IS THREE ROWS (`ph07` `norel`); THE MEASUREMENT QUESTION TURNS ON THE COUNTS, SO IT IS TWO (`ph07` IS RESCUED).** ⛔ **Do not "reconcile" them** |
 | 62 | ⭐⭐ **FAMILY C — `kernel` INCLUSIVE `Ir` — STRICTLY DOMINATES FAMILY B AND IS NOT BUILT** | F83, `.temp/mgr172/inclusive_ir.py`. `callgrind_annotate --inclusive=yes` is in the **pinned** valgrind 3.27.1, so the kernel's whole **call tree** is computable **from ONE run** and **without touching frozen code** — `measure.py::callgrind_ir` records exclusive only, for two needles. ✅ **Same coverage as B with one fewer error source**: on `p25/large` B carries **+101.65 `Ir`/call** that C does not, and on `ph03` the two agree to **0.03 %** and **exactly**. ⚠⚠ **It solves NOTHING about attribution** — the allocator work *is* in the call tree, so C includes it and reads B's number; **I drafted the opposite claim and had to retract it inside the same finding.** ▶ Buildable as a **php-side control**: six PAT patterns' `controls/` already call `objdump` directly, so one calling `callgrind_annotate` is the same shape, and `controls/*.py` costs **one gate re-run and no re-measure**. ⚠ **Its own null must be measured before it is believed** — C is *attributable*, not *clean*. ⚠ Not started; `TASK_PHP_037` has since landed, so the one-agent slot is FREE. ⭐⭐⭐ **RE-SCOPED AGAIN, 2026-09-12, AND THIS TIME BACK TO THE REVIEWER'S RULING: `TASK_PHP_039` (F92) ANSWERS ITEM 68 **NO**, so F90's re-scoping is WITHDRAWN and `_038` §6's decision STANDS — C IS THE PRECONDITION.** ⭐ **And `_039` §12.4 adds POSITIVE evidence for C that nothing had**: F85's family C reads **+14.554** on `ph29/small` `c-gcc` vs `safe_naive` against `_039`'s 6400-iteration **grand B of +14.319 ± 0.15** — **agreement to 0.235 pp, from ONE run**, against the 22× cost of a pin that would match it. ⚠⚠ **BUT TEST TWO THINGS FIRST, AND THE SECOND IS NEW (F91).** (i) **its own NULL**, as this item already demanded; (ii) ⛔⛔ **its own SENSITIVITY** — F91 measured family B's on the cells where the R4/R5 kernels differ by a **known** static count and found `|B/A|` **49.6–393.9×** in the small-Δ regime. **C's is UNMEASURED, and the prediction is that it FAILS THE SAME REGIME**: on `ph03/small`, a **byte-identical** pair, C reads `+265.924` against B's `+266.000`. ▶ **If C also loses a 2-instruction difference, then C is the right SECOND column cross-language and NOT a substitute for A same-language — which is F91's axis, and it would make this item's deliverable narrower and cheaper.** ⓘ **The null alone is one-sided (F82); measure both in one go.** ⭐⭐ **AND F85 ALREADY USED C FOR REAL**: it re-derived `ph29`'s cross-language flips against C on the strength of `inclusive_ir.py` alone, which is the argument for building it properly rather than re-running a probe per question ⚠⚠⚠ **AND `TASK_PHP_038` §6 RULES IT A PRECONDITION, NOT A NICE-TO-HAVE**: its decision is *publish both, and the second column MUST BE C* — **drop W1 as corroboration**, because §1.3 measured that C and W1 are **nested scopes of ONE run** separated by a language-dependent fixed term of **≈176 k `Ir`**, so quoting them as independent was wrong. ▶ **And family B is now disqualified TWICE OVER** — F84 (it misses real work) and F88 (it is one unstable draw). **So C is the only admissible second column, and it is the one thing not built.** ⚠⚠⚠ **RE-SCOPED BY F90, WHICH DISAGREES WITH THAT RULING: of the four families B is the ONLY one with no DEFINITIONAL gap** — A is blind to callees, C is blind to `main` (the `−1.00` class proves it), W1 carries a ≈176 k `Ir` language-dependent fixed term, and **B's flaw is `probe_iters`, a parameter.** ▶ **C is still worth building — it is the only *attributable* column that sees callees, and it is what adjudicated F85 — but it is NO LONGER the answer to B's instability. Try item 68 FIRST.** ⚠ Also owed by that decision: **name `probe_iters` in the label** of any B figure that survives, since F88 makes the draw part of the number's identity |
 | 63 | ⚠⚠ **A THIRD DEFECT IN THE SHARED `spellings.py` MACHINERY, LATENT IN `ph29`, AND F79's TWO FIXES DO NOT COVER IT** | F87, `TASK_PHP_037` §6.2, found by its **128-case** §H suite (`ph29`'s bar was 75). ⚠ **`twin_identical` still compares two `(0, md5(""))` rows EQUAL** — F79 guarded `kernel_fingerprint` and `disasm`'s needle but **not this**, so the same *"two missing binaries are byte-identical"* hole survives at a second call site, in the one function whose whole job is to decide byte-identity. ✅ **Latent on `ph29`** (its call sites are downstream of a checked build), and **`_037` correctly declined to widen its scope into another row's control.** ⚠ Costs a `ph29` re-gate → **batch with open item 56** (`ph29`'s weak bare-identifier pin), the only other `ph29` prose debt. ⭐ **The shape is item 57's exactly, one generation on: a control cloned between rows carries its defects, and only the row that writes NEW negatives finds them** — 54 cases missed two, 75 missed one, **128 found it** |
 | 64 | ⚠⚠ **`ph07`'s AND `ph03`'s CROSS-LANGUAGE FLIPS ARE NOT RE-DERIVED AGAINST FAMILY C** | F85. ✅ `ph29`'s five flips **survive** C and W1 — three statistics agreeing to ~2 pp against A — and its two non-flipping controls agree across **all four** families, **so the `ph29` half is settled.** ⚠ `ph07` (6 flips) and `ph03` (6) are still measured **against family B only**, and F84 showed B confounded in both directions by up to ~266 `Ir`/call. **The mechanism is the same and `ph29` makes it likely, which is exactly why it must be measured rather than assumed** (F78's lesson). ▶ **Cheap**: their binaries are on disk and md5-verified, and `.temp/mgr172/sweep_cg.sh` is the single regeneration entry point — add four C cells per row. ✅✅ **DISCHARGED at `TASK_PHP_038` §1.1, AND IT WENT FURTHER THAN THE ITEM ASKED: all 29 cross-language flips are now adjudicated against family C, not the 12 the manager had. `ph03` 6/6, `ph07` 6/6, `ph29` 16/16 SURVIVE; `ph00` 0/1 is REFUTED by C — so 28 of 29 survive.** ⭐ **The reviewer's OWN prediction that `ph03`'s would fail was refuted — C tracks B there to 0.006 pp.** ⚠ And it corrected the count: **29, not 28**, which the draft's own *"remaining 9"* already implied. ▶ **Quote F85 as *"29 of 38 flips are cross-language and 28 of 29 survive family C"*.** ⓘ `ph45` was excluded from both sweeps because it was being rebuilt; that is the only cell of the 38 still unadjudicated |
@@ -5238,5 +5388,8 @@ the wrong one.
 | 76 | ⭐ **`ph52`'s R1h COLUMN IS PREDICTED `0.00 %`, AND THAT IS A RESULT, NOT A DISQUALIFICATION** | F94. Its R1h deletes one `zval_dtor` from an **error arm the benign corpus never runs**, so R1h should price **identically to R1** on every benign input — where `ph53`'s R1h costs an **O(n) `memset` on the benign path.** ⚠⚠ **The temptation is to read a `0.00 %` R1h column as *"the row measures nothing"* and drop the row. ⛔ THAT IS THE ADMISSION-BAR BIAS** (`CLAUDE.md` rule 6, finding 53): *"no column moves"* is a **FINDING, NEVER A KILL.** ▶ ⭐ **What it actually says is worth publishing: the upstream fix for a whole CLASS of defect — the unreached error path — is FREE, and the ladder can say so with a number.** ⓘ **UNTESTED**, and it is a *prediction* by the engineer, labelled as one. It becomes measurable the moment either row is built, so **batch the check with whichever is built second** |
 | 77 | ⚠⚠ **A ROW WHOSE UPSTREAM FIX DOES NOT REMOVE THE FAULT CANNOT SHIP THE INPUT THAT DEMONSTRATES IT — AND THIS WILL RECUR** | F97(A), `TASK_PHP_041` §4. Stage **7h** requires **R1h clean on every input in `inputs/`**, and `ph53`'s R1h converts a wild dereference into a **NULL** one rather than removing it. ▶ **So there can be no `adversarial-deref.bin`, and there is not one.** ⭐ **`.memory-php/02-ladder.md`'s F31 binding on a real row for the FIRST time**, and the resolution F31 prescribes — put the demonstration in `controls/` — is the one taken (`controls/r1h_consumers.py`, corroborated by the gate's own `sanitizer_hardened.fired = False ×7`). ▶ **Open: is `controls/` the RIGHT home, or does stage 7h want a declared exemption?** ⚠ A `controls/` demonstration is **not in the published table and not in the gate's verdict**, so a reader of `results-php/tables/` cannot see the row's own fault. ⓘ **Any future row with a `d09cdd9f71f3`-shaped R1h hits this**, and F94 says that shape is not rare — an optimisation or a rewrite that closes a window without guarding the consumer |
 | 78 | ⭐⭐ **F91's AXIS MAY BE A PROXY: THE REAL ONE COULD BE *DOES THE CALLEE WORK DIVERGE*, NOT *DOES THE COMPARISON CROSS A LANGUAGE*** | F96 result 2, `TASK_PHP_041` `NOTES.md` §8h. **A and B agree in sign and closely in magnitude on EVERY cross-language cell of `ph53`** — the opposite of F85's regime — **and the stated reason is that §B1a's O(1)-allocation precondition HOLDS on this row, so there is no allocator term for B to include and A to miss.** ▶ ⭐ **If that is the mechanism, then F91's *same-language vs cross-language* axis is a PROXY for *callee work diverges vs does not*, and language is merely correlated with it** — which would make the rule **testable per row** instead of assumed per comparison. ⚠⚠ **This is evidence about ONE row and the engineer says so in those words**; F85's 29 flips are on rows where the C rung allocates and the Rust rungs do not. ▶ **The test: a row where the callee work diverges WITHIN a language.** ⓘ **If it holds, item 72's narrowing gets sharper and cheaper**: the condition becomes measurable rather than declared |
-| 79 | ⚠ **A `MaybeUninit<&Iface>` REPRESENTATION VERIFIES AT 5/0 WITH ZERO TRUSTED ITEMS, AND IT WAS REJECTED UNMEASURED** | F98, `TASK_PHP_041` §8. The shipped R4/R5 carry **four** trusted accessors; this alternative carries **none** — *5 verified / 0 errors with zero trusted items* — and was rejected because **the compare-only consumer needs `ptr::eq`**, ⚠ **without measuring it.** ✅ **The rejection is honest and probably right** (the row ships both consumers on purpose, F96 result 1). ▶ **But a representation with NO TRUSTED BASE AT ALL is worth a number even if it can only serve one consumer** — the ladder's whole point is that the trusted surface is a measured axis, and **this is the first row where a zero-trusted-item R5 was in reach.** ⓘ Cheap: the file verifies already; what is missing is its cost and a statement of which consumer it drops |
-| 80 | ⚠ **BOTH ENDPOINTS UNSEARCHED ON `ph53`, WHICH MAKES IT 3 OF 7 ROWS** | `TASK_PHP_041` §8: **no `controls/spellings.py` was built.** ⭐⭐ **This is item 58's residue GROWING, and F77/F87 are why it matters**: `ph29`'s R4 endpoint moved **5.63 pp** byte-identically, and `ph45`'s R4 **AND** R3 both moved with the bound's **sign reversing** — so a `fixed-R4 bound` over an unsearched endpoint is a bound over a number nobody has tried to move. ▶ **Unsearched now: `ph03`, `ph64`, `ph53`**; `ph07`/`ph16` searched theirs and found them degenerate; `ph29`/`ph45` moved. ⚠ **`ph53` is the cheapest of the three** (fresh, and its `controls/` machinery is the newest and already carries items 57/63's fixes) **and it is the one whose predictions were most wrong** — **R3 came out dearest-but-one against a prediction of cheapest**, which is exactly the signal that a search would move something. ⓘ Costs a `ph53` re-gate — ⭐ **batch with item 79's measurement and F99's citation repair, all three being `ph53` debt** |
+| ~~79~~ | ✅✅ **MEASURED AT `TASK_PHP_042` (F100), AND THREE OF ITS FOUR SUPPORTS FELL.** `+1.79 %` A1, **shipped checksum on all seven inputs**, and it drops the compare-only consumer **on the Verus side only**. ⛔ `ptr::eq` **does** express it on the exec side; the comparison **is** specified (`vstd/raw_ptr.rs:221`, probe verifying against its `ensures`) and what Verus refuses is the **`&T → *const T` coercion in BOTH spellings**; and *"zero trusted items"* is **reachable only in a control**. ✅ Shipped as three arms — `mu_ref_exec.rs` (cost), `mu_ref.rs` (`8/0`, the `p < MAXP` obligation gone), `mu_ref_cmp.rs` (a **must-FIRE** refusal that fires). ⭐⭐ **So F97's *two sound rules are jointly unsatisfiable* is now a MEASURED FLOOR: ONE trusted accessor is reachable on either representation, ZERO only in a control.** **The original text:** | ⚠ **A `MaybeUninit<&Iface>` REPRESENTATION — ORIGINAL FRAMING** | F98, `TASK_PHP_041` §8. The shipped R4/R5 carry **four** trusted accessors; this alternative carries **none** — *5 verified / 0 errors with zero trusted items* — and was rejected because **the compare-only consumer needs `ptr::eq`**, ⚠ **without measuring it.** ✅ **The rejection is honest and probably right** (the row ships both consumers on purpose, F96 result 1). ▶ **But a representation with NO TRUSTED BASE AT ALL is worth a number even if it can only serve one consumer** — the ladder's whole point is that the trusted surface is a measured axis, and **this is the first row where a zero-trusted-item R5 was in reach.** ⓘ Cheap: the file verifies already; what is missing is its cost and a statement of which consumer it drops |
+| ~~80~~ | ✅✅ **DISCHARGED AT `TASK_PHP_042` (F100) — AND BOTH ENDPOINTS MOVE.** `r3_chunks_mask` **−32.08 %**, `r4_bitmask` **−11.40 %**, and ⭐ **`r4_bitmask_min` is CHEAPER *AND* SMALLER-SURFACE** (3 trusted call sites against 10, 2 accessors against 4, twin `32/0`). **Second row in either programme where both endpoints move.** ⚠⚠ **BUT THE R4 HALF IS UNDECIDED ON A PIN QUESTION — see item 83**: under `required[4]`'s backticked spelling the R4 endpoint is degenerate, under its English it moves, and the two disagree. ⭐ **The call to search this row BEFORE building row 8 was made on the signal that R3 measured dearest against a prediction of cheapest, and that signal was RIGHT.** ⓘ **Residue: `ph03` and `ph64`.** **The original text:** | ⚠ **BOTH ENDPOINTS UNSEARCHED ON `ph53` — ORIGINAL FRAMING** | `TASK_PHP_041` §8: **no `controls/spellings.py` was built.** ⭐⭐ **This is item 58's residue GROWING, and F77/F87 are why it matters**: `ph29`'s R4 endpoint moved **5.63 pp** byte-identically, and `ph45`'s R4 **AND** R3 both moved with the bound's **sign reversing** — so a `fixed-R4 bound` over an unsearched endpoint is a bound over a number nobody has tried to move. ▶ **Unsearched now: `ph03`, `ph64`, `ph53`**; `ph07`/`ph16` searched theirs and found them degenerate; `ph29`/`ph45` moved. ⚠ **`ph53` is the cheapest of the three** (fresh, and its `controls/` machinery is the newest and already carries items 57/63's fixes) **and it is the one whose predictions were most wrong** — **R3 came out dearest-but-one against a prediction of cheapest**, which is exactly the signal that a search would move something. ⓘ Costs a `ph53` re-gate — ⭐ **batch with item 79's measurement and F99's citation repair, all three being `ph53` debt** |
+| 81 | ⚠⚠ **A FOURTH DEFECT IN THE SHARED `spellings.py` MACHINERY, AND THE PATTERN NOW HAS A LAW** | F101, `TASK_PHP_042` §8. **`kernel_fingerprint`'s digest is PATH-SENSITIVE** — `r3_oprec_slice` built in two directories whose paths differ by **38 characters** fingerprints differently, so a comparison that should read *byte-identical* reads *different*. ⚠⚠ **LATENT on `ph53`, LIVE on `ph29`**, where byte-identity **is a bar**: F77's headline is *"`r4_fold_iter` verifies BYTE-IDENTICALLY and is 5.63 pp cheaper"*, so a path-sensitive digest there is a **false negative on the one property that sentence rests on.** ⛔ **`ph29` was NOT edited** — reported for routing, the third time that call has been made correctly. ⭐⭐ **THE LAW, and it is monotone in suite size: 54 cases missed two (item 57) → 75 missed one (item 63) → 128 found one (`_037`) → 161 found this.** ▶ ***A control cloned between rows carries its defects, and only the row that writes NEW negatives finds them*** — **so expect the next row's suite to find a fifth.** ⓘ Costs a `ph29` re-gate → **batch with items 56 and 63**, which are the only other `ph29` prose debt |
+| 82 | ⭐⭐ **A1 IS *NOT* INSENSITIVE TO RESPELLING — `ph45`'s `0.000000` pp WAS ROW-SPECIFIC, AND F87 READ IT AS A PROPERTY OF THE STATISTIC** | F100. `ph53`'s `a1_spread_pp` is **R3 `39.899657`, R4 `45.313019`** over 20 searched variants. ⛔ **F87's `ph45` headline was `0.000000` pp over nine variants against `66.7` pp whole-program** — published as *"A1 does not move"*. ▶ **Two rows, two opposite answers, same statistic.** ⭐ **And the reconciliation matters for F91**: F91's regime argument is that A resolves small code differences **because it is symbol-scoped**, and here that same property resolves respellings to **40 pp** — **the property working, where F87 read it as A being blind.** ⚠ **So what `ph45` actually showed is that ITS nine variants did not change the KERNEL SYMBOL's instruction count**, which is a fact about those variants, not about A. ▶ **Owed: restate F87's sentence so it says which**, and check whether F91's `|B/A|` regime claim depends on the wrong reading (**it should not — that claim is measured on the R4/R5 pair's `Δnopad`, not on respellings** — but say so rather than assume it) |
+| 83 | ⚠⚠⚠ **`ph53`'s `required[4]` PINS A SPELLING AND ARGUES A PURPOSE, AND THE TWO DISAGREE — SO WHETHER ITS R4 ENDPOINT MOVES IS UNDECIDED** | F100. The entry's backticked spelling is `` `wrote[i]` `` (an indexed **byte array**); its English says *"THE ONE-BYTE-PER-SLOT WITNESS … what makes R4's unsafe read DISCHARGEABLE"* (a **purpose**). **A `u32` bitmask satisfies the purpose — twins `31/0` and `32/0` — and does not carry the spelling.** ▶ **Under the English both endpoints move; under F72's rule that these entries are *spellings with the ticks dropped*, the R4 endpoint is DEGENERATE.** ⛔ **`idiom.required` is presence-only and CANNOT FAIL THE GATE**, so nothing mechanical was ever going to decide it, and `required_absent` correctly *reported* the absence on both winners. ⭐⭐ **This is F72 recurring at a new site and item 56's prediction coming true** (*"a bare-identifier pin is a weak pin, and nothing measures pin quality"*) — ⚠ **and it is the FIRST time the ambiguity decides a published RESULT rather than a pin's tidiness.** ▶ **The repair: restate `required[4]` so its spelling and its English bind the same thing** — one sentence inside the hashed block, so **one `ph53` re-gate** and no re-measure. **Batch with item 82's F87 restatement if that turns out to need a row edit.** ⚠ **Do NOT resolve it by weakening the pin to match whichever variant won** — `.memory/02-bench-rules.md`'s rule that a rung is never cost-selected applies to its pins too |

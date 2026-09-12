@@ -103,7 +103,7 @@ CLASS = {
     #    PENDING pile makes the marginal figure understate. `N8` bounds it.
     "040": "PENDING",          # R1h hunt + build brief for row 7 (ph52/ph53)
     "041": {"ph53": 1.0},      # BUILD row 7 = ph53 -- row LANDED, so charged
-    "042": {"ph53": 1.0},      # search ph53's endpoints + its batched debt
+    "042": {"ph53": 1.0},      # search ph53's endpoints + its batched debt (DONE)
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them

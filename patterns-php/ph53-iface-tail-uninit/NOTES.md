@@ -17,7 +17,8 @@
 > |---|---|
 > | as first written | `c9b666d39db483dc386e23a4ab2f511f094855dbcdbc841c9ba33a01abe333bd` |
 > | after the gate's `tcb-unsafe` repair | `e42a9b92247fe2db003caa2ed308d7faebb50353f65a478288fd557078b92b1f` |
-> | **as shipped** | `7013be6f7c1cb70da7568716e7eef71908fd109332f64cf76cf769ba063a9d97` |
+> | after `_041`'s citation repair | `7013be6f7c1cb70da7568716e7eef71908fd109332f64cf76cf769ba063a9d97` |
+> | **as shipped** (after `_042` retargeted the THIRD citation, F99) | `c41ffad2b795767b221141f4f2332a68a9800eb79c594997ae474d46795dbe80` |
 >
 > **The first gate run FAILED with two `tcb-unsafe` blockers** and they were
 > right: `check.py::_scan_unsafe_sites` requires every `unsafe` token in a
@@ -35,16 +36,32 @@
 > re-measured after the change rather than carried over.
 >
 > ⚠⚠ **AND IT MOVED A SECOND TIME, FOR A DEFECT I HAD PUT THERE MYSELF.** The
-> `e42a9b92…` block cited **`.temp/php41/probe_wrap.rs`** — twice, in
+> `e42a9b92…` block cited a **gitignored `.temp/` probe** — twice, in
 > `twin_justifications` and `unsafe_justifications` — as the evidence that
 > `slot_read_unchecked`'s hand-asserted `requires` is the one vstd demands.
 > ⛔ **That is `RECAP_PHP.md` open item 65's defect inside the HASHED block**:
-> a committed claim resting on a gitignored path, and the probe is exactly the
-> kind of file `CLAUDE.md` constraint 6 deletes. ✅ **Repaired by shipping the
-> probe as `controls/mu_unwrapped.rs`** (7 verified / 0 errors), retargeting
-> both citations at it, and adding it to `controls/negatives.py --verus` as
+> a committed claim resting on a path that is scheduled for deletion, and the
+> probe is exactly the kind of file `CLAUDE.md` constraint 6 removes once the
+> gates are green. ✅ **Repaired by shipping the probe as
+> `controls/mu_unwrapped.rs`** (7 verified / 0 errors), retargeting both
+> citations at it, and adding it to `controls/negatives.py --verus` as
 > must-NOT-fire arm **N2**, so it is *run* on every invocation rather than
 > merely cited. Nothing else in the fence moved.
+>
+> ⚠⚠⚠ **AND A THIRD MOVE, FOR THE SAME DEFECT IN A THIRD PLACE `_041` DID NOT
+> FIND.** `verus.obligations_note` carried the SAME gitignored citation and was
+> missed, because `.tasks-php/citecheck.py` did not yet scan a row's `spec.md`;
+> it does now, and `RECAP_PHP.md` **F99** is the report of it.
+> ✅ **Retargeted at `controls/mu_unwrapped.rs` at `TASK_PHP_042`, together
+> with the two remaining `NOTES.md` citations** (`probe_mu.rs`, `probe_wrap.rs`
+> — both restated in terms of committed, EXECUTED controls rather than
+> repointed at another path). `python3 .tasks-php/citecheck.py` now reports **no
+> row-specific `.temp/` citation for `ph53`** in either file.
+> ⚠ **`contract_sha256` moved a fourth time and only for that sentence**:
+> `7013be6f…` → `c41ffad2…`, the last row of the table above. `verus.obligations` stayed 27,
+> `twin_obligations` 30, the `identity` pin did not move, and **no measured
+> number moved** — `spec.md` is in the gate digest and not the measurement one,
+> which is why this cost one re-gate and zero re-measures.
 >
 > ⚠⚠ **AND RULE 6 IS NECESSARY AND NOT SUFFICIENT** (`TASK_089_REVIEW`, on
 > `p46`): a matching hash proves nothing was edited *after* measuring and
@@ -395,11 +412,19 @@ number is fractions of a percent and why it can go either way.
 ### 8c. The `fixed-R4 bound`, and it is NOT what was predicted
 
 ⚠ **`PROTOCOL_PHP.md`/`.memory-php/02-ladder.md`'s rule: a bound ships
-LABELLED, beside a cheapest-found counterpart — and `controls/spellings.py`
-was NOT built on this row, so the R3 and R4 endpoints are UNSEARCHED and every
-figure here is a `fixed-R4 bound` over an unsearched endpoint.** The debt is
-declared here, in `README.md` and in the task report; `ph03`, `ph64` and `ph45`
-carry the same one and this row makes it **4 of 7**.
+LABELLED, beside a cheapest-found counterpart.**
+
+> ⭐⭐⭐ **BOTH ENDPOINTS HAVE NOW BEEN SEARCHED (`TASK_PHP_042`,
+> `controls/spellings.py`, 20 variants) AND BOTH MOVE — §8j.** The bound below
+> is still the figure the row PUBLISHES, because `.memory/02-bench-rules.md`
+> holds the shipped rungs fixed by fiat and that fiat is what makes it a bound;
+> what the search changes is what may be said *beside* it.
+> **`r3_endpoint_degenerate: false`, `r4_endpoint_degenerate: false`.**
+> ⚠⚠ **AND THE ORDERING REVERSES**: the cheapest in-contract R3 found
+> (`r3_chunks_mask`, **−32.08 %** A1 against the shipped R3) is **cheaper than** the
+> cheapest in-contract R4 found (`r4_bitmask`, −11.40 %), where the shipped
+> bound below says R3 is **+24.238 %** DEARER. ⚠ That is an ORDERING and **not
+> an interval**: a difference of two minima bounds nothing in either direction.
 
 | | A1, small.bin, O3 | A1, large.bin, O3 | A1, small.bin, O0 |
 |---|---:|---:|---:|
@@ -414,12 +439,42 @@ THE `O0` ROW.** At `O3` the bound is POSITIVE and large, which makes this row
 negative). ⓘ `ph45` publishes A1 `+0.37 %` and whole-program `−3.06 %` and
 belongs to neither list cleanly.
 
-**Mechanism.** R3's `Vec<u32>` scan loops **vectorise** (352 static
-instructions, `xmm`); R4's do not, because the per-slot `if wrote[i]` is a
-branch inside the loop (758 static instructions). So R4 executes *more* static
-code and *fewer* dynamic instructions — it is the **uninit fill and the absent
-`Option` discriminant** that win, not the scan. §8e measures the witness
-directly.
+**Mechanism.**
+
+> ⛔⛔ **THE MECHANISM THIS SECTION PUBLISHED IS REFUTED, BY INSTRUCTION-LEVEL
+> MEASUREMENT, AT `TASK_PHP_042`.** It said:
+>
+> > ~~R3's `Vec<u32>` scan loops **vectorise** (352 static instructions, `xmm`);
+> > R4's do not, because the per-slot `if wrote[i]` is a branch inside the loop
+> > (758 static instructions). So R4 executes *more* static code and *fewer*
+> > dynamic instructions — it is the **uninit fill and the absent `Option`
+> > discriminant** that win, not the scan.~~
+>
+> ⚠ **The two static counts are right and the vectorisation claim is wrong, in
+> the opposite direction from what it says.** Counted over the `kernel` symbol
+> at `O3`/`isolated`, with each instruction's **execution count** taken from
+> `callgrind --dump-instr=yes` on `small.bin`:
+>
+> | | vector (`xmm`) instructions | of which executed more than ONCE per call |
+> |---|---:|---:|
+> | R3 `safe_tuned` | **5** | **0** |
+> | R4 `unsafe` | **23** | **0** |
+> | `controls/r4_nowitness.rs` | 17 | 0 |
+>
+> ▶ **R4 has FOUR AND A HALF TIMES as many vector instructions as R3, and in
+> neither rung is a single one of them inside a scan loop** — all of them run
+> exactly once per call, and they are the `pool`, `idx` and `wrote` array
+> zero-fills. **Both rungs' scan loops are scalar.** The `xmm` the old sentence
+> pointed at was the `[0u64; MAXP]` initialiser.
+> ⭐ **The measured mechanism is the WINDOW READ and it is in §8j**: the shipped
+> R3 pays **nine** bounds checks per op record (18 instructions, 281.8 Ir/call,
+> **20.3 % of the rung**) where R4 pays none, and collapsing them to one is what
+> `r3_oprec_slice` does for **−28.99 %**. ⚠ **That term is not in the slot
+> representation at all**, which is why no amount of reasoning about
+> `Option`/`MaybeUninit`/`push` could have found it.
+> ⚠ **What survives unchanged**: R4 really is cheaper than R3 as shipped, the
+> static counts are 352 and 758, and the uninit fill really is worth ~5.6
+> Ir/call (§8f). **The refutation is about WHY, not about the direction.**
 
 ### 8d. R2 vs R1h — the R2 prediction, refuted in a measurable direction
 
@@ -450,14 +505,59 @@ under callgrind, against `controls/r4_nowitness.rs` (the same program with the
 uncovered blob — that is what the witness is for — so this is a cost
 comparison and not a ladder rung.
 
-**Mechanism.** 260 → 760 static instructions is not a byte per slot: the
-witness-free scan loops are branch-free over a `Vec<MaybeUninit<u32>>` and LLVM
-**vectorises and unrolls** them; `if wrote[i]` puts a data-dependent branch
-inside the loop and both disappear. ▶ **So the cheapest witness that makes R4
-provable costs 21.8 % of the whole run, and the reason is lost vectorisation
-rather than the byte.** ⓘ A bitmask witness (`n_decl ≤ 16` fits one `u32`) is
-the obvious candidate for a cheaper spelling and **is not built** — it is the
-first thing a `controls/spellings.py` on this row should price.
+**Mechanism.**
+
+> ⛔⛔ **REFUTED AT `TASK_PHP_042`, AND SO IS THE HEADLINE FIGURE'S CLAIM TO BE
+> *"the cheapest witness"*.** This section said:
+>
+> > ~~260 → 760 static instructions is not a byte per slot: the witness-free
+> > scan loops are branch-free over a `Vec<MaybeUninit<u32>>` and LLVM
+> > **vectorises and unrolls** them; `if wrote[i]` puts a data-dependent branch
+> > inside the loop and both disappear. ▶ So the cheapest witness that makes R4
+> > provable costs 21.8 % of the whole run, and the reason is lost
+> > vectorisation rather than the byte.~~
+>
+> **1. NOTHING VECTORISES.** `controls/r4_nowitness.rs` has **17** `xmm`
+> instructions and the shipped R4 has **23**, and in both every one of them
+> executes exactly ONCE per call (they are array zero-fills). The witness-free
+> scan loops are scalar. **And they are not unrolled either** — the
+> witness-free `kernel` is *smaller* (266 raw instructions against 766), so the
+> duplication is in the SHIPPED rung, not in the control.
+>
+> **2. THE TEST IS NOT THE COST, AND THE MEASUREMENT IS EXACT.** The witness
+> test costs **39.42 Ir/call in BOTH witness spellings** — 12 `cmpb` sites in
+> the shipped rung and 2 `bt` sites in the bitmask one, summing to the identical
+> figure, which is one instruction per slot iteration (985 384 iterations over
+> 25 000 calls).
+>
+> **3. SO THE COST SPLITS IN TWO, AND ONLY HALF OF IT IS THE WITNESS.**
+> A1, `small.bin`, `O3`/`isolated`:
+>
+> | | A1 Ir/call | above `r4_nowitness` |
+> |---|---:|---:|
+> | `controls/r4_nowitness.rs` | 888.082 | — |
+> | `r4_bitmask` (register-resident witness) | 989.670 | **+101.59** |
+> | R4 as shipped (`[bool; MAXD]`, memory-resident) | 1 116.947 | **+228.87** |
+>
+> ▶ **+101.6 Ir/call is the witness AS SUCH; the remaining +127.3 is the array
+> being in MEMORY** — with an identical logical witness, LLVM peels the shipped
+> rung's scan loops into twelve copies of the test (766 static instructions
+> against 296) and pays the address arithmetic around them.
+>
+> **4. ⭐⭐ AND THE CANDIDATE THIS SECTION NAMED AND DID NOT BUILD IS THE ONE
+> THAT WINS.** *"A bitmask witness (`n_decl ≤ 16` fits one `u32`) is the obvious
+> candidate for a cheaper spelling and is not built"* — it is built now
+> (`controls/spellings.py::r4_bitmask`), its twin verifies at **31 verified /
+> 0 errors** with **two `by (bit_vector)` lemmas, no new trusted item and no
+> `assume`**, and it costs **+9.67 % whole-program against `r4_nowitness`
+> instead of +21.78 %.**
+> ▶ **The row's largest single number is more than HALVED by a respelling.**
+> *"The cheapest witness that makes R4 provable costs 21.8 %"* is **withdrawn**;
+> the measured figure is **9.7 %**, and 9.7 % is still an upper bound because
+> searched is not exhausted.
+> ⚠ **The +21.775 % itself is NOT withdrawn and reproduces to 0.0009 %** in
+> `controls/spellings.py`'s own pipeline. It is a correct measurement of the
+> SHIPPED witness spelling. What was wrong was calling it the cheapest.
 
 ### 8f. R4's prediction — the fill is PARTLY elided, and the number is small
 
@@ -491,6 +591,42 @@ which makes it safe also deletes the `idx[]` array and the `Option`
 discriminant. ⚠ At `O0` R3 IS the cheapest Rust rung (−25.201 % against R4),
 which is the direction the prediction expected, and **no claim rests on an
 `O0` row**.
+
+> ⭐⭐⭐ **AND `TASK_PHP_042` ANSWERED THE *WHY*, WHICH IS THE MORE USEFUL HALF.**
+> The shipped R3 came out **dearest-but-one of the six rungs** (1 387.675 A1,
+> `small`/`O3`; only R2's 1 472.435 is dearer) against a prediction that it
+> would be the cheapest. **Two different findings were available and it is the
+> first one:**
+>
+> * ✅ **THE SHIPPED SPELLING *IS* THE PREDICTION'S SPELLING.** `_040` §5.6's
+>   mechanism was *"push-as-you-go deletes both the discriminant check and the
+>   zeroing pass"*, and `safe_tuned.rs` is exactly that — `Vec::with_capacity`
+>   plus `push`, no `Option`, no fill. **Both deletions happened**, and they are
+>   worth what the prediction said: R3 is 5.8 pp under R2 on `small`.
+> * ⛔ **THE PREDICTION'S MECHANISM WAS WRONG — not mistaken about what it
+>   deletes, but INCOMPLETE ABOUT WHAT REMAINS**, and the term it missed is four
+>   times larger than the two it named. It is not in the slot representation at
+>   all: it is the **window read**. `rd32`/`rd64` index the window slice nine
+>   times per op record, and LLVM emits **nine bounds checks**, as nine
+>   `cmp <threshold>,%r13 / je <panic>` pairs — 18 instructions, each executed
+>   391 385 times on `small.bin`, i.e. **281.8 Ir/call = 20.3 % of the whole
+>   rung**, against an R3−R4 gap of 270.7 Ir/call. ▶ **The single term is larger
+>   than the entire gap the prediction was about.**
+>   ⚠ **Every safe rung pays it and no unsafe rung does** (`win_get_unchecked`),
+>   so it is the row's dominant safe-vs-unsafe term and it is invisible to any
+>   argument about how the empty slot is represented.
+>
+> ▶ **So the honest statement is: the prediction named two real savings and
+> compared them against the wrong baseline.** `r3_oprec_slice` takes the op
+> record as one 9-byte sub-slice, collapses the nine checks to ONE, and is
+> **−28.99 %** — cheaper than the shipped R4; `r3_chunks_mask` reaches
+> **−32.08 %**. **Under either spelling the prediction's conclusion is TRUE**:
+> R3 becomes the cheapest rung on the row.
+> The prediction was refuted by the shipped spelling and vindicated by a
+> spelling nobody had written.
+> ⚠ **And the mirror confirms the direction rather than only the magnitude**:
+> `r4_win_checked` puts the nine checks back into R4 and costs **+33.92 %**. The
+> lever is worth ~30 % in both rungs and in both directions. §8j.
 
 ### 8h. The cross-language column — family `B1`, LABELLED and PROVISIONAL
 
@@ -548,6 +684,243 @@ else**, visible as the odd-numbered spans sitting ~1.8 % above the even ones.
 points now read: uniform 0.03 % (`ph03`), nearly uniform ~1 % (`ph53`, one
 window in sixteen differing), heterogeneous 32 % (`ph29`)** — a hypothesis with
 three supporting points, not a measured mechanism.
+
+### 8j. ⭐⭐⭐ THE ENDPOINT SEARCH — BOTH SIDES MOVE (`controls/spellings.py`, `TASK_PHP_042`)
+
+`controls/spellings.py --verus`: **20 variants**, 9 on the R3 side, 10 on the
+R4 side and one `CTL`, every one produced by **exact text substitution** from
+the shipped `.rs` with the hit count asserted, every one audited against
+`spec.md`'s `idiom` through `harness/check.py::spelling_matches` **before** its
+number is quoted, and every one required to return **its own side's** shipped
+checksum on all seven inputs. Exit **0**, `problems: []`.
+
+⚠ **PER-SIDE reference, and on this row that is forced**: R3 and R4 disagree on
+`inputs/adversarial-cmp.bin` by declaration (§8c's note, `safe_tuned.rs`'s
+header, `check.py` stage 4), so a cross-side reference would fail every R3
+variant on one input and the failure would be the control's.
+
+⚠ **Stage 3 reproduces the shipped cells before any variant is quoted**: A1
+against `results-php/ph53-iface-tail-uninit.json` in **four** cells, all to
+**0.0000 %**, and W1 against §8e's committed whole-program total to **0.0009 %**.
+
+**A1 = `Ir(kernel)/call`, `O3 / isolated`, `small.bin`** — the whole column.
+⚠ **W1 is quoted only on the two rows where it says something A1 does not**;
+`spellings.json` carries both families for all twenty, on both inputs.
+
+| variant | side | A1 Ir/call | vs shipped own side | TCB | twin |
+|---|---|---:|---:|---:|---|
+| `r3_chunks_mask` | R3 | **942.477** | **−32.08 %** (W1 −28.71 %) | — | — |
+| `r3_both` | R3 | 962.888 | −30.61 % | — | — |
+| `r3_chunks_exact` | R3 | 969.399 | −30.14 % | — | — |
+| `r3_oprec_slice` | R3 | 985.420 | −28.99 % | — | — |
+| `r3_oprec_array` | R3 | 985.420 | −28.99 % | — | — |
+| `r3_pool_mask` | R3 | 1 369.143 | −1.34 % | — | — |
+| **`v0_shipped`** | **R3** | **1 387.675** | — | — | — |
+| `r3_slice_param` | R3 | 1 388.135 | +0.03 % **TIE** | — | — |
+| `r3_no_capacity` ⛔ | R3 | 1 369.654 | −1.30 % A1 / **+27.36 % W1** | — | — |
+| `r4_bitmask` | R4 | **989.670** | **−11.40 %** | 6 | **31 / 0** |
+| `r4_bitmask_pool` | R4 | 1 023.469 | **−8.37 %** | **5** | **31 / 0** |
+| `r4_bitmask_min` | R4 | 1 082.068 | **−3.12 %** | **3** | **32 / 0** |
+| **`v0_shipped`** | **R4** | **1 116.947** | — | 6 | 27 / 0 |
+| `r4_set_checked` | R4 | 1 122.580 | +0.50 % | **5** | 27 / 0 |
+| `r4_win_oprec` | R4 | 1 150.319 | +2.99 % | **5** | 27 / 0 |
+| `r4_pool_checked` | R4 | 1 150.745 | +3.03 % | **5** | 27 / 0 |
+| `r4_min_trusted` | R4 | 1 190.689 | +6.60 % | **3** | 28 / 0 |
+| `r4_win_checked` | R4 | 1 495.793 | +33.92 % | 5 | 27 / 0 |
+| `r4_mu_ref` ⛔ | R4 | 1 136.971 | +1.79 % | — | **no twin** — §8k |
+| `ctl_nowitness` (CTL) | — | 888.082 | −20.49 % | — | — |
+
+⛔ = out of contract by **English**, priced anyway and never counted as a rung.
+**TCB** = `#[verifier::external_body]` items in the twin, the shipped rung's
+being **6** (four unchecked accessors plus `load_input` and `emit`).
+
+**THE FOUR RESULTS, IN ORDER OF WHAT THEY ARE WORTH:**
+
+**1. ⭐⭐⭐ `r4_bitmask_min` IS CHEAPER *AND* HAS A SMALLER TRUSTED SURFACE.**
+−3.12 % A1 with **one** unchecked accessor against the shipped rung's **four**
+(TCB 3 against 6), twin at **32 verified / 0 errors**, no `assume`, no
+`is not supported`, and the twin compiles under `build.py`'s own flags. Only the
+`MaybeUninit` read stays trusted, because there is no safe exec expression from
+`MaybeUninit<T>` to `T` — §11.5 — so **one is the floor for a rung that passes
+`check.py::_scan_unsafe_sites`**, and this variant reaches it.
+⚠ `ph45`'s two trusted-surface reductions both came out DEARER (+4.07 %,
++7.51 %) and **all four of this row's reductions that keep the SHIPPED witness
+do too** — `r4_set_checked` +0.50 %, `r4_win_oprec` +2.99 %, `r4_pool_checked`
++3.03 %, and their union `r4_min_trusted` +6.60 %. **The reduction is only free
+in combination with the cheaper witness**, and both halves ship side by side so
+the two contributions are separable rather than buried in one number.
+
+**2. ⭐⭐ THE SECTION THAT NAMED A CHEAPER WITNESS AND DID NOT BUILD IT WAS
+RIGHT** — §8e, and the figure it calls the row's largest goes from **+21.78 %**
+to **+9.67 %**.
+
+**3. ⭐⭐ THE R3 SIDE MOVES BY THE LARGEST MARGIN IN EITHER PROGRAMME, AND THE
+MECHANISM IS A TERM NO REASONING ABOUT THE SLOT REPRESENTATION COULD REACH** —
+§8g's box. `r3_oprec_slice` collapses nine per-op window bounds checks to one
+(**−28.99 %**), `r3_pool_mask` deletes the per-slot-read `cmp $0x7 / ja` that
+survives because the pool index came out of the blob (**−1.34 %**), and together
+they are **−30.61 %**. ⭐ **THREE spellings of the first lever were priced and
+the third is the cheapest**: `chunks_exact(OP_BYTES).take(n_ops)` deletes the
+per-op offset arithmetic as well as eight of the nine checks and is
+**−30.14 %** alone, **−32.08 %** with the pool mask — the cheapest in-contract
+R3 found. ⚠ **So the three spellings are NOT all a tie**, and that is a sharper
+statement than the two-spelling version: **the TYPE buys nothing (byte-identical),
+the ITERATOR buys 1.63 %, and the CHECK COUNT buys everything.**
+⚠ **The panic condition does not change**: the shipped reads need
+`p + 8 < win.len()` and the sub-slice needs `p + 9 <= win.len()`, the same
+predicate, and all seven checksums are unchanged.
+
+**4. ⭐⭐ `&[u8; OP_BYTES]` + `try_into` IS *BYTE-IDENTICAL* TO THE PLAIN `&[u8]`
+SUB-SLICE.** Same 282 instructions, same `kernel` digest, same A1 and W1 to the
+digit — verified in **two different build directories**, so it is not an
+artefact of the fingerprint's path sensitivity. ▶ **This is `ph45`'s §5.6 result
+on a second row and in its sharper form**: there *"the bound LLVM gets free from
+the TYPE"* was a TIE within a 0.05 % threshold, here it needs no threshold at
+all. **The compile-time-constant length buys exactly nothing; the lever is the
+number of CHECKS, not the type.** ⚠ And on this row the array spelling is not
+punished either — `ph45` found `&[u8; N]` was the spelling *Verus refuses*
+(`TryFromSliceError is not supported`), which is why the R3-side winner here is
+declared as the plain `&[u8]` one.
+
+**⚠ THE CALIBRATION ENTRIES, AND A SEARCH WITHOUT THEM CANNOT BE READ:**
+
+* `r3_slice_param` (`&[u32]` for `&Vec<u32>`) is **+0.03 %, a TIE** under this
+  row's own `TIE_PCT` of 0.05 %. The double indirection through `Vec` is worth
+  nothing here.
+* `r4_win_checked` is **+33.92 %** — the mirror of the R3 winner, the same nine
+  checks put back into R4. ▶ **The window-check spelling is worth ~30 % in BOTH
+  rungs and in both directions**, which is what makes it the row's dominant term
+  rather than an R3 quirk.
+* ⭐⭐ `r3_no_capacity` is **the one cell where the two families disagree in
+  SIGN**: `Vec::new()` instead of `Vec::with_capacity(n_decl)` reads **−1.30 %
+  in A1** and **+27.36 % in W1**, because the allocator work it adds is in
+  `malloc` and not in `kernel`. ▶ **That is F85's mechanism demonstrated on this
+  row by this row's own variant, and it is why both families are printed for
+  every comparison even though A1 is the headline.**
+  ⭐ **It also prices what `TASK_PHP_041` §8.6 left open** — *"did not measure
+  what the 5.2.0 schedule would cost"*. ⚠ It is a **LOWER BOUND** on php-5.2.0's
+  schedule and not that schedule: `Vec` doubles, i.e. O(log n) allocations,
+  where `erealloc(..., ++current_iface_num)` is O(n).
+  ⛔ It is **out of contract by English**: `idiom.required[8]` DECLARES the
+  allocation order as O(1) per kernel call and §7a's `PROTOCOL_PHP.md` §B1a
+  precondition — the thing that lets §8h's cross-language column go out with no
+  allocator caveat — rests on it.
+
+**⚠ WHICH FAMILY CAN RESOLVE THIS ROW — and it is the opposite of `ph45`.**
+A1 carries **89.5 %** of this program's instructions (34 691 877 of 38 765 393
+on the shipped R3 / `small.bin`) because every helper is `#[inline(always)]`
+into `kernel`. `spellings.json` MEASURES the spread rather than assuming it:
+
+```
+a1_spread_pp   {"R3": 39.899657, "R4": 45.313019}
+wp_spread_pp   {"R3": 67.930558, "R4": 39.543977}
+```
+
+▶ **A1 resolves this row in both families' regime** — on `ph45` the same field
+reads **`{"R3": 0.0, "R4": 0.0}`** over nine variants, and only the
+whole-program family could rank anything there. ⚠ **Neither family is right in
+general; `cheapest_in_contract`'s default key is A1 BECAUSE of this number, and
+a §H case pins that default so it cannot change family silently.**
+⚠ Both spreads are over `pct_vs_r4ship_*`, i.e. every variant against the
+SHIPPED R4, which is why the R3 figure (39.90) is smaller than the R3 side's
+range against its own shipped rung (−32.08 % .. +0.03 %, 32.11 pp) — **two
+different quantities, and the field name says which one it is.**
+
+**⚠ FOUR MORE SPELLINGS WERE PRICED AND NOT SHIPPED, AND TWO OF THEM ANSWER
+QUESTIONS THIS FILE LEFT OPEN.** A1, `small.bin`, `O3`/`isolated`:
+
+| spelling | A1 Ir/call | vs shipped own side | why it is not a shipped variant |
+|---|---:|---:|---|
+| R3 `[u32; MAXD]` + `len` instead of `Vec<u32>` | 1 184.996 | −14.60 % A1 / **−21.73 % W1** | ⛔ **out of contract by English, and in the OPPOSITE direction from `r3_no_capacity`**: it deletes the allocation entirely, where `idiom.required[8]` declares *exactly ONE `erealloc` per call when `n_decl` is positive*. ⭐ The two together BRACKET that declaration — O(log n) allocations cost **+27.36 % W1** and zero allocations save **21.73 % W1** — and **A1 reads −1.30 % and −14.60 % on those same two cells, i.e. the WRONG SIGN on the first and 7 pp short on the second** |
+| R4 `wrote` reached with `get_unchecked` | 1 001.936 | **−10.30 %** | ⭐⭐ **it REFUTES §11's own guess and would cost a FIFTH trusted item.** `unsafe.rs`'s header says `wrote` is indexed safely *"deliberately: reaching it with `get_unchecked` would make the witness rest on the thing it exists to establish"*, and `TASK_PHP_041` §8.4 added *"LLVM very likely elides the check anyway, so the choice is probably free and I did not verify that"*. ▶ **It is not free: the safe index costs 10.30 %.** The argument for keeping it safe is unchanged and is now a PRICED choice instead of an assumed-free one |
+| R4 without `#[inline(always)]` on the two consumers | 1 117.947 | **+0.09 %** | ⚠ **A CLEAN NEGATIVE, and it is about `ph45` rather than about this row** |
+| R3 without `#[inline(always)]` on the two consumers | 1 387.675 | **+0.00 %** | — identical to the shipped rung **to the digit** |
+
+⭐⭐ **THE LAST TWO ROWS ARE A CROSS-ROW RESULT AND THEY ANSWER A QUESTION `ph45`
+ASKED BY NAME.** `TASK_PHP_037` §10.1 flags *"IS `#[inline(always)]` A
+RESPELLING? This is the call I am least sure of and it is load-bearing: without
+it the winner is +16.65 % instead of −23.47 %"* — a **40-percentage-point** swing
+from one attribute, and it asks for a ruling.
+▶ **On `ph53` the same attribute on the same kind of helper is worth `+0.09 %`
+and `0.00 %`.** So `ph45`'s 40 pp is a property of `ph45`'s loop shape — a
+251-entity scan around a helper LLVM declines to inline — and **not of this
+programme**; here LLVM inlines these helpers whether or not it is asked, because
+each is called from one site per op branch. ⚠ **It does not settle `ph45`'s
+question**; it says the lever is not generic, and it removes the motive for
+worrying about it on rows shaped like this one. **Two rows.**
+
+**⚠ SEARCHED IS NOT EXHAUSTED, AND BOTH LEVERS ARE LLVM DECISIONS.** 20
+spellings shipped, 4 more priced and dropped. Every figure is about
+`rustc 1.97.1` / `LLVM 22.1.6` and Verus `0.2026.08.09.92f466f` on this box:
+how many bounds checks survive a sub-slice, and whether the coverage witness
+lives in a register or on the stack, are both heuristics. **The honest claim is
+*"an admissible cheaper R3 and an admissible cheaper R4 exist"*, never *"these
+are the cheapest"*.** ⓘ What was NOT tried is in `TASK_PHP_042_REPORT.md` §9.10:
+an iterator-based SCAN, `pool` as a `&[u64]` of length `n_pool`, a `u64` mask,
+`#[inline(never)]` anywhere, and any R2 respelling.
+
+### 8k. ⭐ OPEN ITEM 79 — the `MaybeUninit<&Iface>` representation, MEASURED
+
+`TASK_PHP_041` §8.12 reported that a reference representation verifies *"with
+ZERO trusted items"* and **rejected it unmeasured**, because *"the compare-only
+consumer needs `core::ptr::eq`, which is address-dependent … and which the
+pinned vstd does not specify"*. **The rejection stands. Three of its four
+supporting statements do not, and the corrected ones are more useful.**
+
+**1. ⛔ *"can express the faulting consumer and NOT the comparing one"* — FALSE
+ON THE EXEC SIDE.** `controls/mu_ref_exec.rs` is `unsafe.rs` with the slot
+changed from a pool INDEX to a pool REFERENCE (`Vec<MaybeUninit<&u64>>`;
+`c/kernel.h:97` gives `struct ph53_iface { uint64_t id; }`, one `u64`, so `&u64`
+is that struct's reference with the newtype elided). It builds, `core::ptr::eq`
+expresses the comparing consumer, and it returns the **shipped R4 checksum on
+all seven inputs** including `adversarial-cmp.bin` — because distinct pool
+elements have distinct addresses, so `ptr::eq(&pool[i], &pool[t])` *is*
+`i == t`. **Cost: +1.79 % A1, +1.56 % W1** (§8j).
+
+**2. ⛔ *"which the pinned vstd does not specify"* — FALSE OF THE COMPARISON,
+AND THE REAL BARRIER IS ELSEWHERE.** Three Verus runs, in
+`controls/mu_ref_cmp.rs`'s header and executed by `spellings.py --verus`:
+
+| spelling | Verus 0.2026.08.09 |
+|---|---|
+| `core::ptr::eq(a, b)` on two `&u64` | ⛔ `The verifier does not yet support the following Rust feature: dereferencing a pointer (here the dereference is implicit)` |
+| `(a as *const u64) == (b as *const u64)` | ⛔ **the same refusal at the same position** |
+| `a == b` on two ALREADY-RAW `*const u64` | ✅ **verifies**, against `ensures r <==> (a@.addr == b@.addr && a@.metadata == b@.metadata)` |
+
+`~/tools/verus/vstd/raw_ptr.rs:221` ships
+`assume_specification[ <*const T as PartialEq<*const T>>::eq ]` with exactly that
+postcondition. ▶ **So the comparison is fully specified and what Verus refuses
+is turning a `&T` into a `*const T` at all.** That is the difference between
+*"write a spec"* (a row could) and *"the verifier does not support the
+coercion"* (a row cannot), and it is worth having stated precisely.
+⚠ **And a SECOND, independent blocker survives even with a pointer in hand**:
+`vstd::raw_ptr::SharedReference` is the stop-gap route from `&'a T` to
+`*const T`, but `new`'s `ensures` names only `s.value()` and `ptr()` is
+`uninterp` — **nothing in the pinned vstd relates `&arr[i]`'s address to `i`** —
+so `scan_c`'s index-level `ensures` could not close.
+
+**3. ⛔ *"ZERO trusted items"* — TRUE OF A PROBE AND UNREACHABLE IN A RUNG.**
+`check.py::_scan_unsafe_sites` requires every `unsafe` token in a pinned Verus
+source to sit inside an `external_body` body, and there is no safe exec route
+from `MaybeUninit<T>` to `T`, so **ONE trusted accessor is the floor for a
+shippable `verus.rs` on this row** — §11.5. Zero is reachable only in a control
+(`controls/mu_unwrapped.rs`). ▶ **And one accessor is already reached WITHOUT
+the reference representation, by `r4_bitmask_min`, at −3.12 % instead of
++1.79 %.**
+
+**4. ✅ THE ONE ADVERTISED BENEFIT IS REAL AND IT IS MEASURED HERE.**
+`controls/mu_ref.rs` verifies the faulting consumer on this representation at
+**8 verified / 0 errors** with **one** trusted item, and `instanceof_ref` does
+not take `pool` at all — so `unsafe.rs`'s header's FOURTH precondition,
+*"`p < MAXP` … the PRICE OF THE REPRESENTATION and not part of the C's
+obligation"*, **disappears**. The remaining obligation on the read is
+`is_init`, which *is* the defect.
+
+▶ **ADMISSIBILITY, STATED AND NOT DECIDED HERE.** A two-representation row is
+not obviously admissible under §A1/§B — one kernel, one `u64`, one oracle — and
+in any case this representation is out of contract by §2.3's address-freedom.
+**It ships as `controls/` variants and the manager's call is whether anything
+more is wanted.**
 
 ---
 
@@ -650,12 +1023,19 @@ helps.** `_040` §5.6 left open *"whether the `FILL` assignment through `Vec`'s
 `index_mut` carries a value-level `ensures`"*. **It does**, and the whole of
 it: `~/tools/verus/vstd/std_specs/vec.rs:67-78`'s `vec_index_mut` ensures
 `*element == old(vec)@.index(i)`, `final(vec)@ == old(vec)@.update(i, *final(element))`
-**and** `*final(element) == final(vec)@.index(i)`. A probe
-(`.temp/php41/probe_mu.rs`, 5 verified / 0 errors) confirmed it before any rung
-was written, and `controls/mu_unwrapped.rs`'s `fill` is that assignment,
-committed and re-run by `controls/negatives.py`. ⚠ The shipped rung does not use it — it goes through
+**and** `*final(element) == final(vec)@.index(i)`. It was confirmed by probe
+before any rung was written, and the probe is now **committed and executed**
+rather than cited: `controls/mu_unwrapped.rs`'s `fill` is that assignment,
+re-run by `controls/negatives.py --verus` arm N2 — and, since `TASK_PHP_042`,
+`controls/spellings.py`'s `r4_set_checked` variant is the same fact in the
+row's own shape, a whole `verus.rs` whose `slot_set_unchecked` is replaced by
+`slots[idx[d]] = MaybeUninit::new(pi)` and which verifies at **27 verified /
+0 errors** with that trusted item DELETED. ▶ **That is a stronger object than a
+probe: it is the shipped proof with vstd's `ensures` carrying what a trusted
+item used to.** ⚠ The shipped rung still does not use it — it goes through
 `slot_set_unchecked` because the C's write is unchecked — but the answer is now
-recorded so nobody greps for it a third time.
+recorded so nobody greps for it a third time, and §8j prices the swap at
+**+0.50 % A1**.
 
 **4. ⚠⚠⚠ AND THE THING NEITHER PREDICTION ANTICIPATED: A FAITHFUL R4 CANNOT BE
 VERIFIED AT ALL.** The faithful unsafe port scans `0..num_interfaces` and
@@ -758,6 +1138,29 @@ more than one match, with the three negatives above. ⓘ Nothing in `ph16`'s or
 control cloned between rows carries its defects and only the row that writes
 NEW negatives finds them; the cheaper move is not to clone.**
 
+> ⚠⚠ **AND `TASK_PHP_042` FOUND A FOURTH PROPERTY OF THAT MACHINERY, BY
+> MEASUREMENT, WHICH IS LATENT HERE AND WOULD BE LIVE ON `ph29`.**
+> `kernel_fingerprint`'s digest **is not comparable across build directories**:
+> the `r3_oprec_slice` source built in two directories whose paths differ by 38
+> characters gives **282 instructions both times and two different digests**
+> (`452842362705`, `0abc7468b349`), because `rustc` embeds the source path in
+> its panic-location data and the rip-relative DISPLACEMENTS the function
+> deliberately keeps move with it.
+> ⚠⚠ **AND IT IS VARIANT-DEPENDENT — 1 of 3 spellings measured.** `v0_shipped`
+> and `r3_chunks_exact` come out IDENTICAL across the same two directories, so a
+> check that looked at one spelling would have concluded either way. ▶ **The
+> usable rule is *never compare a digest across directories*, not *it always
+> differs*** — and the first draft of the negative that tests this used
+> `safe_tuned.rs` and FAILED for exactly that reason.
+> ✅ **Harmless on `ph53`**: `identity` is pinned `differ`, so `twin_identical`
+> is information here, and §8j's byte-identity claim was re-verified in **both**
+> directories so it is not an artefact.
+> ⛔ **On `ph29` the same function is a BAR** (`identity: O3 exact`) and it
+> compares `<side>_<name>.rs` against `<side>_<name>_verus.rs` — **six
+> characters apart** — so the failure mode there is a FALSE `!= exec`, i.e.
+> refusing an admissible candidate and calling an endpoint degenerate when it is
+> not. ⓘ `ph29` was not edited; reported for routing.
+
 ### 11b. One Verus fact worth the next agent's time
 
 ⚠⚠ **A Verus `while` body sees the loop INVARIANTS and the loop condition and
@@ -779,9 +1182,17 @@ closest are worth naming:
 
 1. The `why` says R4/R5 *"answer it with ONE BYTE PER SLOT in a stack array and
    a test/jz"*. That is a statement about the **source** and it is true. ⚠ It
-   would have been **false as a cost claim** — the witness costs 21.8 % (§8e),
-   because the branch defeats vectorisation — and it does not make one. Had it
-   said *"cheaply"*, §8e would have struck it.
+   would have been **false as a cost claim** — the witness costs 21.8 %
+   whole-program (§8e) — and it does not make one. Had it said *"cheaply"*, §8e
+   would have struck it.
+   ⭐ **And `TASK_PHP_042` makes the sentence sharper rather than wronger**: the
+   *"test/jz"* really does cost the same as the bitmask's `bt` — **39.42 Ir/call
+   in both spellings, exactly** — so what the stack array costs beyond the
+   register one (+127.3 Ir/call) is the ARRAY and not the test. ⛔ **But the
+   reason §8e gave for the 21.8 % was *"the branch defeats vectorisation"* and
+   that is now REFUTED**: nothing in either program vectorises inside a scan
+   loop. §8e carries the correction; the `why` does not repeat the mechanism and
+   so is not affected.
 2. `identity.why` quotes 762/755 and 899/803 from the pre-gate measurement; the
    shipped record reads 758/741 at `O3`. **The VERDICT is unchanged (`differ`
    at both levels, all three hashes `no`)** and the difference is that the
@@ -796,8 +1207,14 @@ closest are worth naming:
 
 ⛔ **What the row does NOT claim, stated because the absence is the finding:**
 no rung of this row reproduces the defect except R1, and `controls/` is where
-the Rust-side reproduction lives. And no figure here is a search: `README.md`
-and §8c carry the unsearched-endpoint debt.
+the Rust-side reproduction lives.
+
+⚠ **The unsearched-endpoint debt is DISCHARGED** (`controls/spellings.py`, §8j)
+and it discharged into a finding rather than a confirmation: **both endpoints
+move, the ordering reverses, and two mechanism claims this file published are
+refuted** (§8c's vectorisation story and §8e's). ▶ **What replaces the debt is a
+narrower caveat: the published `fixed-R4 bound` holds both endpoints fixed BY
+FIAT, which is what makes it a bound, and §8j is what may be said beside it.**
 
 ---
 
@@ -846,9 +1263,8 @@ are `unsafe fn`**; there is no safe exec expression from `MaybeUninit<T>` to
 rules, jointly unsatisfiable for this one operation.** ⚠ **So what is NOT
 checked here is precisely what a twin checks: that this `requires` is STRONG
 ENOUGH to license a checked implementation.** What replaces it: (i)
-`.temp/php41/probe_wrap.rs` verifies the UNWRAPPED shape at 6 verified / 0
-errors — superseded by the COMMITTED `controls/mu_unwrapped.rs` at 7 / 0, which
-is what `controls/negatives.py --verus` arm N2 runs — i.e. vstd's own
+**`controls/mu_unwrapped.rs`** verifies the UNWRAPPED shape at **7 verified / 0
+errors**, and it is what `controls/negatives.py --verus` arm N2 runs — i.e. vstd's own
 `assume_init` specification carrying the same obligation in ordinary exec code
 with no trusted item, so the contract asserted here is demonstrably the one
 vstd asserts; (ii) `controls/negatives.py` M1 deletes the
