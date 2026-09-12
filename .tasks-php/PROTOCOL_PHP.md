@@ -959,6 +959,46 @@ A checklist, not a restatement of the definition of done:
    conditions the heuristic cannot evaluate is a kernel whose number means
    less.
 
+### F6. ⛔⛔ A ROW'S `spec.md` AND `NOTES.md` MUST NOT CITE `.temp/` — commit the probe instead
+
+> ⚠ **UNREVIEWED (rule 9), manager, 2026-09-12.** Free to write:
+> `PROTOCOL_PHP.md` is in no digest (§B1a). **Enforced by
+> `python3 .tasks-php/citecheck.py`**, extended the same day with four must-fire
+> negatives (§H binds it).
+
+**THE RULE.** `.temp/` is gitignored and `CLAUDE.md` constraint 6 mandates
+deleting its artefacts once the gates are green. ▶ **So a `.temp/` path in a
+row's `spec.md` or `NOTES.md` is a committed claim resting on evidence that is
+scheduled for deletion** — and in `spec.md`'s contract block it is **frozen into
+`contract_sha256`**, i.e. into the gate record of that row forever.
+
+**WHAT TO DO INSTEAD:** if a probe is the evidence, **ship it under
+`controls/`** and cite it there. ⭐ `ph53` did exactly this for two of its three
+citations — `controls/mu_unwrapped.rs`, added to
+`controls/negatives.py --verus` as a must-NOT-fire arm **so it is RUN on every
+invocation rather than merely cited.** ▶ **That is the pattern: a committed
+generator, exercised, not a pointer.**
+
+⚠⚠ **THIS IS NOT A NEW RULE BEING IMPOSED ON A CLEAN CORPUS — IT IS A CENSUS,
+AND THE CORPUS IS ALREADY IN BREACH.** Measured 2026-09-12 by the extended
+`citecheck.py`:
+
+| | |
+|---|---|
+| row-specific `.temp/` citations **inside a hashed `spec.md` contract** | **9, across 6 of 8 rows** — `ph00`, `ph03` ×3, `ph07`, `ph16`, `ph45` ×2, `ph53` |
+| row-specific `.temp/` citations in `NOTES.md` | **~90, across all 8 rows** |
+| ⛔ **already GONE** | **3** — `.temp/php13/bin`, `.temp/php16/tb`, `.temp/php36/bin` |
+| inherited from the byte-identical shared `why` block (PAT-era) | **3**, and repairing those is a **six-row re-gate** — open items 55/61, **not a row's debt** |
+
+▶ ⭐ **So `ph53` is the SIXTH row to do this and the only one that NOTICED** —
+it found its own, repaired two of three, and reported the gap that let the third
+through. **The rule exists because of the census, not because of that row.**
+
+⛔ **DO NOT bulk-repair the 99.** `spec.md` and `NOTES.md` are both in
+`source_sha256`, so it is a **re-gate per row and no re-measure** — batch each
+row's citations with that row's next re-gate. **What this rule binds is the NEXT
+row**, and `citecheck.py` is what makes that enforceable rather than remembered.
+
 ---
 
 ## G. Is this candidate a duplicate of a built or catalogued row?

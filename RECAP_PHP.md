@@ -45,26 +45,26 @@ between them read `CLAUDE.md`'s top table.
 ## ▶ START HERE — the next action, in ≤ 20 lines
 
 ```
-STATE   ⭐ ROWS BUILT 6 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
-        ph45 TYPE. ALL THREE AXES OPEN. .memory-php/ is AUTHORITATIVE.
-NEXT    NOTHING RUNNING. _039 + _040 BOTH LANDED + manager-verified.
-        ▶ BUILD ROW 7 = `ph53` (T3, first row in that family). ITS R1h IS
-        `d09cdd9f71f3`, NOT the catalogue's sha, which is REFUTED (F94).
-        BRIEF IS WRITTEN: `TASK_PHP_040_REPORT.md` §5. ⚠ declare `narrowed`
-        not `verbatim` (75); the catalogue's `u64` is ADDRESS-DEPENDENT (74).
-⚠ NEW   F94 ⭐⭐⭐ ph53's R1h CONVERTS A WILD DEREF INTO A **NULL** DEREF and adds
-        no guard -- one hunk, two severities, a shape no built row has.
-        F95 the screen's 43 EXCLUSIONS ARE 25; its soundness test PROMOTED AN
-        EXCLUSION TO A PROOF (1/170, repaired). F92 ⛔ item 68 answered NO.
-        F91 ⭐⭐⭐ |B/A| 50-394x small-delta vs 0.2-3.0x large: B LOSES A SMALL
-        CODE DIFFERENCE. ▶ AXIS = SAME-LANGUAGE (A) vs CROSS-LANGUAGE (not A).
-⚠ WRONG MY F90 REFUTED by F92 -- EIGHTH in this thread. F91's probe made TWO
-        scoping errors, the 2nd the one MY OWN F82 forbids. 0 arithmetic.
+STATE   ⭐ ROWS BUILT 7 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
+        ph45 (T1) + ph53 (T3) TYPE. 6 of 20 families. .memory-php/ AUTHORITATIVE.
+NEXT    NOTHING RUNNING. _039 + _040 + _041 ALL LANDED + manager-verified.
+        ▶ MANAGER'S CALL: (a) ph53 DEBT IN ONE RE-GATE -- items 80
+        (spellings.py) + 79 (a ZERO-trusted-item R5) + F99's citation; or
+        (b) item 62 family C, testing its NULL *and* its SENSITIVITY (F91).
+        ⭐ ROWS BEFORE METHODOLOGY: 3.0 tasks/row, floor 40, built 7, 33 owed.
+⚠ NEW   F96 ROW 7 BUILT, 3 OF 4 PREDICTIONS REFUTED -- R4 landed OUTSIDE BOTH
+        arms of the one that named its own falsifier. F97 ⭐⭐⭐ TWO SOUND GATE
+        RULES ARE JOINTLY UNSATISFIABLE for a MaybeUninit read; 7h FORBIDS the
+        input that shows this row's fault. F98 ⭐⭐⭐ a rung that REPRODUCES
+        cannot be VERIFIED (coverage is ATTACKER DATA), +21.8%.
+        F99 ⛔ item 65 is CORPUS-WIDE: 9 hashed `.temp/` cites, 3 ALREADY GONE.
+⚠ WRONG MY F90 REFUTED by F92. F91's probe made TWO scoping errors, the 2nd the
+        one MY OWN F82 forbids. F87 under-attributed (F99). 0 arithmetic.
 ⚠ TRAPS `grep -a` ALWAYS (41 corpus files). A PROBE WHOSE SETUP ENCODES THE
-        ANSWER is WRONG. A CORRECTION APPENDED LEAVES THE OLD NUMBER (73, x2).
-BAR     C-SIDE ONLY: nothing Rust/Verus/Miri/cost kills a row (ph52's `0.00%`
-        R1h is a RESULT, 76). ⚠ .web/ is CONCURRENT -- NEVER `git add -A`.
-READ    .memory-php/ · PROTOCOL_PHP.md §B1a+§H1 · F1-F95 · items 1-76 · 62 NEXT.
+        ANSWER is WRONG. A CORRECTION APPENDED LEAVES THE OLD NUMBER (73, x3).
+BAR     C-SIDE ONLY: nothing Rust/Verus/Miri/cost kills a row -- "safe Rust
+        can't express it" is F96's POINT. ⚠ .web/ CONCURRENT: NEVER `git add -A`.
+READ    .memory-php/ · PROTOCOL_PHP.md §B1a+§F6+§H1 · F1-F99 · items 1-80.
 ```
 
 ---
@@ -73,8 +73,8 @@ READ    .memory-php/ · PROTOCOL_PHP.md §B1a+§H1 · F1-F95 · items 1-76 · 62
 
 | | |
 |---|---|
-| **rows built** | **6 — `ph03` + `ph07` (both `S1`), `ph16`, `ph29` spatial · `ph64` TEMPORAL · `ph45` TYPE. ⭐ ALL THREE AXES OPEN.** Each five rungs + R1h. ⚠⚠ **THIS ROW SAID *"3"* FOR TEN TASKS** — `PROTOCOL.md` rule 13, and the box above warns about exactly this. **Count it: `ls results-php/gate/ | grep -av ph00 | wc -l`.** ⚠ **The lesson that outlived the arithmetic, kept because it did**: at n = 2 both rows were `ph03-uudecode-bound` and `ph07-strcut-cursor`, **the SAME family** (`S1`, unbounded cursor walk, 1 of the catalogue's 20) — and **no document said so for four tasks.** That cost, and the quota rule out of it, are open item 34 and `QUOTA_001.md`. ⓘ `ph00-smoke` is a relocated PAT calibration kernel — throwaway, **no PHP provenance**, and it prices nothing. ⚠ It IS in `results-php/gate/`, which is why the count command excludes it |
-| **tasks** | **38 written, `_001`–`_038`; 37 have reported; NOTHING RUNNING.** ⚠⚠ **THIS CELL HAD ACCRETED TWO GENERATIONS OF TEXT** — it gave *"28 written"* and *"`_023` is RUNNING"* in the same breath. Rewritten, and **count it rather than trust it**: `ls .tasks-php/TASK_PHP_*.md | grep -av REPORT | wc -l`. ⛔⛔ **AND THE `6.2 … AND RISING` I WROTE HERE LAST SESSION WAS THE WRONG QUANTITY — corrected 2026-09-12, `python3 .tasks-php/task_cost.py`.** `total / rows` **charges 19 ONE-TIME tasks** (Phase 0 `_002`–`_010`, the mining wave, the whole catalogue) **to six rows.** It answers *"what has this cost so far"* and is quoted to answer *"what will row 7 cost"*. ⭐⭐ **THE MARGINAL COST IS `18 / 6 = 3.00`, WHICH IS `PLAN_PHP.md` §8's PAT-MEASURED ~3 — SO THE PLAN WAS RIGHT and the sentence saying the php side costs *twice* what it assumed was mine and was wrong.** ⛔ **And *"RISING"* is a DENOMINATOR ARTEFACT**: `total/rows` rises whenever one-time tasks accumulate while rows lag — **it would rise if every row cost exactly 3.** The series a trend claim needs is per-row, in build order: **`ph03` 2.83 · `ph07` 5.50 · `ph16` 1.33 · `ph29` 3.33 · `ph64` 2.00 · `ph45` 3.00` — flat, with one expensive row**, and `N6` is the control (**`ph07` was named as the dearest BEFORE running**, being the only *rebuilt* row). ✅ **Survives the worst reading of the classification (3.00 / 3.50 / 4.17)**, and the residual error points the **forgiving** way — `_033`/`_035`/`_037` are charged wholly to rows and all three carried statistic work. ⭐ **For the 40-row floor (34 owed): ~102 more tasks at the marginal rate, not the ~221 the 6.2 implies.** ⚠ Still a large programme, and `quota.py` calls the floor *"the cheapest possible programme, not the expected one"* — but *"twice as expensive as planned"* is **withdrawn**. ⓘ `PENDING = 1` (`_040`, charged to a row not yet built) and `N8` fails if that pile passes a quarter of `ROW`. ⓘ Recent: `_033`–`_036` the `ph45` round · **`_037` searched `ph45`'s R4 AND R3 endpoints** (F87) · **`_038` REVIEWED the statistic findings and refuted three manager claims** (F88, and the corrections inside F83/F84/F86) |
+| **rows built** | **7 — `ph03` + `ph07` (both `S1`), `ph16`, `ph29` spatial · `ph64` TEMPORAL · `ph45` (`T1`) + `ph53` (`T3`) TYPE. ⭐ ALL THREE AXES OPEN, and TYPE now has TWO families.** Each five rungs + R1h. ⚠⚠ **THIS ROW SAID *"3"* FOR TEN TASKS** — `PROTOCOL.md` rule 13, and the box above warns about exactly this. **Count it: `ls results-php/gate/ | grep -av ph00 | wc -l`.** ⚠ **The lesson that outlived the arithmetic, kept because it did**: at n = 2 both rows were `ph03-uudecode-bound` and `ph07-strcut-cursor`, **the SAME family** (`S1`, unbounded cursor walk, 1 of the catalogue's 20) — and **no document said so for four tasks.** That cost, and the quota rule out of it, are open item 34 and `QUOTA_001.md`. ⓘ `ph00-smoke` is a relocated PAT calibration kernel — throwaway, **no PHP provenance**, and it prices nothing. ⚠ It IS in `results-php/gate/`, which is why the count command excludes it |
+| **tasks** | **41 written, `_001`–`_041`; all have reported; NOTHING RUNNING.** ⚠⚠ **THIS CELL HAD ACCRETED TWO GENERATIONS OF TEXT** — it gave *"28 written"* and *"`_023` is RUNNING"* in the same breath. Rewritten, and **count it rather than trust it**: `ls .tasks-php/TASK_PHP_*.md | grep -av REPORT | wc -l`. ⛔⛔ **AND THE `6.2 … AND RISING` I WROTE HERE LAST SESSION WAS THE WRONG QUANTITY — corrected 2026-09-12, `python3 .tasks-php/task_cost.py`.** `total / rows` **charges 19 ONE-TIME tasks** (Phase 0 `_002`–`_010`, the mining wave, the whole catalogue) **to six rows.** It answers *"what has this cost so far"* and is quoted to answer *"what will row 7 cost"*. ⭐⭐ **THE MARGINAL COST IS `18 / 6 = 3.00`, WHICH IS `PLAN_PHP.md` §8's PAT-MEASURED ~3 — SO THE PLAN WAS RIGHT and the sentence saying the php side costs *twice* what it assumed was mine and was wrong.** ⛔ **And *"RISING"* is a DENOMINATOR ARTEFACT**: `total/rows` rises whenever one-time tasks accumulate while rows lag — **it would rise if every row cost exactly 3.** The series a trend claim needs is per-row, in build order: **`ph03` 2.83 · `ph07` 5.50 · `ph16` 1.33 · `ph29` 3.33 · `ph64` 2.00 · `ph45` 3.00` — flat, with one expensive row**, and `N6` is the control (**`ph07` was named as the dearest BEFORE running**, being the only *rebuilt* row). ✅ **Survives the worst reading of the classification (3.00 / 3.50 / 4.17)**, and the residual error points the **forgiving** way — `_033`/`_035`/`_037` are charged wholly to rows and all three carried statistic work. ⭐ **For the 40-row floor (34 owed): ~102 more tasks at the marginal rate, not the ~221 the 6.2 implies.** ⚠ Still a large programme, and `quota.py` calls the floor *"the cheapest possible programme, not the expected one"* — but *"twice as expensive as planned"* is **withdrawn**. ⓘ `PENDING = 1` (`_040`, charged to a row not yet built) and `N8` fails if that pile passes a quarter of `ROW`. ⓘ Recent: `_033`–`_036` the `ph45` round · **`_037` searched `ph45`'s R4 AND R3 endpoints** (F87) · **`_038` REVIEWED the statistic findings and refuted three manager claims** (F88, and the corrections inside F83/F84/F86) |
 | **infrastructure** | **built and reviewed TWICE**: `harness-php/{root,gate,provenance}.py` · `common-php/` · `patterns-php/{SOURCES.md,php-5.0.0.manifest}` (1170 files, 109 KB) · `.tasks-php/PROTOCOL_PHP.md` · `results-php/`. ⚠ **Reviewed is not the same as correct — the second review found a blocker in the first review's own fix.** ⚠ There used to be a SECOND row in this table also labelled `infrastructure` saying *"not yet built — Phase 0"* (`TASK_PHP_003` m1); it is gone |
 | **candidates** | **54** delivered across three axes. ⚠ **`.tasks-php/ADJUDICATION_001.md` takes that to ≈ 80**: +6 splits, −2 merges, **+17 kills reversed**, +1 dropped with no reason recorded, +4 that fell between axes. Evidence in `.tasks-php/TASK_PHP_001_MINE/` |
 | **catalogue** | ✅ **`patterns-php/CATALOGUE.md` — 102 rows, LANDED AND VERIFIED** by `TASK_PHP_023` (⚠ this line has said **91** and **93**; count it, do not trust it: `python3 .tasks-php/quota.py`). **20 mechanism families**, unchanged by the landing — spatial **42** · type **29** · temporal **31**. ✅ **Part A and Part B agree row-for-row, and every row is filed under the same axis in both** — the `ph92`/`ph93` mismatch is gone. ✅ `coverage.py` **166/166, MISSING 0**; all 8 withdrawn `C.1` kills present in place with their notes. ⚠⚠ **Two landed sentences were measured FALSE and are corrected in `CATALOGUE.md` AND in `land_019_020.py`** (F52 `ph94`'s trigger, F53 `ph32`'s *"one commit"*) — a landing script left carrying a refuted claim is a cited artefact. ⚠ **`_023` reviewed the nine admissions and would overturn NONE of `_019`'s reversals**; ~70 citations opened across 15 files, including the ones `_019` called correct. ⚠ **Parts A/B beyond the nine are still UNREVIEWED**, and `_020` measured the mechanism sentences right and the `▸ trigger` lines wrong (F46). Part A is a scannable table, Part B a ~150-word block per row, Part C the kill list with a re-derived criterion per kill |
@@ -228,7 +228,19 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > **F95 ⭐⭐⭐ the pre-image screen's 43 EXCLUSIONS ARE 25 (item D11's third
 > label landed), and its soundness test was PROMOTING AN EXCLUSION TO A PROOF —
 > reach 1 of 170, repaired, with the regression negative in the COMMITTED
-> suite because the finding probe stops firing once the defect is gone**
+> suite because the finding probe stops firing once the defect is gone** ·
+> **F96 ⭐⭐⭐ ROW 7 IS BUILT — `ph53`, the first `T3` row and the first
+> IN-BOUNDS uninitialised read, with 3 of 4 predictions REFUTED and R4 landing
+> outside BOTH arms of the one that named its own falsifier** ·
+> **F97 ⭐⭐⭐ two SOUND gate rules are JOINTLY UNSATISFIABLE for a `MaybeUninit`
+> read, and stage 7h forbids shipping the input that shows this row's fault —
+> F31 binding on a real row for the first time** ·
+> **F98 ⭐⭐⭐ a rung that REPRODUCES this defect cannot be VERIFIED: coverage is
+> a property of attacker data, so R4/R5 carry a witness the C does not, at
+> +21.8 %** ·
+> **F99 ⛔⛔⛔ item 65 is CORPUS-WIDE — 9 `.temp/` citations inside HASHED
+> contracts across 6 of 8 rows, ~90 in `NOTES.md`, and 3 ALREADY GONE; `ph53`
+> is the sixth row to do it and the only one that noticed**
 >
 > ⚠ **This index stopped at F59 while F60–F65 existed** — `PROTOCOL.md` rule 13,
 > headers rot. **Extend it in the same edit that adds a finding.**
@@ -1528,6 +1540,186 @@ The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
 
+### F99 — ⛔⛔⛔ ITEM 65 IS **CORPUS-WIDE AND STRUCTURAL**: **9 `.temp/` CITATIONS INSIDE HASHED CONTRACTS, 6 OF 8 ROWS, AND 3 ALREADY GONE**
+
+**Manager, from `_041`'s candidate K.** ⚠ **UNREVIEWED** (rule 9).
+✅ **`.tasks-php/citecheck.py`, extended with FOUR must-fire negatives** (§H),
+`--selftest` **PASS**. **Free — the file is in no digest.**
+
+**`_041` put a `.temp/php41/probe_wrap.rs` citation inside `ph53`'s HASHED
+`slb-contract` block, FOUND IT ITSELF, repaired two of the three places it had
+written it — `verus.obligations_note` survived — and reported the reason nothing
+caught the third:** *"`citecheck.py` does not scan per-row `spec.md` or
+`NOTES.md`, so it reported `0 unresolved` while my hashed block cited a
+gitignored path. Open item 65's own checker has a blind spot exactly where the
+hashed layer is."*
+
+⭐⭐⭐ **I EXTENDED IT, AND THE RESULT IS NOT ONE SLIP:**
+
+| | |
+|---|---|
+| row-specific `.temp/` citations **inside a hashed `spec.md` contract** | ⛔ **9, across 6 OF 8 ROWS** — `ph00`, `ph03` ×3, `ph07`, `ph16`, `ph45` ×2, `ph53` |
+| row-specific `.temp/` citations in `NOTES.md` | **~90, across ALL 8** |
+| ⛔⛔ **already GONE** | **3** — `.temp/php13/bin`, `.temp/php16/tb`, `.temp/php36/bin` |
+| inherited from the byte-identical shared `why` (PAT-era) | **3**, a **six-row** re-gate to repair — items 55/61, **not a row's debt** |
+
+▶ ⭐ **So `ph53` IS THE SIXTH ROW TO DO THIS AND THE ONLY ONE THAT NOTICED.**
+⚠⚠ **And the three that are already GONE are the measurement that says this is
+not hypothetical** — `exists()` cannot tell *"resolves today"* from *"will be
+deleted when the gates go green"*, which is why the check is keyed on the doc
+being **committed** rather than on the path being broken.
+
+⭐ **THE SPLIT IS MECHANICAL, AND IT HAD TO BE.** A citation present in **every**
+row's `spec.md` is the shared block; anything else is the row's. **A
+hand-maintained list would go stale the moment that block is edited** — and
+without the split the 3 inherited ones would print **8 times each** and bury the
+9 that matter. ⓘ `N3` is the negative that stops the check **punishing the
+repair**: `ph53`'s two retargeted `controls/mu_unwrapped.rs` citations must
+**not** be reported.
+
+✅ **AND THE RULE IS NOW WRITTEN WHERE A ROW AUTHOR WILL MEET IT:**
+`PROTOCOL_PHP.md` **§F6** — *if a probe is the evidence, ship it under
+`controls/` and cite it there.* ⭐ **`ph53`'s own repair is the pattern**:
+`controls/mu_unwrapped.rs` is added to `controls/negatives.py --verus` as a
+must-NOT-fire arm, **so it is RUN on every invocation rather than merely
+cited.** ⛔ **DO NOT BULK-REPAIR THE 99** — both files are in `source_sha256`,
+so it is a **re-gate per row and no re-measure**; batch each row's with that
+row's next re-gate. **What the rule binds is the NEXT row.**
+
+⚠ **AND A CORRECTION OWED TO F87, FROM `_041`'s candidate J.** Neither
+`verus_checked` nor `problems` is a field this harness writes into a **gate**
+record — **absent from all 8** (manager-verified). F87 says *"Manager-verified
+from `results-php/gate/` **and `controls/spellings.json`**"* and quotes both.
+✅ **They live in `controls/spellings.json`, which that sentence names, so the
+verification was SOUND — but it does not say which field came from which file**,
+and an engineer checking the gate record for `verus_checked` reasonably concluded
+it was missing. ▶ **Under-attributed, not false.** ⓘ `problems` **is** a
+*preflight* field and reads `[]`; what stands in for `verus_checked` is
+`verus["verus.rs"] = {verified, errors, pinned}`.
+
+### F98 — ⭐⭐⭐ ON THIS ROW A RUNG THAT **REPRODUCES** THE DEFECT **CANNOT BE VERIFIED**, AND THE ONE THAT VERIFIES CARRIES A WITNESS THE C DOES NOT — **+21.8 %**
+
+`TASK_PHP_041` §3.5, candidate **B**. ⚠ **UNREVIEWED** (rule 9).
+
+**The obligation is `forall|i| … ==> v[i].mem_contents().is_init()`, and
+discharging it needs to know WHICH SLOTS THE `FILL`s COVERED. Coverage is a
+property of ATTACKER DATA**, and the pinned driver loop **offers no call site at
+which to establish it.** ▶ **So the shipped R4/R5 carry a coverage WITNESS that
+the C rung does not have, and it costs `+21.8 %`.**
+
+⭐⭐ **THAT IS A LADDER RESULT AND NOT A ROW'S FOOTNOTE**: the row's honest
+statement is *"the verified program is not the program the C is"*, priced. ⚠ **It
+is the reverse of the shape the ladder was built expecting** — R5 usually costs
+nothing over R4 because `identity` pins them byte-identical; here R4 **already**
+carries the witness, so the cost sits between **R1 and R4**, not between R4 and
+R5. ⓘ `identity` pins `differ`/`differ` on this row, so nothing is violated.
+
+⚠ **The engineer refused an alternative it had verified** —
+`MaybeUninit<&Iface>` reaches **5 verified / 0 errors with ZERO trusted items**
+— because *"the compare-only consumer needs `ptr::eq`"*, **and it did not
+measure the alternative.** ▶ **That is the honest form and it is also an open
+question**: a representation with **no trusted base at all** is worth a number
+even if it cannot serve both consumers. → item **79**.
+
+### F97 — ⭐⭐⭐ TWO **SOUND** GATE RULES ARE **JOINTLY UNSATISFIABLE** FOR A `MaybeUninit` READ — AND STAGE 7h FORBIDS SHIPPING THE INPUT THAT SHOWS THIS ROW'S FAULT
+
+`TASK_PHP_041` §1a and §4, candidates **C** and **A**. ⚠ **UNREVIEWED**.
+⭐ **Both were found BY THE GATE, on its first run, which is the gate earning its
+cost.**
+
+**(C) THE UNSATISFIABLE PAIR.** Rule 1: **every `unsafe` token must sit in an
+`external_body` body.** Rule 2 (**5c-twin**): **every trusted item needs a
+verified twin.** ⛔ **For a `MaybeUninit<T>` read there is NO SAFE EXEC ROUTE
+FROM `MaybeUninit<T>` TO `T`, so the twin cannot exist** — not *inconvenient*,
+**impossible**. ▶ **Two individually sound rules that no program of this shape
+can satisfy.**
+✅ **Resolved without weakening either**: fold `get_unchecked` + `assume_init`
+into **one** trusted item (**TCB count unchanged**) and ship
+`controls/mu_unwrapped.rs` (**7 verified / 0 errors, no trusted item**) as the
+twin's substitute — *"which is a stronger statement than a hand-written twin
+would have made"*, because it verifies against **vstd's own specification**
+rather than a hand-written contract. ⚠ **Two `contract_sha256` moves, both
+disclosed in `NOTES.md`'s first box**, with `verus.obligations` (27), the
+`identity` pin, and every `requires`/`ensures`/`idiom`/`provenance`/`why`
+**unmoved** — and §8's figures **re-measured after the change rather than
+carried over.**
+
+**(A) AND THE ROW CANNOT SHIP THE INPUT THAT SHOWS ITS OWN FAULT.** Stage **7h**
+requires **R1h clean on every input in `inputs/`**, and this row's R1h **does not
+remove the fault** (F94) — it converts a wild dereference into a **NULL** one.
+▶ ⛔ **So there can be no `adversarial-deref.bin`**, and there is not one.
+⭐⭐ **`.memory-php/02-ladder.md`'s F31 is BINDING ON A REAL ROW FOR THE FIRST
+TIME, and the resolution F31 prescribes — put it in `controls/` — is the one
+taken**: `controls/r1h_consumers.py`, with the gate's own
+`sanitizer_hardened.fired = False ×7` as the corroboration that the shipped
+corpus really is R1h-clean.
+⚠⚠ **THE GENERAL SHAPE, AND IT WILL RECUR**: **a row whose upstream fix does not
+remove the fault cannot ship the input that demonstrates the fault.** ▶ **Any
+future row with a `d09cdd9f71f3`-shaped R1h hits this**, and `controls/` is where
+the demonstration lives. → item **77**.
+
+### F96 — ⭐⭐⭐ **ROW 7 IS BUILT** — `ph53`, the first `T3` row, the first IN-BOUNDS uninitialised read, and **3 OF 4 PREDICTIONS REFUTED**
+
+`TASK_PHP_041`. ⚠ **UNREVIEWED** (rule 9). ✅ **Manager-verified from
+`results-php/gate/ph53-iface-tail-uninit.json`**: `verdict
+PASS-WITH-BLOCKED-ROWS`, `failures []`, `complete_run true`, `verus
+{verified 27, errors 0, pinned 27}`, `identity` **`differ`/`differ` as
+pinned**, `forbidden_hits 0`, `skipped_inputs []`, `contract_sha256
+7013be6f7c1c`. **Brackets `66/0` + `14/0` → `66/0` + `16/0`, re-run by me.**
+
+⭐ **The row's own novelty: an uninitialised read that is IN BOUNDS.** CWE-824 —
+the slot is inside the reallocated block and nothing is freed. **No built row
+priced that**, and `ph32` (sized to the *literal*, excess *past* the end) is its
+cross-reference, not its duplicate.
+
+### ⛔⛔⛔ 3 OF `_040` §5.6's 4 PREDICTIONS ARE **REFUTED**, AND THAT IS THE BETTER RESULT
+
+| | predicted | **measured** |
+|---|---|---|
+| **R2** | ≈ R1h — *"5.2.0's repair reinvented by the type system"*, niche-optimised to one word | ⛔ **`+6.97 %` against R1h's `+0.23 %`** |
+| **R3** | ⭐ *"the cheapest rung on the row"*, and the row's headline | ⛔ **dearest-but-one at `-O3`** |
+| **R4** | the `MaybeUninit::uninit()` fill **elides**, byte-identical to R1; *"if not, R4 is DEARER than the C it models"* | ⛔ **only PARTLY elided — and R4 is `18.9 %` CHEAPER than R1**, i.e. **neither** arm of a prediction that thought it had covered both |
+| **R5** | no hand-rolled ghost state | ⚠ **HALF-REFUTED**: none for *memory safety*, but **one `Seq<Option<u32>>` for the VALUE postcondition** |
+
+▶ ⭐⭐ **A prediction that names its own falsifier and is then refuted on the
+falsifier's own terms is worth more than a confirmation** — and **R4's is the
+sharpest**, because §5.6 offered two arms (*elides* / *dearer*) and **the truth
+was outside both.** ✅ **`_040`'s residual `index_mut` risk is SETTLED: yes, a
+full value-level `ensures`.**
+
+### ⭐⭐ AND FOUR MEASURED RESULTS BEYOND THE ROW
+
+1. ⭐⭐ **THE COMPARING CONSUMER IS NOT HARMLESS, IT IS MERELY NON-FATAL.** With
+   the wild value **CHOSEN** rather than observed (`controls/wild_choice.py`, 6
+   negatives — the shim's size-class cache primed so the pointer is chosen), it
+   **reports an interface the class never implemented**, and `d09cdd9f71f3`
+   **does** remove that. ▶ **So the upstream fix is COMPLETE on one consumer and
+   USELESS on the other** — which sharpens F94's *"one hunk, two severities"*
+   from a severity claim into a **correctness** one. **Measured per consumer:**
+   R1 → `member access within misaligned address 0xbebebebebebebebe` → SEGV;
+   R1h → `member access within null pointer` → **SEGV at `0x0`**; `QUERY_CMP`
+   exit 0 with the **same `u64`** on both arms.
+2. ⭐⭐⭐ **A DIRECT TEST OF F91's AXIS, AND IT CONFIRMS THE MECHANISM RATHER
+   THAN THE RULE.** **A and B agree in sign and closely in magnitude on EVERY
+   cross-language cell of this row** — the *opposite* of F85's regime — **and
+   the reason is that §B1a's O(1)-allocation precondition HOLDS here, so there
+   is no allocator term for B to include and A to miss.** ▶ **F91 said the axis
+   is same-language vs cross-language; this row says the axis is really
+   *whether the callee work diverges*, and language is a proxy for it.**
+   ⚠ **Evidence about this row, not about A.** → item **78**.
+3. ⭐ **THE PROVED RUNG IS CHEAPER THAN THE UNSAFE ONE — a THIRD row, and by the
+   largest margin of the three** (`A1 −1.253 %`). F82's observation on `ph45`
+   and `ph64`, now `n = 3`.
+4. ⭐ **`[100, 200]` does NOT sit on a transient on this row** (`0.39–0.93 %`) —
+   **a third data point on item 69**, and *"the three points track per-window
+   work heterogeneity"*, which is a **mechanism** for F93 that F93 did not have.
+
+⚠⚠ **AND 15 THINGS IT IS UNSURE OF, IN ITS OWN SECTION** (§8). The largest:
+the **tier** (`9 %` overlap, and *"the `modelled` argument I did not take"*);
+**no `controls/spellings.py`**, so **both endpoints are unsearched and that is
+now 4 of 7 rows** (item 58's residue → item **80**); `MAXD = 16`; and the
+`MaybeUninit<&Iface>` representation it verified and rejected (F98).
+
 ### F95 — ⭐⭐⭐ THE PRE-IMAGE SCREEN'S **43 EXCLUSIONS ARE 25**, AND ITS SOUNDNESS TEST WAS **PROMOTING AN EXCLUSION TO A PROOF**
 
 `TASK_PHP_040` §4 (item **D11**, closed) **plus a manager repair.**
@@ -2215,12 +2407,20 @@ per-window work must vary strongly — **and it is the one row that publishes B1
 
 ### F87 — ⭐⭐⭐ `ph45`'s R4 **AND** R3 ENDPOINTS BOTH MOVE, THE BOUND'S **SIGN REVERSES**, AND `get_unchecked` IS THE **EXPENSIVE** SPELLING
 
-`TASK_PHP_037`. ✅ **Manager-verified from `results-php/gate/` and
-`controls/spellings.json`, not from the report**: `verdict
-PASS-WITH-BLOCKED-ROWS`, `failures []`, `complete_run true`, `controls_json
-{"spellings.json": "FRESH"}`, `verus_checked true`, `problems []`,
-`r4_endpoint_degenerate false`, `r3_endpoint_degenerate false`,
-`contract_sha256` **unmoved**. **Brackets `66/0` and `14/0`, run by the manager
+`TASK_PHP_037`. ✅ **Manager-verified, not from the report — and SAYING WHICH
+FILE EACH FIELD CAME FROM, which this sentence originally did not.** From
+**`results-php/gate/ph45-…json`**: `verdict PASS-WITH-BLOCKED-ROWS`,
+`failures []`, `complete_run true`, `controls_json {"spellings.json":
+"FRESH"}`, `contract_sha256` **unmoved**. From
+**`controls/spellings.json`**: `verus_checked true`, `problems []`,
+`r4_endpoint_degenerate false`, `r3_endpoint_degenerate false`.
+⚠⚠ **`verus_checked` AND `problems` ARE NOT GATE FIELDS AT ALL** — absent from
+**all 8** php gate records (`_041` candidate J, manager-confirmed), so a reader
+who looked for them there reasonably concluded the verification was invented.
+▶ **It was sound and UNDER-ATTRIBUTED**, and the fix is in this sentence rather
+than in a paragraph below it (item **73**). ⓘ `problems` **is** a *preflight*
+field; `verus_checked`'s stand-in is `verus["verus.rs"] = {verified, errors,
+pinned}`. **Brackets `66/0` and `14/0`, run by the manager
 independently — identical to the opening, so no re-measure.**
 
 | side | variant | trusted sites | **W1** |
@@ -4921,7 +5121,7 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 ## Open items — carried, not closed
 
 ⚠ **THE NUMBERS HAVE GAPS AND THAT IS CORRECT — DO NOT "REPAIR" THEM.**
-**73 rows present, numbered 1 → 76, with 45–47 REMOVED ENTIRELY** and
+**77 rows present, numbered 1 → 80, with 45–47 REMOVED ENTIRELY** and
 **4, 7, 10, 12, 18–25, 27, 31 and 48 retired IN PLACE as `~~N~~`**; no number is
 ever reused. ⚠ **Two conventions coexist on purpose** — a retirement whose
 *reasoning* is worth keeping stays as a struck row, and one whose successor
@@ -5017,7 +5217,7 @@ the wrong one.
 | ~~55~~ | ✅✅ **DISCHARGED 2026-09-12 — `PROTOCOL_PHP.md` §H1.** ⛔ **Its headline was FALSE**: *"the rule is real and cheap to state and there is **nowhere cheap to state it**"* — there is, and it is the file the item's own candidate list names. **See item 54 for the measurement.** ⭐ **And §H was not merely *a* candidate home — it is the home whose stated purpose this rule instantiates**: in `forbidden` a backticked character literal is **a ban that CANNOT FIRE**, which is §H's exact target. ⚠ **The php-only SCOPE objection stands and is ACCEPTED rather than solved**, with the condition that would move it: reach is **0 of 33 PAT**, so nothing is owed a PAT author today, and `charlit_reach.py` is the check that would say otherwise. **The original text:** | ⚠⚠ **F73'S WRITING RULE — ORIGINAL FRAMING** | F73. The natural place is the **named-spelling standard**, but that paragraph lives **inside every pattern's `why`, i.e. inside `contract_sha256`**, and it is byte-identical across six patterns — so writing one sentence into it costs a **six-row re-gate on the PHP side and 33 on PAT**. ⚠ The rule is real and cheap to state and there is **nowhere cheap to state it**. Candidate homes, none chosen: `PROTOCOL_PHP.md` §H (php-only, so PAT authors never see it); `.memory-php/` (authoritative but php-only, and needs review first); a `harness/` docstring (**forbidden — hashed**). ⭐ **The general shape is worth more than this instance**: a convention that binds BOTH programmes has no unhashed shared surface, which is why `CLAUDE.md`'s top table exists and why it keeps growing |
 | 56 | ⚠ **A BARE-IDENTIFIER PIN IS A WEAK PIN, AND NOTHING MEASURES PIN QUALITY** | F72. `ph29`'s `required[3].rust` is `real_size`, which occurs **3–7 times per rung** — it pins *"this name occurs"*, not a construction. Compare `.wrapping_add(1)` and `emalloc(to_read + 1)`, which pin **exactly one line per rung**. ⚠ `idiom_audit` reports `pins_nothing` and `absent` but has **no notion of how tightly a present pin binds**, so a one-line pin and a seven-hit identifier are indistinguishable in the record. ✅ **Not a defect in `ph29`** — the entry's English carries the §B1.3 argument and the pin is honest; `TASK_PHP_033` is told explicitly not to strengthen it. ▶ Open: is hit-count-per-rung worth reporting beside each present pin, and **would it be a number nobody acts on** — the exact trap `idiom_audit`'s own docstring records about the printed `2` that moved nothing for three tasks |
 | 57 | ⚠⚠ **`ph16`'s `controls/spellings.py` CARRIES TWO REAL DEFECTS, BOTH LATENT, AND FIXING THEM COSTS A `ph16` RE-GATE** | F79, `_035`, found by its own §H negatives and **guarded in `ph29`'s copy only**. (a) ⭐ **`kernel_fingerprint` returns `(0, 'd41d8cd98f00')` — the md5 of the EMPTY STRING — for a binary that does not exist**, because `disasm` ignores `objdump`'s return code, **so two missing binaries compare EQUAL on the one function whose job is to decide byte-identity.** (b) `disasm`'s needle is a **bare substring**, so a crate named `nokernel` fingerprints its own `main`. ✅ **Latent, not live, on `ph16`** — every call site there is downstream of a build whose success is checked — which is why `_035` correctly left it alone rather than widening its scope. ⚠ `controls/*.py` is in `source_sha256`, so the fix **costs a `ph16` re-gate**; batch it with any other `ph16` work. ⭐ **The general shape: a control cloned between rows carries its defects with it, and only the row that writes NEW negatives finds them** — `ph16`'s suite was 54 cases and did not catch these; `ph29`'s 75 did |
-| 58 | ⚠⚠ **THREE OF SIX BUILT ROWS HAVE AN UNSEARCHED R4 ENDPOINT, AND F77 JUST PROVED THAT MATTERS** | `ph03`, `ph64` and now `ph45` (F80). ⚠ Until `TASK_PHP_035` this debt looked cosmetic, because `ph07` and `ph16` both searched their R4 side and found it **degenerate**. ⭐⭐ **F77 killed that reading**: `ph29`'s `r4_fold_iter` verifies byte-identically and is **5.63 pp cheaper**, so a `fixed-R4 bound` over an *unsearched* endpoint is a bound over a number nobody has tried to move. ▶ **`ph45` is the cheapest of the three to search** (its `spellings.py` was never built, so there is no declaration repair to do first) and `ph03` is the oldest. ⚠ Each costs a re-gate; **batch each row's owed prose fixes into the same run** — the lesson `TASK_PHP_033.md` learned by failing to |
+| 58 | ⚠⚠ **THREE OF SIX BUILT ROWS HAVE AN UNSEARCHED R4 ENDPOINT, AND F77 JUST PROVED THAT MATTERS** | `ph03`, `ph64` and now `ph45` (F80). ⚠ Until `TASK_PHP_035` this debt looked cosmetic, because `ph07` and `ph16` both searched their R4 side and found it **degenerate**. ⭐⭐ **F77 killed that reading**: `ph29`'s `r4_fold_iter` verifies byte-identically and is **5.63 pp cheaper**, so a `fixed-R4 bound` over an *unsearched* endpoint is a bound over a number nobody has tried to move. ▶ **`ph45` is the cheapest of the three to search** (its `spellings.py` was never built, so there is no declaration repair to do first) and `ph03` is the oldest. ✅ **`ph45` WAS SEARCHED at `_037` (F87) and BOTH its endpoints moved.** ⚠⚠ **But the debt did not shrink: `ph53` shipped without a `spellings.py` too.** ▶ **Item 80 supersedes this line for the count and the ordering.** ⚠ Each costs a re-gate; **batch each row's owed prose fixes into the same run** — the lesson `TASK_PHP_033.md` learned by failing to |
 | 59 | ⚠ **A SIGNED OVERFLOW AT `mbfilter_htmlent.c:193`, IN `ph45`'s OWN FUNCTION, UNTRACED TO ANY FIX** | F80, `_036`'s own find, **reported and not pursued** — the right call, since chasing it was outside a build task's scope. ⚠ It is **inside the function `ph45` extracts**, so it is not merely adjacent: the row's benign corpus must be shown not to evaluate it (F46's UB-free-trigger rule), and `_036` does not say whether that was checked. ▶ ✅✅ **ASKED AND ANSWERED — AT `TASK_PHP_037` §4, AND THE ITEM NEVER RECORDED THAT IT WAS CLOSED.** ⛔ **`inputs/gen.py` neither edited nor run** (`sys.dont_write_bytecode` set before import; all eight blobs re-hashed before and after, none moved). **TWO independent decoders sharing no constant**, agreeing on values, entity tables and `html_entity_chars`. ⭐⭐ **And decoder B tracks the accumulator in unbounded integers AND wrapped 32-bit SIMULTANEOUSLY — identical on both inputs**, which is the **direct** statement that `:193` never overflowed, **not an inference from a margin.** ⭐⭐⭐ **THE SENTENCE THAT MUST BE LANDED, because the margin alone reads as *"it cannot happen"*: the guard is NOT VACUOUS A PRIORI — the `buffull` arm permits a 13-DIGIT numeric body, `~7.4e12`, THREE ORDERS OF MAGNITUDE ABOVE `INT_MAX`. ▶ So `:193` CAN overflow; what keeps this corpus safe is the TOKEN GRAMMAR, not the arm bound.** ⓘ Manager re-read `:193` in the pristine tarball independently (`ent = ent*10 + (buffer[pos] - '0')`, no cap inside the loop) — a third confirmation. ▶ **OWED: PROSE ONLY.** `NOTES.md` is in the gate digest and **not** the measurement digest, so landing it costs **one `ph45` re-gate and no re-measure** — **batch with items 63 and 65.** **The original ask:** ⓘ Distinct from the **stack OOB write at `:123`** in the *encode* half (F75), which is also uncatalogued and which the row deliberately does not lift |
 | 60 | ⚠ **`harness/check.py`'s NULL-CONTROL TABLE JUSTIFIES ITS WORST CELL WITH BYTE-IDENTITY THAT THE ROW'S OWN PIN DENIES — PAT-SIDE, FOR ROUTING** | F82. The docstring is **more careful than my probe was** — it corrects the table for **mode**, **opt level** and **input**, and warns *⚠⚠⚠ A NULL IS A PROPERTY OF A CELL. DO NOT MAX IT OVER MODE, OVER LEVEL, OR OVER INPUT.* ⚠ It does not correct for the **identity level**: its worst quoted cell, **`p25 large +269.52`**, is on the row pinned `` `O0: norel`, `O3: norel` ``, while the table is justified by *"`identity` forces R4's and R5's kernels to agree byte for byte."* ✅ **The number is RIGHT and the justification is WRONG** — p25 rescues it by a different route its own identity note records (189 non-pad instructions and identical byte count in both cells). ⚠⚠ **`harness/` is FROZEN**: one sentence costs a 33-pattern re-gate, and `results/SYNTHESIS.md` is the PAT-side authority, not this file. ▶ **Reported, NOT fixed.** ⭐ The general shape is the same as F82's own: **a correct number whose stated reason is false survives every check, because checks test numbers** ⭐⭐ **AND F84 SUPPLIES THE MISSING MECHANISM FOR THE TABLE'S LARGEST CLASS.** That docstring records *"1.00 ≤ |null| < 2 in 35 cells, **34 of them exactly −1.00**"* without explaining the `−1.00`. ⛔ **I answered it wrongly and `TASK_PHP_038` §4.2 supplied the real one: it is exactly ONE INSTRUCTION PER KERNEL CALL IN `main`** — `main_exclusive_ir` Δ/n = **−1.0000** on `ph00` and `p11`, **already in every committed measurement record and needing no callgrind at all.** ⭐ **So the mechanism for `check.py`'s largest documented class IS now on file, just not the one I proposed** — and the routing item stands unchanged, since `harness/` is frozen either way |
 | 61 | ⚠⚠⚠ **THE SHARED `why` BLOCK ARGUES R4 ADMISSIBILITY FROM AN ANTECEDENT THAT IS FALSE ON THREE OF SIX PHP ROWS** | F82. The block — **byte-identical across all six PHP rows and all 33 PAT rows** — says *"All six patterns pin `identity: unsafe == verus, O3 exact`, so an R4 is not merely a program that MAY use `unsafe`: it is a program that must have a byte-identical R5 twin that Verus verifies."* ⚠ **`ph07` pins `norel`, `ph45` and `ph64` pin `differ`.** It is **PAT-side boilerplate carried into a programme where it does not hold**, and it is the step by which `.memory/01-ladder.md` disqualifies unverifiable R4 candidates — so on those three rows **that disqualification has no stated basis**. ⚠⚠⚠ **AND `TASK_PHP_037` MEASURED THE STRONGER FORM: the wider bar is NECESSARY here, not merely permitted. NO twin on `ph45` compiles byte-identically — INCLUDING THE SHIPPED RUNG'S OWN (318 instructions against 320) — so under the shared block's own admissibility argument THIS ROW HAS NO ADMISSIBLE R4, NOT EVEN THE ONE IT SHIPS.** My task file said *"need NOT"* (permission) and that understated it. ▶ An R4 candidate on `ph45`/`ph64`/`ph07` need only **verify**; their searches are **wider than `ph29`'s** and F77's method is not the binding constraint — **F87 result 1 is a direct consequence.** ⚠ Fixing the sentence is a **six-row PHP re-gate** (it is inside `contract_sha256`) — ✅ **and THAT HALF IS CONFIRMED: `idiom.why` really is in the contract, measured at 15 028 B on `ph64`.** ⛔ **But item 55's *"no unhashed shared home"* is WITHDRAWN — `PROTOCOL_PHP.md` is in no digest at all** (item 54), so **one** of the two surfaces is free and one is not, and `STATISTICS_001 §6` collapsed them into one false sentence. ⭐⭐ **AND F91 GIVES THESE ROWS A SECOND, INDEPENDENT CONSEQUENCE: they also have NO NULL CONTROL.** `ph45` and `ph64` fail F82's `Δnopad == 0 and Δbytes == 0` predicate at **every** cell, so the frozen harness's *"compare against that pattern's OWN R5 − R4 null before quoting it in a band"* **cannot be satisfied on them** — and **`ph64` is the one row whose headline is family B.** ⚠⚠ **THE COUNT DIFFERS BY PREDICATE AND BOTH ARE RIGHT: THIS ITEM'S ADMISSIBILITY ARGUMENT TURNS ON BYTE-IDENTITY, SO IT IS THREE ROWS (`ph07` `norel`); THE MEASUREMENT QUESTION TURNS ON THE COUNTS, SO IT IS TWO (`ph07` IS RESCUED).** ⛔ **Do not "reconcile" them** |
@@ -5028,7 +5228,7 @@ the wrong one.
 | 66 | ⭐⭐⭐ **IS `ph64`'s PUBLISHED B1 HEADLINE ONE UNSTABLE DRAW? — THE CHEAPEST NEXT MEASUREMENT IN THE PROGRAMME, AND UNTESTED** | F88, flagged by the reviewer rather than guessed. `probe_iters` is **`[100, 200]` in all seven PHP `spec.md`s and in `p11`** (manager-verified), so **every** family-B figure in both programmes is that one draw. On `ph29` the draw moves the level **32 %** and the published draw is the **largest of seven**. ⚠⚠ **`ph64` is the ONE ROW WHOSE HEADLINE IS B1** (F74), and it allocates **`2n+2` blocks per call** (F71, item 54) — so its per-window work must vary strongly, which is exactly the condition F88 identifies. ▶ **If `ph64`'s B moves like `ph29`'s, the draft §2 ban on family B is not a style rule, it is a correctness fix, and `ph64`'s headline needs restating.** ⭐ Cheap: `probe_iters` is a `spec.md` pin, the binaries are on disk, and `.temp/php38/draws.py` already does the sweep. ⚠ **`ph64`'s `NOTES.md` is in the gate digest but NOT the measurement digest**, so restating costs one re-gate. ✅✅ **ANSWERED — NO (F89).** Nine 100-wide draws: the headline moves **0.07 pp on a +17.08 % effect** and the published draw is **inside** the range; the level moves 6.75–7.04 %, so the heterogeneity is real but **4.6× less than `ph29`'s**. ⭐ **The conditional does not trigger and the ban on B rests on F84's observation alone.** ⚠ **Both my declared expectations were wrong** (I predicted >10 %, and named an `ph03`-like falsifier; the truth is between the two rows). ▶ **What replaces the item: the draw cancels same-language (0.07 pp) and does NOT cross-language (8.63 pp), same row, same draws** ✅✅ **INDEPENDENTLY CONFIRMED AT 64× THE SAMPLE, `TASK_PHP_039` §8.4 (F93): `ph64`'s B1 headline sits `0.0087 pp` from the 6400-iteration population mean on a `+17.08 %` effect — 0.05 % relative, sharper than F89's own `0.07 pp`.** ⚠ **And F93 NARROWS the mechanism on the OTHER row**: `ph29`'s pin is a `+6.9σ` **start-of-run transient**, not a draw, so its cross-language B is off by **3.53 pp = 24.7 % of its own effect** against the population mean — **a bias, which is a stronger statement than F88's 32 % spread.** ⓘ `ph64`'s pin is `+1.76σ` with **no** transient, which is why the two rows' answers differ |
 | 67 | ⚠ **THE `BLIND` CLASS HAS NO WORKING TEST, AND THE TAXONOMY INVERTS THE EVIDENCE ON 5 OF ITS 14 CELLS** | F86 as narrowed, `TASK_PHP_038` §2.4. `BLIND` was defined as *A reads exactly `0` while the whole-program figure does not*, which lumps **two opposite situations**: *A genuinely sees nothing* (`ph45`'s `+0.000 %` against a `+23.37 %` effect — the real thing) and *A correctly reads a true zero* (5 of 14). ⚠ The exact straddle predicate cannot cover it — `a_ratio == 1` fails a strict inequality — and F80's threshold calls **13 of the 14 "safe"**. ⭐ **The reviewer proposed a test, ran it, reported that its own must-fire negative FAILED, and shipped the failure instead of the test** — which is the right call and F79's rule (*a must-fire case that fires for the wrong reason is worth nothing*) applied to itself. ▶ Open: a test that separates the two, or an argument that the distinction is decided by `min(inside_share)` and needs none |
 | ~~68~~ | ⛔⛔⛔ **ANSWERED **NO** — `TASK_PHP_039` (F92, F93). THE EXPONENT IS ≈ −0.5 ON BOTH ROWS.** Six fits on `ph64`/`ph29`, all in `[−0.649, −0.405]`, every one inside the estimator's calibrated −0.5 band and above the −1 band's upper edge. **So 1 % of `ph29`'s `+14.3 %` effect needs `W ≈ 6 474–17 321` = a 22–58× gate stage**, and F93 adds a **bias the lever cannot reach at all** (`lo` stays at 100, so widening keeps the transient inside the span). ▶ ⛔ **DO NOT SPEND THE RE-GATE — the adoption step was conditional on this answer and the condition is NOT met.** ▶ ✅ **`TASK_PHP_038` §6's ruling STANDS; item 62 is the answer; my F90 is REFUTED on its operative half.** ⭐⭐ **AND THE EXPERIMENT VINDICATED ITS OWN DESIGN CHANGE**: this item's `8.124 → 2.092 → 1.243` fall was **faster than 1/W**, which no sampling mechanism permits — and it was **the ESTIMATOR** (9, 4 and 3 disjoint spans, and the expected RANGE of `K` samples grows with `K`). **Holding `K = 8` and the `n`-range fixed, and reporting `SD` not `max − min`, is what made it readable.** **The original text:** | ⭐⭐⭐ **RAISE `probe_iters` ON ONE ROW — ORIGINAL FRAMING** | F90. `probe_iters` is pinned at **`[100, 200]` in all seven PHP `spec.md`s and in `p11`** (manager-verified), and family B's only documented flaw is the **sampling error that pin causes**: on `ph64`'s worst cross-language pair, **8.124 pp at width 100 against 1.243 pp at width 300** (disjoint spans). ⚠⚠ **I could not pin the rate** — sliding spans share draws and disjoint spans leave fewer samples, and **both biases point the same way**, so only the direction and the width-100 figure are trustworthy. ▶ **The experiment: widen the pin on ONE row, re-gate it, and measure what moves.** ⭐ **If the cross-language spread collapses, B needs no replacement and item 62 stops being a precondition** — which is the opposite of `TASK_PHP_038` §6's ruling and is why this is worth an hour. ⚠ **Costs**: `probe_iters` is inside `contract_sha256`, so **one re-gate per row** (7 PHP, 33 PAT) and it moves every `marginal_ir_per_call`; and B takes **two** runs, so width 500 is ~5× the callgrind time of width 100. ⓘ **PAT publishes in A and may not need it — that is a PAT-side call and `results/SYNTHESIS.md` is its authority, not this file** |
-| 69 | ⚠ **`ph29`'s TRANSIENT HAS A SHAPE AND NO MEASURED MECHANISM** | F93, `TASK_PHP_039` §8.2, **flagged by its own author before anyone asked.** The measurement is *"the excess is confined to the first few hundred iterations and decays"* — `17.852 → 14.813 → 15.101 → 14.148`, `+6.9σ` against the other seven spans. ⚠ **The stated cause — allocator free-list warm-up against the C rung's `2n+2` per-call allocation — is a HYPOTHESIS and nothing profiled it.** It is *consistent* with the shape and with F71/item 54. ▶ **Worth measuring because it decides whether the transient is a property of `ph29` or of every row whose C rung allocates per element** — and item 54's own note says **most `E*` rows will be.** ⓘ Cheap: the profiles exist, and `main`/`kernel` exclusive `Ir` against `n` would separate allocator warm-up from anything in the kernel. ⭐ **Same discipline as F72 and F87 result 3: the conclusion lands, the mechanism is marked OPEN** |
+| 69 | ⚠ **`ph29`'s TRANSIENT HAS A SHAPE AND NO MEASURED MECHANISM** | F93, `TASK_PHP_039` §8.2, **flagged by its own author before anyone asked.** The measurement is *"the excess is confined to the first few hundred iterations and decays"* — `17.852 → 14.813 → 15.101 → 14.148`, `+6.9σ` against the other seven spans. ⚠ **The stated cause — allocator free-list warm-up against the C rung's `2n+2` per-call allocation — is a HYPOTHESIS and nothing profiled it.** It is *consistent* with the shape and with F71/item 54. ▶ **Worth measuring because it decides whether the transient is a property of `ph29` or of every row whose C rung allocates per element** — and item 54's own note says **most `E*` rows will be.** ⓘ Cheap: the profiles exist, and `main`/`kernel` exclusive `Ir` against `n` would separate allocator warm-up from anything in the kernel. ⭐ **Same discipline as F72 and F87 result 3: the conclusion lands, the mechanism is marked OPEN.** ⭐⭐ **AND `ph53` IS A THIRD DATA POINT WITH A MECHANISM ATTACHED** (`TASK_PHP_041` §7): its `[100,200]` span does **NOT** sit on a transient (`0.39–0.93 %`), and the three points *track per-window work heterogeneity* — **`ph29` heterogeneous and transient, `ph03` uniform and flat, `ph53` in between and flat.** ▶ **That is a candidate mechanism F93 did not have.** ⚠ **And it is consistent with the allocator story rather than a refutation of it**: `ph53`'s allocations are O(1) per call (§B1a) and it shows no transient, while `ph29` is the `2n+2` row. **What it adds is that heterogeneity predicts the transient at least as well as allocation count does** |
 | 70 | ⚠ **FOUR OF SEVEN ROWS HAVE NO WIDTH→SPREAD MEASUREMENT, AND TWO SMALLER THINGS `_039` COULD NOT TELL** | `TASK_PHP_039` §13. (a) **`ph45`, `ph07`, `ph16`, `ph00` UNTESTED.** ✅ `ph07` publishes **A3** and `ph45` publishes **A1+W1**, so neither headline is family B — **but `ph16`'s and `ph00`'s B behaviour is simply unknown**, and `ph16` publishes **A1**. (b) ⚠ **whether `ph29`'s SD has a FLOOR above `W=400` — COULD NOT TELL**: measured `0.536 → 0.552` is flat, a −0.5 law predicts a 29 % fall, and the `K=8` SD's own noise is **27 %** — *"the two hypotheses are the same size as the error bar"*. ⓘ **It points the same way as the verdict either way**, which is why it is an item and not a blocker. (c) ⚠ **why `_039`'s LEVEL spreads are 1.25–2.2× the published ones while its RATIO spreads AGREE — UNTESTED**; needs contiguous `W=100` spans at low `n`, which its endpoint set does not carry. ⓘ Related: **F89's spreads were RANGES, not SDs**, which nothing said until `_039` §4.4 |
 | 71 | ⓘ **ADJACENT: THE MEASUREMENT RUN MAY ALREADY CONTAIN THE POPULATION SLOPE, FOR FREE** | `TASK_PHP_039` §13.8, **reported and explicitly not proposed.** `measure.py` already runs every cell at the row's full `n_iters` (**25 000** on `ph29`/`ph03`, **1 500** on `ph64`), so a whole-program slope between a cheap small `n` and *that* run would be the population mean at almost no extra callgrind cost — **which is exactly what F93 had to spend 396 profiles to get.** ⛔⛔ **WHOLLY UNTESTED, AND IT TOUCHES FROZEN CODE**: `measure.py::callgrind_ir` records **exclusive** `Ir` for two needles and **may record no whole-program total at all**; adding one is a `harness/` edit = **33 PAT + 7 PHP re-gate** and a full re-measure. ▶ **Check whether the total is already there before considering anything else** — if it is, this is free; if not, it is the most expensive idea on this list |
 | 72 | ⚠⚠ **`STATISTICS_001 §4`'s RULE IS OVER-BROAD, AND NARROWING A PUBLISHED RULE NEEDS REVIEW** | F91. §4 says **publish both, labelled, ALWAYS**. ▶ **F91's regime measurement says A ALONE SUFFICES where the comparison does not cross languages** — `|B/A|` is **49.6–393.9×** at every small-Δ cell, so no callee-inclusive statistic can resolve a 1–2-instruction difference, and `check.py`'s own operative rule says the same with a 66-cell census behind it. ⚠ **Narrowing is not a free edit**: rule 9 (F91 is unreviewed), and it changes what **every** row publishes. ⛔ **And it must NOT be narrowed into *"A always"*** — cross-language the callee work **is** the effect (`_038` §1.5), which is F85. ▶ **Two regimes, named, with the `Δnopad` calibration and its stated limit** (that count exists only for the `unsafe vs verus` pair). ⓘ **`STATISTICS_001.md` is in `.tasks-php/` and in no digest, so the edit itself is free** — the cost is the review |
@@ -5036,3 +5236,7 @@ the wrong one.
 | 74 | ⛔ **`CATALOGUE.md`'s `u64` FOR `ph53` IS ADDRESS-DEPENDENT AND CANNOT BE THE `u64`** | F94, `TASK_PHP_040` §5. The entry says *`u64` = fold of the interface pointers read*. ⛔ **Pointers are addresses**, so that fold differs between rungs — and between runs — **for reasons no rung chose**, which is exactly what the cross-rung checksum exists to rule out. ✅ **Caught by the build brief before a line was written**, and replaced with an index/id/count fold. ⚠ **The row-7 build will ship the correct one, so nothing is blocked** — what is owed is the **catalogue** correction, because the next reader of that entry gets the wrong instruction. ⭐ **And ask the general question once**: `grep -a` the other 101 rows' `u64` lines for *pointer*, *address* and *ptr* — **if `ph53` is not the only one, this is a catalogue-wide defect and not a row's footnote** |
 | 75 | ⚠⚠ **BOTH ROW-7 CANDIDATES' DECLARED TIERS ARE OPTIMISTIC, AND THE ENGINEER SAID SO UNPROMPTED** | F94, `TASK_PHP_040` §5.1. `CATALOGUE.md` declares `ph53` **`verbatim`**; the engineer would declare **`narrowed`**, because the mechanism needs **three frames in two files** (`zend_compile.c:2571` + `:2591` + `zend_operators.c:1534-1535`) and a `verbatim` claim is about a span that lifts byte-identically. ⚠ It judged **`ph52`'s optimistic too.** ▶ **The question is whether `tier` is SYSTEMATICALLY optimistic across the catalogue**, because `tier` is *"a COST STATEMENT, NEVER A FILTER"* (§0.2) and an optimistic cost statement mis-prices every future row's build. ⭐ **Two of two examined are wrong in the same direction**, which is the shape of a rule, not a coincidence — and it is `F81`'s shape exactly (*"measured NOTHING on 2 rows of 2 tested"*). ⓘ Cheap to test: `tier` is declared in each row's `spec.md` **inside the hashed block**, so re-declaring one costs a re-gate — **but MEASURING the mismatch costs nothing** |
 | 76 | ⭐ **`ph52`'s R1h COLUMN IS PREDICTED `0.00 %`, AND THAT IS A RESULT, NOT A DISQUALIFICATION** | F94. Its R1h deletes one `zval_dtor` from an **error arm the benign corpus never runs**, so R1h should price **identically to R1** on every benign input — where `ph53`'s R1h costs an **O(n) `memset` on the benign path.** ⚠⚠ **The temptation is to read a `0.00 %` R1h column as *"the row measures nothing"* and drop the row. ⛔ THAT IS THE ADMISSION-BAR BIAS** (`CLAUDE.md` rule 6, finding 53): *"no column moves"* is a **FINDING, NEVER A KILL.** ▶ ⭐ **What it actually says is worth publishing: the upstream fix for a whole CLASS of defect — the unreached error path — is FREE, and the ladder can say so with a number.** ⓘ **UNTESTED**, and it is a *prediction* by the engineer, labelled as one. It becomes measurable the moment either row is built, so **batch the check with whichever is built second** |
+| 77 | ⚠⚠ **A ROW WHOSE UPSTREAM FIX DOES NOT REMOVE THE FAULT CANNOT SHIP THE INPUT THAT DEMONSTRATES IT — AND THIS WILL RECUR** | F97(A), `TASK_PHP_041` §4. Stage **7h** requires **R1h clean on every input in `inputs/`**, and `ph53`'s R1h converts a wild dereference into a **NULL** one rather than removing it. ▶ **So there can be no `adversarial-deref.bin`, and there is not one.** ⭐ **`.memory-php/02-ladder.md`'s F31 binding on a real row for the FIRST time**, and the resolution F31 prescribes — put the demonstration in `controls/` — is the one taken (`controls/r1h_consumers.py`, corroborated by the gate's own `sanitizer_hardened.fired = False ×7`). ▶ **Open: is `controls/` the RIGHT home, or does stage 7h want a declared exemption?** ⚠ A `controls/` demonstration is **not in the published table and not in the gate's verdict**, so a reader of `results-php/tables/` cannot see the row's own fault. ⓘ **Any future row with a `d09cdd9f71f3`-shaped R1h hits this**, and F94 says that shape is not rare — an optimisation or a rewrite that closes a window without guarding the consumer |
+| 78 | ⭐⭐ **F91's AXIS MAY BE A PROXY: THE REAL ONE COULD BE *DOES THE CALLEE WORK DIVERGE*, NOT *DOES THE COMPARISON CROSS A LANGUAGE*** | F96 result 2, `TASK_PHP_041` `NOTES.md` §8h. **A and B agree in sign and closely in magnitude on EVERY cross-language cell of `ph53`** — the opposite of F85's regime — **and the stated reason is that §B1a's O(1)-allocation precondition HOLDS on this row, so there is no allocator term for B to include and A to miss.** ▶ ⭐ **If that is the mechanism, then F91's *same-language vs cross-language* axis is a PROXY for *callee work diverges vs does not*, and language is merely correlated with it** — which would make the rule **testable per row** instead of assumed per comparison. ⚠⚠ **This is evidence about ONE row and the engineer says so in those words**; F85's 29 flips are on rows where the C rung allocates and the Rust rungs do not. ▶ **The test: a row where the callee work diverges WITHIN a language.** ⓘ **If it holds, item 72's narrowing gets sharper and cheaper**: the condition becomes measurable rather than declared |
+| 79 | ⚠ **A `MaybeUninit<&Iface>` REPRESENTATION VERIFIES AT 5/0 WITH ZERO TRUSTED ITEMS, AND IT WAS REJECTED UNMEASURED** | F98, `TASK_PHP_041` §8. The shipped R4/R5 carry **four** trusted accessors; this alternative carries **none** — *5 verified / 0 errors with zero trusted items* — and was rejected because **the compare-only consumer needs `ptr::eq`**, ⚠ **without measuring it.** ✅ **The rejection is honest and probably right** (the row ships both consumers on purpose, F96 result 1). ▶ **But a representation with NO TRUSTED BASE AT ALL is worth a number even if it can only serve one consumer** — the ladder's whole point is that the trusted surface is a measured axis, and **this is the first row where a zero-trusted-item R5 was in reach.** ⓘ Cheap: the file verifies already; what is missing is its cost and a statement of which consumer it drops |
+| 80 | ⚠ **BOTH ENDPOINTS UNSEARCHED ON `ph53`, WHICH MAKES IT 3 OF 7 ROWS** | `TASK_PHP_041` §8: **no `controls/spellings.py` was built.** ⭐⭐ **This is item 58's residue GROWING, and F77/F87 are why it matters**: `ph29`'s R4 endpoint moved **5.63 pp** byte-identically, and `ph45`'s R4 **AND** R3 both moved with the bound's **sign reversing** — so a `fixed-R4 bound` over an unsearched endpoint is a bound over a number nobody has tried to move. ▶ **Unsearched now: `ph03`, `ph64`, `ph53`**; `ph07`/`ph16` searched theirs and found them degenerate; `ph29`/`ph45` moved. ⚠ **`ph53` is the cheapest of the three** (fresh, and its `controls/` machinery is the newest and already carries items 57/63's fixes) **and it is the one whose predictions were most wrong** — **R3 came out dearest-but-one against a prediction of cheapest**, which is exactly the signal that a search would move something. ⓘ Costs a `ph53` re-gate — ⭐ **batch with item 79's measurement and F99's citation repair, all three being `ph53` debt** |
