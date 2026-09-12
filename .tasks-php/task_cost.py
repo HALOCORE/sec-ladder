@@ -102,6 +102,7 @@ CLASS = {
     #    over BUILT rows. ⭐ But it must be REPORTED, not hidden: a growing
     #    PENDING pile makes the marginal figure understate. `N8` bounds it.
     "040": "PENDING",          # R1h hunt + build brief for row 7 (ph52/ph53)
+    "041": "PENDING",          # BUILD row 7 = ph53
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them
