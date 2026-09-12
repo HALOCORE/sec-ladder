@@ -376,6 +376,46 @@
   > ⚠⚠ **`ph45`'s R4 endpoint is UNSEARCHED, making it 3 of 6** (with `ph03` and
   > `ph64`) — and F77 has just shown that debt is **not cosmetic**.
 
+  > ⚠⚠⚠ **FIFTH FLAG — NOT A FINDING (rule 9), AND IT IS THE MANAGER'S OWN
+  > CORRECTION TO THE FOURTH.** `RECAP_PHP.md` **F82**, `.temp/mgr172/NOTES.md`,
+  > probe `identity_null.py` (`--selftest` PASS, 9 must-fire negatives).
+  >
+  > ⚠⚠ **F74's NULL CONTROL RESTS ON A PREMISE THAT WAS NEVER CHECKED PER ROW.**
+  > `.temp/mgr170/null_control.py` asserted *"`identity` pins R4 and R5
+  > byte-identical"* for **all 39 rows**. Measured at O3: `exact` on **4 of 7
+  > PHP** and **28 of 33 PAT**. ✅ **Every number F74 published SURVIVES** —
+  > the correct predicate is **`Δnopad == 0 and Δbytes == 0`**, not the level,
+  > because `norel` also covers *same instructions at different rip-relative
+  > displacements* (`ph07` and `p25` both say so in their own `identity` notes).
+  > Under it **all 33 PAT rows are true nulls** and `ph03` really is `exact`.
+  > ⚠⚠ **Restricting on the LEVEL instead would have dropped PAT's family-B
+  > worst null from `+5.0102 %` to `−0.8734 %` — a 5.7× reduction to a plausible
+  > number, by discarding five VALID cells. The manager would have published it.**
+  >
+  > ⭐⭐⭐ **THE REAL GAP, AND IT IS A GAP IN THE ARGUMENT AND NOT IN A NUMBER:
+  > A NULL CONTROL IS ONE-SIDED. A statistic hard-wired to `0` would ace every
+  > null in this tree, and F74 argued from nothing else.** The **sensitivity**
+  > half is now measured, off the two rows that are *not* nulls: family A
+  > resolves a **2-instruction** static difference **to the instruction** —
+  > `Δ = −3000` over 1500 calls and `−400` over 200, `exec_rate` **1.0000**
+  > twice — while `ph64`'s single instruction sits on a **conditional** path
+  > whose rate two inputs agree on to **0.0007**. ⚠ `1.0000` is *too clean* and
+  > **`ph64` is the control on `ph45`**: a self-feeding computation would read
+  > `1.0` everywhere.
+  >
+  > ⭐ **AND THE SIGN: ON `ph45` AND `ph64` THE PROVED RUNG IS CHEAPER THAN THE
+  > UNSAFE ONE** — Δnopad `−2` and `−1`, family A `−0.0383 %` and `−0.0067 %`,
+  > **with no search at all**. Nothing is violated; both rows pin `differ`.
+  >
+  > ⚠⚠⚠ **AND IT WIDENS THE R4 SEARCH THIS SECTION IS ABOUT.** The shared `why`
+  > block argues R4 admissibility **from the identity pin** — *"All six patterns
+  > pin `identity: unsafe == verus, O3 exact`, so an R4 … must have a
+  > byte-identical R5 twin that Verus verifies."* **That antecedent is FALSE on
+  > `ph07`, `ph45` and `ph64`.** ▶ **An R4 candidate on those three need only
+  > VERIFY, not compile byte-identically**, so their searches are **wider than
+  > `ph29`'s** and F77's method is not the binding constraint. Open items 60
+  > (PAT-side routing) and 61.
+
   ▶ **`ph03`, `ph64` AND `ph45` REMAIN UNDISCHARGED and need their own task.**
   **3 of 6 built rows are unbounded in both directions** — ⚠ this line said
   **3 of 4** until `TASK_PHP_028` reported, then **2 of 4**, `ph64` took it back

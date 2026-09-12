@@ -47,24 +47,24 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 6 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
         ph45 TYPE. ALL THREE AXES OPEN. .memory-php/ is AUTHORITATIVE.
-NEXT    NOTHING RUNNING; _033/_034/_035/_036 ALL LANDED+VERIFIED from the record.
-        ▶ item 58: THREE rows (ph03/ph64/ph45) have an UNSEARCHED R4 -- and F77
-        proved that is not cosmetic. ph45 is cheapest. THEN item 57, 59, D11, 54.
-⚠ NEW   F80 ⭐⭐⭐ ROW 6, 1st TYPE: `ptr as i32` IS SAFE RUST -- rustc -D warnings
-        is SILENT where gcc WARNS (bug #30573 itself) and only VERUS refuses.
-        Safe Rust blocks the wild WRITE, not the wild VALUE = F71's shape TWICE.
-        ⚠⚠⚠ F74's RULE IS REFUTED -- ph45 flips at Δshare 0.003. CORRECTED: need
-        min(inside_share) HIGH *and* Δ<=0.02; 151/366, 0 flips. F81 catalogue
-        oracle measures NOTHING 2-for-2. F77/F78/F79: see the index.
+NEXT    NOTHING RUNNING; _033/_034/_035/_036 LANDED+VERIFIED from the record.
+        ▶ TASK_PHP_037 IS WRITTEN AND READY: ph45's R4 search (item 58), batched
+        with item 59. THEN item 57, D11, 54. F82 WIDENED it -- see below.
+⚠ NEW   F82 ⭐⭐⭐ F74's NULL CONTROL HAD AN UNCHECKED PREMISE -- `identity` is
+        `exact` at O3 on 4/7 PHP + 28/33 PAT, not 39. ✅ EVERY F74 NUMBER SURVIVES
+        BUT A NULL CONTROL IS ONE-SIDED: a statistic hard-wired to 0 aces every
+        null. SENSITIVITY measured: A resolves 2 insn/call EXACTLY on 2 inputs.
+        ⚠⚠⚠ item 61: the shared `why` argues R4 admissibility from `O3 exact`,
+        FALSE on 3/6 rows -> ph45's R4 need NOT be byte-identical to its R5.
 ⚠ OWED  SPREAD (A1) ph03 +12.19 · ph16 -1.22 · ph29 -6.06 · ph64 +17.47 = 2/2;
         ph45 A1 +0.37% but WHOLE-PROGRAM -3.06% -- publish BOTH, labelled.
 ⚠ TRAPS `grep -a` ALWAYS (blind to 41 corpus files); ask about a FUNCTION, not text.
         ⚠⚠ A PROBE WHOSE SETUP ENCODES THE ANSWER evaluates fine and is WRONG --
-        EIGHT shapes, the 8th MINE; too-clean is the only warning (F52/F70).
+        9 shapes, the 9th MINE (F82); too-clean is the only warning (F52/F70/F82).
 BAR     C-SIDE ONLY: nothing Rust/Verus/Miri/cost kills a row; patterns-php/ is
         FRESH. ⚠ .web/ is CONCURRENT -- NEVER `git add -A`.
 READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.md ·
-        F1-F81 · items 1-59. fixsurvey.py + preimage_screen.py have --selftest.
+        F1-F82 · items 1-61. fixsurvey.py + preimage_screen.py have --selftest.
 ```
 
 ---
@@ -193,7 +193,10 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > the first in either programme, and a counterexample to a PAT rule's PREMISE**
 > · **F78 ⭐⭐ "closes, no residue" was an ARITHMETIC IDENTITY, and the
 > falsification instruction is what caught it** · **F79 ⚠⚠ two real defects in
-> control machinery, found by its own negatives, one LATENT in `ph16`**
+> control machinery, found by its own negatives, one LATENT in `ph16`** ·
+> **F82 ⭐⭐⭐ F74's null control had an UNCHECKED PREMISE — every number
+> survives, but a null control is ONE-SIDED and family A's SENSITIVITY is now
+> measured: 2 instructions/call, resolved exactly, on two inputs**
 >
 > ⚠ **This index stopped at F59 while F60–F65 existed** — `PROTOCOL.md` rule 13,
 > headers rot. **Extend it in the same edit that adds a finding.**
@@ -1488,6 +1491,96 @@ The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
 
+### F82 — ⭐⭐⭐ F74's NULL CONTROL HAD AN **UNCHECKED PREMISE**, AND THE HALF IT NEVER MEASURED IS THE HALF THAT MATTERS
+
+Manager, `.temp/mgr172/NOTES.md`, probe `identity_null.py` (`--selftest` **PASS,
+9 must-fire negatives**). ⚠ **UNREVIEWED** (rule 9). Found while reading
+`ph45`'s gate record to write item 58's task file.
+
+**F74 settled item 52 by a null control**: *"`identity` pins R4 and R5
+byte-identical, so `verus − unsafe` has a known true value of 0."*
+⚠⚠ **`.temp/mgr170/null_control.py` — my own probe, the one F74 rests on —
+NEVER CHECKED THAT PREMISE ON ANY ROW. It asserted it for all 39.** Measured
+`unsafe vs verus` level at O3: **`exact` on 4 of 7 PHP rows and 28 of 33 PAT**.
+Not exact: **`ph07` norel · `ph45` differ · `ph64` differ**; `p25` `p28` `p29`
+`p34` `p36` norel.
+
+⚠⚠ **BUT THE LEVEL IS THE WRONG PREDICATE, AND RESTRICTING ON IT WOULD HAVE
+LOOKED RIGHT.** `exact` is **byte**-identity; a *count* statistic needs only the
+executed count to agree, and `norel` covers **two** situations — same
+instructions at different rip-relative displacements, and genuinely different
+code. **The rows say which, in their own `identity` notes**: `p25` *"both
+resolving to the same absolute address `0x7910` … the instruction count (189
+non-pad at `-O3`) and the byte count are all identical"*; `ph07` *"R4 == R5 at
+O3 **UP TO RELOCATIONS** … 251 instructions and 953 bytes in BOTH cells."* So
+the predicate is **`Δnopad == 0 and Δbytes == 0`**, read from the identity
+entry's own `counts_a`/`counts_b`:
+
+| | true null | level said no, **Δnopad rescues** | **genuinely NOT a null** |
+|---|---|---|---|
+| PHP | 4 | 1 — `ph07` | **2 — `ph45`, `ph64`** |
+| PAT | 28 | 5 — `p25` `p28` `p29` `p34` `p36` | **0** |
+
+✅✅ **ALL 33 PAT ROWS ARE TRUE NULLS, AND EVERY NUMBER F74 PUBLISHED IS
+INTACT** — PHP family-B worst **+3.6522 %** (`ph03 small`, and `ph03` *is*
+`exact`), PAT **+5.0102 %** (`p25 large`), family A **0.0000 %** on both.
+⚠⚠ **The trap is the middle column**: a level-based restriction drops PAT's
+family-B worst to **−0.8734 %**, a **5.7×** reduction to a perfectly plausible
+number, by discarding **five valid cells**. **I would have published it.** The
+negative that stops it is **N6** — `p25`'s `spec.md` contains the literal string
+`identity: unsafe == verus, O3 exact` as **shared-block boilerplate** while its
+real pin, in a table row, is `` `O0: norel`, `O3: norel` ``. ⭐ **Read the
+record, not the `spec.md`.**
+
+⭐⭐⭐ **THE REAL GAP: A NULL CONTROL IS ONE-SIDED, AND F74 ARGUED FROM NOTHING
+ELSE.** **A statistic hard-wired to `0` would ace every null in this tree.**
+The **sensitivity** half was never measured — and the rows that are *not* nulls
+supply it for free, because there the kernels differ by a **known** static count
+so family A has a **predicted** nonzero value:
+
+| row | input | Δnopad | Δ(A) | `n_iters` | `exec_rate` |
+|---|---|---|---|---|---|
+| `ph45` | `large.bin` | −2 | **−400** | 200 | **1.0000** |
+| `ph45` | `small.bin` | −2 | **−3000** | 1500 | **1.0000** |
+| `ph64` | `large.bin` | −1 | −102 | 200 | 0.5100 |
+| `ph64` | `small.bin` | −1 | −764 | 1500 | 0.5093 |
+
+⭐ **Family A resolves a 2-instruction static difference to the instruction**, on
+two inputs 7.5× apart in call count. ⚠ **`1.0000` is "too clean" and too-clean
+is the only warning F52 gives** — so **`ph64` is the control on `ph45`**: if the
+arithmetic were feeding itself every row would read `1.0`, and `ph64`'s
+instruction sits on a **conditional** path whose rate the two inputs agree on to
+**0.0007**. Three fields, two files, no fitting; negatives **N8** (both `1.0`
+and `<1.0` cells must exist or §3 proves nothing) and **N9** guard it.
+
+⭐ **AND THE SIGN: ON `ph45` AND `ph64`, R5 IS CHEAPER THAN R4** — Δnopad −2 and
+−1, family A **−0.0383 %** and **−0.0067 %**. Nothing is violated (both pin
+`differ`), but the direction is **F77's shape from a new angle**: F77 found an
+admissible R4 cheaper than the shipped one; this is the **shipped R5** cheaper
+than the shipped R4, on two of six rows, **with no search at all**.
+
+⚠ **FOR ROUTING — `harness/check.py` HAS THE SAME UNCHECKED PREMISE.** Its null
+docstring is *more* careful than my probe was: it corrects for **mode**, **opt
+level** and **input**, and warns **⚠⚠⚠ A NULL IS A PROPERTY OF A CELL. DO NOT
+MAX IT OVER MODE, OVER LEVEL, OR OVER INPUT.** It does **not** correct for the
+**identity level**, and its worst quoted cell — **`p25 large +269.52`** — is the
+row pinned `` `O3: norel` ``, while the docstring justifies the whole table by
+*"`identity` forces R4's and R5's kernels to agree byte for byte."*
+✅ **The number is right and the justification is wrong** (p25 rescues it by the
+Δnopad route). ⚠⚠ **`harness/` is FROZEN — reported, NOT fixed**; and
+`results/SYNTHESIS.md` is the PAT-side authority, not this file. → **item 60.**
+
+⚠⚠⚠ **AND IT CHANGES ITEM 58, WHICH IS WHY THE DETOUR WAS WORTH IT.** The shared
+`why` block — byte-identical across all six PHP rows — argues R4 admissibility
+**from the identity pin**: *"All six patterns pin `identity: unsafe == verus, O3
+exact`, so an R4 … must have a byte-identical R5 twin that Verus verifies."*
+**THAT ANTECEDENT IS FALSE ON THREE OF SIX PHP ROWS.** It is PAT-side
+boilerplate carried into a programme where it does not hold. ▶ **So an R4
+candidate on `ph45` need NOT be byte-identical to its R5 twin** — `ph45`'s R4
+search is **wider** than `ph29`'s, and F77's method (hunt a spelling whose Verus
+twin compiles byte-identically) is **not the binding constraint there**. The
+binding constraint is only that the candidate **verify**. → **item 61.**
+
 ### F80 — ⭐⭐⭐ ROW 6, THE **FIRST TYPE ROW**, AND **gcc WARNS WHERE rustc IS SILENT** — ONLY THE PROVER REFUSES
 
 `TASK_PHP_036`. **`patterns-php/ph45-htmlent-cache-int/`.** ✅ **Manager-verified
@@ -1661,6 +1754,16 @@ mixed A1 and B1 and was FAITHFUL in doing so — the rows themselves disagree.**
 ⭐⭐⭐ **THE DECIDER WAS ALREADY IN THE TREE.** `identity: unsafe == verus, O3
 exact` pins R4 and R5 **byte-identical**, so **`verus − unsafe` has a known true
 value of exactly 0** — a null control on every row, which nobody had read as one:
+
+> ⚠⚠⚠ **CORRECTED IN PLACE BY F82 — THE SENTENCE ABOVE IS THE PREMISE AND IT WAS
+> NEVER CHECKED PER ROW.** `identity` is `exact` at O3 on only **4 of 7 PHP** and
+> **28 of 33 PAT** rows. ✅ **Every number in this section survives** — the right
+> predicate is `Δnopad == 0`, not the level, and under it **all 33 PAT rows are
+> true nulls**; `ph03` really is `exact`. ⚠ But **`ph45` and `ph64` are NOT nulls
+> at all** and were counted as such below. ⭐⭐ **And a null control is ONE-SIDED:
+> a statistic hard-wired to 0 would ace every null here. F82 supplies the
+> sensitivity half this section argued without.** Read F82 before quoting the
+> block below.
 
 ```
 verus - unsafe        family A (kx)        family B (marginal)
@@ -3821,3 +3924,5 @@ the wrong one.
 | 57 | ⚠⚠ **`ph16`'s `controls/spellings.py` CARRIES TWO REAL DEFECTS, BOTH LATENT, AND FIXING THEM COSTS A `ph16` RE-GATE** | F79, `_035`, found by its own §H negatives and **guarded in `ph29`'s copy only**. (a) ⭐ **`kernel_fingerprint` returns `(0, 'd41d8cd98f00')` — the md5 of the EMPTY STRING — for a binary that does not exist**, because `disasm` ignores `objdump`'s return code, **so two missing binaries compare EQUAL on the one function whose job is to decide byte-identity.** (b) `disasm`'s needle is a **bare substring**, so a crate named `nokernel` fingerprints its own `main`. ✅ **Latent, not live, on `ph16`** — every call site there is downstream of a build whose success is checked — which is why `_035` correctly left it alone rather than widening its scope. ⚠ `controls/*.py` is in `source_sha256`, so the fix **costs a `ph16` re-gate**; batch it with any other `ph16` work. ⭐ **The general shape: a control cloned between rows carries its defects with it, and only the row that writes NEW negatives finds them** — `ph16`'s suite was 54 cases and did not catch these; `ph29`'s 75 did |
 | 58 | ⚠⚠ **THREE OF SIX BUILT ROWS HAVE AN UNSEARCHED R4 ENDPOINT, AND F77 JUST PROVED THAT MATTERS** | `ph03`, `ph64` and now `ph45` (F80). ⚠ Until `TASK_PHP_035` this debt looked cosmetic, because `ph07` and `ph16` both searched their R4 side and found it **degenerate**. ⭐⭐ **F77 killed that reading**: `ph29`'s `r4_fold_iter` verifies byte-identically and is **5.63 pp cheaper**, so a `fixed-R4 bound` over an *unsearched* endpoint is a bound over a number nobody has tried to move. ▶ **`ph45` is the cheapest of the three to search** (its `spellings.py` was never built, so there is no declaration repair to do first) and `ph03` is the oldest. ⚠ Each costs a re-gate; **batch each row's owed prose fixes into the same run** — the lesson `TASK_PHP_033.md` learned by failing to |
 | 59 | ⚠ **A SIGNED OVERFLOW AT `mbfilter_htmlent.c:193`, IN `ph45`'s OWN FUNCTION, UNTRACED TO ANY FIX** | F80, `_036`'s own find, **reported and not pursued** — the right call, since chasing it was outside a build task's scope. ⚠ It is **inside the function `ph45` extracts**, so it is not merely adjacent: the row's benign corpus must be shown not to evaluate it (F46's UB-free-trigger rule), and `_036` does not say whether that was checked. ▶ **Ask that question before `ph45`'s next re-gate.** ⓘ Distinct from the **stack OOB write at `:123`** in the *encode* half (F75), which is also uncatalogued and which the row deliberately does not lift |
+| 60 | ⚠ **`harness/check.py`'s NULL-CONTROL TABLE JUSTIFIES ITS WORST CELL WITH BYTE-IDENTITY THAT THE ROW'S OWN PIN DENIES — PAT-SIDE, FOR ROUTING** | F82. The docstring is **more careful than my probe was** — it corrects the table for **mode**, **opt level** and **input**, and warns *⚠⚠⚠ A NULL IS A PROPERTY OF A CELL. DO NOT MAX IT OVER MODE, OVER LEVEL, OR OVER INPUT.* ⚠ It does not correct for the **identity level**: its worst quoted cell, **`p25 large +269.52`**, is on the row pinned `` `O0: norel`, `O3: norel` ``, while the table is justified by *"`identity` forces R4's and R5's kernels to agree byte for byte."* ✅ **The number is RIGHT and the justification is WRONG** — p25 rescues it by a different route its own identity note records (189 non-pad instructions and identical byte count in both cells). ⚠⚠ **`harness/` is FROZEN**: one sentence costs a 33-pattern re-gate, and `results/SYNTHESIS.md` is the PAT-side authority, not this file. ▶ **Reported, NOT fixed.** ⭐ The general shape is the same as F82's own: **a correct number whose stated reason is false survives every check, because checks test numbers** |
+| 61 | ⚠⚠⚠ **THE SHARED `why` BLOCK ARGUES R4 ADMISSIBILITY FROM AN ANTECEDENT THAT IS FALSE ON THREE OF SIX PHP ROWS** | F82. The block — **byte-identical across all six PHP rows and all 33 PAT rows** — says *"All six patterns pin `identity: unsafe == verus, O3 exact`, so an R4 is not merely a program that MAY use `unsafe`: it is a program that must have a byte-identical R5 twin that Verus verifies."* ⚠ **`ph07` pins `norel`, `ph45` and `ph64` pin `differ`.** It is **PAT-side boilerplate carried into a programme where it does not hold**, and it is the step by which `.memory/01-ladder.md` disqualifies unverifiable R4 candidates — so on those three rows **that disqualification has no stated basis**. ▶ **Consequence, and it is a widening not a defect**: an R4 candidate on `ph45`/`ph64`/`ph07` need only **verify**, not compile byte-identically, so their R4 searches are **wider than `ph29`'s** and F77's method is not the binding constraint. **Already written into item 58's task file as a premise to re-derive.** ⚠ Fixing the sentence is a **six-row PHP re-gate** (it is inside `contract_sha256`) — item 55's shape exactly, and the same open question: a convention binding both programmes has no unhashed shared home |
