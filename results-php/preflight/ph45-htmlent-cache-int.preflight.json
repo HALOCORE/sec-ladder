@@ -1,0 +1,593 @@
+{
+  "row": "ph45-htmlent-cache-int",
+  "runs": [
+    {
+      "row": "ph45-htmlent-cache-int",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph45-htmlent-cache-int: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph45-htmlent-cache-int: ext/mbstring/libmbfl/filters/mbfilter_htmlent.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.h, ext/mbstring/libmbfl/filters/html_entities.h, ext/mbstring/libmbfl/filters/html_entities.c, ext/mbstring/libmbfl/mbfl/mbfl_allocators.h, ext/mbstring/mbstring.c, ext/mbstring/mbstring.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.c, ext/mbstring/libmbfl/mbfl/mbfilter.c, ext/mbstring/libmbfl/filters/mbfilter_htmlent.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.c are in the manifest (d4622f8a95fe, f8f6f99c2063, 29d581efe66e, fb83b85a86a5, 7fa9633568f1, 9d0bbd06beac, 9d0bbd06beac, 0fe4c132cd1d, 0fe4c132cd1d, da3f5f9ef501, d4622f8a95fe, 0fe4c132cd1d)",
+        "  ph45-htmlent-cache-int: OK  ext/mbstring/libmbfl/filters/mbfilter_htmlent.c:155-258  2799 bytes  sha256 6aad722d2b6cf73e  tier=narrowed",
+        "  ph45-htmlent-cache-int: OK+1 ext/mbstring/libmbfl/mbfl/mbfl_convert.h:40-54  462 bytes  sha256 6586bd6948ccceaa  -- `struct _mbfl_convert_filter`, and \u26a0\u26a0\u26a0 `:49 int cache;` IS THE DEFECT ",
+        "  ph45-htmlent-cache-int: OK+2 ext/mbstring/libmbfl/filters/html_entities.h:33-36  97 bytes  sha256 3528826585f2667f  -- `mbfl_html_entity_entry` -- `{char *name; int code;}`, what `:200-206`",
+        "  ph45-htmlent-cache-int: OK+3 ext/mbstring/libmbfl/filters/html_entities.c:37-290  5628 bytes  sha256 734afebb8f33375d  -- `mbfl_html_entity_list` -- 251 entities plus the `{NULL,-1}` terminato",
+        "  ph45-htmlent-cache-int: OK+4 ext/mbstring/libmbfl/mbfl/mbfl_allocators.h:36-54  688 bytes  sha256 289b5ecc8a164bff  -- \u2b50\u2b50 `mbfl_malloc` AND `mbfl_free` ARE `#define`s OVER A FUNCTION-POINTE",
+        "  ph45-htmlent-cache-int: OK+5 ext/mbstring/mbstring.c:240-283  875 bytes  sha256 dff1cfd53b12bf78  -- `_php_mb_allocators` -- `malloc`->`emalloc`, `free`->`efree`, and the ",
+        "  ph45-htmlent-cache-int: OK+6 ext/mbstring/mbstring.c:762-765  74 bytes  sha256 2c7752b17cbb4466  -- `PHP_MINIT_FUNCTION(mbstring)`: `__mbfl_allocators = &_php_mb_allocato",
+        "  ph45-htmlent-cache-int: OK+7 ext/mbstring/libmbfl/mbfl/mbfl_convert.c:216-256  1026 bytes  sha256 b208a9247d05506b  -- `mbfl_convert_filter_new` -- allocates the filter STRUCT with `mbfl_ma",
+        "  ph45-htmlent-cache-int: OK+8 ext/mbstring/libmbfl/mbfl/mbfl_convert.c:259-266  144 bytes  sha256 79461e635638b0aa  -- `mbfl_convert_filter_delete` -- calls the dtor, i.e. reaches `:169`'s ",
+        "  ph45-htmlent-cache-int: OK+9 ext/mbstring/libmbfl/mbfl/mbfilter.c:243-271  614 bytes  sha256 7192691a09af5e1f  -- \u2b50 `mbfl_buffer_converter_feed` -- and its body `while (n > 0) { (*filt",
+        "  ph45-htmlent-cache-int: OK+10 ext/mbstring/libmbfl/filters/mbfilter_htmlent.c:85-91  226 bytes  sha256 de7bc3bc60a06877  -- `vtbl_html_wchar` -- the vtable wiring ctor, dtor, filter and flush to",
+        "  ph45-htmlent-cache-int: OK+11 ext/mbstring/libmbfl/mbfl/mbfl_convert.c:299-317  573 bytes  sha256 b710d7ed81ad1bbd  -- `mbfl_convert_filter_copy` -- `:312` copies `dist->cache = src->cache`",
+        "  ph45-htmlent-cache-int: per-span overlap: span0 91% (42/46), span1 86% (12/14), span2 0% (0/4), span3 0% (0/253), span4 0% (0/10), span5 0% (0/22), span6 0% (0/2), span7 23% (6/26), span8 40% (2/5), span9 12% (2/17), span10 0% (0/7), span11 0% (0/17)  -- the UNION is what is reported below, and it is what 12 cited spans oblige the row to",
+        "  ph45-htmlent-cache-int: kernel overlap 15% (61/419 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph45-htmlent-cache-int: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (15% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph45-htmlent-cache-int: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph45-htmlent-cache-int: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH45_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "build",
+      "gate_argv": [
+        "--tool",
+        "build",
+        "ph45-htmlent-cache-int",
+        "--all"
+      ],
+      "tool_argv": [
+        "ph45-htmlent-cache-int",
+        "--all"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph45-htmlent-cache-int",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph45-htmlent-cache-int: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph45-htmlent-cache-int: ext/mbstring/libmbfl/filters/mbfilter_htmlent.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.h, ext/mbstring/libmbfl/filters/html_entities.h, ext/mbstring/libmbfl/filters/html_entities.c, ext/mbstring/libmbfl/mbfl/mbfl_allocators.h, ext/mbstring/mbstring.c, ext/mbstring/mbstring.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.c, ext/mbstring/libmbfl/mbfl/mbfilter.c, ext/mbstring/libmbfl/filters/mbfilter_htmlent.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.c are in the manifest (d4622f8a95fe, f8f6f99c2063, 29d581efe66e, fb83b85a86a5, 7fa9633568f1, 9d0bbd06beac, 9d0bbd06beac, 0fe4c132cd1d, 0fe4c132cd1d, da3f5f9ef501, d4622f8a95fe, 0fe4c132cd1d)",
+        "  ph45-htmlent-cache-int: OK  ext/mbstring/libmbfl/filters/mbfilter_htmlent.c:155-258  2799 bytes  sha256 6aad722d2b6cf73e  tier=narrowed",
+        "  ph45-htmlent-cache-int: OK+1 ext/mbstring/libmbfl/mbfl/mbfl_convert.h:40-54  462 bytes  sha256 6586bd6948ccceaa  -- `struct _mbfl_convert_filter`, and \u26a0\u26a0\u26a0 `:49 int cache;` IS THE DEFECT ",
+        "  ph45-htmlent-cache-int: OK+2 ext/mbstring/libmbfl/filters/html_entities.h:33-36  97 bytes  sha256 3528826585f2667f  -- `mbfl_html_entity_entry` -- `{char *name; int code;}`, what `:200-206`",
+        "  ph45-htmlent-cache-int: OK+3 ext/mbstring/libmbfl/filters/html_entities.c:37-290  5628 bytes  sha256 734afebb8f33375d  -- `mbfl_html_entity_list` -- 251 entities plus the `{NULL,-1}` terminato",
+        "  ph45-htmlent-cache-int: OK+4 ext/mbstring/libmbfl/mbfl/mbfl_allocators.h:36-54  688 bytes  sha256 289b5ecc8a164bff  -- \u2b50\u2b50 `mbfl_malloc` AND `mbfl_free` ARE `#define`s OVER A FUNCTION-POINTE",
+        "  ph45-htmlent-cache-int: OK+5 ext/mbstring/mbstring.c:240-283  875 bytes  sha256 dff1cfd53b12bf78  -- `_php_mb_allocators` -- `malloc`->`emalloc`, `free`->`efree`, and the ",
+        "  ph45-htmlent-cache-int: OK+6 ext/mbstring/mbstring.c:762-765  74 bytes  sha256 2c7752b17cbb4466  -- `PHP_MINIT_FUNCTION(mbstring)`: `__mbfl_allocators = &_php_mb_allocato",
+        "  ph45-htmlent-cache-int: OK+7 ext/mbstring/libmbfl/mbfl/mbfl_convert.c:216-256  1026 bytes  sha256 b208a9247d05506b  -- `mbfl_convert_filter_new` -- allocates the filter STRUCT with `mbfl_ma",
+        "  ph45-htmlent-cache-int: OK+8 ext/mbstring/libmbfl/mbfl/mbfl_convert.c:259-266  144 bytes  sha256 79461e635638b0aa  -- `mbfl_convert_filter_delete` -- calls the dtor, i.e. reaches `:169`'s ",
+        "  ph45-htmlent-cache-int: OK+9 ext/mbstring/libmbfl/mbfl/mbfilter.c:243-271  614 bytes  sha256 7192691a09af5e1f  -- \u2b50 `mbfl_buffer_converter_feed` -- and its body `while (n > 0) { (*filt",
+        "  ph45-htmlent-cache-int: OK+10 ext/mbstring/libmbfl/filters/mbfilter_htmlent.c:85-91  226 bytes  sha256 de7bc3bc60a06877  -- `vtbl_html_wchar` -- the vtable wiring ctor, dtor, filter and flush to",
+        "  ph45-htmlent-cache-int: OK+11 ext/mbstring/libmbfl/mbfl/mbfl_convert.c:299-317  573 bytes  sha256 b710d7ed81ad1bbd  -- `mbfl_convert_filter_copy` -- `:312` copies `dist->cache = src->cache`",
+        "  ph45-htmlent-cache-int: per-span overlap: span0 91% (42/46), span1 86% (12/14), span2 0% (0/4), span3 0% (0/253), span4 0% (0/10), span5 0% (0/22), span6 0% (0/2), span7 23% (6/26), span8 40% (2/5), span9 12% (2/17), span10 0% (0/7), span11 0% (0/17)  -- the UNION is what is reported below, and it is what 12 cited spans oblige the row to",
+        "  ph45-htmlent-cache-int: kernel overlap 15% (61/419 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph45-htmlent-cache-int: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (15% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph45-htmlent-cache-int: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph45-htmlent-cache-int: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH45_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "ph45-htmlent-cache-int"
+      ],
+      "tool_argv": [
+        "ph45-htmlent-cache-int"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph45-htmlent-cache-int",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph45-htmlent-cache-int: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph45-htmlent-cache-int: ext/mbstring/libmbfl/filters/mbfilter_htmlent.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.h, ext/mbstring/libmbfl/filters/html_entities.h, ext/mbstring/libmbfl/filters/html_entities.c, ext/mbstring/libmbfl/mbfl/mbfl_allocators.h, ext/mbstring/mbstring.c, ext/mbstring/mbstring.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.c, ext/mbstring/libmbfl/mbfl/mbfilter.c, ext/mbstring/libmbfl/filters/mbfilter_htmlent.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.c are in the manifest (d4622f8a95fe, f8f6f99c2063, 29d581efe66e, fb83b85a86a5, 7fa9633568f1, 9d0bbd06beac, 9d0bbd06beac, 0fe4c132cd1d, 0fe4c132cd1d, da3f5f9ef501, d4622f8a95fe, 0fe4c132cd1d)",
+        "  ph45-htmlent-cache-int: OK  ext/mbstring/libmbfl/filters/mbfilter_htmlent.c:155-258  2799 bytes  sha256 6aad722d2b6cf73e  tier=narrowed",
+        "  ph45-htmlent-cache-int: OK+1 ext/mbstring/libmbfl/mbfl/mbfl_convert.h:40-54  462 bytes  sha256 6586bd6948ccceaa  -- `struct _mbfl_convert_filter`, and \u26a0\u26a0\u26a0 `:49 int cache;` IS THE DEFECT ",
+        "  ph45-htmlent-cache-int: OK+2 ext/mbstring/libmbfl/filters/html_entities.h:33-36  97 bytes  sha256 3528826585f2667f  -- `mbfl_html_entity_entry` -- `{char *name; int code;}`, what `:200-206`",
+        "  ph45-htmlent-cache-int: OK+3 ext/mbstring/libmbfl/filters/html_entities.c:37-290  5628 bytes  sha256 734afebb8f33375d  -- `mbfl_html_entity_list` -- 251 entities plus the `{NULL,-1}` terminato",
+        "  ph45-htmlent-cache-int: OK+4 ext/mbstring/libmbfl/mbfl/mbfl_allocators.h:36-54  688 bytes  sha256 289b5ecc8a164bff  -- \u2b50\u2b50 `mbfl_malloc` AND `mbfl_free` ARE `#define`s OVER A FUNCTION-POINTE",
+        "  ph45-htmlent-cache-int: OK+5 ext/mbstring/mbstring.c:240-283  875 bytes  sha256 dff1cfd53b12bf78  -- `_php_mb_allocators` -- `malloc`->`emalloc`, `free`->`efree`, and the ",
+        "  ph45-htmlent-cache-int: OK+6 ext/mbstring/mbstring.c:762-765  74 bytes  sha256 2c7752b17cbb4466  -- `PHP_MINIT_FUNCTION(mbstring)`: `__mbfl_allocators = &_php_mb_allocato",
+        "  ph45-htmlent-cache-int: OK+7 ext/mbstring/libmbfl/mbfl/mbfl_convert.c:216-256  1026 bytes  sha256 b208a9247d05506b  -- `mbfl_convert_filter_new` -- allocates the filter STRUCT with `mbfl_ma",
+        "  ph45-htmlent-cache-int: OK+8 ext/mbstring/libmbfl/mbfl/mbfl_convert.c:259-266  144 bytes  sha256 79461e635638b0aa  -- `mbfl_convert_filter_delete` -- calls the dtor, i.e. reaches `:169`'s ",
+        "  ph45-htmlent-cache-int: OK+9 ext/mbstring/libmbfl/mbfl/mbfilter.c:243-271  614 bytes  sha256 7192691a09af5e1f  -- \u2b50 `mbfl_buffer_converter_feed` -- and its body `while (n > 0) { (*filt",
+        "  ph45-htmlent-cache-int: OK+10 ext/mbstring/libmbfl/filters/mbfilter_htmlent.c:85-91  226 bytes  sha256 de7bc3bc60a06877  -- `vtbl_html_wchar` -- the vtable wiring ctor, dtor, filter and flush to",
+        "  ph45-htmlent-cache-int: OK+11 ext/mbstring/libmbfl/mbfl/mbfl_convert.c:299-317  573 bytes  sha256 b710d7ed81ad1bbd  -- `mbfl_convert_filter_copy` -- `:312` copies `dist->cache = src->cache`",
+        "  ph45-htmlent-cache-int: per-span overlap: span0 91% (42/46), span1 86% (12/14), span2 0% (0/4), span3 0% (0/253), span4 0% (0/10), span5 0% (0/22), span6 0% (0/2), span7 23% (6/26), span8 40% (2/5), span9 12% (2/17), span10 0% (0/7), span11 0% (0/17)  -- the UNION is what is reported below, and it is what 12 cited spans oblige the row to",
+        "  ph45-htmlent-cache-int: kernel overlap 15% (61/419 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph45-htmlent-cache-int: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (15% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph45-htmlent-cache-int: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph45-htmlent-cache-int: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH45_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "report",
+      "gate_argv": [
+        "--tool",
+        "report",
+        "ph45-htmlent-cache-int"
+      ],
+      "tool_argv": [
+        "ph45-htmlent-cache-int"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph45-htmlent-cache-int",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph45-htmlent-cache-int: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph45-htmlent-cache-int: ext/mbstring/libmbfl/filters/mbfilter_htmlent.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.h, ext/mbstring/libmbfl/filters/html_entities.h, ext/mbstring/libmbfl/filters/html_entities.c, ext/mbstring/libmbfl/mbfl/mbfl_allocators.h, ext/mbstring/mbstring.c, ext/mbstring/mbstring.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.c, ext/mbstring/libmbfl/mbfl/mbfilter.c, ext/mbstring/libmbfl/filters/mbfilter_htmlent.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.c are in the manifest (d4622f8a95fe, f8f6f99c2063, 29d581efe66e, fb83b85a86a5, 7fa9633568f1, 9d0bbd06beac, 9d0bbd06beac, 0fe4c132cd1d, 0fe4c132cd1d, da3f5f9ef501, d4622f8a95fe, 0fe4c132cd1d)",
+        "  ph45-htmlent-cache-int: OK  ext/mbstring/libmbfl/filters/mbfilter_htmlent.c:155-258  2799 bytes  sha256 6aad722d2b6cf73e  tier=narrowed",
+        "  ph45-htmlent-cache-int: OK+1 ext/mbstring/libmbfl/mbfl/mbfl_convert.h:40-54  462 bytes  sha256 6586bd6948ccceaa  -- `struct _mbfl_convert_filter`, and \u26a0\u26a0\u26a0 `:49 int cache;` IS THE DEFECT ",
+        "  ph45-htmlent-cache-int: OK+2 ext/mbstring/libmbfl/filters/html_entities.h:33-36  97 bytes  sha256 3528826585f2667f  -- `mbfl_html_entity_entry` -- `{char *name; int code;}`, what `:200-206`",
+        "  ph45-htmlent-cache-int: OK+3 ext/mbstring/libmbfl/filters/html_entities.c:37-290  5628 bytes  sha256 734afebb8f33375d  -- `mbfl_html_entity_list` -- 251 entities plus the `{NULL,-1}` terminato",
+        "  ph45-htmlent-cache-int: OK+4 ext/mbstring/libmbfl/mbfl/mbfl_allocators.h:36-54  688 bytes  sha256 289b5ecc8a164bff  -- \u2b50\u2b50 `mbfl_malloc` AND `mbfl_free` ARE `#define`s OVER A FUNCTION-POINTE",
+        "  ph45-htmlent-cache-int: OK+5 ext/mbstring/mbstring.c:240-283  875 bytes  sha256 dff1cfd53b12bf78  -- `_php_mb_allocators` -- `malloc`->`emalloc`, `free`->`efree`, and the ",
+        "  ph45-htmlent-cache-int: OK+6 ext/mbstring/mbstring.c:762-765  74 bytes  sha256 2c7752b17cbb4466  -- `PHP_MINIT_FUNCTION(mbstring)`: `__mbfl_allocators = &_php_mb_allocato",
+        "  ph45-htmlent-cache-int: OK+7 ext/mbstring/libmbfl/mbfl/mbfl_convert.c:216-256  1026 bytes  sha256 b208a9247d05506b  -- `mbfl_convert_filter_new` -- allocates the filter STRUCT with `mbfl_ma",
+        "  ph45-htmlent-cache-int: OK+8 ext/mbstring/libmbfl/mbfl/mbfl_convert.c:259-266  144 bytes  sha256 79461e635638b0aa  -- `mbfl_convert_filter_delete` -- calls the dtor, i.e. reaches `:169`'s ",
+        "  ph45-htmlent-cache-int: OK+9 ext/mbstring/libmbfl/mbfl/mbfilter.c:243-271  614 bytes  sha256 7192691a09af5e1f  -- \u2b50 `mbfl_buffer_converter_feed` -- and its body `while (n > 0) { (*filt",
+        "  ph45-htmlent-cache-int: OK+10 ext/mbstring/libmbfl/filters/mbfilter_htmlent.c:85-91  226 bytes  sha256 de7bc3bc60a06877  -- `vtbl_html_wchar` -- the vtable wiring ctor, dtor, filter and flush to",
+        "  ph45-htmlent-cache-int: OK+11 ext/mbstring/libmbfl/mbfl/mbfl_convert.c:299-317  573 bytes  sha256 b710d7ed81ad1bbd  -- `mbfl_convert_filter_copy` -- `:312` copies `dist->cache = src->cache`",
+        "  ph45-htmlent-cache-int: per-span overlap: span0 91% (42/46), span1 86% (12/14), span2 0% (0/4), span3 0% (0/253), span4 0% (0/10), span5 0% (0/22), span6 0% (0/2), span7 23% (6/26), span8 40% (2/5), span9 12% (2/17), span10 0% (0/7), span11 0% (0/17)  -- the UNION is what is reported below, and it is what 12 cited spans oblige the row to",
+        "  ph45-htmlent-cache-int: kernel overlap 15% (61/419 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph45-htmlent-cache-int: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (15% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph45-htmlent-cache-int: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph45-htmlent-cache-int: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH45_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph45-htmlent-cache-int"
+      ],
+      "tool_argv": [
+        "ph45-htmlent-cache-int"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 1
+    },
+    {
+      "row": "ph45-htmlent-cache-int",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph45-htmlent-cache-int: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph45-htmlent-cache-int: ext/mbstring/libmbfl/filters/mbfilter_htmlent.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.h, ext/mbstring/libmbfl/filters/html_entities.h, ext/mbstring/libmbfl/filters/html_entities.c, ext/mbstring/libmbfl/mbfl/mbfl_allocators.h, ext/mbstring/mbstring.c, ext/mbstring/mbstring.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.c, ext/mbstring/libmbfl/mbfl/mbfilter.c, ext/mbstring/libmbfl/filters/mbfilter_htmlent.c, ext/mbstring/libmbfl/mbfl/mbfl_convert.c are in the manifest (d4622f8a95fe, f8f6f99c2063, 29d581efe66e, fb83b85a86a5, 7fa9633568f1, 9d0bbd06beac, 9d0bbd06beac, 0fe4c132cd1d, 0fe4c132cd1d, da3f5f9ef501, d4622f8a95fe, 0fe4c132cd1d)",
+        "  ph45-htmlent-cache-int: OK  ext/mbstring/libmbfl/filters/mbfilter_htmlent.c:155-258  2799 bytes  sha256 6aad722d2b6cf73e  tier=narrowed",
+        "  ph45-htmlent-cache-int: OK+1 ext/mbstring/libmbfl/mbfl/mbfl_convert.h:40-54  462 bytes  sha256 6586bd6948ccceaa  -- `struct _mbfl_convert_filter`, and \u26a0\u26a0\u26a0 `:49 int cache;` IS THE DEFECT ",
+        "  ph45-htmlent-cache-int: OK+2 ext/mbstring/libmbfl/filters/html_entities.h:33-36  97 bytes  sha256 3528826585f2667f  -- `mbfl_html_entity_entry` -- `{char *name; int code;}`, what `:200-206`",
+        "  ph45-htmlent-cache-int: OK+3 ext/mbstring/libmbfl/filters/html_entities.c:37-290  5628 bytes  sha256 734afebb8f33375d  -- `mbfl_html_entity_list` -- 251 entities plus the `{NULL,-1}` terminato",
+        "  ph45-htmlent-cache-int: OK+4 ext/mbstring/libmbfl/mbfl/mbfl_allocators.h:36-54  688 bytes  sha256 289b5ecc8a164bff  -- \u2b50\u2b50 `mbfl_malloc` AND `mbfl_free` ARE `#define`s OVER A FUNCTION-POINTE",
+        "  ph45-htmlent-cache-int: OK+5 ext/mbstring/mbstring.c:240-283  875 bytes  sha256 dff1cfd53b12bf78  -- `_php_mb_allocators` -- `malloc`->`emalloc`, `free`->`efree`, and the ",
+        "  ph45-htmlent-cache-int: OK+6 ext/mbstring/mbstring.c:762-765  74 bytes  sha256 2c7752b17cbb4466  -- `PHP_MINIT_FUNCTION(mbstring)`: `__mbfl_allocators = &_php_mb_allocato",
+        "  ph45-htmlent-cache-int: OK+7 ext/mbstring/libmbfl/mbfl/mbfl_convert.c:216-256  1026 bytes  sha256 b208a9247d05506b  -- `mbfl_convert_filter_new` -- allocates the filter STRUCT with `mbfl_ma",
+        "  ph45-htmlent-cache-int: OK+8 ext/mbstring/libmbfl/mbfl/mbfl_convert.c:259-266  144 bytes  sha256 79461e635638b0aa  -- `mbfl_convert_filter_delete` -- calls the dtor, i.e. reaches `:169`'s ",
+        "  ph45-htmlent-cache-int: OK+9 ext/mbstring/libmbfl/mbfl/mbfilter.c:243-271  614 bytes  sha256 7192691a09af5e1f  -- \u2b50 `mbfl_buffer_converter_feed` -- and its body `while (n > 0) { (*filt",
+        "  ph45-htmlent-cache-int: OK+10 ext/mbstring/libmbfl/filters/mbfilter_htmlent.c:85-91  226 bytes  sha256 de7bc3bc60a06877  -- `vtbl_html_wchar` -- the vtable wiring ctor, dtor, filter and flush to",
+        "  ph45-htmlent-cache-int: OK+11 ext/mbstring/libmbfl/mbfl/mbfl_convert.c:299-317  573 bytes  sha256 b710d7ed81ad1bbd  -- `mbfl_convert_filter_copy` -- `:312` copies `dist->cache = src->cache`",
+        "  ph45-htmlent-cache-int: per-span overlap: span0 91% (42/46), span1 86% (12/14), span2 0% (0/4), span3 0% (0/253), span4 0% (0/10), span5 0% (0/22), span6 0% (0/2), span7 23% (6/26), span8 40% (2/5), span9 12% (2/17), span10 0% (0/7), span11 0% (0/17)  -- the UNION is what is reported below, and it is what 12 cited spans oblige the row to",
+        "  ph45-htmlent-cache-int: kernel overlap 15% (61/419 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph45-htmlent-cache-int: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (15% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph45-htmlent-cache-int: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph45-htmlent-cache-int: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH45_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph45-htmlent-cache-int"
+      ],
+      "tool_argv": [
+        "ph45-htmlent-cache-int"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+From e8901dc17087075645dc867a9b6d7d534673482b Mon Sep 17 00:00:00 2001
+From: Moriyoshi Koizumi <moriyoshi@php.net>
+Date: Mon, 21 Feb 2005 10:12:43 +0000
+Subject: [PATCH] - Fix bug #30573 (compiler warning due to invalid type cast)
+
+---
+ ext/mbstring/libmbfl/filters/mbfilter_htmlent.c | 14 +++++++-------
+ ext/mbstring/libmbfl/mbfl/mbfl_convert.h        |  1 +
+ 2 files changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/ext/mbstring/libmbfl/filters/mbfilter_htmlent.c b/ext/mbstring/libmbfl/filters/mbfilter_htmlent.c
+index 2eaa09cf7405..40c24c3424e5 100644
+--- a/ext/mbstring/libmbfl/filters/mbfilter_htmlent.c
++++ b/ext/mbstring/libmbfl/filters/mbfilter_htmlent.c
+@@ -145,7 +145,7 @@ int mbfl_filt_conv_html_enc(int c, mbfl_convert_filter *filter)
+ int mbfl_filt_conv_html_enc_flush(mbfl_convert_filter *filter)
+ {
+ 	filter->status = 0;
+-	filter->cache = 0;
++	filter->opaque = NULL;
+ 	return 0;
+ }
+ 
+@@ -158,24 +158,24 @@ static const char html_entity_chars[] = "#0123456789abcdefghijklmnopqrstuvwxyzAB
+ void mbfl_filt_conv_html_dec_ctor(mbfl_convert_filter *filter)
+ {
+ 	filter->status = 0;
+-	filter->cache = (int)mbfl_malloc(html_enc_buffer_size+1);
++	filter->opaque = mbfl_malloc(html_enc_buffer_size+1);
+ }
+ 	
+ void mbfl_filt_conv_html_dec_dtor(mbfl_convert_filter *filter)
+ {
+ 	filter->status = 0;
+-	if (filter->cache)
++	if (filter->opaque)
+ 	{
+-		mbfl_free((void*)filter->cache);
++		mbfl_free((void*)filter->opaque);
+ 	}
+-	filter->cache = 0;
++	filter->opaque = NULL;
+ }
+ 
+ int mbfl_filt_conv_html_dec(int c, mbfl_convert_filter *filter)
+ {
+ 	int  pos, ent = 0;
+ 	mbfl_html_entity_entry *entity;
+-	char *buffer = (char*)filter->cache;
++	char *buffer = (char*)filter->opaque;
+ 
+ 	if (!filter->status) {
+ 		if (c == '&' ) {
+@@ -246,7 +246,7 @@ int mbfl_filt_conv_html_dec_flush(mbfl_convert_filter *filter)
+ 	int status, pos = 0;
+ 	char *buffer;
+ 
+-	buffer = (char*)filter->cache;
++	buffer = (char*)filter->opaque;
+ 	status = filter->status;
+ 	/* flush fragments */
+ 	while (status--) {
+diff --git a/ext/mbstring/libmbfl/mbfl/mbfl_convert.h b/ext/mbstring/libmbfl/mbfl/mbfl_convert.h
+index 0bc06209c178..afec8f06279e 100644
+--- a/ext/mbstring/libmbfl/mbfl/mbfl_convert.h
++++ b/ext/mbstring/libmbfl/mbfl/mbfl_convert.h
+@@ -51,6 +51,7 @@ struct _mbfl_convert_filter {
+ 	const mbfl_encoding *to;
+ 	int illegal_mode;
+ 	int illegal_substchar;
++	void *opaque;
+ };
+ 
+ struct mbfl_convert_vtbl {
