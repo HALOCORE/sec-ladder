@@ -416,8 +416,59 @@
   > `ph29`'s** and F77's method is not the binding constraint. Open items 60
   > (PAT-side routing) and 61.
 
-  > ⚠⚠⚠ **SIXTH FLAG — NOT A FINDING (rule 9). THE MANAGER CORRECTED HIMSELF
-  > FOUR TIMES IN ONE ROUND AND `TASK_PHP_037` DISCHARGED ITEM 58 ON `ph45`.**
+  > ⚠⚠⚠ **SIXTH FLAG — THE MANAGER CORRECTED HIMSELF FOUR TIMES IN ONE ROUND,
+  > `TASK_PHP_037` DISCHARGED ITEM 58 ON `ph45`, AND THEN `TASK_PHP_038`
+  > REVIEWED THE LOT AND REFUTED THREE MORE OF MY CLAIMS.**
+  >
+  > ⚠ **STATUS, precisely, because rule 9 turns on it:** F83–F86 have now had
+  > an engineer→reviewer cycle and are **UPHELD-NARROWED** — they are
+  > eligible for this layer once someone writes them in properly. **F88 is
+  > the REVIEWER'S OWN finding, so its cycle has NOT closed.** ⚠⚠ **Nothing
+  > below is authoritative yet; this is still a FLAG.**
+  >
+  > ⛔⛔ **WHAT THE REVIEW REFUTED, and all three were mine:**
+  > **(1) F84's `−1.00` mechanism.** It is **not** the slope — it is exactly
+  > **one instruction per kernel call in `main`**, `main_exclusive_ir`
+  > `Δ/n = −1.0000` on `ph00` and `p11`, **already in every committed record
+  > and needing no callgrind.** ⭐ **My decomposition was right and I put the
+  > instance in the wrong term.** C reads `0.000` because `main` is outside
+  > the call tree, so **B is RIGHT there and C is blind.**
+  > **(2) F83's environment control is worthless** — it tests a *stack*-array
+  > alignment mechanism on a row whose per-call buffer is `emalloc`, i.e.
+  > **heap**. The mechanism F83 itself names is **UNTESTED**; its conclusion
+  > survives on the B/C agreement alone, on **one** leg not two.
+  > **(3) F86(b) is a logical TAUTOLOGY** — *"0 mispredictions over 366"* is
+  > not evidence, and my negative cannot fire for the reason it states.
+  > F86(c) is **too strong**; *"three independent statistics"* is **wrong** —
+  > C and W1 are **nested scopes of one run**, ≈176 k `Ir` apart. And the
+  > cross-language flip count is **29, not 28**, which the draft's own
+  > arithmetic already implied.
+  >
+  > ⭐⭐⭐ **AND THE REVIEWER'S OWN FINDING IS BIGGER THAN ANYTHING IT
+  > REFUTED: FAMILY B IS ONE DRAW OF A SAMPLING DISTRIBUTION.** `probe_iters`
+  > is **`[100, 200]` in all seven PHP `spec.md`s and in `p11`**
+  > (manager-verified), the driver picks its window by a pseudo-random
+  > function of a running accumulator, and on `ph29` the slope level moves
+  > **32 % across draws with the published draw the LARGEST of seven.**
+  > `ph03` reads **0.03 %** because its per-window work is uniform — **that
+  > contrast is the control.** ⚠⚠ **So `inside_share` is ARITHMETICALLY FINE
+  > AND INTERPRETIVELY VOID on any row with heterogeneous per-window work:
+  > it divides a mean over 25 000 calls by a biased 100-call sample.**
+  > ▶ **90–93 % of the B-vs-C gap I called *"the confound is real and
+  > present"* is the DRAW.** ✅ Signs stable over seven draws, so **no flip
+  > verdict moves.**
+  >
+  > ▶ **THE DECISION, as the reviewer would have it: publish both, and the
+  > second column MUST BE FAMILY C.** Family B is now disqualified twice —
+  > it misses real work (F84) and it is one unstable draw (F88) — and W1 is
+  > not independent of C. ⚠⚠ **So the only admissible second column is the
+  > one nobody has built (item 62), and `ph64`'s published B1 headline may
+  > be a single outlier draw (item 66, UNTESTED and cheapest).**
+  >
+  > ⚠ **The count of my corrections this round is SEVEN, and not one was
+  > arithmetic.** Every one came from a second method applied to something I
+  > had published from a single probe, a two-row sample, or — twice now — a
+  > restatement of a definition mistaken for a measurement.
   > `RECAP_PHP.md` **F83–F87**, `.temp/mgr172/NOTES.md`, probes
   > `identity_null.py` · `inclusive_ir.py` · `bc_sweep.py` · `flip_exact.py`,
   > all `--selftest` PASS. ⚠ **And `.temp/mgr172/STATISTIC-DECISION-DRAFT.md`

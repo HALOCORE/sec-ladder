@@ -47,24 +47,24 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 6 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
         ph45 TYPE. ALL THREE AXES OPEN. .memory-php/ is AUTHORITATIVE.
-NEXT    NOTHING RUNNING; _037 LANDED + manager-verified (gate + BOTH brackets).
-        ▶ REVIEW `.temp/mgr172/STATISTIC-DECISION-DRAFT.md` -- F85 is the
-        programme's CENTRAL CLAIM and is UNREVIEWED. THEN item 64, 63+56, 65, 54.
-⚠ NEW   F87 ⭐⭐⭐ ph45's R4 *AND* R3 BOTH MOVE (1st row), the bound's SIGN
-        REVERSES -> F67 STAYS n=1, and `get_unchecked` is the EXPENSIVE spelling
-        (+44pp). RULED: #[inline(always)] IS a respelling -- 98 shipped files.
-        F85 ⚠⚠⚠ 28 of 38 SIGN FLIPS are CROSS-LANGUAGE and SURVIVE family C:
-        A says C is +33% dearer than safe Rust, 3 statistics say ~1% CHEAPER.
-        F86 NO SHORTCUT -- certifying A needs B. PUBLISH BOTH. F83/F84: index.
-⚠ OWED  A1 IS BLIND ON ph45: spread 0.000000pp over 9 variants vs 66.7/44.5pp.
-        SPREAD (A1) ph03 +12.19 · ph16 -1.22 · ph29 -6.06 · ph64 +17.47 = 2/2.
+NEXT    NOTHING RUNNING. _037 + _038 (REVIEW) BOTH LANDED + manager-verified.
+        ▶ item 66: is ph64's PUBLISHED B1 HEADLINE one unstable draw? CHEAPEST
+        in the programme. THEN 62 (family C is a PRECONDITION now), 63+56, 67.
+⚠ NEW   F88 ⭐⭐⭐ FAMILY B IS ONE DRAW of a sampling distribution -- probe_iters
+        is [100,200] EVERYWHERE, ph29's B moves 32% across draws, the published
+        draw is an OUTLIER, `inside_share` INTERPRETIVELY VOID on such a row.
+        F87 ph45's R4 *AND* R3 both move (1st row), bound's SIGN REVERSES ->
+        F67 stays n=1, `get_unchecked` is the EXPENSIVE spelling (+44pp).
+⚠ WRONG My F84 `-1.00`=slope REFUTED (it is 1 insn/call in `main`, in every
+        record); F83's env control tests a mechanism that CANNOT apply; F86(b)
+        is a TAUTOLOGY, (c) TOO STRONG; "3 independent statistics" -> 2.
 ⚠ TRAPS `grep -a` ALWAYS (blind to 41 corpus files); ask about a FUNCTION, not text.
         ⚠⚠ A PROBE WHOSE SETUP ENCODES THE ANSWER evaluates fine and is WRONG --
         9 shapes, the 9th MINE (F82); too-clean is the only warning (F52/F70/F82).
 BAR     C-SIDE ONLY: nothing Rust/Verus/Miri/cost kills a row; patterns-php/ is
         FRESH. ⚠ .web/ is CONCURRENT -- NEVER `git add -A`.
 READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.md ·
-        F1-F87 · items 1-65. fixsurvey.py + preimage_screen.py have --selftest.
+        F1-F88 · items 1-67. fixsurvey.py + preimage_screen.py have --selftest.
 ```
 
 ---
@@ -201,10 +201,12 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > not noise, and a confound does not shrink with measurement; family C
 > (inclusive) dominates B and solves nothing, because attribution belongs to the
 > COMPARISON. F74 corrected 3× in 3 rounds, never once on arithmetic** ·
-> **F84 ⭐⭐⭐ family B can MISS real work as well as invent it, and `check.py`'s
-> documented `−1.00` class is the SLOPE** · **F85 ⚠⚠⚠ the CROSS-LANGUAGE column
-> carries 28 of 38 sign flips and they SURVIVE family C — this project's central
-> claim** · **F86 ⭐⭐ three classes not two (agree/FLIP/BLIND), and the exact
+> **F84 ⭐⭐⭐ family B can MISS real work as well as invent it — ⛔ my `−1.00`
+> mechanism REFUTED by the review: it is one instruction per call in `main`** ·
+> **F85 ⚠⚠⚠ the CROSS-LANGUAGE column carries 29 of 38 sign flips and 28 of 29
+> SURVIVE family C — this project's central claim** · **F88 ⭐⭐⭐ family B is ONE
+> DRAW of a sampling distribution; `ph29`'s B moves 32 % across draws and
+> `inside_share` is interpretively VOID on such a row** · **F86 ⭐⭐ three classes not two (agree/FLIP/BLIND), and the exact
 > flip test proves THERE IS NO SHORTCUT: certifying A needs B** ·
 > **F87 ⭐⭐⭐ `ph45`'s R4 AND R3 both move, the bound's SIGN REVERSES, and
 > `get_unchecked` is the EXPENSIVE spelling — 44 pp dearer**
@@ -1502,6 +1504,74 @@ The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
 
+### F88 — ⭐⭐⭐ **FAMILY B IS ONE DRAW OF A SAMPLING DISTRIBUTION**, AND ON `ph29` THAT IS BIGGER THAN EVERY ERROR SOURCE ALREADY ON FILE
+
+`TASK_PHP_038`, the **reviewer's own** finding. ⚠ **UNREVIEWED — it is the
+reviewer's, so rule 9's cycle has not closed on it.** ✅ **Manager-verified where
+it is cheap to**: `probe_iters` is `[100, 200]` in **all seven PHP `spec.md`s and
+in `p11`**, and the reviewer reports its `[100,200]` slope reproduces every
+published `marginal_ir_per_call` **to 0.01 `Ir`** — so the thing it is describing
+really is family B.
+
+⚠⚠ **This is in no finding, no `spec.md` note, and not in `check.py`'s
+null-control docstring — which corrects that table for mode, opt level, input and
+(per F82) identity level, but not for THIS.**
+
+**`Ir(n)` is not linear in `n`.** Adjacent-span slopes over `n = 100..960`:
+
+| row / cell | slopes | spread |
+|---|---|---|
+| `ph29/small` `c-gcc` | 1576.8 .. 2084.2 | **32.2 %** |
+| `ph29/small` `safe_naive` | 1365.9 .. 1794.2 | 31.4 % |
+| `ph29/small` `unsafe` | 1278.8 .. 1695.4 | 32.6 % |
+| `ph03/small` `c-gcc` | 7516.6 .. 7519.1 | **0.03 %** — the control |
+
+**The mechanism is in committed driver source**, not inferred: `c/main.c`'s
+`SLB-DRIVER` loop picks the window index `k` as a **pseudo-random function of the
+running accumulator** (`acc * nwin >> 64`, `acc = acc*31 + r`). `ph29/small.bin`
+holds 32 windows whose **per-window work varies**, so B is the mean over a
+**pseudo-random 100-element sample** of them — deterministic, but a *sample*.
+⭐ **`ph03` has 32 windows too and reads 0.03 %, because its per-window work is
+uniform. That contrast is the control.**
+
+⚠ **The reviewer's own first hypothesis was WRONG and its negative caught it**: it
+predicted plain *aliasing* (spans at exact multiples of the 32-window cycle would
+be stable); `alias.py::N3` **FAILED**, because the sequence is not indexed by
+iteration so there is no cycle to align to. **It published the refutation instead
+of the tidy story.**
+
+⛔⛔ **AND IT MIS-ATTRIBUTES F85's OWN RESIDUAL — MY CLAIM, CORRECTED.** F85 says
+*"B and C do differ by 2–3 pp on `small.bin` — the confound is real and
+present"*. Across **seven** draws, the published `[100,200]` draw is an
+**OUTLIER** and every other draw sits within **0.17–0.22 pp** of family C:
+
+```
+ph29/small               F85 B   F85 C   (200,400) (300,600) (400,800) (640,960)
+c-clang vs safe_tuned    -2.82   -4.85     -4.18     -4.67     -4.34     -3.88
+c-gcc   vs safe_naive   +17.85  +14.55    +15.08    +14.78    +15.12    +15.50
+```
+
+▶ **So 90–93 % of that gap is the DRAW, not the attribution confound F83/F84
+describe.** ✅ **The SIGN is stable across all seven draws on every pair, so no
+flip verdict moves and F85's conclusion is untouched.**
+
+⚠⚠ **Two consequences that are not cosmetic:**
+
+1. ⭐⭐ **`inside_share` IS NOT A SHARE ON `ph29`.** `s = A/B` divides a mean over
+   **25 000** calls by a mean over a *different, biased* **100**-call sample.
+   ▶ **F80's `min(inside_share)` rule and F86's `r = s_a/s_b` are
+   arithmetically fine and INTERPRETIVELY VOID on any row with heterogeneous
+   per-window work.**
+2. **F84's `ph29` figures inherit it** — *"99.31 % artefact"* and *"`ph29/large`
+   C `+2.383` against B `+0.000`"* are readings of this unstable quantity.
+   ⭐ **The CONCLUSIONS get STRONGER** (a sampling error is two-directional by
+   nature); **the MECHANISM changes.**
+
+▶ **The cheapest next measurement in the programme, and the reviewer flagged it
+rather than guessing: `ph64`.** It allocates `2n+2` blocks per call so its
+per-window work must vary strongly — **and it is the one row that publishes B1.**
+**UNTESTED.** → **item 66.**
+
 ### F87 — ⭐⭐⭐ `ph45`'s R4 **AND** R3 ENDPOINTS BOTH MOVE, THE BOUND'S **SIGN REVERSES**, AND `get_unchecked` IS THE **EXPENSIVE** SPELLING
 
 `TASK_PHP_037`. ✅ **Manager-verified from `results-php/gate/` and
@@ -1571,7 +1641,7 @@ cost-selected** is what contains that: the search reports what exists, the
 shipped rung stays put. ⭐ And **both variants ship side by side**, so the
 attribute's 40-pp contribution is visible rather than buried in one number.
 
-### F84 — ⭐⭐⭐ FAMILY B **CAN MISS REAL WORK AS WELL AS INVENT IT**, AND `check.py`'s DOCUMENTED `−1.00` CLASS IS THE **SLOPE**
+### F84 — ⭐⭐⭐ FAMILY B **CAN MISS REAL WORK AS WELL AS INVENT IT** — ⛔ AND MY `−1.00` MECHANISM WAS **REFUTED BY THE REVIEW**
 
 Manager, `.temp/mgr172/NOTES.md` §9, probe `bc_sweep.py` (`--selftest` **PASS,
 7 must-fire negatives**), profiles from `sweep_cg.sh`, **every binary
@@ -1602,12 +1672,22 @@ decomposition the numbers force:
 
 > **B = C + work OUTSIDE the kernel's call tree + slope-method effects**
 
-⭐⭐ **1. THE UBIQUITOUS `−1.00` IS A SLOPE ARTEFACT.** `harness/check.py`'s PAT
+⛔⛔ **1. I CLAIMED THE UBIQUITOUS `−1.00` IS A SLOPE ARTEFACT. `TASK_PHP_038` §4.2 REFUTED THE MECHANISM.** `harness/check.py`'s PAT
 null table records *"1.00 ≤ |null| < 2 in 35 cells (**34 of them exactly
 −1.00**)"* and offers **no mechanism for it**. `ph00` reads **B `−1.000` on both
-inputs while C reads `0.000` on both.** ▶ **A whole documented class of that
-table is the measurement method, not the program.** ⚠ PAT-side, **reported for
-routing** — see item 60.
+inputs while C reads `0.000` on both.** ▶ I read that as *"a whole documented
+class of that table is the measurement method"*.
+
+> ⛔⛔ **IT IS NOT THE SLOPE — AND THE ANSWER WAS IN EVERY COMMITTED RECORD,
+> UNREAD, NEEDING NO CALLGRIND. It is exactly ONE INSTRUCTION PER KERNEL CALL
+> EXECUTED IN `main`**: `main_exclusive_ir` Δ = **−199 995 at n = 200 000** on
+> `ph00` and **−6 001 at n = 6 000** on `p11`, i.e. `Δ/n = −1.0000` —
+> **manager-re-verified on both rows.** ▶ **C reads `0.000` because `main` is
+> OUTSIDE the kernel's call tree, so B is RIGHT here and C is BLIND to it, which
+> is the opposite of what I claimed.** ⭐ **The decomposition below was correct;
+> I attributed the instance to the WRONG TERM — out-of-tree work, not slope
+> effects.** ✅ The *observation* is upheld, and on a PAT row. ⚠ PAT-side, still
+> **reported for routing** — item 60.
 
 ⚠⚠ **2. B CAN MISS REAL WORK, NOT ONLY INVENT IT.** `ph29/large`: **C
 `+2.383`/call against B `+0.000`.** **B reports a clean null over a real
@@ -1647,6 +1727,11 @@ caught by its own negative **N5**, phrased *"a number is being read wrong"*
 rather than *"the rule is wrong"*, which is what pointed at the real cause.
 ⭐ **BLIND is the worse failure**: on `ph45` it is **A `+0.000 %` against a
 `+23.37 %` effect**, which is F87 result 4's neighbourhood reached independently.
+⚠⚠ **BUT THE TAXONOMY INVERTS THE EVIDENCE ON 5 OF THE 14 BLIND CELLS**
+(`TASK_PHP_038` §2.4) — the class lumps *A genuinely sees nothing* together with
+*A correctly reads a true zero*, and on 5 cells it is the latter. ⭐ **The
+reviewer proposed a test and reported that its own negative FAILED, rather than
+shipping it**, so BLIND still has **no** working test. → **item 67.**
 
 ⚠ **F80's `|Δs| ≤ 0.02`, scored per class, calls 7 real FLIPS and 13 of the 14
 BLIND cells "safe", and flags 153 that agree — 20 failures, not the 6 F80
@@ -1661,6 +1746,13 @@ nothing** (F78's shape; I had it written as a mechanism before noticing).
 **A flip occurs iff `1` lies strictly between the two ratios — 0 mispredictions
 over all 366.**
 
+> ⚠⚠ **`TASK_PHP_038` §2.2: *"0 mispredictions over all 366"* IS A LOGICAL
+> TAUTOLOGY AND IS NOT EVIDENCE — F78's shape one level up, in the finding that
+> cites F78.** The predicate *is* the definition of a sign flip, so it cannot
+> fail, and **my negative N5 cannot fire for the reason its message gives.**
+> ✅ The algebra is UPHELD (the reviewer checked it by hand on three cells);
+> what is withdrawn is treating its own restatement as a measurement.
+
 ⚠⚠ **I THEN TRIED TO REDUCE THAT TO A SCALAR `|effect| < |share mismatch|` AND
 IT IS REFUTED, 30 OF 346** — the scalar form drops the *side* condition and
 fires wherever the effect sits on the far side of 1. **Kept running and labelled
@@ -1669,9 +1761,15 @@ re-derive.**
 
 ⭐⭐⭐ **THE CONSEQUENCE IS DEFLATIONARY AND IT IS THE POINT: the exact test needs
 BOTH ratios, so deciding whether A is safe to publish REQUIRES COMPUTING THE
-STATISTIC THE RULE WOULD LET YOU SKIP.** No function of the shares alone can
-certify A **at any threshold**, because the flip condition depends on the
-**effect size** and the shares do not know it. ▶ **F80's rule is not a licence
+STATISTIC THE RULE WOULD LET YOU SKIP.**
+
+> ⚠ **NARROWED by `TASK_PHP_038` §2.3. I wrote *"no function of the shares alone
+> can certify A at any threshold"* — TOO STRONG: a certifier from the shares
+> **plus a declared minimum effect size** IS constructible, and rows do declare
+> `Ir` floors. It fails here only because no such floor exists.**
+> ✅ **And the operative conclusion survives for a SIMPLER, UNCONDITIONAL reason
+> the finding under-used: `s ≡ A/B`, so computing the share requires B already.**
+> ⭐ That holds with no threshold and no effect-size assumption at all. ▶ **F80's rule is not a licence
 to publish A alone — it is a way to EXPLAIN a disagreement after seeing both.
 The operative rule is the one `ph45` already follows: PUBLISH BOTH, LABELLED,
 ALWAYS.**
@@ -1682,8 +1780,20 @@ Manager, `.temp/mgr172/STATISTIC-DECISION-DRAFT.md` §5, probes `callee_share.py
 + `sweep_cg.sh`. ⚠ **UNREVIEWED** (rule 9), **and it needs a reviewer** — this is
 the programme's central claim.
 
-**Of the 38 sign flips, 28 (76 %) are C-vs-Rust**, carrying the largest
-magnitudes in the corpus. ⚠ **Every one was measured against family B, which F84
+**Of the 38 sign flips, 29 (76 %) are C-vs-Rust**, carrying the largest
+magnitudes in the corpus.
+
+> ⚠⚠ **CORRECTED BY `TASK_PHP_038`, AND THE DRAFT CONTRADICTED ITSELF ON IT.**
+> The count is **29, not 28** — `38 − 9 = 29`, and the draft's own *"the
+> remaining 9 are Rust-vs-Rust"* implies it, while my `mine.txt` already had 29.
+> **76 % was right and "28" was not**; the headline mixed two scripts'
+> populations. ⚠ The by-column table also sums to 37 and mislabels `ph45`'s
+> R3-vs-R5 pair as R2-vs-R3.
+> ⭐⭐ **AND THE REVIEW WENT FURTHER THAN ASKED: all 29 are now adjudicated
+> against family C, not the 12 I had — `ph03` 6/6, `ph07` 6/6, `ph29` 16/16
+> survive; `ph00` 0/1 is REFUTED by C.** So **28 of 29 survive**, and item 64 is
+> discharged. ⭐ **The reviewer's own prediction that `ph03`'s would fail was
+> refuted — C tracks B there to 0.006 pp.** ⚠ **Every one was measured against family B, which F84
 had just shown confounded by up to ~266 `Ir`/call — 17 % of `ph29`'s own
 1 566.56 marginal. So I re-derived them against family C rather than publish and
 hope:**
@@ -1697,12 +1807,18 @@ hope:**
 | small | `c-gcc` vs `safe_naive` | +39.92 | +17.85 | +14.55 | +13.83 | agree — **control** |
 | large | `c-gcc` vs `safe_tuned` | +51.40 | +7.04 | +6.85 | +6.61 | agree — **control** |
 
-⭐⭐⭐ **EVERY FLIP SURVIVES. The disagreement is not "A versus a confounded
-statistic" — it is A versus THREE INDEPENDENT STATISTICS THAT AGREE WITH EACH
-OTHER TO ~2 pp.** ✅ **And the two non-flipping comparisons agree across all
+⭐⭐⭐ **EVERY `ph29` FLIP SURVIVES.**
+⛔ ⚠⚠ **BUT "THREE INDEPENDENT STATISTICS" IS WRONG AND `TASK_PHP_038` §1.3
+MEASURED WHY: C AND W1 ARE NESTED SCOPES OF ONE RUN, NOT INDEPENDENT.** The
+fixed per-program term **does** differ by language — **≈176 k `Ir`, two rows
+agreeing to 0.45 %** — and it fully accounts for the C-vs-W1 gaps. ▶ **The honest
+claim is TWO methods (a two-run slope and a one-run call tree), not three.** ✅ **And the two non-flipping comparisons agree across all
 four families, which is the control**: a pipeline artefact would have moved them
-too. ⓘ B and C *do* differ by 2–3 pp on `small.bin` — the confound is real — but
-an order of magnitude short of flipping anything.
+too. ⛔⛔ **AND MY CLOSING CLAIM THAT THE 2–3 pp GAP ON `small.bin` SHOWS *"the
+confound is real and present"* IS MIS-ATTRIBUTED — see F88. Across seven draws
+the published `[100,200]` one is an OUTLIER and every other sits within
+0.17–0.22 pp of C, so 90–93 % of that gap is the DRAW.** ✅ Signs stable, so no
+flip verdict moves.
 
 ⚠⚠ **`ph29/large c-gcc vs safe_naive` is the sentence this is about:** A says C
 is **33 % dearer** than naive safe Rust; three other statistics say **~1 %
@@ -1751,6 +1867,15 @@ shifts the stack pointer → a per-call stack array's alignment → a different 
 in `__memset_avx2_unaligned_erms`"*, ±7, **between two runs of the SAME build**.
 One binary, **three** environment sizes spanning 4 000 bytes: kernel inclusive
 is **181 733 873 at every one, spread 0** (negative **N6**).
+
+> ⛔⛔ **THE CONTROL IS WORTHLESS AND `TASK_PHP_038` §4.1 SAYS WHY: IT TESTS A
+> MECHANISM THAT CANNOT APPLY TO `ph03`.** `check.py` attributes its ±7 to *a
+> per-call **stack array**'s alignment*; **`ph03`'s per-call buffer is
+> `emalloc` — HEAP.** So three sizes is not too few, it is **irrelevant**, and
+> ⚠⚠ **the mechanism F83 itself names — binary layout → heap alignment, and the
+> two binaries differ by 48 text bytes — is UNTESTED.**
+> ✅ **F83's conclusion survives on the B/C agreement**, which is independent of
+> this control. ⚠ But it survives on **one** leg, not two.
 ⚠ **The work is LOCATED**: **+205.94/call** in one unnamed `libc.so.6` function
 and **+56.98** in a second, both **local** symbols the dynamic table does not
 name — nearest exported are `__default_morecore` (+2912) and `timer_settime`
@@ -4253,9 +4378,11 @@ the wrong one.
 | 57 | ⚠⚠ **`ph16`'s `controls/spellings.py` CARRIES TWO REAL DEFECTS, BOTH LATENT, AND FIXING THEM COSTS A `ph16` RE-GATE** | F79, `_035`, found by its own §H negatives and **guarded in `ph29`'s copy only**. (a) ⭐ **`kernel_fingerprint` returns `(0, 'd41d8cd98f00')` — the md5 of the EMPTY STRING — for a binary that does not exist**, because `disasm` ignores `objdump`'s return code, **so two missing binaries compare EQUAL on the one function whose job is to decide byte-identity.** (b) `disasm`'s needle is a **bare substring**, so a crate named `nokernel` fingerprints its own `main`. ✅ **Latent, not live, on `ph16`** — every call site there is downstream of a build whose success is checked — which is why `_035` correctly left it alone rather than widening its scope. ⚠ `controls/*.py` is in `source_sha256`, so the fix **costs a `ph16` re-gate**; batch it with any other `ph16` work. ⭐ **The general shape: a control cloned between rows carries its defects with it, and only the row that writes NEW negatives finds them** — `ph16`'s suite was 54 cases and did not catch these; `ph29`'s 75 did |
 | 58 | ⚠⚠ **THREE OF SIX BUILT ROWS HAVE AN UNSEARCHED R4 ENDPOINT, AND F77 JUST PROVED THAT MATTERS** | `ph03`, `ph64` and now `ph45` (F80). ⚠ Until `TASK_PHP_035` this debt looked cosmetic, because `ph07` and `ph16` both searched their R4 side and found it **degenerate**. ⭐⭐ **F77 killed that reading**: `ph29`'s `r4_fold_iter` verifies byte-identically and is **5.63 pp cheaper**, so a `fixed-R4 bound` over an *unsearched* endpoint is a bound over a number nobody has tried to move. ▶ **`ph45` is the cheapest of the three to search** (its `spellings.py` was never built, so there is no declaration repair to do first) and `ph03` is the oldest. ⚠ Each costs a re-gate; **batch each row's owed prose fixes into the same run** — the lesson `TASK_PHP_033.md` learned by failing to |
 | 59 | ⚠ **A SIGNED OVERFLOW AT `mbfilter_htmlent.c:193`, IN `ph45`'s OWN FUNCTION, UNTRACED TO ANY FIX** | F80, `_036`'s own find, **reported and not pursued** — the right call, since chasing it was outside a build task's scope. ⚠ It is **inside the function `ph45` extracts**, so it is not merely adjacent: the row's benign corpus must be shown not to evaluate it (F46's UB-free-trigger rule), and `_036` does not say whether that was checked. ▶ **Ask that question before `ph45`'s next re-gate.** ⓘ Distinct from the **stack OOB write at `:123`** in the *encode* half (F75), which is also uncatalogued and which the row deliberately does not lift |
-| 60 | ⚠ **`harness/check.py`'s NULL-CONTROL TABLE JUSTIFIES ITS WORST CELL WITH BYTE-IDENTITY THAT THE ROW'S OWN PIN DENIES — PAT-SIDE, FOR ROUTING** | F82. The docstring is **more careful than my probe was** — it corrects the table for **mode**, **opt level** and **input**, and warns *⚠⚠⚠ A NULL IS A PROPERTY OF A CELL. DO NOT MAX IT OVER MODE, OVER LEVEL, OR OVER INPUT.* ⚠ It does not correct for the **identity level**: its worst quoted cell, **`p25 large +269.52`**, is on the row pinned `` `O0: norel`, `O3: norel` ``, while the table is justified by *"`identity` forces R4's and R5's kernels to agree byte for byte."* ✅ **The number is RIGHT and the justification is WRONG** — p25 rescues it by a different route its own identity note records (189 non-pad instructions and identical byte count in both cells). ⚠⚠ **`harness/` is FROZEN**: one sentence costs a 33-pattern re-gate, and `results/SYNTHESIS.md` is the PAT-side authority, not this file. ▶ **Reported, NOT fixed.** ⭐ The general shape is the same as F82's own: **a correct number whose stated reason is false survives every check, because checks test numbers** ⭐⭐ **AND F84 SUPPLIES THE MISSING MECHANISM FOR THE TABLE'S LARGEST CLASS.** That docstring records *"1.00 ≤ |null| < 2 in 35 cells, **34 of them exactly −1.00**"* without explaining the `−1.00`. Family C answers it: on `ph00`, B reads `−1.000` on both inputs where **C reads `0.000`** — **the `−1.00` is the slope method, not the program.** ⚠ Still frozen, still not fixed; this only adds the mechanism to what is already reported for routing |
+| 60 | ⚠ **`harness/check.py`'s NULL-CONTROL TABLE JUSTIFIES ITS WORST CELL WITH BYTE-IDENTITY THAT THE ROW'S OWN PIN DENIES — PAT-SIDE, FOR ROUTING** | F82. The docstring is **more careful than my probe was** — it corrects the table for **mode**, **opt level** and **input**, and warns *⚠⚠⚠ A NULL IS A PROPERTY OF A CELL. DO NOT MAX IT OVER MODE, OVER LEVEL, OR OVER INPUT.* ⚠ It does not correct for the **identity level**: its worst quoted cell, **`p25 large +269.52`**, is on the row pinned `` `O0: norel`, `O3: norel` ``, while the table is justified by *"`identity` forces R4's and R5's kernels to agree byte for byte."* ✅ **The number is RIGHT and the justification is WRONG** — p25 rescues it by a different route its own identity note records (189 non-pad instructions and identical byte count in both cells). ⚠⚠ **`harness/` is FROZEN**: one sentence costs a 33-pattern re-gate, and `results/SYNTHESIS.md` is the PAT-side authority, not this file. ▶ **Reported, NOT fixed.** ⭐ The general shape is the same as F82's own: **a correct number whose stated reason is false survives every check, because checks test numbers** ⭐⭐ **AND F84 SUPPLIES THE MISSING MECHANISM FOR THE TABLE'S LARGEST CLASS.** That docstring records *"1.00 ≤ |null| < 2 in 35 cells, **34 of them exactly −1.00**"* without explaining the `−1.00`. ⛔ **I answered it wrongly and `TASK_PHP_038` §4.2 supplied the real one: it is exactly ONE INSTRUCTION PER KERNEL CALL IN `main`** — `main_exclusive_ir` Δ/n = **−1.0000** on `ph00` and `p11`, **already in every committed measurement record and needing no callgrind at all.** ⭐ **So the mechanism for `check.py`'s largest documented class IS now on file, just not the one I proposed** — and the routing item stands unchanged, since `harness/` is frozen either way |
 | 61 | ⚠⚠⚠ **THE SHARED `why` BLOCK ARGUES R4 ADMISSIBILITY FROM AN ANTECEDENT THAT IS FALSE ON THREE OF SIX PHP ROWS** | F82. The block — **byte-identical across all six PHP rows and all 33 PAT rows** — says *"All six patterns pin `identity: unsafe == verus, O3 exact`, so an R4 is not merely a program that MAY use `unsafe`: it is a program that must have a byte-identical R5 twin that Verus verifies."* ⚠ **`ph07` pins `norel`, `ph45` and `ph64` pin `differ`.** It is **PAT-side boilerplate carried into a programme where it does not hold**, and it is the step by which `.memory/01-ladder.md` disqualifies unverifiable R4 candidates — so on those three rows **that disqualification has no stated basis**. ⚠⚠⚠ **AND `TASK_PHP_037` MEASURED THE STRONGER FORM: the wider bar is NECESSARY here, not merely permitted. NO twin on `ph45` compiles byte-identically — INCLUDING THE SHIPPED RUNG'S OWN (318 instructions against 320) — so under the shared block's own admissibility argument THIS ROW HAS NO ADMISSIBLE R4, NOT EVEN THE ONE IT SHIPS.** My task file said *"need NOT"* (permission) and that understated it. ▶ An R4 candidate on `ph45`/`ph64`/`ph07` need only **verify**; their searches are **wider than `ph29`'s** and F77's method is not the binding constraint — **F87 result 1 is a direct consequence.** ⚠ Fixing the sentence is a **six-row PHP re-gate** (it is inside `contract_sha256`) — item 55's shape exactly, and the same open question: a convention binding both programmes has no unhashed shared home |
-| 62 | ⭐⭐ **FAMILY C — `kernel` INCLUSIVE `Ir` — STRICTLY DOMINATES FAMILY B AND IS NOT BUILT** | F83, `.temp/mgr172/inclusive_ir.py`. `callgrind_annotate --inclusive=yes` is in the **pinned** valgrind 3.27.1, so the kernel's whole **call tree** is computable **from ONE run** and **without touching frozen code** — `measure.py::callgrind_ir` records exclusive only, for two needles. ✅ **Same coverage as B with one fewer error source**: on `p25/large` B carries **+101.65 `Ir`/call** that C does not, and on `ph03` the two agree to **0.03 %** and **exactly**. ⚠⚠ **It solves NOTHING about attribution** — the allocator work *is* in the call tree, so C includes it and reads B's number; **I drafted the opposite claim and had to retract it inside the same finding.** ▶ Buildable as a **php-side control**: six PAT patterns' `controls/` already call `objdump` directly, so one calling `callgrind_annotate` is the same shape, and `controls/*.py` costs **one gate re-run and no re-measure**. ⚠ **Its own null must be measured before it is believed** — C is *attributable*, not *clean*. ⚠ Not started; `TASK_PHP_037` has since landed, so the one-agent slot is FREE. ⭐⭐ **AND F85 ALREADY USED C FOR REAL**: it re-derived `ph29`'s cross-language flips against C on the strength of `inclusive_ir.py` alone, which is the argument for building it properly rather than re-running a probe per question |
+| 62 | ⭐⭐ **FAMILY C — `kernel` INCLUSIVE `Ir` — STRICTLY DOMINATES FAMILY B AND IS NOT BUILT** | F83, `.temp/mgr172/inclusive_ir.py`. `callgrind_annotate --inclusive=yes` is in the **pinned** valgrind 3.27.1, so the kernel's whole **call tree** is computable **from ONE run** and **without touching frozen code** — `measure.py::callgrind_ir` records exclusive only, for two needles. ✅ **Same coverage as B with one fewer error source**: on `p25/large` B carries **+101.65 `Ir`/call** that C does not, and on `ph03` the two agree to **0.03 %** and **exactly**. ⚠⚠ **It solves NOTHING about attribution** — the allocator work *is* in the call tree, so C includes it and reads B's number; **I drafted the opposite claim and had to retract it inside the same finding.** ▶ Buildable as a **php-side control**: six PAT patterns' `controls/` already call `objdump` directly, so one calling `callgrind_annotate` is the same shape, and `controls/*.py` costs **one gate re-run and no re-measure**. ⚠ **Its own null must be measured before it is believed** — C is *attributable*, not *clean*. ⚠ Not started; `TASK_PHP_037` has since landed, so the one-agent slot is FREE. ⭐⭐ **AND F85 ALREADY USED C FOR REAL**: it re-derived `ph29`'s cross-language flips against C on the strength of `inclusive_ir.py` alone, which is the argument for building it properly rather than re-running a probe per question ⚠⚠⚠ **AND `TASK_PHP_038` §6 RULES IT A PRECONDITION, NOT A NICE-TO-HAVE**: its decision is *publish both, and the second column MUST BE C* — **drop W1 as corroboration**, because §1.3 measured that C and W1 are **nested scopes of ONE run** separated by a language-dependent fixed term of **≈176 k `Ir`**, so quoting them as independent was wrong. ▶ **And family B is now disqualified TWICE OVER** — F84 (it misses real work) and F88 (it is one unstable draw). **So C is the only admissible second column, and it is the one thing not built.** ⚠ Also owed by that decision: **name `probe_iters` in the label** of any B figure that survives, since F88 makes the draw part of the number's identity |
 | 63 | ⚠⚠ **A THIRD DEFECT IN THE SHARED `spellings.py` MACHINERY, LATENT IN `ph29`, AND F79's TWO FIXES DO NOT COVER IT** | F87, `TASK_PHP_037` §6.2, found by its **128-case** §H suite (`ph29`'s bar was 75). ⚠ **`twin_identical` still compares two `(0, md5(""))` rows EQUAL** — F79 guarded `kernel_fingerprint` and `disasm`'s needle but **not this**, so the same *"two missing binaries are byte-identical"* hole survives at a second call site, in the one function whose whole job is to decide byte-identity. ✅ **Latent on `ph29`** (its call sites are downstream of a checked build), and **`_037` correctly declined to widen its scope into another row's control.** ⚠ Costs a `ph29` re-gate → **batch with open item 56** (`ph29`'s weak bare-identifier pin), the only other `ph29` prose debt. ⭐ **The shape is item 57's exactly, one generation on: a control cloned between rows carries its defects, and only the row that writes NEW negatives finds them** — 54 cases missed two, 75 missed one, **128 found it** |
 | 64 | ⚠⚠ **`ph07`'s AND `ph03`'s CROSS-LANGUAGE FLIPS ARE NOT RE-DERIVED AGAINST FAMILY C** | F85. ✅ `ph29`'s five flips **survive** C and W1 — three statistics agreeing to ~2 pp against A — and its two non-flipping controls agree across **all four** families, **so the `ph29` half is settled.** ⚠ `ph07` (6 flips) and `ph03` (6) are still measured **against family B only**, and F84 showed B confounded in both directions by up to ~266 `Ir`/call. **The mechanism is the same and `ph29` makes it likely, which is exactly why it must be measured rather than assumed** (F78's lesson). ▶ **Cheap**: their binaries are on disk and md5-verified, and `.temp/mgr172/sweep_cg.sh` is the single regeneration entry point — add four C cells per row. ⚠⚠ **Until then quote F85 as *"28 of 38 flips are cross-language"* (measured over the corpus) plus *"they survive C"* (measured on ONE row of three)** |
 | 65 | ⚠ **`safe_tuned.rs`'s HEADER CITES A 68-BYTE LOG FOR FIVE NUMBERS IT DOES NOT CONTAIN, AND THE FIX COSTS A 32-CELL RE-MEASURE** | F87, `TASK_PHP_037` §9.5. `.temp/php36/logs-06-r3search.log` is **two lines** carrying two whole-program totals; **none** of the header's five candidate figures is in it, or anywhere under `.temp/php36/`. ✅ **A dangling citation, not a wrong number** — the `.rs` candidate sources survive so the figures are re-derivable, and two re-measured independently agree to **0.014 %**. ⓘ ⭐ **And `.temp/` is gitignored, so the citation was never reachable from a fresh clone at all** — which is the more general defect and applies to every `.temp/` citation in a committed file. ⚠ It is a `.rs` comment, i.e. **inside the measurement digest: 32 cells.** ▶ **Batch with F87 result 4's mechanism correction**, owed in the same file and the substantive one; **never alone** (`PROTOCOL.md` rule 6, item 53's shape) |
+| 66 | ⭐⭐⭐ **IS `ph64`'s PUBLISHED B1 HEADLINE ONE UNSTABLE DRAW? — THE CHEAPEST NEXT MEASUREMENT IN THE PROGRAMME, AND UNTESTED** | F88, flagged by the reviewer rather than guessed. `probe_iters` is **`[100, 200]` in all seven PHP `spec.md`s and in `p11`** (manager-verified), so **every** family-B figure in both programmes is that one draw. On `ph29` the draw moves the level **32 %** and the published draw is the **largest of seven**. ⚠⚠ **`ph64` is the ONE ROW WHOSE HEADLINE IS B1** (F74), and it allocates **`2n+2` blocks per call** (F71, item 54) — so its per-window work must vary strongly, which is exactly the condition F88 identifies. ▶ **If `ph64`'s B moves like `ph29`'s, the draft §2 ban on family B is not a style rule, it is a correctness fix, and `ph64`'s headline needs restating.** ⭐ Cheap: `probe_iters` is a `spec.md` pin, the binaries are on disk, and `.temp/php38/draws.py` already does the sweep. ⚠ **`ph64`'s `NOTES.md` is in the gate digest but NOT the measurement digest**, so restating costs one re-gate |
+| 67 | ⚠ **THE `BLIND` CLASS HAS NO WORKING TEST, AND THE TAXONOMY INVERTS THE EVIDENCE ON 5 OF ITS 14 CELLS** | F86 as narrowed, `TASK_PHP_038` §2.4. `BLIND` was defined as *A reads exactly `0` while the whole-program figure does not*, which lumps **two opposite situations**: *A genuinely sees nothing* (`ph45`'s `+0.000 %` against a `+23.37 %` effect — the real thing) and *A correctly reads a true zero* (5 of 14). ⚠ The exact straddle predicate cannot cover it — `a_ratio == 1` fails a strict inequality — and F80's threshold calls **13 of the 14 "safe"**. ⭐ **The reviewer proposed a test, ran it, reported that its own must-fire negative FAILED, and shipped the failure instead of the test** — which is the right call and F79's rule (*a must-fire case that fires for the wrong reason is worth nothing*) applied to itself. ▶ Open: a test that separates the two, or an argument that the distinction is decided by `min(inside_share)` and needs none |
