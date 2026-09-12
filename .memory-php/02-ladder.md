@@ -416,6 +416,67 @@
   > `ph29`'s** and F77's method is not the binding constraint. Open items 60
   > (PAT-side routing) and 61.
 
+  > ⚠⚠⚠ **SIXTH FLAG — NOT A FINDING (rule 9). THE MANAGER CORRECTED HIMSELF
+  > FOUR TIMES IN ONE ROUND AND `TASK_PHP_037` DISCHARGED ITEM 58 ON `ph45`.**
+  > `RECAP_PHP.md` **F83–F87**, `.temp/mgr172/NOTES.md`, probes
+  > `identity_null.py` · `inclusive_ir.py` · `bc_sweep.py` · `flip_exact.py`,
+  > all `--selftest` PASS. ⚠ **And `.temp/mgr172/STATISTIC-DECISION-DRAFT.md`
+  > IS AN UNREVIEWED PROPOSAL — it must not enter this file until reviewed.**
+  >
+  > ⭐⭐⭐ **`ph45`'s R4 ENDPOINT MOVES AND SO DOES ITS R3 — THE FIRST ROW WHERE
+  > BOTH DO.** `r4_buf_slice_inline` is **−23.47 %** whole-program with a twin
+  > verifying **41/0** and **10 unchecked-dereference sites against the shipped
+  > rung's 12** — cheaper *and* a smaller trusted surface. `r3_namecmp_fn` is
+  > **18.2 %** under the shipped R3. ⚠⚠ **THE SIGN OF THE BOUND REVERSES UNDER
+  > SEARCH** — shipped, R3 is cheaper; cheapest-found each side, R4 is cheaper
+  > by 3.5 %. ▶ **So this row is NOT `ph16`'s F67 mechanism: F67 STAYS n = 1.**
+  > **Manager-verified from `results-php/gate/` and `controls/spellings.json`,
+  > with both brackets re-run independently at `66/0` and `14/0`.**
+  >
+  > ⭐⭐⭐ **AND `get_unchecked` IS THE EXPENSIVE SPELLING ON THIS ROW.** The
+  > mirror control is the winner's shape exactly — same signature, same hoist,
+  > same attribute, same 12 trusted sites — with the arena reads left
+  > **unchecked**, and it is **44 pp DEARER**. ⚠ **The conclusion is landed and
+  > the MECHANISM is marked OPEN**, after the engineer re-read its own prose and
+  > found it had stated a story as fact. **That is the strongest form of *"the
+  > safety check can be negative-cost"* in either programme.**
+  >
+  > ⚠⚠ **AND A1 IS BLIND ON THIS ROW: spread `0.000000` pp across all NINE
+  > searched variants, against 66.7 pp (R3) and 44.5 pp (R4) whole-program.**
+  > ▶ **A control pricing `ph45` in A1 alone writes `r4_endpoint_degenerate:
+  > true` AND `r3_endpoint_degenerate: true`. Both are false.** ⭐ That is the
+  > corrected two-condition rule earning its keep on the FIRST row it was
+  > applied to — condition (i) catches it, while F74's **withdrawn**
+  > one-condition form PASSES at `|Δinside_share| = 0.003` and would have
+  > licensed A1.
+  >
+  > ⚠⚠⚠ **THE STATISTIC PICTURE, AND IT IS NOT SETTLED.** F83: F74's "null" was
+  > **measuring real work** — family C reproduces B's `+266.000` as `+265.924`
+  > on `ph03/small` by an independent method, so **B's defect is ATTRIBUTION,
+  > not noise, and a confound does not shrink with measurement.** F84: B and C
+  > agree on 6 of 12 R4/R5 cells and **B can MISS real work as well as invent
+  > it.** F86: the A/B disagreement has **three** classes — agree 314, **FLIP
+  > 38**, **BLIND 14** (A exactly `0` against a nonzero effect) — and the exact
+  > flip test **needs both ratios**, so ⭐⭐⭐ **NO FUNCTION OF THE SHARES CAN
+  > CERTIFY A AT ANY THRESHOLD. There is no shortcut: PUBLISH BOTH, LABELLED,
+  > ALWAYS.**
+  >
+  > ⚠⚠⚠ **F85 IS THE ONE THAT MATTERS AND IT IS UNREVIEWED: 28 of the 38 sign
+  > flips are CROSS-LANGUAGE, and on `ph29` they SURVIVE family C.** A says C is
+  > **+33 %** dearer than naive safe Rust; **B, C and W1 all say ~1 % CHEAPER**,
+  > agreeing to ~2 pp. **That is the difference between *"safe Rust is a third
+  > cheaper than C here"* and *"they are the same"* — this programme's central
+  > claim.** ⚠ `ph07` and `ph03` are **B-only** so far (item 64).
+  > ⭐ **It generalises open item 54 rather than repeating it: it is not one row.**
+  >
+  > ⚠ **Four corrections to the manager's own published work this round:** F74's
+  > mechanism (F83), its generalisation (F84), F82's percentages published
+  > **unlabelled** per input (`_037` §9.3 — `check.py`'s own *DO NOT MAX IT OVER
+  > INPUT* warning landing inside the finding that quotes it), and a scalar
+  > restatement of the flip rule **refuted 30 of 346**. ▶ **Not one was
+  > arithmetic. Every one came from a second method on something published from
+  > one probe or two rows.**
+
   ▶ **`ph03`, `ph64` AND `ph45` REMAIN UNDISCHARGED and need their own task.**
   **3 of 6 built rows are unbounded in both directions** — ⚠ this line said
   **3 of 4** until `TASK_PHP_028` reported, then **2 of 4**, `ph64` took it back

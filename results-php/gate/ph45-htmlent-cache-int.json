@@ -153,7 +153,7 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
     "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
-    "patterns/ph45-htmlent-cache-int/NOTES.md": "6ee0aac181892f4827030e0b2844e8246336ee03a795efa4d5f2e45d4e31cf0f",
+    "patterns/ph45-htmlent-cache-int/NOTES.md": "22f00a29a72c96299e5dd86132cf741d8b42868973ca26da1edb7321e3e91439",
     "patterns/ph45-htmlent-cache-int/README.md": "36deca06cd49106b1f0659c8a369e9b205eaaa912818a1408842c467db4f6136",
     "patterns/ph45-htmlent-cache-int/c/arena.h": "37d36206c887c8d627dbe814aceecebe9e8b4f111ce08ec792a07749d1621431",
     "patterns/ph45-htmlent-cache-int/c/emalloc_shim.h": "aa9abf48535e8df93c9398e96c044697a784d73c40d7a7ccc830b5ee308c378f",
@@ -169,6 +169,7 @@
     "patterns/ph45-htmlent-cache-int/controls/o1_roundtrip.rs": "f79b950e3e397b108b8d6147eb93040e07672dac57be0d124da1d6bc5e62bff3",
     "patterns/ph45-htmlent-cache-int/controls/o1_roundtrip_nopre.rs": "da0f6bce6ae263cdee98d3eac9b0f66bfd38cc91c00e857179da3f8cff34c3e0",
     "patterns/ph45-htmlent-cache-int/controls/oracle.py": "2293540fe08cae87e8033b979aee78b3caf530e45ba7024c616c3c551d7423d8",
+    "patterns/ph45-htmlent-cache-int/controls/spellings.py": "f74efb894c1bd983c155799cc3d5bb45081ead1b45a003c4bfeb0892187b1f81",
     "patterns/ph45-htmlent-cache-int/controls/strchr_equiv.c": "3dae2edc62d12f7dd8cae4c505c6a16b0bb3a1b236e2d4537c579cbd1e618d98",
     "patterns/ph45-htmlent-cache-int/controls/vacuity.py": "73d16a995cb90c3433ad856023464e7bd446d74fd4198f1b554931b7f902e6b7",
     "patterns/ph45-htmlent-cache-int/controls/warnings.py": "b0492af5627eaa5f44e1e7d438c9c08545879304184366d41afa2799451d0d84",
@@ -1862,7 +1863,9 @@
     "published_sha256": "0dc7c4916f4afa5754a83f9f07dd0f4b8f0d4253c8366dc9b25a695e1230bcc4",
     "verdict": "FRESH"
   },
-  "controls_json": {},
+  "controls_json": {
+    "spellings.json": "FRESH"
+  },
   "failures": [],
   "notes": [
     "verus O0 isolated: the kernel symbol has no backward branch and no bulk-memory call, but the loop is one DIRECT CALL away -- _RNvCs5wP2qveqZnT_5verus3run (1 back edge). Structural anti-collapse is satisfied by the callee; 3b is what establishes the work happened."

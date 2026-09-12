@@ -413,6 +413,11 @@ quantities and not three:**
 >
 > ⚠ **There is NO pair interval**, and `min(R3 found) − min(R4 found)` is not
 > the repair.
+>
+> ⭐ **AND SINCE `TASK_PHP_037` THERE IS A SECOND QUANTITY BESIDE IT: the
+> R3-side span, whole-program, `−20.66 % .. +46.07 %`** (§8g). ⚠⚠ **Both
+> endpoints of the bound above are now known to MOVE**, so read §8g before
+> quoting either figure in this box as if it were tight.
 
 ⚠⚠ **AND `inside_share` CANNOT BE COMPUTED AS §3 SPELLS IT ON THIS ROW.**
 §3 defines it as `(kernel_exclusive_ir / n_iters) / marginal_ir_per_call`, and
@@ -426,9 +431,33 @@ INSIDE §3's 0.02 threshold — **and the two families still disagree on sign.**
 result about the condition and not about this row: a small `Δinside_share` says
 the two cells have the same callee *share*, and on this row **both** cells put
 90 % of the work in a callee. The rule catches cells that differ; it cannot
-catch cells that agree on being mostly outside. ⚠ **That is offered as an
-observation on one row, not as a correction to F74** — F74 is a 310-comparison
-result and this is one row with a mechanism.
+catch cells that agree on being mostly outside.
+
+> ⚠⚠⚠ **THE PARAGRAPH THAT USED TO CLOSE HERE SAID *"that is offered as an
+> observation on one row, not as a correction to F74 — F74 is a 310-comparison
+> result and this is one row with a mechanism."* THAT CAUTION WAS RIGHT WHEN IT
+> WAS WRITTEN AND THE OBSERVATION HAS SINCE BECOME THE CORRECTION.**
+> `TASK_PHP_037`, from `RECAP_PHP.md` F74/F80/F82.
+>
+> The manager took the observation up, re-ran the same probe over **366**
+> comparisons, and **F74's rule is withdrawn in its published one-condition
+> form** — the probe printed its own refutation, and **all six refuting
+> comparisons are this row's.** The corrected rule, measured clean at **0 sign
+> flips in 151 comparisons**:
+>
+> > **(i) `min(inside_share)` over the two compared cells must be HIGH — family
+> > A must actually SEE both cells — AND (ii) `|Δinside_share| ≤ 0.02`.**
+>
+> ⚠ The threshold in (i) is **not tuned and six rows cannot pin it**: `> 0.3`,
+> `> 0.5` and `> 0.6` all give 0 flips. Read it as *"A sees most of both
+> cells"*.
+> ⚠⚠ **DO NOT OVERSTATE WHAT THIS ROW DID.** It supplied the counterexample —
+> one row, with a mechanism, which is exactly what the withdrawn sentence
+> claimed for itself. **The 366-comparison sweep is the manager's, it is
+> UNREVIEWED under `PROTOCOL.md` rule 9, and nothing here re-derives it.** What
+> this row can still say on its own evidence is the sentence above the box:
+> the condition passes and A1 is still wrong.
+> ⚠ **Do not quote F74's one-condition form** anywhere.
 
 ### 8c. ⭐ The upstream fix is CHEAPER than the defect, and A1 cannot see it
 
@@ -462,6 +491,38 @@ has is four measured R3 candidates and no R4 search at all. **Read it as a
 pointer for whoever discharges this row's spellings debt, not as a second data
 point.**
 
+> ⚠⚠⚠ **THE SENTENCE ABOVE IS NOW HISTORY AND SO IS ITS STATED MECHANISM.
+> `controls/spellings.py` EXISTS (§8g), AND IT REFUTES THE FIRST PARAGRAPH OF
+> THIS SECTION.** `TASK_PHP_037`.
+>
+> The lever is **not** *"a `&[u8; REQ]` whose length is a compile-time
+> constant"*. It is the **HOIST** — resolving the work-buffer base once, outside
+> the 251-entity scan, instead of re-deriving it per byte compared. The array
+> type contributes essentially nothing, measured **three independent times**:
+>
+> | measurement | whole-program `Ir`, `small.bin` |
+> |---|---:|
+> | shipped R3, `&[u8; REQ]` via `try_into` | **53 015.2** /call |
+> | `r3_subslice` — the identical hoist as a plain `&[u8]` | **53 008.2** /call |
+> | `r4_buf_slice_inline` (`&[u8]`) vs `r4_buf_array` (`&[u8; REQ]`) | **41 851.1** vs **41 844.1** /call |
+>
+> **Both pairs agree to 0.02 %, i.e. a TIE by this row's own 0.05 % threshold.**
+> ⭐ And the third measurement is the sharp one, because the *same* pair of
+> spellings is a tie on the unsafe side too: it is not an artefact of one rung.
+>
+> ⚠⚠ **`safe_tuned.rs`'s header STATES the refuted mechanism** — *"the bound
+> LLVM gets free from the TYPE is worth more than the check it removes"* — **and
+> it is NOT EDITED HERE.** `.rs` sources are in this row's MEASUREMENT digest,
+> so a comment fix costs a **32-cell re-measure**; `RECAP_PHP.md` open item 53 is
+> the same situation on `ph16` and its ruling is *batch it, never land it alone,
+> and do it the next time the row is re-measured for a substantive reason*. ▶ The
+> correction lives here, where it is free, and the `.rs` comment is flagged for
+> the manager.
+> ⚠ **What the header gets RIGHT and this correction does not touch**: the
+> obvious `&mut [u8]` sub-slice hoisted per `dec` call really was **+6.9 %
+> worse**, and three of its four candidates really were pessimisations. The
+> refutation is about WHY the shipped one wins, not about whether it wins.
+
 ### 8e. What is NOT a safety effect on this row
 
 * **`c-clang` beats `c-gcc` by 9.91 % in A1 and by 1.15 % whole-program.** Two
@@ -477,6 +538,268 @@ point.**
   byte"*. The row states it rather than publishing the number bare.
 * **R5 − R4 = −0.04 % (A1) / +0.21 % (whole-program).** A codegen coin flip; the
   `identity` pin's `why` says so. **The proof costs nothing at run time.**
+
+### 8f. ⭐⭐ THIS ROW IS THE TREE'S SENSITIVITY CALIBRATION FOR FAMILY A, AND IT DID NOT KNOW IT
+
+`TASK_PHP_037`, re-derived from `results-php/ph45-htmlent-cache-int.json` and
+`results-php/ph64-callback-frees-cursor.json` alone (`.temp/php37/sens.py`,
+`.temp/php37/sens.log`). ⚠ **The reasoning below is the manager's (F82) and is
+UNREVIEWED; the arithmetic is re-derived here rather than transcribed.**
+
+F74 settled which statistic this programme should headline **by a null
+control** — `identity` pins R4 and R5 byte-identical on most rows, so
+`verus − unsafe` has a known true value of 0, and family A reads `0.0000 %`
+everywhere. ⚠⚠ **A null control is ONE-SIDED: a statistic hard-wired to `0`
+would ace every null in this tree.** Nothing had measured whether family A can
+*resolve* a difference it ought to see.
+
+⭐ **This row supplies that half for free, because it pins `differ`.** R4 and R5
+here are genuinely different programs whose `kernel` symbols differ by a
+**known** static count, so family A has a **predicted nonzero** value:
+
+| row | input | `n_iters` | Δnopad | Δ(A) | `exec_rate` | A1 |
+|---|---|---:|---:|---:|---:|---:|
+| **`ph45`** | `small.bin` | 1 500 | **−2** | **−3 000** | **1.0000** | **−0.0383 %** |
+| **`ph45`** | `large.bin` | 200 | **−2** | **−400** | **1.0000** | **−0.0054 %** |
+| `ph64` | `small.bin` | 1 500 | −1 | −764 | 0.5093 | −0.0067 % |
+| `ph64` | `large.bin` | 200 | −1 | −102 | 0.5100 | −0.0009 % |
+
+where `exec_rate = Δ(A) / (Δnopad × n_iters)`.
+
+▶ **Family A resolves a two-instruction static difference to the instruction, on
+two inputs 7.5× apart in call count.** `−3 000` over 1 500 calls and `−400` over
+200 calls are both exactly `2 × n_iters`.
+
+⚠⚠ **`exec_rate` of exactly `1.0000` is *too clean*, and too-clean is the only
+warning F52 gives — so `ph64` is the control on `ph45` and it must be read
+beside it.** If the arithmetic were feeding itself, every row would read `1.0`.
+`ph64`'s extra instruction sits on a **conditional** path, so its rate is
+**0.51**, and its two inputs — different sizes, different call counts — agree on
+that rate to **0.0007**. Three fields, two files, no fitting.
+⚠ **`ph45`'s rate is 1.0 for a reason that is stated rather than assumed**: both
+of its two instructions are on the unconditional path through `kernel`, which is
+what `exec_rate == 1` means and is why this row is the clean calibration point
+and `ph64` is not.
+
+⭐ **AND THE SIGN. The shipped R5's `kernel` is TWO INSTRUCTIONS SMALLER than the
+shipped R4's** (306 non-pad against 308), so **the proved rung is cheaper than
+the hand-written unsafe one, with no search at all.** ⚠ Nothing is violated:
+this row pins `identity: differ` at both levels and the gate measures `differ`.
+⚠ And it is not a result about verification — §8e already calls R5 − R4 a
+codegen coin flip, and −0.04 % is what a coin flip looks like. **The value here
+is the CALIBRATION, not the direction.**
+⚠ **F82 and `TASK_PHP_037.md` both quote family A as `−0.0383 %` for this row
+without saying which input; that is the `small.bin` figure and `large.bin` is
+`−0.0054 %`.** Same for `ph64`'s `−0.0067 %`.
+
+### 8g. ⭐⭐⭐ THE SPELLING SEARCH — `controls/spellings.py`, AND **NEITHER** ENDPOINT IS DEGENERATE
+
+`TASK_PHP_037`. **The debt §13 used to declare is discharged.** Nine variants,
+all produced by exact-string substitution from the shipped rungs with the hit
+count asserted; every one audited against `spec.md`'s declaration by
+`harness/check.py::spelling_matches`; every one returning the shipped checksum on
+all eight inputs; every R4 variant's substitution applied to `verus.rs` as well
+and put through Verus. Full output and both families per variant:
+`controls/spellings.json`.
+
+⚠⚠⚠ **READ THIS FIRST, BECAUSE IT IS THE MOST IMPORTANT THING THE SEARCH FOUND
+AND IT IS ABOUT THE ROW'S OWN HEADLINE STATISTIC.** §8a says A1 sees 9.5 % of
+this row. Every lever the search found lives in `dec`, which A1 excludes — so
+
+> ## ⚠⚠⚠ **A1 CANNOT RESOLVE THIS ROW AT ALL.**
+>
+> **A1 reports EVERY ONE of the nine variants as EXACTLY `+0.37 %` (R3 side) or
+> EXACTLY `+0.00 %` (R4 side).** Its spread over a side is **`0.000000`
+> percentage points**. The whole-program spread over the same nine variants is
+> **66.7 pp on R3 and 44.5 pp on R4.**
+>
+> ▶▶ **SO A CONTROL THAT PRICED THIS ROW IN A1 ALONE WOULD HAVE WRITTEN
+> `r4_endpoint_degenerate: true` AND `r3_endpoint_degenerate: true`. BOTH ARE
+> FALSE.** That is not a small mis-estimate — it is a **false negative on this
+> row's main result**, produced by a statistic that is `0.0000 %` on every null
+> in the tree and therefore looks impeccable.
+>
+> ⭐⭐ **AND THIS IS THE CORRECTED TWO-CONDITION RULE EARNING ITS KEEP ON THE
+> FIRST ROW IT WAS APPLIED TO** (§8b). Condition (i) — *family A must actually
+> SEE both cells* — is precisely what fails here: `inside_share` is
+> **0.055–0.094**, so A1 sees under 10 % of either cell. F74's withdrawn
+> one-condition form passes on this comparison (`|Δinside_share| = 0.003`) and
+> would have licensed A1 as the headline. **The condition that catches it is the
+> one the sweep added.**
+
+⭐ And the `kernel` **fingerprints are NOT identical** — the four R3 variants
+carry **3** distinct `kernel` digests and the five R4 variants **4**
+(`spellings.json .kernel_digests_distinct`), because `dec_flush` is inlined into
+`kernel`. **So A1's blindness here is not *"the symbol did not change"*; it is
+*"the symbol's EXECUTED COUNT did not move at all while its code did"*** — a
+sharper statement, and the one the A1 column actually rests on.
+▶ **A control that priced this row in A1 alone would have reported both
+endpoints DEGENERATE, and it would have been wrong for a reason that has nothing
+to do with Rust.** That is why `spellings.json`'s `headline_statistic` is the
+whole-program family and both are printed for every comparison.
+
+**Both families, `O3 / isolated`, `small.bin`, per kernel call.** A1 =
+`kernel_exclusive_ir / n_iters` (`measure.py::_sum_rows`, imported); W1 =
+whole-program `Ir / n_iters` (callgrind's own `PROGRAM TOTALS`, which is §8b's
+*"whole-program"* column). Stage 3 reproduces the shipped cells to **0.0000 %**
+in A1 against `results-php/ph45-htmlent-cache-int.json` and to **0.014 %** in W1
+against §8b.
+
+| variant | side | A1 vs R4ship | **W1 vs R4ship** | trusted sites | twin |
+|---|---|---:|---:|---:|---|
+| `v0_shipped` | R3 | +0.37 % | **−3.06 %** | 0 | — |
+| `r3_subslice` | R3 | +0.37 % | −3.07 % | 0 | — |
+| `r3_namecmp_fn` | R3 | +0.37 % | **−20.66 %** | 0 | — |
+| `r3_arena_index` | R3 | +0.37 % | +46.07 % | 0 | — |
+| `v0_shipped` | R4 | +0.00 % | **+0.00 %** | 12 | verifies 41/0 |
+| `r4_buf_slice_inline` | R4 | +0.00 % | **−23.47 %** | **10** | **verifies 41/0** |
+| `r4_buf_slice` | R4 | +0.00 % | +16.65 % | 10 | verifies 41/0 |
+| `r4_mirror_unchecked` | R4 | +0.00 % | +20.97 % | 12 | verifies 41/0 |
+| `r4_buf_array` | R4 | +0.00 % | (−23.48 %) | 10 | ⛔ `is not supported` |
+
+**What may be quoted, labelled, and it is two quantities per family and not
+three:**
+
+> **`fixed-R4 bound`, R4 held fixed by fiat — A1 `+0.37 %`, W1 `−3.06 %`.**
+> **R3-side span, cheapest-found .. dearest-found in contract — W1 `−20.66 %`
+> .. `+46.07 %` (`r3_namecmp_fn` .. `r3_arena_index`).** ⚠ **In family A1 the
+> span is NOT COMPUTABLE**: all four in-contract R3 variants measure the same
+> figure, and a `min` over equal values is the enumeration order, not a
+> minimum. The control says so rather than naming a variant.
+>
+> ⚠⚠ **NO PAIR INTERVAL.** `min(R3 found) − min(R4 found)` differences two
+> upper bounds and bounds nothing in either direction.
+
+**1. ⭐⭐⭐ THE R4 ENDPOINT MOVES, AND THE CANDIDATE IS CHEAPER *AND* SMALLER.**
+`r4_buf_slice_inline` — `name_eq` taking the work buffer as a hoisted `&[u8]`
+and reading it with a **checked** index, forced inline — is **−23.47 %** on W1
+against the shipped R4, has a Verus twin that verifies at **41 verified, 0
+errors** (the shipped rung's own count) with **no `assume`, no new trusted item
+and no `is not supported`**, and its unchecked-dereference surface is **10 call
+sites against the shipped rung's 12** (measured, not asserted). So it is cheaper
+**and two trusted call sites smaller** — `ph07`'s `r4_index0` shape and `ph29`'s
+`r4_fold_iter` shape at once. This row is the **second** in either programme
+whose R4 endpoint moves.
+
+**2. ⭐⭐ AND THE R3 ENDPOINT MOVES TOO, WHICH IS THE FIRST TIME BOTH HAVE.**
+`r3_namecmp_fn` is **−20.66 %** on W1 against R4ship, i.e. **18.1 % cheaper than
+the shipped R3.** ▶ **So NEITHER published endpoint of this row's `fixed-R4
+bound` is a searched endpoint**, and that is a fact about the published number
+rather than about Rust.
+
+**3. ⚠⚠⚠ AND THE SIGN OF THE BOUND REVERSES UNDER SEARCH.** Shipped, R3 is
+cheaper than R4 (`−3.06 %`). Under the cheapest spelling found on each side, R4
+is cheaper than R3 — `41 851` against `43 389` `Ir`/call, **3.5 %**. ⚠ **That
+3.5 % is the only figure here that is a difference of two minima and it is
+therefore NOT a bound**; it is quoted as an ordering, never as an interval.
+⚠⚠ **So this row is NOT `ph16`'s F67 mechanism after all**, and §8d's old
+paragraph guessed the other way: F67 is *two rungs cheapest under DIFFERENT
+spellings with a degenerate R4*, and here the **same** spelling is cheapest on
+both sides and R4 is **not** degenerate. **F67 stays n = 1**, exactly as
+`ph29`'s search also concluded.
+
+**4. ⭐⭐⭐ THE MIRROR CONTROL, AND IT IS THE SHARPEST LADDER RESULT ON THIS ROW.**
+`r4_mirror_unchecked` is `r4_buf_slice_inline`'s shape **exactly** — same
+signature, same hoist, same inline hint, same 12 trusted call sites — with the
+arena reads left as `get_unchecked`. It measures **+20.97 %**, i.e. **44
+percentage points dearer than the checked spelling of the same program.**
+
+> ▶ **WHAT IS MEASURED, and it is the whole of what is measured: on this row, in
+> this loop shape, the BOUNDS-CHECKED read is 44 pp cheaper than the unchecked
+> one in an otherwise identical program.** So `get_unchecked` is not merely
+> free here — it is the expensive spelling. **The two programs differ in the
+> read and in nothing else**, which is what makes the 44 pp attributable to the
+> read at all.
+
+⚠⚠⚠ **AND THE MECHANISM IS A STORY I HAVE NOT VERIFIED. DO NOT QUOTE IT AS A
+RESULT.** The explanation that suggests itself — *"reading through the whole
+512-byte arena at a computed offset is what blocks the hoist, and `unsafe` is
+what forces that spelling, because an unchecked read has to name the object the
+bound was removed from"* — is **plausible and unmeasured**. I did not diff the
+two `dec` symbols at the instruction level, and **a disassembly diff is what
+would settle it.**
+⭐ **This is recorded as open because F72 is exactly this shape**: a stated cause
+that read as measured, and `TASK_PHP_033` produced git evidence against it one
+round later. `PROTOCOL.md` rule 9's refinement applies — *a result with a
+CONCLUSION and a MECHANISM has different evidence for each; land the conclusion,
+mark the mechanism OPEN.* **The conclusion (44 pp, attributable to the read) is
+measured and stands on its own. The mechanism is a hypothesis for whoever
+reviews this row.**
+
+⚠ **And what the conclusion does NOT license.** One loop, one row, one
+toolchain; it says nothing about `get_unchecked` in general. What it does say is
+that *"remove the bounds check"* and *"make it faster"* **came apart here**, and
+the mirror is what separates them.
+
+**5. ⛔ THE R3 LEVER CANNOT BE MOVED TO R4 IN ITS OWN SPELLING, AND THE REASON IS
+vstd COVERAGE.** `r4_buf_array` is `safe_tuned.rs`'s own `&[u8; REQ]` /
+`try_into` lever put into R4. It builds, it returns the shipped checksum, and it
+is **−23.48 %** — but its twin is refused:
+
+```
+error: `core::array::TryFromSliceError` is not supported
+```
+
+**`is not supported` DISQUALIFIES** (`spec.md`'s own hashed rule): the pinned
+vstd ships no `TryFrom<&[T]> for &[T; N]`, and `std_specs/convert.rs`'s only
+`TryFromSpecImpl` is a macro over integer types.
+⭐⭐ **AND THE SHARED `why` BLOCK ALREADY SAYS SO, WHICH IS WHY IT MATTERS THAT
+THIS WAS RE-DERIVED AND NOT INHERITED.** That block — byte-identical across all
+six PHP rows — lists the routes that are `is not supported` at the pinned vstd
+and **`TryFromSliceError` is one of the six it names**. The control reproduces
+the error text from a Verus run on this row's own twin rather than quoting the
+declaration, because a control that inherits a claim cannot detect the day the
+claim stops being true.
+⚠ **Declaring the error type by hand does not rescue it** — measured: with
+`#[verifier::external_type_specification]` plus `#[verifier::external_body]` the
+error becomes `precondition not satisfied` on `Result::unwrap`, because nothing
+establishes the conversion succeeded, and discharging that needs a
+`TryFromSpecImpl` this vstd does not have. **Two new trusted declarations and it
+still does not close.** ⭐ This is `ph29`'s `r4_head_array` result on a second
+row — *the R3-side lever is out of contract on the R4 side for a vstd-coverage
+reason* — and it is why the ADMISSIBLE candidate had to be spelled `&[u8]`. ⭐⭐
+**That the two spellings are a TIE at run time is what makes it free to comply.**
+
+**6. ⚠⚠⚠ THE HONEST CAVEAT, AND IT IS LARGE.** `r4_buf_slice` and
+`r4_buf_slice_inline` differ by **one attribute** and by **40 percentage
+points**, and `#[inline(always)]` applied WITHOUT the hoist is a **pessimisation**
+(measured, `.temp/php37/explore2.log`). The two levers are not separable and
+neither is a property of Rust. **Every number in this section is about
+`rustc 1.97.1 / LLVM 22.1.6` on this box**, and inlining is an LLVM heuristic.
+⚠ **R4 searched is NOT R4 exhausted**: nine spellings shipped, seven more priced
+and dropped (`.temp/php37/explore*.log`): a `for` over the table **+14.21 %**, a
+`.position()` **+13.31 %**, the table as a `static` an **exact tie** (identical
+whole-program AND identical `dec`), a name-byte iterator and the loop bound
+hoisted both **ties**, `#[inline(never)]` **+56.79 %**, `#[inline(always)]`
+WITHOUT the hoist **+13.35 %**, and two trusted-surface reductions in `dec_flush`
+and the numeric arm at **+4.07 %** and **+7.51 %** — both **dearer**, so neither
+is the *"smaller trusted surface at the same price"* result they were proposed
+as. **The honest claim is *"an admissible cheaper R4 exists"*, never *"this is
+the cheapest"*.**
+⚠ **ONE MARGIN ON THE WHOLE-PROGRAM FAMILY ITSELF, quoted rather than
+re-measured** (`RECAP_PHP.md` F83, manager, **UNREVIEWED**): a whole-program
+statistic on this programme carries an **attribution confound** measured at up
+to **~266 `Ir`/call** — work in a callee that neither compared rung's own code
+caused — and it runs in **both** directions, missing real work as readily as
+charging extra. Against the **−23.47 %** above (≈ 12 800 `Ir`/call) that is about
+**2 %** of the effect, and against the **44 pp** mirror it is smaller still.
+**Nothing in this section turns on it.** ⚠ It would matter to a sub-percent
+claim, and this row makes none.
+
+**7. ⚠ AND THE ADMISSIBILITY BAR ON THIS ROW IS WIDER THAN `ph29`'s, WHICH IS A
+PREMISE THE CONTROL READS RATHER THAN ASSUMES.** The shared `why` block argues
+R4 admissibility from *"All six patterns pin `identity: unsafe == verus, O3
+exact`"*. **That antecedent is FALSE here**: this row pins `differ` at both
+levels and the gate record measures `differ` (`RECAP_PHP.md` F82, open item 61).
+So an R4 candidate needs only a twin that **VERIFIES**, not one that compiles
+byte-identically — and all four admissible twins here are in fact **not**
+byte-identical to their exec rungs, as `differ` predicts.
+⚠ `controls/spellings.py::identity_premise` reads the pin **and** the gate
+record and derives the bar from what it finds, so a row re-pinned to `exact`
+tightens the rule instead of silently keeping the loose one. It is also why the
+bar reads the RECORD: F82 found a PAT row whose `spec.md` carries
+`identity: unsafe == verus, O3 exact` as shared-block boilerplate while its real
+pin is `norel`.
 
 ---
 
@@ -777,21 +1100,79 @@ does not price it**: `inputs/gen.py::_check_span` refuses a corpus whose largest
 `|ent|` comes within 100× of `INT_MAX` **on either rung**, so no shipped number
 is taken over that path. Reported, not pursued, and not traced to a fix.
 
+**⭐ THE OBSERVED MARGIN, MEASURED OVER THE TWO SHIPPED BENIGN INPUTS.**
+`TASK_PHP_037`, discharging `RECAP_PHP.md` open item 59. F46 requires a row's
+benign corpus be shown not to evaluate a UB path inside its own scope. The guard
+existed and was verified; what was missing is that it only **printed** its number
+and nothing kept it. It is kept here:
+
+| | `small.bin` | `large.bin` |
+|---|---:|---:|
+| windows, all `place = 0` | 32 | 2 050 |
+| arms of the nine reached | **9 / 9** | **9 / 9** |
+| numeric-arm evaluations | 528 | 251 323 |
+| longest numeric body reached | **5 digits** | **5 digits** |
+| **max abs ent** | **20 013** | **20 013** |
+| margin vs `ENT_CEILING` (= `INT_MAX // 100` = 21 474 836) | **1 073.04×** | **1 073.04×** |
+| margin vs `INT_MAX` | **107 304×** | **107 304×** |
+
+⚠ **The guard is NOT vacuous a priori, and that is why the observed number is
+worth keeping rather than the ceiling.** The `buffull` arm caps a numeric body at
+**13 digits**, i.e. about `7.4e12` — three orders of magnitude ABOVE `INT_MAX`.
+What keeps this corpus safe is not the arm bound; it is that no token in
+`inputs/gen.py::TOKENS`, and no splice between two of them, ever produces a body
+longer than the five digits of the largest numeric entity the grammar contains.
+
+**How it was measured, and it is READ-ONLY.** ⛔ `inputs/gen.py` is in this row's
+**measurement** digest *and* it rewrites `inputs/*.bin`, so it must not be run:
+either would cost a 32-cell re-measure and a byte change would invalidate every
+number this row publishes. `.temp/php37/entmargin.py` instead unpacks the
+**shipped** `.bin` files through `common-php/slb.py` and decodes them **twice**:
+
+* **decoder A** — `gen.py`'s own `_arms_of` and `_entities`, imported as a module
+  (its `main()` sits behind an `if __name__` guard, and `sys.dont_write_bytecode`
+  is set before the import so not even a `__pycache__` entry appears beside a
+  file in the measurement digest);
+* **decoder B** — an independent re-implementation with its own entity-table
+  parser over `c/mbfl__html_entities.h` and its own `html_entity_chars` read from
+  **`c/kernel.c`**, so the two decoders share no constant. It tracks the
+  accumulator in unbounded integers **and** in wrapped 32-bit at the same time.
+
+✅ **The two agree on both inputs (20 013 / 20 013) and on all nine arms**; the
+two entity tables are equal; the two character sets are equal; and the
+**wrapped and unbounded accumulators are identical, which is the direct statement
+that `:193` never overflowed on a shipped input** rather than an inference from a
+margin. The probe re-hashes all eight blobs before and after and confirms none
+moved.
+⚠ Had the two decoders disagreed, the disagreement would have been the result: a
+re-implementation that quietly differs is F52's shape.
+⚠ **Still not traced to a fix, and that half is unchanged.** Nothing here is
+evidence about whether upstream ever repaired `:193`.
+
 ---
 
 ## 13. What I did not do
 
-* ⚠ **`controls/spellings.py` is NOT built.** ⚠⚠ The R4 endpoint is
+* ~~⚠ **`controls/spellings.py` is NOT built.** ⚠⚠ The R4 endpoint is
   **UNSEARCHED**, so the `fixed-R4 bound` this row publishes is over an
   unsearched endpoint and `.memory-php/02-ladder.md`'s standing debt applies —
-  `ph03` and `ph64` carry the same one and this row makes it three. ⭐ **The R3
-  side is PARTIALLY searched and the search is in `safe_tuned.rs`'s header**:
-  four candidates measured whole-program on both inputs, three of them
-  pessimisations, one cheaper than R4, and a fifth (`c3`) measured and
-  deliberately not shipped. That is not a `spellings.py` and does not claim to
-  be — it has no `.idiom_audit`, so nothing checks the candidates against the
-  declaration by grep — but it is more than an unsearched side, and §8 quotes
-  the numbers. The bound ships **labelled** and there is **no pair interval**.
+  `ph03` and `ph64` carry the same one and this row makes it three.~~
+  ✅ **DISCHARGED AT `TASK_PHP_037`: `controls/spellings.py` and
+  `controls/spellings.json` ship, both sides are searched, and §8g is the
+  result.** ⚠⚠ **And the answer is that NEITHER endpoint is degenerate**, so
+  the `fixed-R4 bound` this row publishes is a bound over two numbers that both
+  move, which is a stronger statement of the debt than the one struck above.
+  `ph03` and `ph64` still carry it, so this row takes the count from 3 of 6 to
+  **2 of 6** — ⚠ count it rather than trusting this line.
+  ⭐ **The R3-side search that WAS here is not superseded, it is corrected**:
+  `safe_tuned.rs`'s header carries four candidates measured whole-program on
+  both inputs, three of them pessimisations, one cheaper than R4, and a fifth
+  (`c3`) measured and deliberately not shipped. What it does not have is an
+  `.idiom_audit`, so nothing checked those candidates against the declaration by
+  grep — `spellings.py` does, for nine variants. ⚠ **And §8d records that the
+  header's stated MECHANISM for its own lever is refuted**: the array type is a
+  tie against a plain sub-slice, measured three ways. The bound ships
+  **labelled**, in **both families**, and there is **no pair interval**.
 * ⚠ **No PHP was built and no reproducer was run.** The corpus's `n_fault: 3/3`
   is its measurement; mine is `controls/fatal.c`, and the two agree on signal,
   access type, function and line (§9).

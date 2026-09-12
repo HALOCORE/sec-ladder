@@ -627,7 +627,21 @@ one: a **signed overflow at `:193`, INSIDE the function this row extracts**,
 untraced to any fix (open item 59).
 
 ✅✅ **BUILT — `patterns-php/ph45-htmlent-cache-int/`, `TASK_PHP_036`, row 6 and
-the FIRST TYPE ROW.** Gate `PASS-WITH-BLOCKED-ROWS`, `failures []` (the blocked
+the FIRST TYPE ROW.** ⭐⭐⭐ **AND `TASK_PHP_037` THEN SEARCHED BOTH
+ENDPOINTS (`RECAP_PHP.md` F87): `r4_endpoint_degenerate: false` AND
+`r3_endpoint_degenerate: false` — the FIRST row in either programme where BOTH
+move, and THE SIGN OF THE BOUND REVERSES under search, so this is NOT `ph16`'s
+F67 mechanism and F67 stays n = 1.** `r4_buf_slice_inline` is **−23.47 %**
+whole-program with a twin verifying 41/0 and **10 unchecked-dereference sites
+against the shipped rung's 12** — cheaper *and* a smaller trusted surface.
+⭐⭐ **The mirror control is the sharpest result in the corpus: the same program
+with `get_unchecked` restored is 44 pp DEARER, so on this row `unsafe` is the
+EXPENSIVE spelling.** ⚠⚠ **And A1 is BLIND here — spread `0.000000` pp across
+all nine variants against 66.7/44.5 pp whole-program, so a control pricing this
+row in A1 alone would have called both endpoints degenerate and been wrong.**
+⚠ The row's own stated R3 mechanism — *the compile-time-constant length* — is
+**refuted**: it is a tie against a plain sub-slice, and the lever is the
+**hoist**. Gate `PASS-WITH-BLOCKED-ROWS`, `failures []` (the blocked
 row is `verus.rs`'s `ent_table`, which has no verified twin and cannot — the
 same verdict `p01`, `p35` and `ph00-smoke` carry). Verus **41/0**, **43/0** with
 twins. Tier shipped **`narrowed`** with the **counter-argument written into
