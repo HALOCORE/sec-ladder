@@ -45,26 +45,26 @@ between them read `CLAUDE.md`'s top table.
 ## ▶ START HERE — the next action, in ≤ 20 lines
 
 ```
-STATE   ROWS BUILT 5 -- ph03+ph07 (S1), ph16 (S2), ph29 (S3) spatial, ⭐ ph64 the
-        FIRST TEMPORAL. TYPE still ZERO. .memory-php/ is AUTHORITATIVE.
-NEXT    NOTHING RUNNING. _033/_034/_035 ALL LANDED+VERIFIED from the record.
-        ▶ DISPATCH TASK_PHP_036 -- BUILD ph45, the 1st TYPE row, WRITTEN and
-        ready, built to _034's §6. THEN ph03+ph64 spellings, item 57, D11, 54.
-⚠ NEW   F77 ⭐⭐⭐ ph29's R4 ENDPOINT MOVES -- 1st in EITHER programme: r4_fold_iter
-        verifies 10/0 byte-identical, A1 -5.63%. Counterexample to bench-rules
-        REASON 2's PREMISE; the RULE is VINDICATED. ⚠ F67 STAYS n=1. F78 ⭐⭐
-        "closes, no residue" was an ARITHMETIC IDENTITY, true of ANY pair --
-        mechanism SURVIVES, 91.1% -> 93.0%. F79 ⚠⚠ 2 control defects -> item 57.
-⚠ OWED  SPREAD (A1) ph03 +12.19 · ph16 -1.22 · ph29 -6.06 · ph64 +17.47 = 2/2.
-        ⚠⚠ item 52's rule covers A-vs-B ONLY -- ph29's r3_copy_loop FLIPS SIGN
-        between A1 and A3, driven by FIXED per-call cost, NOT callee share.
+STATE   ⭐ ROWS BUILT 6 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
+        ph45 TYPE. ALL THREE AXES OPEN. .memory-php/ is AUTHORITATIVE.
+NEXT    NOTHING RUNNING; _033/_034/_035/_036 ALL LANDED+VERIFIED from the record.
+        ▶ item 58: THREE rows (ph03/ph64/ph45) have an UNSEARCHED R4 -- and F77
+        proved that is not cosmetic. ph45 is cheapest. THEN item 57, 59, D11, 54.
+⚠ NEW   F80 ⭐⭐⭐ ROW 6, 1st TYPE: `ptr as i32` IS SAFE RUST -- rustc -D warnings
+        is SILENT where gcc WARNS (bug #30573 itself) and only VERUS refuses.
+        Safe Rust blocks the wild WRITE, not the wild VALUE = F71's shape TWICE.
+        ⚠⚠⚠ F74's RULE IS REFUTED -- ph45 flips at Δshare 0.003. CORRECTED: need
+        min(inside_share) HIGH *and* Δ<=0.02; 151/366, 0 flips. F81 catalogue
+        oracle measures NOTHING 2-for-2. F77/F78/F79: see the index.
+⚠ OWED  SPREAD (A1) ph03 +12.19 · ph16 -1.22 · ph29 -6.06 · ph64 +17.47 = 2/2;
+        ph45 A1 +0.37% but WHOLE-PROGRAM -3.06% -- publish BOTH, labelled.
 ⚠ TRAPS `grep -a` ALWAYS (blind to 41 corpus files); ask about a FUNCTION, not text.
         ⚠⚠ A PROBE WHOSE SETUP ENCODES THE ANSWER evaluates fine and is WRONG --
         EIGHT shapes, the 8th MINE; too-clean is the only warning (F52/F70).
 BAR     C-SIDE ONLY: nothing Rust/Verus/Miri/cost kills a row; patterns-php/ is
         FRESH. ⚠ .web/ is CONCURRENT -- NEVER `git add -A`.
 READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.md ·
-        F1-F79 · items 1-57. fixsurvey.py + preimage_screen.py have --selftest.
+        F1-F81 · items 1-59. fixsurvey.py + preimage_screen.py have --selftest.
 ```
 
 ---
@@ -186,7 +186,10 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > family A and name it** · **F75 ⭐⭐⭐ `ph45`'s `crashes_pristine_5_0_0` is
 > BOOKKEEPING, and the forcing mechanism is needed for the BENIGN case** ·
 > **F76 ⚠ the `idiom` key whitelist is the backtick trap one level up, and
-> `ph29` has now paid for it twice** · **F77 ⭐⭐⭐ `ph29`'s R4 endpoint MOVES —
+> `ph29` has now paid for it twice** · **F80 ⭐⭐⭐ ROW 6, the FIRST TYPE ROW:
+> `ptr as i32` is SAFE RUST — gcc warns, rustc is silent, only Verus refuses** ·
+> **F81 ⚠⚠ the catalogue's proposed oracle has measured NOTHING on 2 rows of 2
+> tested — a rule, not a coincidence** · **F77 ⭐⭐⭐ `ph29`'s R4 endpoint MOVES —
 > the first in either programme, and a counterexample to a PAT rule's PREMISE**
 > · **F78 ⭐⭐ "closes, no residue" was an ARITHMETIC IDENTITY, and the
 > falsification instruction is what caught it** · **F79 ⚠⚠ two real defects in
@@ -1485,6 +1488,68 @@ The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
 
+### F80 — ⭐⭐⭐ ROW 6, THE **FIRST TYPE ROW**, AND **gcc WARNS WHERE rustc IS SILENT** — ONLY THE PROVER REFUSES
+
+`TASK_PHP_036`. **`patterns-php/ph45-htmlent-cache-int/`.** ✅ **Manager-verified
+from `results-php/gate/`**: `verdict PASS-WITH-BLOCKED-ROWS`, `failures []`,
+`complete_run true`. ⚠ **Not bare `PASS`** — one blocked row, `verus.rs`'s
+`ent_table` trusted item has no verified twin and **cannot**, justified in
+`spec.md`; `p01`, `p35` and `ph00-smoke` carry the same verdict. Brackets
+**`66/0`** and **`14/0`** — the predicted figure, since a new row adds **two**
+measure records. Verus **41/0**, **43/0** with twins.
+
+⚠⚠⚠ **THE LADDER RESULT CONTRADICTS THE BRIEF, AND I WROTE THE BRIEF.**
+`TASK_PHP_036.md` §1 and `_034` §6.8 both asserted *"safe Rust cannot store a
+pointer in an `i32` at all"*. **Measured false, and I re-verified it
+independently** (`.temp/mgr171/`):
+
+```
+rustc -D warnings -O          ZERO diagnostics      0x56016e08bd60 -> 0x6e08bd60 -> wild ptr
+gcc  -std=c99 -Wall -Wextra   WARNS, once per cast site   (2 in my probe; 4 on the kernel)
+Verus                         REFUSES, and names both cast sites
+```
+
+`(&x[0] as *const u8) as i32` is **ordinary safe Rust** — no `unsafe` block
+anywhere — it truncates, and the cast back yields a wild pointer. ⭐⭐⭐ **So on
+this defect class the C compiler catches what the Rust compiler misses, and
+ONLY THE PROVER CATCHES IT.** And **bug #30573 IS that gcc warning** — the
+upstream "compiler warning" commit is the fix (F75).
+
+▶ **Consequently all four Rust rungs carry R1's OWN idiom, not R1h's, and are
+safe anyway.** What safe Rust refuses is **only the DEREFERENCE** (`error[E0133]`,
+and only at O2 in this row's shape): **it prevents the wild WRITE, not the wild
+VALUE.** ⭐⭐ **That is F71's shape on a second axis, so it is now TWICE** — safe
+Rust turns the defect into a **wrong answer**, not a panic.
+
+⚠ **The upstream fix is 68,613 `Ir` CHEAPER than the defect** — a sign-extending
+load removed — **which A1 reports as `0.00 %`.** ⚠ R4 endpoint **unsearched**:
+the **third** row owing that debt → open item 58.
+
+⚠ **Tier shipped `narrowed` per the manager's §2.2 call, with the
+counter-argument written INTO `spec.md`** — the engineer's objection is that the
+`place` word *"has no pre-image in PHP at all"*, and it flags this as the call it
+most wants attacked. ▶ **I am not overruling it and it stays open.**
+
+⚠ Found and reported-not-pursued, and it is the engineer's own: a **signed
+overflow at `mbfilter_htmlent.c:193`, in the row's own function**, untraced to
+any fix → open item 59.
+
+### F81 — ⚠⚠ THE CATALOGUE'S PROPOSED ORACLE HAS NOW MEASURED **NOTHING** ON TWO ROWS OUT OF TWO TESTED — IT IS A RULE, NOT A COINCIDENCE
+
+* `ph64` (F66): the catalogue's `u64` is bit-identical between R1 and R1h.
+* `ph45` (F80): the same, **32 of 32 cells**.
+
+⭐ **Two for two.** ▶ **A catalogue `▸ benign` / oracle line is a PROPOSAL and
+must be TESTED before a build task commits to it** — both times a real,
+non-fatal, deterministic replacement existed and had to be derived from scratch.
+⚠ And on `ph45` the replacement's *number* did not transfer either: `_034`
+predicted `&amp;` → **674**, `_036` re-derived **65**. **The mechanism
+transferred; the number did not** — and the engineer re-derived rather than
+transcribing, which is the only reason it was caught.
+
+⚠⚠ **`ph45`'s own `▸ benign` line was worse than useless — it was
+UNREACHABLE**, and that is already corrected in `CATALOGUE.md` from F75's hunt.
+
 ### F77 — ⭐⭐⭐ `ph29`'s R4 ENDPOINT **MOVES** — THE FIRST ROW IN EITHER PROGRAMME, AND A COUNTEREXAMPLE TO A PAT RULE'S **PREMISE**
 
 `TASK_PHP_035`. ✅ **Manager-verified from `results-php/gate/` and
@@ -1616,12 +1681,61 @@ records the null in a unit where it reads as negligible, while **every published
 claim in both programmes is a percentage**, where the same quantity is larger
 than most published effects.
 
-▶ **THE RULE, and its condition matters as much as it does:** **quote `A1`, and
-name it — but A is the headline only where the two compared cells have
-comparable callee share.** `inside_share = (kx/n_iters) / marginal`; a 310-
+⚠⚠⚠ **THE RULE AS FIRST PUBLISHED IS REFUTED. `TASK_PHP_036` BROKE IT ON THE
+VERY NEXT ROW, AND I HAD ALREADY PUT IT INTO TWO TASK FILES.** Read the
+correction below before quoting anything in this finding.
+
+**What I published:** *"A is the headline only where the two compared cells have
+comparable callee share"* — `inside_share = (kx/n_iters) / marginal`; a 310-
 comparison sweep found **31 sign flips, every one with `|Δinside_share| > 0.02`
 and NOT ONE below it** (medians: flips 0.146 / 20.68 pp, non-flips 0.009 /
-1.03 pp). So:
+1.03 pp).
+
+⚠⚠ **What `ph45` does to it.** Re-run over **366** comparisons, the same probe
+now prints its own refutation — ***"flips with Δshare ≤ 0.02: 6 ⚠⚠ THESE REFUTE
+THE MECHANISM"*** — and **all six are `ph45`**:
+
+```
+ph45 small  safe_tuned vs unsafe    A +0.37 %   B -3.01 %   Δshare 0.003   ⚠⚠
+ph45 small  safe_tuned vs verus     A +0.40 %   B -3.19 %   Δshare 0.004
+ph45 small  safe_naive vs safe_tuned A +0.00 %  B +23.37 %  Δshare 0.019
+      … and the same three on large.bin
+```
+
+▶ **THE CONDITION PASSES AND A1 IS STILL WRONG.** `_036` found this and said so
+in exactly those terms.
+
+⭐⭐ **WHY, and the repair is one word: ABSOLUTE, not only RELATIVE.**
+`ph45`'s `inside_share` is **0.055 – 0.094** — the most extreme in the corpus by
+a factor of seven. When family A sees **9 %** of a cell, the **91 %** it cannot
+see carries the whole effect **even when both cells miss the same proportion**.
+Asymmetry is what matters when the shares are high; when both are low, A is
+measuring a small and unrepresentative slice and may disagree arbitrarily.
+
+▶ ⭐ **THE CORRECTED RULE — TWO CONDITIONS, AND THE CONJUNCTION IS MEASURED
+CLEAN:**
+
+> **(i) `min(inside_share)` over the two cells must be HIGH — A must actually
+> SEE both — AND (ii) `|Δinside_share| ≤ 0.02`.**
+> Under both: **151 of 366 comparisons, ZERO sign flips.** Dropping (ii) is my
+> original error; dropping (i) admits the six `ph45` cases.
+
+⚠ **The threshold in (i) is NOT tuned and the corpus cannot pin it**: `> 0.3`,
+`> 0.5` and `> 0.6` all give **0 flips** at 145–151 comparisons. Read it as
+*"A sees most of both cells"*; **six rows cannot say more.** ⭐ Medians tell the
+same story from the other side: `min(inside_share)` is **0.678** on flips and
+**0.923** on non-flips.
+
+⭐⭐⭐ **AND THE LESSON IS ABOUT ME, NOT ABOUT THE STATISTIC.** I published a
+mechanism from **six rows**, wrote a *"refutation test PASSES"* line into the
+probe, and **put the rule into `TASK_PHP_035.md` §3 and `TASK_PHP_036.md` §3
+before any row had tried to break it.** The seventh row broke it. ⚠ **The probe
+is what saved this** — it recomputes from the tree on every run and printed
+`⚠⚠ THESE REFUTE THE MECHANISM` itself, unprompted. *A rule whose checker is a
+committed script that re-derives it gets corrected; a rule written only into
+prose does not.*
+
+**With the corrected rule in hand, the original observations still hold:**
 
 * **R3 vs R4** (`fixed-R4 bound`): Δshare ~0.003–0.014 → **never flips**. ⭐ That
   is **why** the spread table is robust — a mechanism, not luck.
@@ -3705,3 +3819,5 @@ the wrong one.
 | 55 | ⚠⚠ **F73'S WRITING RULE HAS NO HOME THAT IS NOT HASHED** — *"never backtick a span containing a character literal"* | F73. The natural place is the **named-spelling standard**, but that paragraph lives **inside every pattern's `why`, i.e. inside `contract_sha256`**, and it is byte-identical across six patterns — so writing one sentence into it costs a **six-row re-gate on the PHP side and 33 on PAT**. ⚠ The rule is real and cheap to state and there is **nowhere cheap to state it**. Candidate homes, none chosen: `PROTOCOL_PHP.md` §H (php-only, so PAT authors never see it); `.memory-php/` (authoritative but php-only, and needs review first); a `harness/` docstring (**forbidden — hashed**). ⭐ **The general shape is worth more than this instance**: a convention that binds BOTH programmes has no unhashed shared surface, which is why `CLAUDE.md`'s top table exists and why it keeps growing |
 | 56 | ⚠ **A BARE-IDENTIFIER PIN IS A WEAK PIN, AND NOTHING MEASURES PIN QUALITY** | F72. `ph29`'s `required[3].rust` is `real_size`, which occurs **3–7 times per rung** — it pins *"this name occurs"*, not a construction. Compare `.wrapping_add(1)` and `emalloc(to_read + 1)`, which pin **exactly one line per rung**. ⚠ `idiom_audit` reports `pins_nothing` and `absent` but has **no notion of how tightly a present pin binds**, so a one-line pin and a seven-hit identifier are indistinguishable in the record. ✅ **Not a defect in `ph29`** — the entry's English carries the §B1.3 argument and the pin is honest; `TASK_PHP_033` is told explicitly not to strengthen it. ▶ Open: is hit-count-per-rung worth reporting beside each present pin, and **would it be a number nobody acts on** — the exact trap `idiom_audit`'s own docstring records about the printed `2` that moved nothing for three tasks |
 | 57 | ⚠⚠ **`ph16`'s `controls/spellings.py` CARRIES TWO REAL DEFECTS, BOTH LATENT, AND FIXING THEM COSTS A `ph16` RE-GATE** | F79, `_035`, found by its own §H negatives and **guarded in `ph29`'s copy only**. (a) ⭐ **`kernel_fingerprint` returns `(0, 'd41d8cd98f00')` — the md5 of the EMPTY STRING — for a binary that does not exist**, because `disasm` ignores `objdump`'s return code, **so two missing binaries compare EQUAL on the one function whose job is to decide byte-identity.** (b) `disasm`'s needle is a **bare substring**, so a crate named `nokernel` fingerprints its own `main`. ✅ **Latent, not live, on `ph16`** — every call site there is downstream of a build whose success is checked — which is why `_035` correctly left it alone rather than widening its scope. ⚠ `controls/*.py` is in `source_sha256`, so the fix **costs a `ph16` re-gate**; batch it with any other `ph16` work. ⭐ **The general shape: a control cloned between rows carries its defects with it, and only the row that writes NEW negatives finds them** — `ph16`'s suite was 54 cases and did not catch these; `ph29`'s 75 did |
+| 58 | ⚠⚠ **THREE OF SIX BUILT ROWS HAVE AN UNSEARCHED R4 ENDPOINT, AND F77 JUST PROVED THAT MATTERS** | `ph03`, `ph64` and now `ph45` (F80). ⚠ Until `TASK_PHP_035` this debt looked cosmetic, because `ph07` and `ph16` both searched their R4 side and found it **degenerate**. ⭐⭐ **F77 killed that reading**: `ph29`'s `r4_fold_iter` verifies byte-identically and is **5.63 pp cheaper**, so a `fixed-R4 bound` over an *unsearched* endpoint is a bound over a number nobody has tried to move. ▶ **`ph45` is the cheapest of the three to search** (its `spellings.py` was never built, so there is no declaration repair to do first) and `ph03` is the oldest. ⚠ Each costs a re-gate; **batch each row's owed prose fixes into the same run** — the lesson `TASK_PHP_033.md` learned by failing to |
+| 59 | ⚠ **A SIGNED OVERFLOW AT `mbfilter_htmlent.c:193`, IN `ph45`'s OWN FUNCTION, UNTRACED TO ANY FIX** | F80, `_036`'s own find, **reported and not pursued** — the right call, since chasing it was outside a build task's scope. ⚠ It is **inside the function `ph45` extracts**, so it is not merely adjacent: the row's benign corpus must be shown not to evaluate it (F46's UB-free-trigger rule), and `_036` does not say whether that was checked. ▶ **Ask that question before `ph45`'s next re-gate.** ⓘ Distinct from the **stack OOB write at `:123`** in the *encode* half (F75), which is also uncatalogued and which the row deliberately does not lift |

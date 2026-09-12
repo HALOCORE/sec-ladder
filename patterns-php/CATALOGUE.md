@@ -136,7 +136,7 @@ corpus's**. `echoes` is a reading throughout this file (§0.3, §9.4) — for th
 | ph42 | type | guard present and passing, but on the WRONG tag namespace | narrowed | I4/O1, I3 | CRASH-144 | p38 | catalogued |
 | ph43 | type | a two-arm helper laundering the tag, misused both ways | narrowed | I4/O1, I4/O3 | CRASH-079, CRASH-111 | p35 | catalogued |
 | ph44 | type | type inferred from the creation path, not from the tag | narrowed | I4/O1 | CRASH-085 | p35 | catalogued |
-| ph45 | type | a heap pointer stored in an `int` field, cast back, freed and written | narrowed | pointer-value-integrity | CRASH-123 | p38 | catalogued |
+| ph45 | type | a heap pointer stored in an `int` field, cast back, freed and written | narrowed | pointer-value-integrity | CRASH-123 | p38 | **BUILT** |
 | ph46 | type | one untagged union; one call site invents a discriminant, one omits it | narrowed | I4/O1 | CRASH-053, CRASH-056 | p35 | catalogued |
 | ph47 | type | in-place retype through a value the separator refuses to separate | narrowed | I4/O2 | CRASH-104, CRASH-058 | p49 | catalogued |
 | ph48 | type | the same helper used to FORCE the shared flag ON | narrowed | I4/O2 | LOGIC-017, LOGIC-014 | p49 | catalogued |
@@ -622,7 +622,27 @@ rather than silently rewritten, because what this block got wrong is the useful 
 ⚠ **Adjacent, uncatalogued, and deliberately NOT lifted**: `mbfilter_htmlent.c:123`
 carries a **separate** stack OOB write (`tmp + sizeof(tmp)` on an `int tmp[64]`),
 fixed in the same release window by a **different** commit — which is why this
-row must not lift the **encode** half.
+row must not lift the **encode** half. ⚠ And `TASK_PHP_036` found a **second**
+one: a **signed overflow at `:193`, INSIDE the function this row extracts**,
+untraced to any fix (open item 59).
+
+✅✅ **BUILT — `patterns-php/ph45-htmlent-cache-int/`, `TASK_PHP_036`, row 6 and
+the FIRST TYPE ROW.** Gate `PASS-WITH-BLOCKED-ROWS`, `failures []` (the blocked
+row is `verus.rs`'s `ent_table`, which has no verified twin and cannot — the
+same verdict `p01`, `p35` and `ph00-smoke` carry). Verus **41/0**, **43/0** with
+twins. Tier shipped **`narrowed`** with the **counter-argument written into
+`spec.md`** — the engineer's objection is that the `place` word has no pre-image
+in PHP at all, and it is the call it most wants attacked.
+
+⭐⭐⭐ **AND THE ROW'S RESULT CONTRADICTS ITS OWN BUILD BRIEF.** *"Safe Rust
+cannot store a pointer in an `i32` at all"* is **false**: `(&x[0] as *const u8)
+as i32` is ordinary safe Rust, it truncates, and **`rustc -D warnings` emits
+ZERO diagnostics where the same C emits one per cast site** — and **bug #30573
+IS that gcc warning.** Only **Verus** refuses, naming both cast sites. So all
+four Rust rungs carry **R1's own idiom** and are safe anyway; what safe Rust
+blocks is the **dereference**, i.e. the wild *write*, **not the wild value**.
+⚠ **The upstream fix is 68,613 `Ir` CHEAPER than the defect** — a sign-extending
+load removed — which the kernel-exclusive statistic reports as `0.00 %`.
 
 **ph46 · one untagged union, two ways to get it wrong** — `Zend/zend_execute.c:138-151` and `:198-217` · CRASH-053, CRASH-056 · `narrowed` · I4/O1 · echoes p35
 **Paired; do not split.** `temp_variable` (`zend_execute.h:30-43`) is a union whose live arm depends on how the operand was fetched — an ordinary variable populates `var`, a string offset (`$s[0]`) populates `str_offset` — and **it carries no tag**. Both call sites discriminate on `var.ptr_ptr`'s NULL-ness, a **sibling member**, not a tag. `zend_switch_free` (`:198-217`) reads that discriminant out of a temp slot the compiler never initialised. `_get_zval_ptr_ptr` (`:138-151`) uses it correctly for the unlock at `:141-146` and then **returns `T(...).var.ptr_ptr` unconditionally** at `:147` — i.e. returns the NULL it just detected. FAULT: `:283`, the first line of `make_real_object`.

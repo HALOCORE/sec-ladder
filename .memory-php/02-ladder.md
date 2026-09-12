@@ -341,11 +341,49 @@
   > `|Δinside_share| ≤ 0.02` rule does not cover this case and must not be
   > quoted as if it did.**
 
-  ▶ **`ph03` AND `ph64` REMAIN UNDISCHARGED and need their own task.**
-  **2 of 5 built rows are unbounded in both directions** — ⚠ this line said
+  > ⚠⚠⚠ **FOURTH FLAG — NOT A FINDING (rule 9). `TASK_PHP_036` BUILT `ph45`,
+  > ROW 6 AND THE FIRST TYPE ROW, AND IT IS UNREVIEWED.** `RECAP_PHP.md`
+  > **F80/F81**. Gate `PASS-WITH-BLOCKED-ROWS`, `failures []`, brackets `66/0`
+  > and `14/0` — manager-verified from the record. **All three axes are now
+  > open.**
+  >
+  > ⭐⭐⭐ **THE ROW'S RESULT CONTRADICTS ITS OWN BUILD BRIEF, WHICH THE MANAGER
+  > WROTE.** *"Safe Rust cannot store a pointer in an `i32` at all"* is **false**
+  > — re-verified independently by the manager: `(&x[0] as *const u8) as i32`
+  > compiles under `rustc -D warnings -O` with **zero diagnostics**, truncates,
+  > and casts back to a wild pointer, **with no `unsafe` block**. The same idiom
+  > in C **warns once per cast site**, and **bug #30573 IS that warning**. Only
+  > **Verus** refuses. ▶ **So safe Rust blocks the wild WRITE (`E0133` on the
+  > dereference) and NOT the wild VALUE** — ⭐ **F71's shape on a second axis, so
+  > it is now TWICE**, and it is the sharpest ladder result in the corpus.
+  >
+  > ⚠⚠⚠ **AND IT REFUTES F74's PUBLISHED RULE, ONE ROW AFTER THE MANAGER
+  > PUBLISHED IT AND PUT IT INTO TWO TASK FILES.** `ph45`'s `inside_share` is
+  > **0.055–0.094**, seven times more extreme than anything else in the corpus,
+  > and it **flips sign between A1 and the whole-program statistic at
+  > `|Δinside_share| = 0.003`** — well inside F74's 0.02 threshold. **The
+  > condition passes and A1 is still wrong.** ▶ **CORRECTED RULE, two conditions,
+  > conjunction measured clean at 151 of 366 comparisons with ZERO flips:**
+  > **(i) `min(inside_share)` over the two cells must be HIGH — A must actually
+  > SEE both — AND (ii) `|Δinside_share| ≤ 0.02`.** ⚠ The threshold in (i) is
+  > **not tuned and six rows cannot pin it** (`>0.3`, `>0.5`, `>0.6` all give 0
+  > flips). ⚠ **Do not quote F74's one-condition form.**
+  >
+  > ⚠ `ph45` publishes **both** families, labelled: A1 **+0.37 %**,
+  > whole-program **−3.06 %**. ⚠ **The upstream fix is 68,613 `Ir` CHEAPER than
+  > the defect** and A1 reports that as **`0.00 %`**.
+  >
+  > ⚠⚠ **`ph45`'s R4 endpoint is UNSEARCHED, making it 3 of 6** (with `ph03` and
+  > `ph64`) — and F77 has just shown that debt is **not cosmetic**.
+
+  ▶ **`ph03`, `ph64` AND `ph45` REMAIN UNDISCHARGED and need their own task.**
+  **3 of 6 built rows are unbounded in both directions** — ⚠ this line said
   **3 of 4** until `TASK_PHP_028` reported, then **2 of 4**, `ph64` took it back
-  up to **3 of 5**, and `TASK_PHP_035` brings it down again — and it remains the
-  largest standing threat to the programme's headline quantity. ⚠ **`ph29` was
-  BLOCKED on open item 51 and is no longer**; both halves are done. **`ph03`
-  (`spellings: 11`) and `ph64` (`spellings: 13`, 6 forbidden) are both
-  searchable today.**
+  up to **3 of 5**, `TASK_PHP_035` brought it to **2 of 5**, and `ph45` takes it
+  to **3 of 6** — ⭐ **count it, do not trust this line**; it has moved five
+  times. It remains the largest standing threat to the programme's headline
+  quantity. ⚠ **`ph29` was BLOCKED on open item 51 and is no longer**; both
+  halves are done. **`ph03` (`spellings: 11`) and `ph64` (`spellings: 13`, 6
+  forbidden) are searchable today, and `ph45` has no `spellings.py` at all** —
+  which makes it the **cheapest of the three**, since there is no declaration
+  repair to do first (open item 58).
