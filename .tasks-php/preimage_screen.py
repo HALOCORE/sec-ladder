@@ -17,17 +17,72 @@ written against.  If the 5.0.0 line the corpus cites is nowhere in that
 snapshot, the commit was diffed against a tree that no longer has it -- i.e.
 something else removed it first.  That is a PROOF OF EXCLUSION, not a ranking.
 
-THREE OUTCOMES, NOT TWO
------------------------
+⚠⚠ AND THAT SENTENCE IS TRUE ONLY WHEN THE PRE-IMAGE'S WINDOW REACHES THE CITED
+SITE, WHICH IT DOES FOR 26 OF THE 43 RECORDS IT USED TO COVER.  It stood
+unqualified here until TASK_PHP_040 §3 and it is what RECAP_PHP.md F68 asked to
+have fixed "in the same edit".  See FOUR OUTCOMES below: `NOT-THE-REPAIR` is now
+the proof and `INAPPLICABLE-SAME-FILE` is the rest.
+
+FOUR OUTCOMES, AND ONLY ONE OF THEM IS A PROOF
+----------------------------------------------
+    ⚠⚠ THIS SECTION SAID `THREE OUTCOMES, NOT TWO` AND THE LINE ABOVE CALLS
+    `NOT-THE-REPAIR` "a PROOF OF EXCLUSION" FULL STOP.  That is true of 26 of
+    its 43 records and FALSE of the other 17 (RECAP_PHP.md F68, TASK_PHP_031
+    §7.1: `ph64`/`562f886ecb14` is a CONFIRMED FALSE EXCLUSION — it repairs a
+    THIRD FUNCTION in the same file, so no line-level pre-image screen can find
+    a fix of that shape).  The 17 now carry a label of their own.  Landed at
+    TASK_PHP_040 §3 (RECAP_PHP.md item D11) with negatives N10a-N10e.
+
     INAPPLICABLE    the patch has no pre-image hunk for the defect's file at
                     all (the `ph07` shape: the fix is in the caller, in another
                     file).  The screen says NOTHING about such a commit.
-    NOT-THE-REPAIR  the patch DOES touch the defect's file, and none of the
-                    cited 5.0.0 lines appear in its pre-image for that file.
+
+    INAPPLICABLE-SAME-FILE
+                    the patch DOES touch the defect's file, none of the cited
+                    5.0.0 lines appear in its pre-image, AND nothing shows the
+                    commit's window ever reaches the cited site (`bracketed`
+                    and `same_function` are both False).  ⚠ THE ABSENCE IS THE
+                    WINDOW'S AND NOT NECESSARILY THE TREE'S.  Mechanically this
+                    is `INAPPLICABLE`'s mechanism one granularity down — same
+                    file, different function — so the screen says NOTHING about
+                    such a commit either.  ⛔ IT IS NOT AN EXCLUSION.  Do not
+                    cite it as one.
+
+    NOT-THE-REPAIR  as above, and the commit's window PROVABLY REACHES the site
+                    (`bracketed` or `same_function`).  The cited line is
+                    missing from INSIDE the window, so the tree the commit was
+                    diffed against no longer has it.  ⭐ THIS IS THE PROOF OF
+                    EXCLUSION, AND IT IS THE ONLY ONE.
+
     CANDIDATE       at least one cited 5.0.0 line appears.  ⚠ CANDIDATE IS NOT
                     A VERDICT OF CORRECTNESS.  It means the screen could not
                     exclude the commit.  The tag comparison still owes an
                     answer (PROTOCOL_PHP.md §F5(iii)).
+
+    ⚠⚠ THE BOUNDARY BETWEEN THE TWO MIDDLE LABELS IS EXACTLY `decisive`, SO IT
+    INHERITS `same_function`'s SOUNDNESS — AND `same_function` HAD ONE MEASURED
+    FALSE POSITIVE: `ph53`/CRASH-158/`be8daf1f47fa`.  git's `xfuncname` labels a
+    hunk with the function preceding the hunk's FIRST line, so a hunk that
+    starts on the blank line after a closing brace is attributed to the function
+    that just ENDED, and `same_function` believed it.  Measured reach 1 of 170
+    records; found at TASK_PHP_040 §4.3 and explicitly NOT repaired there
+    (out of that task's scope), evidence in `.temp/php40/samefunc_probe.py`.
+    ✅✅ REPAIRED BY THE MANAGER, 2026-09-12 — see `same_function`'s own
+    docstring for the rule, and **N11 for the regression negative, which lives
+    in THIS suite and not in `.temp/`** because once the guard landed the
+    original probe's must-fire case correctly stopped firing and so cannot
+    guard the fix.  ▶ `NOT-THE-REPAIR` is now **25 proofs and no known
+    misfiling**, and `ph53` is the 18th `INAPPLICABLE-SAME-FILE`.
+    ⭐ Its verdict as an EXCLUSION was never in doubt — the text proof stands,
+    and the 5.0.x tag walk settles it independently (the cited `erealloc` line
+    is present through `php-5.0.4` and gone at `php-5.0.5`, 2 years 9 months
+    before the 2008 commit).
+
+    ⛔⛔ AND DO NOT ADD THE `.phpt` SIGNAL.  Scoring a bug-numbered `.phpt` in
+    `patch_files` as evidence of a repair was MEASURED at 53 % / 46 % / 45 %
+    across non-decisive exclusions, decisive exclusions and candidates — no
+    discriminating power, because nearly every commit in that column IS a
+    repair.  Refuted in F68; re-adding it is the one move item D11 forbids.
 
 WHAT THIS DELIBERATELY DOES NOT DO
 ----------------------------------
@@ -399,15 +454,33 @@ def screen_record(rec, corpus_row, file_restrict=True, span_override=None):
                       f"the pre-image of {dfile}"
                       + (" — ⚠ ALL of them from RESIDUAL (bare-number) citations"
                          if only_resid and resid_nums else ""))
+    elif file_restrict and not out.get("decisive"):
+        # ⚠⚠ THE THIRD LABEL — item D11 / TASK_PHP_040 §3.  `absent from the
+        # pre-image` with NOTHING showing the window reaches the site is not an
+        # exclusion; it is `INAPPLICABLE`'s mechanism at function granularity
+        # instead of file granularity.  `ph64`/`562f886ecb14` is the confirmed
+        # false exclusion this label exists to stop being cited (F68).
+        # ⚠ Gated on `file_restrict` because `--no-file-restrict` is a CONTROL
+        # (selftest N5) and never computes `decisive` at all — under that flag
+        # the label stays as it was, so the control still measures one thing.
+        out["verdict"] = "INAPPLICABLE-SAME-FILE"
+        out["why"] = (f"the patch touches {dfile} but NONE of its {len(good)} "
+                      f"cited 5.0.0 lines appear in that file's pre-image, and "
+                      f"⚠ NOTHING shows the commit's window ever reaches the "
+                      f"cited site (bracketed={out['bracketed']}, "
+                      f"same_function={out['same_function']}) — so the absence "
+                      f"is the window's and not necessarily the tree's. "
+                      f"⛔ THIS IS NOT AN EXCLUSION; the screen says nothing "
+                      f"about this commit. PROTOCOL_PHP.md §F5(iii) owes the "
+                      f"whole answer.")
     else:
         out["verdict"] = "NOT-THE-REPAIR"
         out["why"] = (f"the patch touches {dfile} but NONE of its {len(good)} "
                       f"cited 5.0.0 lines appear in that file's pre-image"
                       + ("; and the commit's window PROVABLY REACHES the site "
                          "(DECISIVE)" if out.get("decisive") else
-                         "; ⚠ but nothing shows the commit's window reaches the "
-                         "site, so the absence may be the window's and not the "
-                         "tree's (NOT DECISIVE)"))
+                         "; ⚠ decisiveness was not computed (--no-file-restrict "
+                         "is a control, not a verdict path)"))
     return out
 
 
@@ -500,7 +573,39 @@ def same_function(src, section_texts, cited_nums):
     window does reach the site, and the cited line's absence from the
     pre-image means the tree differs there.  That is `TASK_PHP_029` §3 exactly:
     `@@ -4949,6 +4949,10 @@ PHP_FUNCTION(str_repeat)` against 5.0.0's
-    `PHP_FUNCTION(str_repeat)` at :4115, cited line :4144."""
+    `PHP_FUNCTION(str_repeat)` at :4115, cited line :4144.
+
+    ⚠⚠⚠ AND THE TRAILING TEXT CAN NAME A FUNCTION THE HUNK DOES NOT TOUCH --
+    a defect found by `TASK_PHP_040` §4.3, reported and NOT landed there, and
+    repaired here by the manager (2026-09-12) with that task's own negatives.
+    git's `xfuncname` scans BACKWARDS FROM THE HUNK'S FIRST LINE, so a hunk
+    that begins just before a function definition is labelled with the
+    PRECEDING function while editing only the NEXT one.  Measured on
+    `be8daf1f47fa` against its own parent tree (sha256 `1dc76c81013f6067`):
+    header `@@ -3261,35 +3261,25 @@ void zend_do_end_class_declaration(...)`,
+    that function is 3215-3259, `zend_do_implements_interface` is 3262-3293,
+    the hunk's pre-image is 3261-3295 and line 3261 is BLANK.  ▶ The hunk
+    contains ZERO lines of the function it is labelled with -- not one context
+    line -- and all 16 removals are in the next function, yet the screen printed
+    `the commit's window PROVABLY REACHES the site (DECISIVE)`.
+
+    ⛔ A FALSE PROMOTION OF AN EXCLUSION TO A PROOF IS THE ONE DIRECTION THIS
+    SCREEN MAY NOT FAIL IN, so the guard below is a soundness fix and not a
+    refinement.  THE RULE: the matched hunk must contain no function-definition
+    header BEFORE its first changed line -- i.e. the label must describe the
+    EDITED region, not the hunk's first byte.
+
+    ⭐ Reach, measured before the repair (`.temp/php40/samefunc_probe.py`,
+    4 negatives, `probe: PASS`): 25 records use `same_function`, exactly ONE is
+    affected, and it is `ph53 / CRASH-158 / be8daf1f47fa`, whose `decisive`
+    rested on `same_function` ALONE (`bracketed=False`).  Its verdict is
+    UNAFFECTED as an exclusion -- the text proof stands, and the 5.0.x tag walk
+    settles it independently -- but it moves from `NOT-THE-REPAIR` to
+    `INAPPLICABLE-SAME-FILE`, which is the honest label for a text-only screen
+    to give a commit whose hunks are in a different function.
+    ⭐⭐ AND IT IS `INAPPLICABLE-SAME-FILE`'s ARRIVAL THAT MAKES THIS SAFE:
+    before that label existed, demoting `ph53` would have moved it from one
+    wrong label to another."""
     want = set()
     for c in cited_nums:
         _, h = enclosing_header(src, c)
@@ -508,15 +613,43 @@ def same_function(src, section_texts, cited_nums):
             want.add(norm_code(h))
     if not want:
         return False, {}
+    crossed = None
     for h in split_hunks(section_texts):
-        head = h.split("\n", 1)[0]
+        lines = h.split("\n")
+        head = lines[0]
         m = re.match(r"^@@ -\S+ \+\S+ @@ ?(.*)$", head)
         ctx = norm_code(m.group(1)) if m else ""
         if not ctx:
             continue
         for w in want:
-            if w == ctx or w.startswith(ctx) or ctx.startswith(w):
-                return True, {"hunk_context": ctx, "5.0.0_enclosing": w}
+            if not (w == ctx or w.startswith(ctx) or ctx.startswith(w)):
+                continue
+            # ⛔ THE GUARD. Does a function-definition header appear in this
+            # hunk BEFORE its first changed line?  If so the `xfuncname` label
+            # names the function the hunk STARTS in, not the one it EDITS, and
+            # this hunk is no evidence that the commit's window reaches the
+            # cited site.  Text-only, like the rest of the screen.
+            hdr = None
+            for ln in lines[1:]:
+                if not ln:
+                    continue
+                tag, body = ln[0], ln[1:]
+                if tag in "-+":
+                    break                      # the first changed line
+                if tag == " " and _FUNCHEAD.match(body):
+                    hdr = body.strip()
+            if hdr is not None:
+                crossed = {"hunk_context": ctx, "5.0.0_enclosing": w,
+                           "crossed_into": hdr,
+                           "why": "the hunk's `xfuncname` label names a "
+                                  "function it does not edit -- a definition "
+                                  "header precedes its first changed line, so "
+                                  "this hunk is NO evidence the commit's "
+                                  "window reaches the cited site"}
+                continue
+            return True, {"hunk_context": ctx, "5.0.0_enclosing": w}
+    if crossed:
+        return False, crossed
     return False, {}
 
 
@@ -596,6 +729,12 @@ GROUND_TRUTH = [
      "TASK_PHP_029 §2; bug #30562, 5.0.3->5.0.4"),
     ("ph07", "CRASH-124", "cb3cca21b345", "INAPPLICABLE",
      "the fix is in the caller, ext/mbstring/mbstring.c"),
+    # ⭐ added at TASK_PHP_040 §3 so the ground truth spans all FOUR outcomes
+    # and no constant answer can score better than 1/5.
+    ("ph64", "CRASH-086", "562f886ecb14", "INAPPLICABLE-SAME-FILE",
+     "TASK_PHP_031 §7.1 / F68: a CONFIRMED FALSE EXCLUSION, established BY HAND "
+     "before this label existed — the commit repairs a THIRD FUNCTION in the "
+     "same file, so no line-level pre-image screen can find a fix of that shape"),
 ]
 
 
@@ -604,7 +743,7 @@ def selftest():
     ok = True
 
     print("=" * 78)
-    print("§4 GROUND TRUTH -- all four must reproduce, in BOTH directions")
+    print("§4 GROUND TRUTH -- all FIVE must reproduce, in BOTH directions")
     print("=" * 78)
     for row, cid, sha, want, who in GROUND_TRUTH:
         r = screen_record({"row": row, "id": cid, "sha": sha}, idx[cid])
@@ -627,7 +766,7 @@ def selftest():
     print("=" * 78)
     print("N0  MUST-FIRE (regression): ph73 · CRASH-100 · 5d804d163ae9")
     print("=" * 78)
-    print("    NOT one of §4's four -- it is TASK_PHP_029 §2's fifth per-id block,")
+    print("    NOT one of §4's FIVE -- it is TASK_PHP_029 §2's fifth per-id block,")
     print("    which states of this commit: \"its pre-image is byte-identical to")
     print("    5.0.0\".  The FIRST version of this screen called it NOT-THE-REPAIR,")
     print("    a FALSE EXCLUSION, because the corpus cites the site as")
@@ -650,15 +789,16 @@ def selftest():
     print("N1  MUST-NOT-FIRE: no constant answer passes §4")
     print("=" * 78)
     wants = [w for _, _, _, w, _ in GROUND_TRUTH]
-    for const in ("CANDIDATE", "NOT-THE-REPAIR", "INAPPLICABLE"):
+    for const in ("CANDIDATE", "NOT-THE-REPAIR", "INAPPLICABLE",
+                  "INAPPLICABLE-SAME-FILE"):
         n = sum(1 for w in wants if w == const)
-        print(f"    a screen that always says {const:15} scores {n}/4")
-    if len(set(wants)) != 3:
-        print("    ❌ the ground truth does not span all three outcomes")
+        print(f"    a screen that always says {const:22} scores {n}/{len(wants)}")
+    if len(set(wants)) != 4:
+        print("    ❌ the ground truth does not span all four outcomes")
         ok = False
     else:
-        print("    ✅ the four cases span all three outcomes, so a no-op "
-              "implementation cannot pass")
+        print(f"    ✅ the {len(wants)} cases span all FOUR outcomes and the best "
+              "constant scores 2/5, so a no-op implementation cannot pass")
     print()
 
     print("=" * 78)
@@ -673,9 +813,16 @@ def selftest():
                        idx["CRASH-051"], span_override=[(300, 340)])
     print(f"    cited span {r0['span']} -> {r0['verdict']}")
     print(f"    bogus span [[300, 340]] -> {r1['verdict']}")
-    if r0["verdict"] == "CANDIDATE" and r1["verdict"] == "NOT-THE-REPAIR":
-        print("    ✅ fires -- moving the span flips the verdict, so the screen "
-              "reads the cited 5.0.0 text")
+    # ⚠⚠ THIS ASSERTION WAS `r1 == "NOT-THE-REPAIR"` AND TASK_PHP_040 §3's THIRD
+    # LABEL WOULD HAVE BROKEN IT: the bogus span is bracketed=False and
+    # same_function=False, so it is now INAPPLICABLE-SAME-FILE.  N2 tests that
+    # the verdict is KEYED ON THE CITED TEXT, so the assertion it wants is
+    # "moved out of CANDIDATE", not "landed on one particular non-candidate".
+    # Widened deliberately, with the reason, rather than silently retuned.
+    if r0["verdict"] == "CANDIDATE" and r1["verdict"] != "CANDIDATE":
+        print("    ✅ fires -- moving the span flips the verdict out of "
+              f"CANDIDATE (to {r1['verdict']}), so the screen reads the cited "
+              "5.0.0 text")
     else:
         print("    ❌ DID NOT FIRE -- the verdict does not depend on the span")
         ok = False
@@ -728,6 +875,7 @@ def selftest():
 
     print("=" * 78)
     print("N5  MUST-FIRE: the file restriction is load-bearing")
+    print(f"    (over all {len(GROUND_TRUTH)} ground-truth records)")
     print("=" * 78)
     moved = 0
     for row, cid, sha, want, _ in GROUND_TRUTH:
@@ -739,10 +887,11 @@ def selftest():
         print(f"    {row:5} {cid:10} restricted={a['verdict']:15} "
               f"unrestricted={b['verdict']:15} {flag}")
     if moved:
-        print(f"    ✅ fires -- {moved} of 4 verdicts change when the "
-              "defect-file restriction is dropped")
+        print(f"    ✅ fires -- {moved} of {len(GROUND_TRUTH)} verdicts change "
+              "when the defect-file restriction is dropped")
     else:
-        print("    ❌ DID NOT FIRE: the restriction changes nothing on these 4")
+        print(f"    ❌ DID NOT FIRE: the restriction changes nothing on these "
+              f"{len(GROUND_TRUTH)}")
         ok = False
     print()
 
@@ -751,7 +900,8 @@ def selftest():
     print("=" * 78)
     print("    §3.1 is the trap that would produce a confident, uniformly wrong")
     print("    answer.  Behavioural test: rewrite EVERY `@@ -a,b +c,d @@` header")
-    print("    in all four ground-truth patches to `@@ -1,1 +1,1 @@` and re-run.")
+    print(f"    in all {len(GROUND_TRUTH)} ground-truth patches to "
+          f"`@@ -1,1 +1,1 @@` and re-run.")
     moved6 = []
     for row, cid, sha, want, _ in GROUND_TRUTH:
         before = screen_record({"row": row, "id": cid, "sha": sha}, idx[cid])
@@ -844,7 +994,7 @@ def selftest():
     print("N9  CORROBORATION -- five verdicts this programme established BY HAND,")
     print("    none of which was used to build the screen")
     print("=" * 78)
-    print("    ⚠ These are NOT §4's four.  They are recorded because a screen")
+    print("    ⚠ These are NOT §4's five.  They are recorded because a screen")
     print("    validated only against the cases it was written for is validated")
     print("    against nothing.  THREE ARE MUST-NOT-EXCLUDE, which is the")
     print("    direction a NOT-THE-REPAIR screen is dangerous in.")
@@ -873,6 +1023,168 @@ def selftest():
         print(f"    {mark} {row:5} {cid:10} expect {want:15} got {got:15}"
               f" decisive={r['decisive']}")
         print(f"       {why}")
+    print()
+
+    print("=" * 78)
+    print("N10 THE THIRD LABEL -- `INAPPLICABLE-SAME-FILE` (item D11,")
+    print("    TASK_PHP_040 §3).  §H: a change to a validator lands with its")
+    print("    must-fire negatives, or it does not land.")
+    print("=" * 78)
+
+    def _v(row, cid, sha, **kw):
+        return screen_record({"row": row, "id": cid, "sha": sha}, idx[cid], **kw)
+
+    # ---- N10a MUST-FIRE: the case the label exists for.
+    print("  N10a MUST-FIRE: ph64 · CRASH-086 · 562f886ecb14 must LEAVE")
+    print("       NOT-THE-REPAIR.  TASK_PHP_031 §7.1 confirmed BY HAND that this")
+    print("       commit repairs a THIRD FUNCTION in the same file and removes no")
+    print("       line at either cited site, ever -- a false exclusion.")
+    r64 = _v("ph64", "CRASH-086", "562f886ecb14")
+    print(f"       verdict={r64['verdict']}  decisive={r64['decisive']}  "
+          f"bracketed={r64['bracketed']}  same_function={r64['same_function']}")
+    if r64["verdict"] == "INAPPLICABLE-SAME-FILE":
+        print("       ✅ fires")
+    else:
+        print("       ❌ DID NOT FIRE -- the false exclusion is still cited as one")
+        ok = False
+
+    # ---- N10b MUST-NOT-FIRE: the sound exclusion must not be retracted.
+    print("  N10b MUST-NOT-FIRE: ph21 · CRASH-107 must STAY NOT-THE-REPAIR.")
+    print("       This is §H's own case and the ONE record known to be decisive;")
+    print("       a label change that swallows it has destroyed the product.")
+    r21b = _v("ph21", "CRASH-107", "c591f022f8ab")
+    print(f"       verdict={r21b['verdict']}  decisive={r21b['decisive']}")
+    if r21b["verdict"] == "NOT-THE-REPAIR":
+        print("       ✅ silent")
+    else:
+        print("       ❌ FIRED -- a sound exclusion was relabelled")
+        ok = False
+
+    # ---- N10c MUST-NOT-FIRE: file-granularity INAPPLICABLE is untouched.
+    print("  N10c MUST-NOT-FIRE: ph07 · CRASH-124 must STAY INAPPLICABLE.")
+    print("       The new label is the FUNCTION-granularity case; the FILE-")
+    print("       granularity one must keep its own name or the two merge.")
+    r07 = _v("ph07", "CRASH-124", "cb3cca21b345")
+    print(f"       verdict={r07['verdict']}")
+    if r07["verdict"] == "INAPPLICABLE":
+        print("       ✅ silent")
+    else:
+        print("       ❌ FIRED")
+        ok = False
+
+    # ---- N10d MUST-NOT-FIRE: the new branch must not swallow a CANDIDATE.
+    print("  N10d MUST-NOT-FIRE: the three F38-corroborated MUST-NOT-EXCLUDE")
+    print("       records must stay CANDIDATE.  The new branch is inside the")
+    print("       `not hits` arm, so a CANDIDATE reaching it is a logic error.")
+    for row, cid, sha in (("ph03", "CRASH-115", "f95c1df58349"),
+                          ("ph29", "CRASH-097", "445daac3ab1a"),
+                          ("ph16", "CRASH-098", "99e290f882c9")):
+        rr = _v(row, cid, sha)
+        mark = "✅" if rr["verdict"] == "CANDIDATE" else "❌"
+        if rr["verdict"] != "CANDIDATE":
+            ok = False
+        print(f"       {mark} {row:5} {cid:10} {rr['verdict']}")
+
+    # ---- N10e MUST-FIRE: the corpus-wide INVARIANT, not just five records.
+    print("  N10e MUST-FIRE: the partition invariant over every resolved record.")
+    print("       NOT-THE-REPAIR            => decisive is True,  file touched")
+    print("       INAPPLICABLE-SAME-FILE    => decisive is False, file touched,")
+    print("                                    and zero hits")
+    print("       INAPPLICABLE              => file NOT touched")
+    print("       and NTR + ISF must equal the 43 the old label carried.")
+    allres = run(load_records(), idx)
+    bad10 = []
+    for r in allres:
+        v, df, pf = r["verdict"], r.get("defect_file"), r.get("patch_files") or []
+        if v == "NOT-THE-REPAIR":
+            if r.get("decisive") is not True or df not in pf:
+                bad10.append((r["row"], r["id"], v, "decisive/file"))
+        elif v == "INAPPLICABLE-SAME-FILE":
+            if r.get("decisive") is not False or df not in pf or r.get("hits"):
+                bad10.append((r["row"], r["id"], v, "decisive/file/hits"))
+        elif v == "INAPPLICABLE":
+            if df in pf:
+                bad10.append((r["row"], r["id"], v, "file IS touched"))
+    from collections import Counter as _C
+    cc = _C(r["verdict"] for r in allres)
+    ntr, isf = cc["NOT-THE-REPAIR"], cc["INAPPLICABLE-SAME-FILE"]
+    print(f"       records={len(allres)}  NOT-THE-REPAIR={ntr}  "
+          f"INAPPLICABLE-SAME-FILE={isf}  sum={ntr + isf}  "
+          f"CANDIDATE={cc['CANDIDATE']}  INAPPLICABLE={cc['INAPPLICABLE']}")
+    if bad10:
+        print(f"       ❌ DID NOT FIRE -- {len(bad10)} invariant violation(s): "
+              f"{bad10[:5]}")
+        ok = False
+    elif ntr + isf != 43:
+        print(f"       ❌ DID NOT FIRE -- the two labels sum to {ntr + isf}, not "
+              f"the 43 the single label carried (F64/F68). The refinement must "
+              f"REPARTITION, not reclassify.")
+        ok = False
+    elif isf == 0:
+        print("       ❌ DID NOT FIRE -- no record carries the new label, so it "
+              "is unexercised and this suite proves nothing about it")
+        ok = False
+    else:
+        # ⚠ THIS LINE USED TO SAY "and it is 26/17, which is F68's own
+        #   measured split" AS A LITERAL, and the manager's `same_function`
+        #   soundness guard moved the split to 25/18 -- leaving a validator
+        #   printing a figure its own data contradicted. `RECAP_PHP.md` open
+        #   item 73's class, inside the tool. ▶ Computed now.
+        print(f"       ✅ fires -- partition holds, split {ntr}/{isf}"
+              + ("  (F68 measured 26/17 BEFORE the `same_function` guard "
+                 "demoted ph53 -- see N11)" if (ntr, isf) == (25, 18)
+                 else "  ⚠ neither 26/17 (pre-guard) nor 25/18 (post-guard)"))
+
+    # ---- N11 MUST-FIRE + MUST-NOT-FIRE: the `same_function` soundness guard.
+    #      ⚠⚠ THIS LIVES HERE AND NOT IN `.temp/` ON PURPOSE. `TASK_PHP_040`
+    #      §4.3 found the defect with a probe under `.temp/php40/`, which is
+    #      GITIGNORED -- and once the guard landed that probe's own must-fire
+    #      case stopped firing (correctly: the defect is gone), so it cannot
+    #      serve as a regression test. Without the two assertions below,
+    #      DELETING THE GUARD WOULD SILENTLY PASS. `PROTOCOL_PHP.md` §H, and
+    #      open item 65's lesson about evidence in gitignored scratch.
+    print("  N11 THE `same_function` SOUNDNESS GUARD, both directions.")
+    print("       MUST-NOT-FIRE: a hunk labelled with a function it does NOT")
+    print("       edit must NOT count as reaching the site (ph53/be8daf1f47fa,")
+    print("       whose 16 removals are all in the NEXT function).")
+    print("       MUST-FIRE: ph21/c591f022f8ab, whose hunk really is inside")
+    print("       PHP_FUNCTION(str_repeat), must still count -- or the guard")
+    print("       has retracted a sound exclusion instead of an unsound one.")
+    n11 = []
+    for short, sha, want_sf in (("ph53", "be8daf1f47fa", False),
+                                ("ph21", "c591f022f8ab", True)):
+        rec = next((r for r in allres
+                    if r.get("row") == short
+                    and sha[:12] in str(r.get("fix_commit") or r.get("sha") or "")),
+                   None)
+        if rec is None:
+            n11.append((short, sha, "NO RECORD"))
+            print(f"       ❌ {short} {sha}: no resolved record to test")
+            continue
+        got = bool(rec.get("same_function"))
+        crossed = (rec.get("same_function_evidence") or {}).get("crossed_into")
+        okk = (got == want_sf) and (want_sf or crossed)
+        print(f"       {'✅' if okk else '❌'} {short} {sha}: "
+              f"same_function={got} (want {want_sf})"
+              + (f", crossed_into={crossed!r}" if crossed else ""))
+        if not okk:
+            n11.append((short, sha, got, want_sf, crossed))
+    if n11:
+        print(f"       ❌ N11 FAILED: {n11}")
+        ok = False
+
+    # ---- N10f MUST-NOT-FIRE: the control path is untouched.
+    print("  N10f MUST-NOT-FIRE: `--no-file-restrict` is a CONTROL (N5) and")
+    print("       never computes `decisive`, so it must produce ZERO of the new")
+    print("       label -- otherwise the control silently measures two things.")
+    nlab = sum(1 for r in run(load_records(), idx, file_restrict=False)
+               if r["verdict"] == "INAPPLICABLE-SAME-FILE")
+    print(f"       records with the new label under --no-file-restrict: {nlab}")
+    if nlab == 0:
+        print("       ✅ silent")
+    else:
+        print("       ❌ FIRED -- the control path acquired the new label")
+        ok = False
     print()
 
     print(f"selftest: {'PASS' if ok else 'FAIL'}")
@@ -922,10 +1234,13 @@ def main():
     from collections import Counter
     c = Counter(r["verdict"] for r in res)
     print(f"records screened: {len(res)}")
-    for k in ("NOT-THE-REPAIR", "CANDIDATE", "INAPPLICABLE", "NO-SPAN",
-              "NO-SHA", "NO-PATCH", "UNRESOLVED"):
+    for k in ("NOT-THE-REPAIR", "INAPPLICABLE-SAME-FILE", "CANDIDATE",
+              "INAPPLICABLE", "NO-SPAN", "NO-SHA", "NO-PATCH", "UNRESOLVED"):
         if c[k]:
-            print(f"   {k:16} {c[k]}")
+            print(f"   {k:22} {c[k]}")
+    print(f"\n⭐ CITE {c['NOT-THE-REPAIR']} EXCLUSIONS, NOT "
+          f"{c['NOT-THE-REPAIR'] + c['INAPPLICABLE-SAME-FILE']}: "
+          f"INAPPLICABLE-SAME-FILE is not an exclusion (F68, item D11).")
     print()
 
     print("## NOT-THE-REPAIR -- the exclusions (this is the deliverable)\n")
@@ -951,11 +1266,24 @@ def main():
               f"[bracketed={r['bracketed']} {r['bracket_evidence']}]")
         print()
 
+    print("## INAPPLICABLE-SAME-FILE -- ⛔ NOT exclusions. The screen says\n"
+          "   nothing about these: the patch touches the file, but nothing\n"
+          "   shows its window reaches the cited site (F68, item D11).\n")
+    for r in res:
+        if r["verdict"] != "INAPPLICABLE-SAME-FILE":
+            continue
+        print(f"### {r['row']} · {r['id']} · `{r['sha']}` · `{r['defect_file']}` "
+              f"{r['span']}")
+        print(f"    the patch touches: {', '.join(r['patch_files'])}")
+        for n, t in r["misses"]:
+            print(f"    5.0.0     :{n}  {t.strip()}")
+        print()
+
     if a.verbose:
         print("## every record\n")
         for r in res:
             print(f"{r['row']:6} {r['id']:10} {r['sha'][:12]:12} "
-                  f"{r['verdict']:15} {r['defect_file']}")
+                  f"{r['verdict']:22} {r['defect_file']}")
 
     if a.json:
         json.dump(res, open(a.json, "w"), indent=1)
