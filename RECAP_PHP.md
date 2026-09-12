@@ -48,23 +48,23 @@ between them read `CLAUDE.md`'s top table.
 STATE   ⭐ ROWS BUILT 6 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
         ph45 TYPE. ALL THREE AXES OPEN. .memory-php/ is AUTHORITATIVE.
 NEXT    NOTHING RUNNING. _037 + _038 (REVIEW) BOTH LANDED + manager-verified.
-        ▶ item 66: is ph64's PUBLISHED B1 HEADLINE one unstable draw? CHEAPEST
-        in the programme. THEN 62 (family C is a PRECONDITION now), 63+56, 67.
+        ▶ item 62: FAMILY C IS NOW A PRECONDITION, not a nice-to-have -- it is
+        the only admissible 2nd column. THEN 63+56, 67, 65, 54. 64+66 DONE.
 ⚠ NEW   F88 ⭐⭐⭐ FAMILY B IS ONE DRAW of a sampling distribution -- probe_iters
-        is [100,200] EVERYWHERE, ph29's B moves 32% across draws, the published
-        draw is an OUTLIER, `inside_share` INTERPRETIVELY VOID on such a row.
-        F87 ph45's R4 *AND* R3 both move (1st row), bound's SIGN REVERSES ->
-        F67 stays n=1, `get_unchecked` is the EXPENSIVE spelling (+44pp).
-⚠ WRONG My F84 `-1.00`=slope REFUTED (it is 1 insn/call in `main`, in every
-        record); F83's env control tests a mechanism that CANNOT apply; F86(b)
-        is a TAUTOLOGY, (c) TOO STRONG; "3 independent statistics" -> 2.
+        is [100,200] EVERYWHERE, ph29's B moves 32% across draws, `inside_share`
+        INTERPRETIVELY VOID on such a row. F89 ⭐⭐ but the draw CANCELS in a
+        same-language ratio (0.07pp) and NOT cross-language (8.63pp), same row:
+        ph64's B1 HEADLINE IS SAFE, so the ban on B rests on F84 alone.
+        F87 ph45's R4 *AND* R3 both move, bound's SIGN REVERSES, F67 stays n=1.
+⚠ WRONG My F84 `-1.00`=slope REFUTED (1 insn/call in `main`, in every record);
+        F83's env control CANNOT apply; F86(b) TAUTOLOGY. SEVEN in all, 0 arith.
 ⚠ TRAPS `grep -a` ALWAYS (blind to 41 corpus files); ask about a FUNCTION, not text.
         ⚠⚠ A PROBE WHOSE SETUP ENCODES THE ANSWER evaluates fine and is WRONG --
         9 shapes, the 9th MINE (F82); too-clean is the only warning (F52/F70/F82).
 BAR     C-SIDE ONLY: nothing Rust/Verus/Miri/cost kills a row; patterns-php/ is
         FRESH. ⚠ .web/ is CONCURRENT -- NEVER `git add -A`.
 READ    .memory-php/ · PLAN_PHP.md · PROTOCOL.md · CATALOGUE.md · QUOTA_001.md ·
-        F1-F88 · items 1-67. fixsurvey.py + preimage_screen.py have --selftest.
+        F1-F89 · items 1-67. fixsurvey.py + preimage_screen.py have --selftest.
 ```
 
 ---
@@ -1503,6 +1503,62 @@ which pins `kernel.c:247` and `hardened:175`, one line each.
 The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
+
+### F89 — ✅ ITEM 66 ANSWERED **NO**, AND IT SHARPENS F88: THE DRAW **CANCELS IN A SAME-LANGUAGE RATIO** AND **DOES NOT** CROSS-LANGUAGE
+
+Manager, `.temp/mgr173/ph64_draws.py` (`--selftest` **PASS, 5 negatives**).
+⚠ **UNREVIEWED** (rule 9). Nine **100-wide** spans at different offsets, so every
+slope is a 100-draw sample and the only thing varying is *which* draws.
+
+✅ **The pipeline reproduces both controls before being used**: `ph03`'s level
+spread comes out **0.034 %** against F88's reported **0.03 %** (negative **N4**),
+and my `[100,200]` span reproduces the gate's `c-gcc` marginal to **0.12 %**
+(**N5**). ⭐ **And the headline figure is reproduced EXACTLY**: `ph64`'s
+`safe_tuned` 9351.56 / `unsafe` 7987.14 → **+17.08 %**, the gate record's own
+`O3/isolated/small.bin` numbers to the digit.
+
+**`ph64` LEVEL spread across draws: 6.75 – 7.04 %** on all four cells.
+⚠ **So BOTH of my declared expectations were wrong.** I predicted **> 10 %**
+(E1) and named a falsifier at `ph03`-like **0.03 %** (E5). **The truth is
+between the two rows**: ~200× `ph03`, but **4.6× LESS than `ph29`'s 32 %.**
+Per-call allocation produces real heterogeneity and **not** as much as
+`ph29`'s per-window `navail` draw.
+
+**And the RATIOS, which is what a row publishes:**
+
+| pair | published `[100,200]` | other 8 draws | spread | verdict |
+|---|---|---|---|---|
+| **`safe_tuned` vs `unsafe`** — ⭐ **ph64's HEADLINE** | **+17.08** | +17.05 .. +17.12 | **0.07 pp** | **INSIDE** |
+| `safe_naive` vs `safe_tuned` | +32.68 | +33.04 .. +33.68 | 1.00 pp | ⚠ **OUTLIER** |
+| `c-gcc` vs `safe_naive` | +243.21 | +235.09 .. +242.52 | **8.12 pp** | outside by 0.29 % of effect — immaterial |
+| `c-gcc` vs `safe_tuned` | +355.38 | +347.95 .. +356.58 | **8.63 pp** | INSIDE |
+
+⭐⭐⭐ **ITEM 66's ANSWER IS NO. `ph64`'s PUBLISHED B1 HEADLINE IS NOT AN
+UNSTABLE DRAW** — it moves **0.07 pp** on a **+17.08 %** effect, i.e. **0.4 %
+relative**, and the published draw sits inside the range. ▶ **So the reviewer's
+conditional — *"if its B moves like `ph29`'s, the ban on family B is not a style
+rule, it is a correctness fix"* — does NOT trigger. The disqualification of B
+rests on F84's OBSERVATION alone, not on F88.**
+
+⭐⭐ **THE SHARPER STATEMENT, and it is the same row and the same nine draws:
+`0.07 pp` same-language against `8.63 pp` cross-language.** Every rung walks the
+**same** window sequence, so the sampling error cancels in a ratio **only when
+the two cells' cost-vs-window-size curves match** — which they do between two
+Rust rungs and do **not** between C and Rust, because the C rung allocates
+`2n+2` per call and scales differently. ▶ **This is the reviewer's own Q2
+prediction, measured on a second row**, and it is a more useful rule than *"B is
+one draw"*: **the draw threatens cross-language B figures and leaves the
+`fixed-R4 bound` alone.**
+
+⚠⚠ **AND MY OUTLIER TEST HAD NO MAGNITUDE FLOOR — the third time this round.**
+Its first version fired on `ph03` at spreads of **0.02 pp** and **0.00 pp**,
+reporting floating-point noise as a finding. **That is the `ph00` near-zero sign
+flip (F86) and the `BLIND` class's defect (item 67) a third time: a predicate
+that is technically true and carries no information.** ▶ Fixed with a **relative**
+floor — *does the draw move the number enough to change what the row claims?* —
+and the `ph64` verdicts above are after the fix. ⭐ **A pattern worth naming:
+every taxonomy I wrote this round needed a magnitude floor and none of them had
+one on the first pass.**
 
 ### F88 — ⭐⭐⭐ **FAMILY B IS ONE DRAW OF A SAMPLING DISTRIBUTION**, AND ON `ph29` THAT IS BIGGER THAN EVERY ERROR SOURCE ALREADY ON FILE
 
@@ -4384,5 +4440,5 @@ the wrong one.
 | 63 | ⚠⚠ **A THIRD DEFECT IN THE SHARED `spellings.py` MACHINERY, LATENT IN `ph29`, AND F79's TWO FIXES DO NOT COVER IT** | F87, `TASK_PHP_037` §6.2, found by its **128-case** §H suite (`ph29`'s bar was 75). ⚠ **`twin_identical` still compares two `(0, md5(""))` rows EQUAL** — F79 guarded `kernel_fingerprint` and `disasm`'s needle but **not this**, so the same *"two missing binaries are byte-identical"* hole survives at a second call site, in the one function whose whole job is to decide byte-identity. ✅ **Latent on `ph29`** (its call sites are downstream of a checked build), and **`_037` correctly declined to widen its scope into another row's control.** ⚠ Costs a `ph29` re-gate → **batch with open item 56** (`ph29`'s weak bare-identifier pin), the only other `ph29` prose debt. ⭐ **The shape is item 57's exactly, one generation on: a control cloned between rows carries its defects, and only the row that writes NEW negatives finds them** — 54 cases missed two, 75 missed one, **128 found it** |
 | 64 | ⚠⚠ **`ph07`'s AND `ph03`'s CROSS-LANGUAGE FLIPS ARE NOT RE-DERIVED AGAINST FAMILY C** | F85. ✅ `ph29`'s five flips **survive** C and W1 — three statistics agreeing to ~2 pp against A — and its two non-flipping controls agree across **all four** families, **so the `ph29` half is settled.** ⚠ `ph07` (6 flips) and `ph03` (6) are still measured **against family B only**, and F84 showed B confounded in both directions by up to ~266 `Ir`/call. **The mechanism is the same and `ph29` makes it likely, which is exactly why it must be measured rather than assumed** (F78's lesson). ▶ **Cheap**: their binaries are on disk and md5-verified, and `.temp/mgr172/sweep_cg.sh` is the single regeneration entry point — add four C cells per row. ⚠⚠ **Until then quote F85 as *"28 of 38 flips are cross-language"* (measured over the corpus) plus *"they survive C"* (measured on ONE row of three)** |
 | 65 | ⚠ **`safe_tuned.rs`'s HEADER CITES A 68-BYTE LOG FOR FIVE NUMBERS IT DOES NOT CONTAIN, AND THE FIX COSTS A 32-CELL RE-MEASURE** | F87, `TASK_PHP_037` §9.5. `.temp/php36/logs-06-r3search.log` is **two lines** carrying two whole-program totals; **none** of the header's five candidate figures is in it, or anywhere under `.temp/php36/`. ✅ **A dangling citation, not a wrong number** — the `.rs` candidate sources survive so the figures are re-derivable, and two re-measured independently agree to **0.014 %**. ⓘ ⭐ **And `.temp/` is gitignored, so the citation was never reachable from a fresh clone at all** — which is the more general defect and applies to every `.temp/` citation in a committed file. ⚠ It is a `.rs` comment, i.e. **inside the measurement digest: 32 cells.** ▶ **Batch with F87 result 4's mechanism correction**, owed in the same file and the substantive one; **never alone** (`PROTOCOL.md` rule 6, item 53's shape) |
-| 66 | ⭐⭐⭐ **IS `ph64`'s PUBLISHED B1 HEADLINE ONE UNSTABLE DRAW? — THE CHEAPEST NEXT MEASUREMENT IN THE PROGRAMME, AND UNTESTED** | F88, flagged by the reviewer rather than guessed. `probe_iters` is **`[100, 200]` in all seven PHP `spec.md`s and in `p11`** (manager-verified), so **every** family-B figure in both programmes is that one draw. On `ph29` the draw moves the level **32 %** and the published draw is the **largest of seven**. ⚠⚠ **`ph64` is the ONE ROW WHOSE HEADLINE IS B1** (F74), and it allocates **`2n+2` blocks per call** (F71, item 54) — so its per-window work must vary strongly, which is exactly the condition F88 identifies. ▶ **If `ph64`'s B moves like `ph29`'s, the draft §2 ban on family B is not a style rule, it is a correctness fix, and `ph64`'s headline needs restating.** ⭐ Cheap: `probe_iters` is a `spec.md` pin, the binaries are on disk, and `.temp/php38/draws.py` already does the sweep. ⚠ **`ph64`'s `NOTES.md` is in the gate digest but NOT the measurement digest**, so restating costs one re-gate |
+| 66 | ⭐⭐⭐ **IS `ph64`'s PUBLISHED B1 HEADLINE ONE UNSTABLE DRAW? — THE CHEAPEST NEXT MEASUREMENT IN THE PROGRAMME, AND UNTESTED** | F88, flagged by the reviewer rather than guessed. `probe_iters` is **`[100, 200]` in all seven PHP `spec.md`s and in `p11`** (manager-verified), so **every** family-B figure in both programmes is that one draw. On `ph29` the draw moves the level **32 %** and the published draw is the **largest of seven**. ⚠⚠ **`ph64` is the ONE ROW WHOSE HEADLINE IS B1** (F74), and it allocates **`2n+2` blocks per call** (F71, item 54) — so its per-window work must vary strongly, which is exactly the condition F88 identifies. ▶ **If `ph64`'s B moves like `ph29`'s, the draft §2 ban on family B is not a style rule, it is a correctness fix, and `ph64`'s headline needs restating.** ⭐ Cheap: `probe_iters` is a `spec.md` pin, the binaries are on disk, and `.temp/php38/draws.py` already does the sweep. ⚠ **`ph64`'s `NOTES.md` is in the gate digest but NOT the measurement digest**, so restating costs one re-gate. ✅✅ **ANSWERED — NO (F89).** Nine 100-wide draws: the headline moves **0.07 pp on a +17.08 % effect** and the published draw is **inside** the range; the level moves 6.75–7.04 %, so the heterogeneity is real but **4.6× less than `ph29`'s**. ⭐ **The conditional does not trigger and the ban on B rests on F84's observation alone.** ⚠ **Both my declared expectations were wrong** (I predicted >10 %, and named an `ph03`-like falsifier; the truth is between the two rows). ▶ **What replaces the item: the draw cancels same-language (0.07 pp) and does NOT cross-language (8.63 pp), same row, same draws** |
 | 67 | ⚠ **THE `BLIND` CLASS HAS NO WORKING TEST, AND THE TAXONOMY INVERTS THE EVIDENCE ON 5 OF ITS 14 CELLS** | F86 as narrowed, `TASK_PHP_038` §2.4. `BLIND` was defined as *A reads exactly `0` while the whole-program figure does not*, which lumps **two opposite situations**: *A genuinely sees nothing* (`ph45`'s `+0.000 %` against a `+23.37 %` effect — the real thing) and *A correctly reads a true zero* (5 of 14). ⚠ The exact straddle predicate cannot cover it — `a_ratio == 1` fails a strict inequality — and F80's threshold calls **13 of the 14 "safe"**. ⭐ **The reviewer proposed a test, ran it, reported that its own must-fire negative FAILED, and shipped the failure instead of the test** — which is the right call and F79's rule (*a must-fire case that fires for the wrong reason is worth nothing*) applied to itself. ▶ Open: a test that separates the two, or an argument that the distinction is decided by `min(inside_share)` and needs none |
