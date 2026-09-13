@@ -1,0 +1,1041 @@
+{
+  "row": "ph52-concat-copy-uninit",
+  "runs": [
+    {
+      "row": "ph52-concat-copy-uninit",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph52-concat-copy-uninit: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph52-concat-copy-uninit: Zend/zend.c, Zend/zend_operators.c, Zend/zend.c, Zend/zend.c, Zend/zend_variables.c, Zend/zend_operators.c, Zend/zend_variables.c, Zend/zend.h, Zend/zend.h, Zend/zend.h are in the manifest (d00658ea68a1, aa957a381e9d, d00658ea68a1, d00658ea68a1, fe61a0cc1083, aa957a381e9d, fe61a0cc1083, 0b0fd801f619, 0b0fd801f619, 0b0fd801f619)",
+        "  ph52-concat-copy-uninit: OK  Zend/zend.c:242-247  151 bytes  sha256 e3dc2e7da55c2df2  tier=narrowed",
+        "  ph52-concat-copy-uninit: OK+1 Zend/zend_operators.c:1146-1153  242 bytes  sha256 ccb12491a26d4257  -- `concat_function`'s head -- **THE DECLARATION THE ROW EXISTS TO EXTRAC",
+        "  ph52-concat-copy-uninit: OK+2 Zend/zend.c:188-216  901 bytes  sha256 76180c0f3708c6f2  -- `zend_make_printable_zval`'s head and its first four arms. \u26a0\u26a0 `:190-19",
+        "  ph52-concat-copy-uninit: OK+3 Zend/zend.c:248-265  521 bytes  sha256 5dc049cf738019e8  -- The tail -- `:249-250`'s `emalloc` + `sprintf(\"Object id #%ld\")` and, ",
+        "  ph52-concat-copy-uninit: OK+4 Zend/zend_variables.c:36-80  852 bytes  sha256 bb9d89f1495de6c4  -- `_zval_dtor` -- **THE TAG-DISPATCHED TEARDOWN, AND THE REASON THE HARM",
+        "  ph52-concat-copy-uninit: OK+5 Zend/zend_operators.c:1179-1194  493 bytes  sha256 94f5871e6adf7cf1  -- `concat_function`'s `result != op1` arm and **its own teardown at `:11",
+        "  ph52-concat-copy-uninit: OK+6 Zend/zend_variables.c:29-33  256 bytes  sha256 9950ff838542d2ad  -- `ZEND_API char *empty_string` and upstream's own comment that `STR_FRE",
+        "  ph52-concat-copy-uninit: OK+7 Zend/zend.h:467-470  160 bytes  sha256 06000ffe91b9aba9  -- `STR_FREE` / `STR_FREE_REL` -- `if (ptr && ptr!=empty_string) { efree(",
+        "  ph52-concat-copy-uninit: OK+8 Zend/zend.h:275-293  389 bytes  sha256 8c18cd66941a8bfe  -- `union _zvalue_value` and `struct _zval_struct`. \u26a0\u26a0 THE FIELD ORDER IS",
+        "  ph52-concat-copy-uninit: OK+9 Zend/zend.h:386-399  318 bytes  sha256 51efeeddb82da4d2  -- The IS_* codes and `IS_CONSTANT_INDEX 0x80`. \u2b50 THIS SPAN IS THE ROW'S ",
+        "  ph52-concat-copy-uninit: per-span overlap: span0 40% (2/5), span1 20% (1/5), span2 25% (5/20), span3 22% (2/9), span4 12% (3/24), span5 25% (3/12), span6 0% (0/1), span7 0% (0/1), span8 40% (6/15), span9 n/a  -- the UNION is what is reported below, and it is what 10 cited spans oblige the row to",
+        "  ph52-concat-copy-uninit: kernel overlap 19% (15/78 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph52-concat-copy-uninit: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (19% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph52-concat-copy-uninit: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph52-concat-copy-uninit: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH52_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1554,
+          "prefix_words": 1554,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "build",
+      "gate_argv": [
+        "--tool",
+        "build",
+        "ph52-concat-copy-uninit",
+        "--all"
+      ],
+      "tool_argv": [
+        "ph52-concat-copy-uninit",
+        "--all"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph52-concat-copy-uninit",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph52-concat-copy-uninit: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph52-concat-copy-uninit: Zend/zend.c, Zend/zend_operators.c, Zend/zend.c, Zend/zend.c, Zend/zend_variables.c, Zend/zend_operators.c, Zend/zend_variables.c, Zend/zend.h, Zend/zend.h, Zend/zend.h are in the manifest (d00658ea68a1, aa957a381e9d, d00658ea68a1, d00658ea68a1, fe61a0cc1083, aa957a381e9d, fe61a0cc1083, 0b0fd801f619, 0b0fd801f619, 0b0fd801f619)",
+        "  ph52-concat-copy-uninit: OK  Zend/zend.c:242-247  151 bytes  sha256 e3dc2e7da55c2df2  tier=narrowed",
+        "  ph52-concat-copy-uninit: OK+1 Zend/zend_operators.c:1146-1153  242 bytes  sha256 ccb12491a26d4257  -- `concat_function`'s head -- **THE DECLARATION THE ROW EXISTS TO EXTRAC",
+        "  ph52-concat-copy-uninit: OK+2 Zend/zend.c:188-216  901 bytes  sha256 76180c0f3708c6f2  -- `zend_make_printable_zval`'s head and its first four arms. \u26a0\u26a0 `:190-19",
+        "  ph52-concat-copy-uninit: OK+3 Zend/zend.c:248-265  521 bytes  sha256 5dc049cf738019e8  -- The tail -- `:249-250`'s `emalloc` + `sprintf(\"Object id #%ld\")` and, ",
+        "  ph52-concat-copy-uninit: OK+4 Zend/zend_variables.c:36-80  852 bytes  sha256 bb9d89f1495de6c4  -- `_zval_dtor` -- **THE TAG-DISPATCHED TEARDOWN, AND THE REASON THE HARM",
+        "  ph52-concat-copy-uninit: OK+5 Zend/zend_operators.c:1179-1194  493 bytes  sha256 94f5871e6adf7cf1  -- `concat_function`'s `result != op1` arm and **its own teardown at `:11",
+        "  ph52-concat-copy-uninit: OK+6 Zend/zend_variables.c:29-33  256 bytes  sha256 9950ff838542d2ad  -- `ZEND_API char *empty_string` and upstream's own comment that `STR_FRE",
+        "  ph52-concat-copy-uninit: OK+7 Zend/zend.h:467-470  160 bytes  sha256 06000ffe91b9aba9  -- `STR_FREE` / `STR_FREE_REL` -- `if (ptr && ptr!=empty_string) { efree(",
+        "  ph52-concat-copy-uninit: OK+8 Zend/zend.h:275-293  389 bytes  sha256 8c18cd66941a8bfe  -- `union _zvalue_value` and `struct _zval_struct`. \u26a0\u26a0 THE FIELD ORDER IS",
+        "  ph52-concat-copy-uninit: OK+9 Zend/zend.h:386-399  318 bytes  sha256 51efeeddb82da4d2  -- The IS_* codes and `IS_CONSTANT_INDEX 0x80`. \u2b50 THIS SPAN IS THE ROW'S ",
+        "  ph52-concat-copy-uninit: per-span overlap: span0 40% (2/5), span1 20% (1/5), span2 25% (5/20), span3 22% (2/9), span4 12% (3/24), span5 25% (3/12), span6 0% (0/1), span7 0% (0/1), span8 40% (6/15), span9 n/a  -- the UNION is what is reported below, and it is what 10 cited spans oblige the row to",
+        "  ph52-concat-copy-uninit: kernel overlap 19% (15/78 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph52-concat-copy-uninit: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (19% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph52-concat-copy-uninit: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph52-concat-copy-uninit: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH52_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1554,
+          "prefix_words": 1554,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "ph52-concat-copy-uninit"
+      ],
+      "tool_argv": [
+        "ph52-concat-copy-uninit"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph52-concat-copy-uninit",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph52-concat-copy-uninit: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph52-concat-copy-uninit: Zend/zend.c, Zend/zend_operators.c, Zend/zend.c, Zend/zend.c, Zend/zend_variables.c, Zend/zend_operators.c, Zend/zend_variables.c, Zend/zend.h, Zend/zend.h, Zend/zend.h are in the manifest (d00658ea68a1, aa957a381e9d, d00658ea68a1, d00658ea68a1, fe61a0cc1083, aa957a381e9d, fe61a0cc1083, 0b0fd801f619, 0b0fd801f619, 0b0fd801f619)",
+        "  ph52-concat-copy-uninit: OK  Zend/zend.c:242-247  151 bytes  sha256 e3dc2e7da55c2df2  tier=narrowed",
+        "  ph52-concat-copy-uninit: OK+1 Zend/zend_operators.c:1146-1153  242 bytes  sha256 ccb12491a26d4257  -- `concat_function`'s head -- **THE DECLARATION THE ROW EXISTS TO EXTRAC",
+        "  ph52-concat-copy-uninit: OK+2 Zend/zend.c:188-216  901 bytes  sha256 76180c0f3708c6f2  -- `zend_make_printable_zval`'s head and its first four arms. \u26a0\u26a0 `:190-19",
+        "  ph52-concat-copy-uninit: OK+3 Zend/zend.c:248-265  521 bytes  sha256 5dc049cf738019e8  -- The tail -- `:249-250`'s `emalloc` + `sprintf(\"Object id #%ld\")` and, ",
+        "  ph52-concat-copy-uninit: OK+4 Zend/zend_variables.c:36-80  852 bytes  sha256 bb9d89f1495de6c4  -- `_zval_dtor` -- **THE TAG-DISPATCHED TEARDOWN, AND THE REASON THE HARM",
+        "  ph52-concat-copy-uninit: OK+5 Zend/zend_operators.c:1179-1194  493 bytes  sha256 94f5871e6adf7cf1  -- `concat_function`'s `result != op1` arm and **its own teardown at `:11",
+        "  ph52-concat-copy-uninit: OK+6 Zend/zend_variables.c:29-33  256 bytes  sha256 9950ff838542d2ad  -- `ZEND_API char *empty_string` and upstream's own comment that `STR_FRE",
+        "  ph52-concat-copy-uninit: OK+7 Zend/zend.h:467-470  160 bytes  sha256 06000ffe91b9aba9  -- `STR_FREE` / `STR_FREE_REL` -- `if (ptr && ptr!=empty_string) { efree(",
+        "  ph52-concat-copy-uninit: OK+8 Zend/zend.h:275-293  389 bytes  sha256 8c18cd66941a8bfe  -- `union _zvalue_value` and `struct _zval_struct`. \u26a0\u26a0 THE FIELD ORDER IS",
+        "  ph52-concat-copy-uninit: OK+9 Zend/zend.h:386-399  318 bytes  sha256 51efeeddb82da4d2  -- The IS_* codes and `IS_CONSTANT_INDEX 0x80`. \u2b50 THIS SPAN IS THE ROW'S ",
+        "  ph52-concat-copy-uninit: per-span overlap: span0 40% (2/5), span1 20% (1/5), span2 25% (5/20), span3 22% (2/9), span4 12% (3/24), span5 25% (3/12), span6 0% (0/1), span7 0% (0/1), span8 40% (6/15), span9 n/a  -- the UNION is what is reported below, and it is what 10 cited spans oblige the row to",
+        "  ph52-concat-copy-uninit: kernel overlap 19% (15/78 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph52-concat-copy-uninit: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (19% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph52-concat-copy-uninit: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph52-concat-copy-uninit: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH52_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1554,
+          "prefix_words": 1554,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "report",
+      "gate_argv": [
+        "--tool",
+        "report",
+        "ph52-concat-copy-uninit"
+      ],
+      "tool_argv": [
+        "ph52-concat-copy-uninit"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph52-concat-copy-uninit",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph52-concat-copy-uninit: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph52-concat-copy-uninit: Zend/zend.c, Zend/zend_operators.c, Zend/zend.c, Zend/zend.c, Zend/zend_variables.c, Zend/zend_operators.c, Zend/zend_variables.c, Zend/zend.h, Zend/zend.h, Zend/zend.h are in the manifest (d00658ea68a1, aa957a381e9d, d00658ea68a1, d00658ea68a1, fe61a0cc1083, aa957a381e9d, fe61a0cc1083, 0b0fd801f619, 0b0fd801f619, 0b0fd801f619)",
+        "  ph52-concat-copy-uninit: OK  Zend/zend.c:242-247  151 bytes  sha256 e3dc2e7da55c2df2  tier=narrowed",
+        "  ph52-concat-copy-uninit: OK+1 Zend/zend_operators.c:1146-1153  242 bytes  sha256 ccb12491a26d4257  -- `concat_function`'s head -- **THE DECLARATION THE ROW EXISTS TO EXTRAC",
+        "  ph52-concat-copy-uninit: OK+2 Zend/zend.c:188-216  901 bytes  sha256 76180c0f3708c6f2  -- `zend_make_printable_zval`'s head and its first four arms. \u26a0\u26a0 `:190-19",
+        "  ph52-concat-copy-uninit: OK+3 Zend/zend.c:248-265  521 bytes  sha256 5dc049cf738019e8  -- The tail -- `:249-250`'s `emalloc` + `sprintf(\"Object id #%ld\")` and, ",
+        "  ph52-concat-copy-uninit: OK+4 Zend/zend_variables.c:36-80  852 bytes  sha256 bb9d89f1495de6c4  -- `_zval_dtor` -- **THE TAG-DISPATCHED TEARDOWN, AND THE REASON THE HARM",
+        "  ph52-concat-copy-uninit: OK+5 Zend/zend_operators.c:1179-1194  493 bytes  sha256 94f5871e6adf7cf1  -- `concat_function`'s `result != op1` arm and **its own teardown at `:11",
+        "  ph52-concat-copy-uninit: OK+6 Zend/zend_variables.c:29-33  256 bytes  sha256 9950ff838542d2ad  -- `ZEND_API char *empty_string` and upstream's own comment that `STR_FRE",
+        "  ph52-concat-copy-uninit: OK+7 Zend/zend.h:467-470  160 bytes  sha256 06000ffe91b9aba9  -- `STR_FREE` / `STR_FREE_REL` -- `if (ptr && ptr!=empty_string) { efree(",
+        "  ph52-concat-copy-uninit: OK+8 Zend/zend.h:275-293  389 bytes  sha256 8c18cd66941a8bfe  -- `union _zvalue_value` and `struct _zval_struct`. \u26a0\u26a0 THE FIELD ORDER IS",
+        "  ph52-concat-copy-uninit: OK+9 Zend/zend.h:386-399  318 bytes  sha256 51efeeddb82da4d2  -- The IS_* codes and `IS_CONSTANT_INDEX 0x80`. \u2b50 THIS SPAN IS THE ROW'S ",
+        "  ph52-concat-copy-uninit: per-span overlap: span0 40% (2/5), span1 20% (1/5), span2 25% (5/20), span3 22% (2/9), span4 12% (3/24), span5 25% (3/12), span6 0% (0/1), span7 0% (0/1), span8 40% (6/15), span9 n/a  -- the UNION is what is reported below, and it is what 10 cited spans oblige the row to",
+        "  ph52-concat-copy-uninit: kernel overlap 19% (15/78 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph52-concat-copy-uninit: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (19% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph52-concat-copy-uninit: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph52-concat-copy-uninit: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH52_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1554,
+          "prefix_words": 1554,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph52-concat-copy-uninit"
+      ],
+      "tool_argv": [
+        "ph52-concat-copy-uninit"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 1
+    },
+    {
+      "row": "ph52-concat-copy-uninit",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph52-concat-copy-uninit: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph52-concat-copy-uninit: Zend/zend.c, Zend/zend_operators.c, Zend/zend.c, Zend/zend.c, Zend/zend_variables.c, Zend/zend_operators.c, Zend/zend_variables.c, Zend/zend.h, Zend/zend.h, Zend/zend.h are in the manifest (d00658ea68a1, aa957a381e9d, d00658ea68a1, d00658ea68a1, fe61a0cc1083, aa957a381e9d, fe61a0cc1083, 0b0fd801f619, 0b0fd801f619, 0b0fd801f619)",
+        "  ph52-concat-copy-uninit: OK  Zend/zend.c:242-247  151 bytes  sha256 e3dc2e7da55c2df2  tier=narrowed",
+        "  ph52-concat-copy-uninit: OK+1 Zend/zend_operators.c:1146-1153  242 bytes  sha256 ccb12491a26d4257  -- `concat_function`'s head -- **THE DECLARATION THE ROW EXISTS TO EXTRAC",
+        "  ph52-concat-copy-uninit: OK+2 Zend/zend.c:188-216  901 bytes  sha256 76180c0f3708c6f2  -- `zend_make_printable_zval`'s head and its first four arms. \u26a0\u26a0 `:190-19",
+        "  ph52-concat-copy-uninit: OK+3 Zend/zend.c:248-265  521 bytes  sha256 5dc049cf738019e8  -- The tail -- `:249-250`'s `emalloc` + `sprintf(\"Object id #%ld\")` and, ",
+        "  ph52-concat-copy-uninit: OK+4 Zend/zend_variables.c:36-80  852 bytes  sha256 bb9d89f1495de6c4  -- `_zval_dtor` -- **THE TAG-DISPATCHED TEARDOWN, AND THE REASON THE HARM",
+        "  ph52-concat-copy-uninit: OK+5 Zend/zend_operators.c:1179-1194  493 bytes  sha256 94f5871e6adf7cf1  -- `concat_function`'s `result != op1` arm and **its own teardown at `:11",
+        "  ph52-concat-copy-uninit: OK+6 Zend/zend_variables.c:29-33  256 bytes  sha256 9950ff838542d2ad  -- `ZEND_API char *empty_string` and upstream's own comment that `STR_FRE",
+        "  ph52-concat-copy-uninit: OK+7 Zend/zend.h:467-470  160 bytes  sha256 06000ffe91b9aba9  -- `STR_FREE` / `STR_FREE_REL` -- `if (ptr && ptr!=empty_string) { efree(",
+        "  ph52-concat-copy-uninit: OK+8 Zend/zend.h:275-293  389 bytes  sha256 8c18cd66941a8bfe  -- `union _zvalue_value` and `struct _zval_struct`. \u26a0\u26a0 THE FIELD ORDER IS",
+        "  ph52-concat-copy-uninit: OK+9 Zend/zend.h:386-399  318 bytes  sha256 51efeeddb82da4d2  -- The IS_* codes and `IS_CONSTANT_INDEX 0x80`. \u2b50 THIS SPAN IS THE ROW'S ",
+        "  ph52-concat-copy-uninit: per-span overlap: span0 40% (2/5), span1 20% (1/5), span2 25% (5/20), span3 22% (2/9), span4 12% (3/24), span5 25% (3/12), span6 0% (0/1), span7 0% (0/1), span8 40% (6/15), span9 n/a  -- the UNION is what is reported below, and it is what 10 cited spans oblige the row to",
+        "  ph52-concat-copy-uninit: kernel overlap 19% (15/78 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph52-concat-copy-uninit: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (19% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph52-concat-copy-uninit: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph52-concat-copy-uninit: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH52_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "report",
+      "gate_argv": [
+        "--tool",
+        "report",
+        "ph52-concat-copy-uninit"
+      ],
+      "tool_argv": [
+        "ph52-concat-copy-uninit"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph52-concat-copy-uninit",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph52-concat-copy-uninit: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph52-concat-copy-uninit: Zend/zend.c, Zend/zend_operators.c, Zend/zend.c, Zend/zend.c, Zend/zend_variables.c, Zend/zend_operators.c, Zend/zend_variables.c, Zend/zend.h, Zend/zend.h, Zend/zend.h are in the manifest (d00658ea68a1, aa957a381e9d, d00658ea68a1, d00658ea68a1, fe61a0cc1083, aa957a381e9d, fe61a0cc1083, 0b0fd801f619, 0b0fd801f619, 0b0fd801f619)",
+        "  ph52-concat-copy-uninit: OK  Zend/zend.c:242-247  151 bytes  sha256 e3dc2e7da55c2df2  tier=narrowed",
+        "  ph52-concat-copy-uninit: OK+1 Zend/zend_operators.c:1146-1153  242 bytes  sha256 ccb12491a26d4257  -- `concat_function`'s head -- **THE DECLARATION THE ROW EXISTS TO EXTRAC",
+        "  ph52-concat-copy-uninit: OK+2 Zend/zend.c:188-216  901 bytes  sha256 76180c0f3708c6f2  -- `zend_make_printable_zval`'s head and its first four arms. \u26a0\u26a0 `:190-19",
+        "  ph52-concat-copy-uninit: OK+3 Zend/zend.c:248-265  521 bytes  sha256 5dc049cf738019e8  -- The tail -- `:249-250`'s `emalloc` + `sprintf(\"Object id #%ld\")` and, ",
+        "  ph52-concat-copy-uninit: OK+4 Zend/zend_variables.c:36-80  852 bytes  sha256 bb9d89f1495de6c4  -- `_zval_dtor` -- **THE TAG-DISPATCHED TEARDOWN, AND THE REASON THE HARM",
+        "  ph52-concat-copy-uninit: OK+5 Zend/zend_operators.c:1179-1194  493 bytes  sha256 94f5871e6adf7cf1  -- `concat_function`'s `result != op1` arm and **its own teardown at `:11",
+        "  ph52-concat-copy-uninit: OK+6 Zend/zend_variables.c:29-33  256 bytes  sha256 9950ff838542d2ad  -- `ZEND_API char *empty_string` and upstream's own comment that `STR_FRE",
+        "  ph52-concat-copy-uninit: OK+7 Zend/zend.h:467-470  160 bytes  sha256 06000ffe91b9aba9  -- `STR_FREE` / `STR_FREE_REL` -- `if (ptr && ptr!=empty_string) { efree(",
+        "  ph52-concat-copy-uninit: OK+8 Zend/zend.h:275-293  389 bytes  sha256 8c18cd66941a8bfe  -- `union _zvalue_value` and `struct _zval_struct`. \u26a0\u26a0 THE FIELD ORDER IS",
+        "  ph52-concat-copy-uninit: OK+9 Zend/zend.h:386-399  318 bytes  sha256 51efeeddb82da4d2  -- The IS_* codes and `IS_CONSTANT_INDEX 0x80`. \u2b50 THIS SPAN IS THE ROW'S ",
+        "  ph52-concat-copy-uninit: per-span overlap: span0 40% (2/5), span1 20% (1/5), span2 25% (5/20), span3 22% (2/9), span4 12% (3/24), span5 25% (3/12), span6 0% (0/1), span7 0% (0/1), span8 40% (6/15), span9 n/a  -- the UNION is what is reported below, and it is what 10 cited spans oblige the row to",
+        "  ph52-concat-copy-uninit: kernel overlap 19% (15/78 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph52-concat-copy-uninit: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (19% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph52-concat-copy-uninit: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph52-concat-copy-uninit: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH52_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph52-concat-copy-uninit"
+      ],
+      "tool_argv": [
+        "ph52-concat-copy-uninit"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 1
+    },
+    {
+      "row": "ph52-concat-copy-uninit",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph52-concat-copy-uninit: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph52-concat-copy-uninit: Zend/zend.c, Zend/zend_operators.c, Zend/zend.c, Zend/zend.c, Zend/zend_variables.c, Zend/zend_operators.c, Zend/zend_variables.c, Zend/zend.h, Zend/zend.h, Zend/zend.h are in the manifest (d00658ea68a1, aa957a381e9d, d00658ea68a1, d00658ea68a1, fe61a0cc1083, aa957a381e9d, fe61a0cc1083, 0b0fd801f619, 0b0fd801f619, 0b0fd801f619)",
+        "  ph52-concat-copy-uninit: OK  Zend/zend.c:242-247  151 bytes  sha256 e3dc2e7da55c2df2  tier=narrowed",
+        "  ph52-concat-copy-uninit: OK+1 Zend/zend_operators.c:1146-1153  242 bytes  sha256 ccb12491a26d4257  -- `concat_function`'s head -- **THE DECLARATION THE ROW EXISTS TO EXTRAC",
+        "  ph52-concat-copy-uninit: OK+2 Zend/zend.c:188-216  901 bytes  sha256 76180c0f3708c6f2  -- `zend_make_printable_zval`'s head and its first four arms. \u26a0\u26a0 `:190-19",
+        "  ph52-concat-copy-uninit: OK+3 Zend/zend.c:248-265  521 bytes  sha256 5dc049cf738019e8  -- The tail -- `:249-250`'s `emalloc` + `sprintf(\"Object id #%ld\")` and, ",
+        "  ph52-concat-copy-uninit: OK+4 Zend/zend_variables.c:36-80  852 bytes  sha256 bb9d89f1495de6c4  -- `_zval_dtor` -- **THE TAG-DISPATCHED TEARDOWN, AND THE REASON THE HARM",
+        "  ph52-concat-copy-uninit: OK+5 Zend/zend_operators.c:1179-1194  493 bytes  sha256 94f5871e6adf7cf1  -- `concat_function`'s `result != op1` arm and **its own teardown at `:11",
+        "  ph52-concat-copy-uninit: OK+6 Zend/zend_variables.c:29-33  256 bytes  sha256 9950ff838542d2ad  -- `ZEND_API char *empty_string` and upstream's own comment that `STR_FRE",
+        "  ph52-concat-copy-uninit: OK+7 Zend/zend.h:467-470  160 bytes  sha256 06000ffe91b9aba9  -- `STR_FREE` / `STR_FREE_REL` -- `if (ptr && ptr!=empty_string) { efree(",
+        "  ph52-concat-copy-uninit: OK+8 Zend/zend.h:275-293  389 bytes  sha256 8c18cd66941a8bfe  -- `union _zvalue_value` and `struct _zval_struct`. \u26a0\u26a0 THE FIELD ORDER IS",
+        "  ph52-concat-copy-uninit: OK+9 Zend/zend.h:386-399  318 bytes  sha256 51efeeddb82da4d2  -- The IS_* codes and `IS_CONSTANT_INDEX 0x80`. \u2b50 THIS SPAN IS THE ROW'S ",
+        "  ph52-concat-copy-uninit: per-span overlap: span0 40% (2/5), span1 20% (1/5), span2 25% (5/20), span3 22% (2/9), span4 12% (3/24), span5 25% (3/12), span6 0% (0/1), span7 0% (0/1), span8 40% (6/15), span9 n/a  -- the UNION is what is reported below, and it is what 10 cited spans oblige the row to",
+        "  ph52-concat-copy-uninit: kernel overlap 19% (15/78 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph52-concat-copy-uninit: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (19% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph52-concat-copy-uninit: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph52-concat-copy-uninit: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH52_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph52-concat-copy-uninit"
+      ],
+      "tool_argv": [
+        "ph52-concat-copy-uninit"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph52-concat-copy-uninit",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph52-concat-copy-uninit: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph52-concat-copy-uninit: Zend/zend.c, Zend/zend_operators.c, Zend/zend.c, Zend/zend.c, Zend/zend_variables.c, Zend/zend_operators.c, Zend/zend_variables.c, Zend/zend.h, Zend/zend.h, Zend/zend.h are in the manifest (d00658ea68a1, aa957a381e9d, d00658ea68a1, d00658ea68a1, fe61a0cc1083, aa957a381e9d, fe61a0cc1083, 0b0fd801f619, 0b0fd801f619, 0b0fd801f619)",
+        "  ph52-concat-copy-uninit: OK  Zend/zend.c:242-247  151 bytes  sha256 e3dc2e7da55c2df2  tier=narrowed",
+        "  ph52-concat-copy-uninit: OK+1 Zend/zend_operators.c:1146-1153  242 bytes  sha256 ccb12491a26d4257  -- `concat_function`'s head -- **THE DECLARATION THE ROW EXISTS TO EXTRAC",
+        "  ph52-concat-copy-uninit: OK+2 Zend/zend.c:188-216  901 bytes  sha256 76180c0f3708c6f2  -- `zend_make_printable_zval`'s head and its first four arms. \u26a0\u26a0 `:190-19",
+        "  ph52-concat-copy-uninit: OK+3 Zend/zend.c:248-265  521 bytes  sha256 5dc049cf738019e8  -- The tail -- `:249-250`'s `emalloc` + `sprintf(\"Object id #%ld\")` and, ",
+        "  ph52-concat-copy-uninit: OK+4 Zend/zend_variables.c:36-80  852 bytes  sha256 bb9d89f1495de6c4  -- `_zval_dtor` -- **THE TAG-DISPATCHED TEARDOWN, AND THE REASON THE HARM",
+        "  ph52-concat-copy-uninit: OK+5 Zend/zend_operators.c:1179-1194  493 bytes  sha256 94f5871e6adf7cf1  -- `concat_function`'s `result != op1` arm and **its own teardown at `:11",
+        "  ph52-concat-copy-uninit: OK+6 Zend/zend_variables.c:29-33  256 bytes  sha256 9950ff838542d2ad  -- `ZEND_API char *empty_string` and upstream's own comment that `STR_FRE",
+        "  ph52-concat-copy-uninit: OK+7 Zend/zend.h:467-470  160 bytes  sha256 06000ffe91b9aba9  -- `STR_FREE` / `STR_FREE_REL` -- `if (ptr && ptr!=empty_string) { efree(",
+        "  ph52-concat-copy-uninit: OK+8 Zend/zend.h:275-293  389 bytes  sha256 8c18cd66941a8bfe  -- `union _zvalue_value` and `struct _zval_struct`. \u26a0\u26a0 THE FIELD ORDER IS",
+        "  ph52-concat-copy-uninit: OK+9 Zend/zend.h:386-399  318 bytes  sha256 51efeeddb82da4d2  -- The IS_* codes and `IS_CONSTANT_INDEX 0x80`. \u2b50 THIS SPAN IS THE ROW'S ",
+        "  ph52-concat-copy-uninit: per-span overlap: span0 40% (2/5), span1 20% (1/5), span2 25% (5/20), span3 22% (2/9), span4 12% (3/24), span5 25% (3/12), span6 0% (0/1), span7 0% (0/1), span8 40% (6/15), span9 n/a  -- the UNION is what is reported below, and it is what 10 cited spans oblige the row to",
+        "  ph52-concat-copy-uninit: kernel overlap 19% (15/78 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph52-concat-copy-uninit: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (19% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph52-concat-copy-uninit: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph52-concat-copy-uninit: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH52_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "ph52-concat-copy-uninit"
+      ],
+      "tool_argv": [
+        "ph52-concat-copy-uninit"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    }
+  ]
+}

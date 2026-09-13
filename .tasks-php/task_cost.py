@@ -58,7 +58,8 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-ROWS = ["ph03", "ph07", "ph16", "ph29", "ph64", "ph45", "ph53"]  # BUILD order
+ROWS = ["ph03", "ph07", "ph16", "ph29", "ph64", "ph45", "ph53",
+        "ph52"]  # BUILD order
 
 # ---------------------------------------------------------------------------
 # THE CLASSIFICATION. `ONCE` = paid once for the programme. A dict = the row
@@ -111,6 +112,15 @@ CLASS = {
     #    findings from ph53's and ph45's rounds and retracted F100's R4 half --
     #    none of that cost lands on ph53 here.
     "043": "METH",             # THE review round, F88-F101 (DONE)
+    # ⚠ _044 IS CHARGED TO `ph53` AND NOT TO METH, and the call is arguable:
+    #    it is a REPAIR of ph53's shipped contract (the pin item 83 ruled, plus
+    #    four batched debts), so it is that row's cost in the same way _042's
+    #    endpoint search was. ⭐ But it ALSO refuted three of _043's claims and
+    #    opened items 97/98/100, which is methodology. Charged to the row
+    #    because the row is what it re-gated; the PESSIMISM ladder below is
+    #    where that judgement gets its sensitivity.
+    "044": {"ph53": 1.0},      # the five-debt ph53 re-gate (DONE)
+    "045": {"ph52": 1.0},      # BUILD row 8 = ph52 -- row LANDED, so charged
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them
@@ -169,6 +179,29 @@ def spread(extra_rows):
     return per, once, meth, pend
 
 
+def incomplete_rows():
+    """Rows whose ENDPOINT SEARCH has not been run, read off the FILESYSTEM.
+
+    ⛔⛔ WHY THIS EXISTS. Every row's cost figure except one includes a spelling
+    search -- `ph45` = build (_036) + search (_037), `ph53` = build (_041) +
+    search (_042) -- and the search is where `r{3,4}_endpoint_degenerate` and
+    the in-contract spread come from. `ph52` landed at **1.00**, the cheapest
+    figure in the series, WITH NO SEARCH: `TASK_PHP_045` §23 names the missing
+    `controls/spellings.py` as the row's clearest omission.
+
+    ▶ So 1.00 is NOT COMPARABLE with the rest of the series and the marginal
+    rate computed over it is OPTIMISTIC. A per-row series is a trend claim, and
+    a trend claim over entries that measure different amounts of work is the
+    defect `N5` exists to catch -- one level down, where N5 could not see it.
+
+    ⭐ Detected MECHANICALLY rather than by a maintained list, for the reason
+    `.memory-php/04-process.md` law 6 gives: the moment a search lands, the file
+    appears and this stops firing with no edit here.
+    """
+    return [r for r in ROWS
+            if not glob.glob("patterns-php/%s-*/controls/spellings.py" % r)]
+
+
 def report():
     ids = task_ids()
     print("=" * 96)
@@ -187,7 +220,19 @@ def report():
     print(f"  ⛔ PUBLISHED: total / rows        = {tot}/{len(ROWS)} "
           f"= {tot / len(ROWS):.2f}   <- the 6.2-class figure")
     print(f"  ⭐ MARGINAL: row-attributable/rows = {rowsum:.0f}/{len(ROWS)} "
-          f"= {rowsum / len(ROWS):.2f}   <- what row 7 costs")
+          f"= {rowsum / len(ROWS):.2f}   <- what the next row costs")
+    inc = incomplete_rows()
+    if inc:
+        csum = sum(v for k, v in per.items() if k not in inc)
+        cn = len(ROWS) - len(inc)
+        print()
+        print(f"  ⚠⚠ BUT {len(inc)} ROW(S) HAVE NO `controls/spellings.py`, i.e. NO")
+        print(f"     ENDPOINT SEARCH, so their cost is INCOMPLETE and the series")
+        print(f"     mixes two different amounts of work: {inc}")
+        print(f"  ⭐ MARGINAL over SEARCHED rows only  = {csum:.0f}/{cn} "
+              f"= {csum / cn:.2f}   <- the comparable figure")
+        print(f"     ▶ Quote the SEARCHED figure for projection; the other is "
+              f"optimistic by {csum / cn - rowsum / len(ROWS):+.2f} tasks/row.")
     print(f"     PLAN_PHP.md §8's PAT-measured figure: ~3")
     print()
     print("  --- per row, IN BUILD ORDER (the series a trend claim needs) ---")
@@ -221,8 +266,27 @@ def report():
           f"at {marg:.2f}")
     print(f"      =  ~{first * OPENER_RATE + follow * marg:.0f} more tasks   "
           f"<-- the premium-weighted middle")
-    print(f"  ▶ PUBLISH THE RANGE: ~{owed * marg:.0f} .. "
-          f"~{owed * worst:.0f}, middle ~{first * OPENER_RATE + follow * marg:.0f}")
+    # ⛔⛔ TWO CORRECTIONS THE ROW COUNT ALONE CANNOT SEE.
+    #  (1) The marginal must be the SEARCHED-ONLY one, or the projection inherits
+    #      the optimism of rows that skipped their endpoint search.
+    #  (2) ⭐ THE 40-ROW FLOOR COUNTS *ROWS*, NOT WORK OWED BY ROWS ALREADY
+    #      BUILT. Each unsearched row still owes its endpoint search, and those
+    #      tasks are in NO floor estimate published so far.
+    cmarg = (sum(v for k, v in per.items() if k not in inc)
+             / (len(ROWS) - len(inc))) if inc else marg
+    owed_searches = len(inc)
+    lo = owed * cmarg + owed_searches
+    hi = owed * worst + owed_searches
+    mid = first * OPENER_RATE + follow * cmarg + owed_searches
+    print()
+    print(f"  ⚠⚠ CORRECTED, on the SEARCHED-ONLY marginal {cmarg:.2f} and with the")
+    print(f"     {owed_searches} endpoint search(es) STILL OWED BY BUILT ROWS "
+          f"{inc} added --")
+    print(f"     those are real tasks and appear in NO floor estimate so far:")
+    print(f"  ▶ PUBLISH THE RANGE: ~{lo:.0f} .. ~{hi:.0f}, middle ~{mid:.0f}")
+    print(f"     (uncorrected, for comparison: ~{owed * marg:.0f} .. "
+          f"~{owed * worst:.0f}, middle "
+          f"~{first * OPENER_RATE + follow * marg:.0f})")
     return per
 
 
@@ -368,6 +432,28 @@ def selftest():
           f"the premium-weighted rate {mid:.2f} sits inside "
           f"[marginal {mg:.2f}, worst {wr:.2f}] -- outside it, the published "
           f"range is three estimates and not a range")
+
+    # ⛔ N12 MUST-FIRE WHILE ANY ROW IS UNSEARCHED, and it is derived from the
+    #    filesystem so it stops on its own when the search lands. Without it the
+    #    series silently mixes build-only rows with build+search rows and the
+    #    marginal rate drifts DOWN while nothing improves.
+    inc = incomplete_rows()
+    print(f"  ⓘ  N12: rows with no `controls/spellings.py` (no endpoint "
+          f"search) = {inc or 'none'}")
+    check("N12", all(glob.glob("patterns-php/%s-*" % r) for r in inc),
+          f"every row flagged INCOMPLETE exists on disk, so the flag is a "
+          f"MISSING SEARCH and not a typo in ROWS: {inc or 'none flagged'}")
+
+    # ⚠ N13 MUST-NOT-FIRE: the searched-only marginal must not EXCEED the worst
+    #   reading, or the two estimates have swapped roles and the range is wrong.
+    if inc:
+        csum = sum(v for k, v in per.items() if k not in inc)
+        cmarg = csum / (len(ROWS) - len(inc))
+        check("N13", rowsum / len(ROWS) <= cmarg <= max(worsts),
+              f"the searched-only marginal {cmarg:.2f} sits between the all-rows "
+              f"marginal {rowsum / len(ROWS):.2f} and the worst reading "
+              f"{max(worsts):.2f} -- an unsearched row can only make the "
+              f"all-rows figure LOOK cheaper, never dearer")
 
     check("N8", pend <= 0.25 * rowsum,
           f"PENDING={pend:.0f} is at most a quarter of ROW={rowsum:.0f} — past "

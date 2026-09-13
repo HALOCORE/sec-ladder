@@ -45,21 +45,21 @@ between them read `CLAUDE.md`'s top table.
 ## ▶ START HERE — the next action, in ≤ 20 lines
 
 ```
-STATE   ⭐ ROWS BUILT 7 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
-        ph45 (T1) + ph53 (T3) TYPE. 6 of 20 families. .memory-php/ AUTHORITATIVE.
-NEXT    NOTHING RUNNING. _043+_044 LANDED; `.memory-php/` LANDED (16 findings,
-        oldest debt GONE); ph53 RE-GATED `6924e66fde49`. ▶ (1) ROW 8 = `ph52`:
-        `.tasks-php/TASK_PHP_045.md` IS WRITTEN AND READY TO DISPATCH. ▶ (2) ROW
-        9 = `ph55` (T5), screened (94); run preimage_screen first. ▶ (3) item 97
-        (§H gitignored, 4 rows) batches w/ 89+63 per row. 33 owed, 94-127 tasks.
-⚠ NEW   _043 cost ONE HEADLINE + 4 QUALIFIERS (F100's R4 half, F94 "twice",
-        F98's 4, F101 backwards, F91's AXIS). 78 ANSWERED: `inside_share`.
-        ⛔⛔ _044 THEN REFUTED _043 THREE TIMES: its draft would have added 3
-        FALSE PINS (a backtick IS a pin -- item 100); its §H claim was false
-        (97); its a1_spread prediction was wrong (the filter isn't applied).
-⚠ WRONG MY route to 83 was an OVER-READ. MY `:1945` became a PHANTOM row debt
-        (85). MY shim premise was FALSE BOTH HALVES (96) -- `ecalloc` zeroes,
-        not `emalloc`; `0x5a` is in "NOT MODELLED". READ THE BODY, NOT THE PROSE.
+STATE   ⭐ ROWS BUILT 8 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
+        ph45 (T1) + ph53+ph52 (T3, CLOSED). 6 of 20 fam. .memory-php/ AUTHORITATIVE.
+NEXT    NOTHING RUNNING. _045 LANDED: ROW 8 `ph52` BUILT+GATED `d73ab3298ecd`.
+        ▶ (1) THREE ENDPOINT SEARCHES OWED -- ph52 (also buys its in-contract
+        spread), ph03, ph64 (102). ph52's first. ▶ (2) REVIEW ROUND: F96+F97
+        still open + F102-F104 NEW = 5. ▶ (3) ROW 9 `ph55` (T5), screened (94).
+        ⚠ 32 owed, ~106-119 tasks (was ~88-116; 102 corrects it).
+⚠ NEW   F103 ROW 8 BUILT and it REFUTED 5 OF MY STATEMENTS + my O(slots) LAW
+        (3x slots -> 8.19x cost; the PER-SLOT term moves). ⭐ ITEM 76 UPHELD IN
+        A, REFUTED IN W1 -- and the upstream fix is PROFITABLE, not free; A's 0
+        is F86 BLINDNESS w/ a named mechanism. F104 ⛔ THE GATE PRESSURES A ROW
+        TO **ENLARGE** ITS TCB -- n_twins==0 fails the SMALLEST base (105).
+⚠ WRONG 5 of my ph52 statements REFUTED (only "the offset is exact" survived).
+        MY cost tool mixed searched+unsearched rows: marginal is 3.23 not 2.75.
+        READ THE BODY, NOT THE PROSE BESIDE IT (96). A BACKTICK IS A PIN (100).
 ⚠ TRAPS `grep -a` ALWAYS. APPENDING A CORRECTION LEAVES THE OLD NUMBER (73,x4).
         NAME THE FILE EVERY FIELD CAME FROM (84). ⛔ NOT 62 until F91's
         SENSITIVITY half. ⚠ .web/ CONCURRENT: NEVER `git add -A`.
@@ -1600,6 +1600,121 @@ which pins `kernel.c:247` and `hardened:175`, one line each.
 The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
+
+### F104 — ⛔⛔⛔ THE GATE'S `n_twins == 0` RULE **HARD-FAILS THE ROW WHOSE TRUSTED BASE IS SMALLEST**, SO IT PRESSURES A ROW TO **ENLARGE** ITS TCB
+
+`TASK_PHP_045` §8.1. ⚠ **UNREVIEWED** (rule 9). **`ph52`'s first gate run FAILED
+at stage 5c-twin**, and the message was right about the row: with
+`slot_read_unchecked` as its **only** contract-bearing trusted item, and that item
+**genuinely untwinnable**, *"stage 5c-twin checked the strength of NOTHING."*
+
+⛔ **WHY IT IS UNTWINNABLE, AND IT IS NOT INCONVENIENCE.** A twin must be a
+**verified exec** function meeting the same contract, whose `ensures` here is
+`r == m.mem_contents().value()` — so its body must get a `Pr` **out of** a
+`MaybeUninit<Pr>`. **The pinned vstd offers exactly three routes — `assume_init`,
+`assume_init_ref`, `assume_init_mut` — and ALL THREE ARE `unsafe fn`.** ⭐ **There
+is no safe exec expression from `MaybeUninit<T>` to `T`; that is what the type
+MEANS.** So any twin's body carries an `unsafe` token outside a trusted body, which
+`check.py::_scan_unsafe_sites` refuses **with no justification hatch.**
+
+> ### ⛔⛔ AND THE PERVERSE INCENTIVE, WHICH IS THE PART THAT MATTERS
+>
+> **`ph53` PASSES THIS STAGE PRECISELY BECAUSE ITS TRUSTED BASE IS LARGER** — four
+> items, three of them twinnable `get_unchecked` accessors on a `Vec`. **`ph52` is
+> the first row in either programme to reach the failure, because it is the first
+> whose trusted surface is SMALL enough.**
+> ▶ ⭐⭐ **So the rule puts pressure on a row to ENLARGE its trusted base** —
+> which is `.memory/02-bench-rules.md`'s *a rung is never cost-selected*, one axis
+> over, and the trusted surface is one of this project's **published** axes.
+> ⚠⚠ **AND IT REPRODUCES AT `n = 1` THE DEFECT `TASK_007` DELETED
+> `MAX_TWIN_JUSTIFICATIONS` FOR, WITH `check.py`'s OWN COMMENT SAYING SO:** *"It
+> was the only knob in the twin regime that could hard-fail an **honest** pattern
+> with no route out. A pattern with two genuinely untwinnable trusted items had no
+> legal configuration."* ▶ **A pattern with ONE has no legal configuration
+> either.**
+
+✅ **F97's SECOND INSTANCE, AND THAT MAKES IT A PROPERTY OF THE RULE PAIR RATHER
+THAN OF A ROW** — found on `ph53` with **four** trusted items, reproduced here with
+**one**. ⛔ **NOT worked around**: the fix is a `harness/` edit and a **33-pattern
+re-gate**, recorded in the row's `NOTES.md` §11f and here. → item **105**.
+⭐ **The pressure is LATENT rather than live on this row**, because the row found a
+legitimate way out that it owed anyway — `win_get_unchecked`, **a fidelity repair
+worth `−7.12 %`**: every window read in the C is an unchecked array access, and the
+Rust rungs had been paying for bounds checks the C never had.
+
+### F103 — ⭐⭐⭐ **ROW 8 IS BUILT** — `ph52`, T3's second row, and it **REFUTED FIVE OF MY STATEMENTS, ITEM 76's COLUMN, AND THE LAW I HOPED FOR**
+
+`TASK_PHP_045`, 1519 lines. ⚠ **UNREVIEWED** (rule 9). ✅ **Manager-verified from
+`results-php/gate/ph52-concat-copy-uninit.json` and SAYING WHICH**: `verdict
+PASS-WITH-BLOCKED-ROWS`, `failures []`, `complete_run true`, `contract_sha256
+d73ab3298ecd`, `identity` **`O0 differ` / `O3 norel`**, **1 blocked row** (F104),
+**0 advisories**. **Brackets: `66/0` unmoved and `16/0 → 18/0`, the `+2` being
+exactly this row's two records with the other eight rows FRESH — re-run by me.**
+⭐ **`quota.py`: 8 built, T3 CLOSED, 32 owed.**
+
+> ### ⭐⭐⭐ ITEM 76 IS **UPHELD IN FAMILY A AND REFUTED IN W1 — AND THE UPSTREAM FIX IS NOT FREE, IT IS *PROFITABLE***
+>
+> | statistic | R1 | R1h | Δ |
+> |---|---:|---:|---:|
+> | **A1** | 32,509,505 | 32,509,505 | **0, exactly `0.00 %`** |
+> | **W1** ⭐ | 146,152,976 | 145,653,146 | **`−0.342 %`** (clang `−0.740 %`) |
+>
+> **`small.bin`, `O3/isolated`, R1h against R1** — same language, same allocator, so
+> §B1a's caveat does not apply. ⓘ B1 and W1 agree to rounding.
+> ⛔⛔ **AND FAMILY A's ZERO IS *BLINDNESS*, NOT ABSENCE, WITH THE MECHANISM NAMED
+> BY A PER-FUNCTION SPLIT**: `ph52_zval_dtor` **−382,226**,
+> `ph52_make_printable_zval` **−117,608**, `kernel` **0** — summing to the
+> −499,834 total. ⭐ **F86's `BLIND` class, on a row where the blind quantity is the
+> row's own headline, and the FIRST use of `.memory-php/03-numbers.md`'s new rule:
+> `inside_share` was measured FIRST and it chose W1.**
+> ▶ ⭐⭐ **WHAT THIS PUBLISHES, with the sign I did not predict:** *the upstream
+> fix for a whole CLASS of defect — the unreached-error-path teardown — does not
+> merely cost nothing, it PAYS FOR ITSELF*, because R1 calls the teardown once per
+> faulting-arm op and R1h does not. ⚠ **Small — a third to three quarters of one
+> per cent — and small for a stated reason.** ⛔ A `0.00 %` column would have been
+> a finding, not a disqualification (`CLAUDE.md` rule 6); **a negative one is a
+> better finding and the row did not have to choose.**
+
+✅✅ **PREDICTION 1 (F97/F98 RECUR) — UPHELD, AND MORE STRONGLY THAN ON `ph53`** →
+**F104**. ⚠⚠ **PREDICTION 2 — UPHELD IN DIRECTION, *"~FREE"* REFUTED, AND THE LAW
+I HOPED FOR IS REFUTED OUTRIGHT.** The witness costs **`+12.41 Ir/call`
+(`+0.632 %`)**, B1 and W1 agreeing to `+0.622 %` — real and reproducible, an order
+of magnitude under `ph53`'s, **but not free**:
+
+| | `ph53` | `ph52` | ratio |
+|---|---:|---:|---:|
+| witness, **Ir per kernel call** | **+101.59** | **+12.41** | **8.19×** |
+| slots | 6 typical | 2 | 3× |
+| **Ir per slot per call** | 16.93 | 6.21 | **2.73×** |
+
+⛔⛔ **MY *"the cost of a safety witness is O(the number of slots)"* IS REFUTED**:
+3× the slots gives **8.19×** the cost, because the **per-slot** term is itself
+**2.73×** higher. ⭐ **The replacement is a DECOMPOSITION, not a law** —
+`(slots) × (per-slot cost)`, and the per-slot term is what moves: `ph53`'s
+`wrote[i]` is an **indexed array read re-read on every consumer iteration**
+(`n_ops × n_decl`), `ph52`'s is a **register-resident `bool`** tested twice per op.
+⚠⚠ **AND THE DATA CANNOT SEPARATE THE TWO CANDIDATE MECHANISMS AT `n = 2`** —
+normalising by *reads* gives 1.59 vs 0.39 Ir/read, so *read count* and *indexed vs
+register* point the same way and neither is isolated. ▶ **The row publishes the
+decomposition and both candidates.** ⭐ **A third `T3` row separates them, and
+three remain** (`ph49`, `ph50`, `ph51`).
+
+⛔⛔ **AND DELIVERABLE #0 SETTLED BY BREAKING FIVE OF MY STATEMENTS** — the defect
+is deterministic on **14 of 16 cells** and the fault is a **real double free**, but:
+**(1)** *"a clean stack slot reads zero"* is an **ASan** property, **not a property
+of the shipped build**; **(2)** the load-bearing boundary is **NOT** the harness's
+`isolated`/`whole` — it is the **callee inline boundary**, which `build.py` does not
+control, **so my registered TU-boundary prediction was about the wrong boundary**;
+**(3)** fallback (a) as I wrote it **does not fire** — the call history needs **two
+different arms**, not a repeated one; **(4)** **ASan deletes the defect by
+RELOCATING THE FRAME**, not by poisoning; **(5)** F102's *"five named cases out of a
+byte"* is **wrong in three ways** (§3.1). ✅ **Only hypothesis 3 — the offset is
+exact — survived.**
+
+⭐ **AND THE BACKTICK LAW (item 100) FIRED ON THIS ROW'S OWN DRAFT**, because the
+engineer did not run the audit first — *§8.3* — **plus a second, worse one the same
+audit found in `required`, where the gate cannot see it** (§8.4). ▶ **Two rounds,
+three authors, same defect: the law needs to be a STEP, not a sentence.**
 
 ### F102 — ⭐⭐⭐ ROW 8's GROUNDWORK: `ph52` IS ADMITTED ON THE C — AND **THE DEFECT IS SILENT ON A CLEAN STACK**, WHICH IS WHY LOGIC-007 HAS NO CRASH ANCHOR
 
@@ -5768,3 +5883,7 @@ the wrong one.
 | 99 | ⚠⚠ **W1 MOVES BY ±14–28 Ir ACROSS REGENERATIONS WHILE **EVERY** A1 FIGURE IS BIT-IDENTICAL — UNEXPLAINED, AND IT IS EVIDENCE *FOR* THE `inside_share` RULE** | `TASK_PHP_044` §8.2. Across **four** regenerations of `ph53`'s sidecar the engineer measured **every A1 figure bit-identical** while the whole-program column moved by a **constant ±14–28 Ir**; I confirmed the residue myself — `wp_spread_pp` now reads `{R3: 67.930588, R4: 39.543994}` against `_042`'s `{67.930558, 39.543977}`, while `a1_spread_pp` is **unchanged to the digit**. ⓘ **14–28 Ir is exactly the per-call stack-alignment bistability `check.py::check_marginal_ir` names, and exactly the band `width.py`'s X3 found between sessions** — so the likely cause is the argv/env block, i.e. **the path length of whatever invoked the gate.** ⚠ **NOT ISOLATED** — the engineer de-quoted `wp_spread_pp` to 2 dp to break the fixpoint and said so rather than chasing it. ⭐⭐ **AND IT IS A THIRD, INDEPENDENT LEG UNDER `.memory-php/03-numbers.md`'s RULE: A IS SYMBOL-SCOPED AND THEREFORE REPRODUCIBLE, THE WHOLE-PROGRAM COLUMN IS NOT.** ▶ **So *"quote both, labelled"* now has a REPRODUCIBILITY reason beside its resolution reason** — and a row that publishes only W1 (`ph45`) publishes the unstable one. ⚠ **UNEXPLAINED; do not quote a W1 figure to more than 2 dp** |
 | 100 | ⛔⛔⛔ **A BACKTICK IN AN `idiom.required` ENTRY *IS* A PIN — AND `_043`'s DRAFTED REPAIR WOULD HAVE ADDED **THREE FALSE PINS** TO THE ENTRY IT WAS FIXING** | `TASK_PHP_044` §2. `_043` §1.8's draft backticked `` `u32` ``, `` `controls/spellings.json` `` and `` `required_absent` ``. Under `harness/check.py::spelling_matches` each becomes a declared spelling matched against every Rust rung: ⛔ **`u32` matches EVERY rung** (a pin that cannot discriminate, i.e. the **ANTI-signal** class `idiom_audit` measures at **17 of 41**), and the other two **match NO rung** (`pins nothing`, on all 20 variants and all 6 shipped rungs). ⭐⭐ **THE REVIEWER THAT ESTABLISHED *"a backticked span pins the representation"* THEN WROTE THREE SPANS IT DID NOT MEAN TO PIN, IN THE SENTENCE ESTABLISHING IT** — and `_043` §1.1 had already recorded the convention that forbids it (`p42`'s *"quoting a file name or a retracted span would pin it too"*). ⭐ **The engineer caught one of its OWN the same way**: a meta-sentence reading *"ONLY `wrote[i]` AND `[bool; MAXD]` ARE BACKTICKED HERE"* **re-backticked both spans and duplicated them** — caught **by running `spellings.py --audit-only` and reading the output, not by reasoning.** ▶▶ **THE LAW: ANY DRAFT OF `idiom.required` / `forbidden` PROSE GOES THROUGH `idiom_audit` BEFORE IT LANDS — including a reviewer's, including a manager's.** ✅ Landed in `.memory-php/02-ladder.md`. ⓘ `_043` §1.8's uncertainty 13 flagged exactly this gap, which is why flagging it was right |
 | 101 | ⚠ **TWO THINGS `TASK_PHP_044` CHANGED OR DID NOT RUN, BOTH DECLARED** | `TASK_PHP_044` §8.2–8.3. **(a)** its generator change **alters `spellings.py --audit-only`'s exit code** — a deliberate consequence of moving two §H arms inside the validator so `problems` feeds stage 9b, **but any script that shells out to `--audit-only` and reads `$?` is affected.** ▶ **Grep for callers before the next row clones this control.** **(b)** **`controls/negatives.py` was NOT re-run — `UNTESTED`, and the engineer said so rather than implying coverage.** ⓘ It is a different control from `spellings.py` and the gate records `controls_json {"spellings.json": "FRESH"}` only. ▶ **Cheap: run it and record the result.** ⭐ **Both are the shape the programme wants — a declared gap costs one line; an implied one costs a reviewer** |
+| 102 | ⛔⛔ **`ph52` SHIPS WITH NO `controls/spellings.py` — AND THAT MADE ITS COST FIGURE THE CHEAPEST IN THE SERIES AND NOT COMPARABLE TO IT** | `TASK_PHP_045` §23 names it the row's clearest omission: **the headline ships with no in-contract spread beside it**, and `controls_json` is `{}`. ⭐⭐ **AND CHECKING IT EXPOSED A DEFECT IN MY OWN COST TOOL, WITH A BIGGER ANSWER THAN THE ROW.** Every other row's figure includes an endpoint search (`ph45` = `_036`+`_037`; `ph53` = `_041`+`_042`); `ph52` landed at **1.00**, the cheapest entry ever, **with no search** — so the per-row series mixed two different amounts of work, which is `N5`'s own defect one level down where `N5` could not see it. ⛔ **`task_cost.py` now derives the flag FROM THE FILESYSTEM and the answer is THREE rows, not one: `ph03`, `ph64`, `ph52`.** ▶ **The comparable marginal is `3.23`, not `2.75` — the all-rows figure is optimistic by `+0.48` tasks/row** — and ⭐⭐ **the 40-row floor counts ROWS and not WORK OWED BY ROWS ALREADY BUILT, so three endpoint searches appear in NO floor estimate published so far.** ✅ **Range corrected to `~106 … ~119`, middle `~117`** (uncorrected it read `~88 … ~116`), with negatives **N12** (must-fire while any row is unsearched, and it stops on its own when the file appears) and **N13**. ▶ **Owed: three endpoint searches. `ph52`'s is the one that also buys its in-contract spread** |
+| 103 | ⛔⛔ **`results-php/preflight/_norow.preflight.json` IS A DE-DUPLICATING LEDGER, NOT A PER-INVOCATION LOG — AND CLOSING THE BRACKET IS ITSELF A WRITE** | `TASK_PHP_045` §22.1. The engineer ran the no-row bracket **four** times; `runs` went **21 → 23 and stopped**, the two new entries differing in a single field (`tool_returncode`, `1` then `0`). ▶ **So a reviewer counting `runs` to count gate invocations UNDERCOUNTS**, and the ledger de-duplicates on content rather than appending. ⚠⚠ **AND THE STRUCTURAL HALF: taking the required bracket reading WRITES to a tracked file, so there is no way to satisfy the bracket obligation without dirtying the tree** — which is why `git status` shows that file modified after every task that obeys its own instructions. ▶ **Owed: either (a) say in `PROTOCOL_PHP.md` that this file is expected to move and is not part of any digest, or (b) give the check a read-only mode.** ⓘ **(a) is free**; confirm first that the file is in no digest |
+| 104 | ⚠ **FOUR `build.py` LINE CITATIONS LEFT ROTTING IN `ph52`, DELIBERATELY — ITEM 98's CLASS ON A SECOND ROW** | `TASK_PHP_045` §23. Four citations of `harness/build.py` line numbers have drifted, and **repairing a POINTER costs a 32-cell re-measure** because the citing files are in the measurement digest. ✅ **Left rotting deliberately and declared, which is the right call** — and it is **item 98's exact class on a second row within one day**, so the policy item 98 asks for is now load-bearing twice. ▶ **Free to fix the moment item 102's endpoint search forces a re-measure on this row** — batch them. ⭐ **AND THE GENERAL REPAIR IS THE SAME AS 98's: a file in the measurement digest carries NO pointer that can age** — cite a symbol name, not a line number |
+| 105 | ⛔⛔⛔ **F104 IS A `harness/` FIX AT 33-PATTERN RE-GATE PRICE, AND IT IS THE FIRST PHP FINDING THAT CANNOT BE ACTED ON AT ALL WITHOUT TOUCHING FROZEN INFRASTRUCTURE** | F104. `check.py::check_trusted_twins`'s `n_twins == 0` rule hard-fails a row whose trusted base is **smallest**, and the repair is inside `harness/check.py` — **hashed into all 33 PAT gate records** (`CLAUDE.md`'s top banner). ⛔ **So the cost is a 33-pattern re-gate for a rule that currently pressures a php row to ENLARGE its TCB.** ⭐⭐ **THIS IS THE DECISION THE SPLIT-PROGRAMME DESIGN WAS ALWAYS GOING TO FORCE, and it has now arrived**: the php programme imports `harness/` and never edits it, which works until a php row finds a DEFECT there. ▶ **Three options, and the manager should pick one rather than let it recur: (a) accept the re-gate once, with the PAT side re-verified; (b) add the condition in `harness-php/` where php can override the stage; (c) leave it, and every future small-TCB row pays a `twin_justifications` hatch plus a blocked row.** ⚠ **(c) is what `ph52` did and it is honest, but it means the gate's strongest statement about a trusted item is unavailable exactly where the TCB is smallest.** ⓘ **Latent, not live** — `ph52` found a legitimate way out worth `−7.12 %`. ⚠⚠ **DO NOT EDIT `harness/` TO TEST THIS** — price it first |
