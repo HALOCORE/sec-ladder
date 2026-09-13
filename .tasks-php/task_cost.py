@@ -121,6 +121,7 @@ CLASS = {
     #    where that judgement gets its sensitivity.
     "044": {"ph53": 1.0},      # the five-debt ph53 re-gate (DONE)
     "045": {"ph52": 1.0},      # BUILD row 8 = ph52 -- row LANDED, so charged
+    "046": {"ph52": 1.0},      # search ph52's endpoints + its missing control
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them

@@ -1,0 +1,1158 @@
+{
+  "pin": {
+    "regenerate": "python3 patterns-php/ph52-concat-copy-uninit/controls/spellings.py --verus",
+    "note": "The pin covers the two rung sources the variants are derived from, verus.rs (the R4 admissibility half), spec.md (the declaration the audit runs against AND the `identity` pin the admissibility rule reads AND the twin_justifications gate_refusals reads), NOTES.md (whose sections 8c/8d carry the two whole-program totals stage 3 reproduces), inputs/gen.py (the corpus every number is measured over), the two controls/ files that are variants, and this script. It does NOT cover results-php/ph52-concat-copy-uninit.json: stage 3 compares against that record at run time and prints the delta, which is a stronger check than a hash of it."
+  },
+  "measured_utc": "2026-09-13T10:13:00Z",
+  "derived_from_sha256": {
+    "patterns/ph52-concat-copy-uninit/safe_tuned.rs": "7cc77515a9807f64de5736a8387d49fbbf86100bc7855bd6e86047c379a07890",
+    "patterns/ph52-concat-copy-uninit/unsafe.rs": "de07aa8c34545151e2533d10bfa6d674741478489ec57f0e5b9dbfd73ca3c601",
+    "patterns/ph52-concat-copy-uninit/verus.rs": "1d76a616602e380223283536c1bc71be6da6276dfc297f4ae7049d86ee5f45b6",
+    "patterns/ph52-concat-copy-uninit/spec.md": "428efb5272c0455387f86348a2ecb626edd5cd71701691a939c5daeba3ad5535",
+    "patterns/ph52-concat-copy-uninit/NOTES.md": "8a0510c21d893cf3ac9e59502a4a0140cb46bdcaddc54a38fda54609bdfd1374",
+    "patterns/ph52-concat-copy-uninit/inputs/gen.py": "cd7eb3b4416999395759869140f4400cdbb7c4c76c4b0c3cc541160176e80018",
+    "patterns/ph52-concat-copy-uninit/controls/r4_nowitness.rs": "ff26f3b206cd6f3ab8dea72a80493f8dbf3ae0c8bd14642f510784a54c47415c",
+    "patterns/ph52-concat-copy-uninit/controls/mu_unwrapped.rs": "c6fd49eca1855d258bd53aa63b08cfab6c12dbe44ff03faae64c77fe9cf802cd",
+    "patterns/ph52-concat-copy-uninit/controls/spellings.py": "afe4ddbfced485a5ed71392f417f3f5c7802e59043f0d96d3cbfc8217704ab6e"
+  },
+  "scratch_slug": {
+    "R3_v0_shipped": "v00",
+    "R3_r3_oprec_slice": "v01",
+    "R3_r3_oprec_array": "v02",
+    "R3_r3_chunks_exact": "v03",
+    "R3_r3_head_slice": "v04",
+    "R3_r3_both": "v05",
+    "R3_r3_loop_for": "v06",
+    "R4_v0_shipped": "v07",
+    "R4_r4_slot_byval": "v08",
+    "R4_r4_oprec_checked": "v09",
+    "R4_r4_win_checked": "v10",
+    "R4_r4_win_oprec": "v11",
+    "R4_r4_no_wrapper": "v12",
+    "CTL_ctl_r3_unchecked": "v13",
+    "CTL_ctl_nowitness": "v14"
+  },
+  "probes": [
+    {
+      "input": "small.bin",
+      "stride": 74,
+      "n_iters": 25000
+    },
+    {
+      "input": "large.bin",
+      "stride": 181,
+      "n_iters": 10000
+    }
+  ],
+  "tie_pct": 0.05,
+  "verus_checked": true,
+  "identity_pinned": {
+    "O0": "differ",
+    "O3": "norel"
+  },
+  "identity_measured": {
+    "O0": "differ",
+    "O3": "norel"
+  },
+  "identity_required_twin_level": "norel",
+  "identity_checked": "O3 is pinned AND measured `norel`, so an R4 candidate's twin must reach `norel` by harness/asm.py::identity_level -- which for `norel` is byte identity once pc-relative displacement FIELDS are zeroed, and is NOT byte identity",
+  "statistic": "TWO FAMILIES, BOTH PUBLISHED, from one callgrind run per cell. A1 = kernel_exclusive_ir / n_iters -- harness/measure.py::_sum_rows itself, IMPORTED and not transcribed -- which stage 3 compares against results-php/ph52-concat-copy-uninit.json in FOUR cells. W1 = whole-program Ir / n_iters off callgrind_annotate's PROGRAM TOTALS, which stage 3 compares against NOTES.md sections 8c and 8d in TWO cells. \u2b50 A1 IS THE HEADLINE FOR THIS SEARCH AND W1 IS THE HEADLINE FOR THE ROW, AND BOTH ARE RIGHT: .memory-php/03-numbers.md records that inside_share is PER-CELL, NOTES.md section 8a measures 22.24 per cent on the C rungs -- PH52_NOINLINE puts three callees in their own symbols, 62.35 per cent of the program -- and the Rust rungs inline everything, so inside_share_pct below is about 98.6 per cent on every cell this search touches. Stage 2b recomputes it rather than inheriting it, and raises a problem if it ever falls below 50 per cent. Every percentage here is small.bin, O3/isolated, against the named base -- F98's four qualifiers.",
+  "headline_statistic": "ir_per_call_small",
+  "row_headline_statistic": "ir_per_call_small_wp",
+  "inside_share_pct_by_cell": {
+    "R3_v0_shipped": 98.6685,
+    "R3_r3_oprec_slice": 98.6573,
+    "R3_r3_oprec_array": 98.6573,
+    "R3_r3_chunks_exact": 98.5633,
+    "R3_r3_head_slice": 98.6685,
+    "R3_r3_both": 98.6573,
+    "R3_r3_loop_for": 98.6685,
+    "R4_v0_shipped": 98.5804,
+    "R4_r4_slot_byval": 98.5804,
+    "R4_r4_oprec_checked": 98.6813,
+    "R4_r4_win_checked": 98.6813,
+    "R4_r4_win_oprec": 98.6353,
+    "R4_r4_no_wrapper": 98.5804,
+    "CTL_ctl_r3_unchecked": 98.5749,
+    "CTL_ctl_nowitness": 98.5716
+  },
+  "reproduces_shipped_record": true,
+  "reproduces_shipped_record_scope": "TWO Ir FAMILIES AT 0.5 PER CENT TOLERANCE, AND NOT THE STATIC COUNTS. A1 is compared against results-php/ph52-concat-copy-uninit.json in four cells (safe_tuned and unsafe, small.bin and large.bin) and W1 against NOTES.md section 8c (R3, 52829203) and section 8d (R4, 49549469). `kernel_insns` below is a raw disassembled instruction count over the `kernel` symbol INCLUDING the int3 pad and is NOT comparable to the gate record's n_fn_nopad (444 against 425). The tolerance is not equality because .memory-php/03-numbers.md item 99 measured the whole-program column moving by a constant 14-28 Ir between runs -- the argv/env block -- which NOTES.md section 8d sees as the +40 Ir between R4 and R5.",
+  "r3_endpoint_degenerate": false,
+  "r4_endpoint_degenerate": true,
+  "r4_endpoint_degenerate_ignoring_gate_rules": true,
+  "r4_endpoint_note": "BOTH FIELDS ARE TRUE ON THIS ROW AND THAT IS THE RESULT. No R4 variant priced here is cheaper than the shipped rung by more than tie_pct with OR without the gate-rule filter, so the R4 endpoint is degenerate on COST, as ph07's and ph16's are. What the gate-rule filter changes is the TRUSTED-SURFACE column, not the cost one: all three variants with a smaller external_body count are refused by harness/check.py, two by stage 5c-twin's n_twins == 0 rule (F104) and one by _scan_unsafe_sites (F97). \u26d4 NOTHING HERE ENLARGES THE TRUSTED BASE TO SATISFY A STAGE: that is cost-selection on the TCB axis and the TCB is a published axis of this project.",
+  "cheapest_r3_in_contract": "r3_chunks_exact",
+  "dearest_r3_in_contract": "v0_shipped",
+  "cheapest_r4_in_contract": "v0_shipped",
+  "smaller_surface_found": [
+    {
+      "name": "r4_no_wrapper",
+      "external_body_items": 3,
+      "pct_vs_own_side_a1": 0.0,
+      "gate_refusals": [
+        "5-tcb-unsafe"
+      ],
+      "twin_identity_level": "norel"
+    },
+    {
+      "name": "r4_win_oprec",
+      "external_body_items": 3,
+      "pct_vs_own_side_a1": 4.084792,
+      "gate_refusals": [
+        "5c-twin"
+      ],
+      "twin_identity_level": "norel"
+    },
+    {
+      "name": "r4_win_checked",
+      "external_body_items": 3,
+      "pct_vs_own_side_a1": 7.769824,
+      "gate_refusals": [
+        "5c-twin"
+      ],
+      "twin_identity_level": "norel"
+    }
+  ],
+  "a1_spread_pp": {
+    "R3": 7.923098,
+    "R4": 7.769824
+  },
+  "a1_spread_pp_admissible": {
+    "R3": 7.923098,
+    "R4": 7.769824
+  },
+  "wp_spread_pp": {
+    "R3": 7.810729,
+    "R4": 7.65963
+  },
+  "wp_spread_pp_admissible": {
+    "R3": 7.810729,
+    "R4": 7.65963
+  },
+  "in_contract_filter_note": "STATED RATHER THAN ASSUMED (TASK_PHP_044 section 3.4, open item 102). a1_spread_pp and wp_spread_pp apply NO in_contract, NO english_verdict and NO gate_refusals filter, which is what ph45's and ph53's copies do and therefore the only figures comparable with theirs. a1_spread_pp_admissible and wp_spread_pp_admissible are the filtered twins and are published beside them so the question needs no assumption in either direction.",
+  "kernel_digests_distinct": {
+    "R3": 4,
+    "R4": 3,
+    "CTL": 2
+  },
+  "byte_identical_pairs": {
+    "r3_oprec_array == r3_oprec_slice": true,
+    "r3_head_slice == v0_shipped": true,
+    "r3_both == r3_oprec_slice": true,
+    "r4_slot_byval == v0_shipped": true,
+    "r4_no_wrapper == v0_shipped": true,
+    "r4_win_checked == r4_oprec_checked": true
+  },
+  "oprec_array_byte_identical_to_slice": true,
+  "ctl_r3_unchecked_is_not_an_upper_bound": "\u26d4 A FRAMING THIS FILE'S FIRST DRAFT GOT WRONG AND THE MEASUREMENT CORRECTED. ctl_r3_unchecked was written as the CEILING of the R3 search -- what the R3 side would cost if the four per-op bounds checks did not exist -- and it is NOT an upper bound, because r3_chunks_exact is CHEAPER than it (1930.232 against 1946.174 Ir/call A1 on small.bin at O3/isolated, i.e. -0.82 per cent). \u25b6 The reason is that chunks_exact deletes a SECOND term the unsafe spelling keeps: the per-op offset arithmetic. ctl_r3_unchecked still computes `p = OPS_OFF + OP_BYTES * o` and indexes from it where the iterator walks a cursor. \u2b50 So the honest statement is the stronger one: A SAFE RESPELLING OF THIS ROW's R3 BEATS THE SAME RUNG WITH EVERY WINDOW BOUNDS CHECK REMOVED BY `get_unchecked`. It remains the right control -- it isolates the bounds-check term at the shipped spelling, which is what makes the 128-of-131 Ir attribution checkable -- but it bounds nothing.",
+  "panic_call_sites": {
+    "CTL_ctl_nowitness": 1,
+    "CTL_ctl_r3_unchecked": 1,
+    "R3_r3_both": 2,
+    "R3_r3_chunks_exact": 1,
+    "R3_r3_head_slice": 5,
+    "R3_r3_loop_for": 5,
+    "R3_r3_oprec_array": 2,
+    "R3_r3_oprec_slice": 2,
+    "R3_v0_shipped": 5,
+    "R4_r4_no_wrapper": 1,
+    "R4_r4_oprec_checked": 5,
+    "R4_r4_slot_byval": 1,
+    "R4_r4_win_checked": 5,
+    "R4_r4_win_oprec": 2,
+    "R4_v0_shipped": 1
+  },
+  "r3_gap_mechanism": {
+    "shipped_r3_minus_shipped_r4_ir_per_call_a1": 131.18748,
+    "extra_panic_sites_in_shipped_r3": 4,
+    "static_prediction_ir_per_call": 128.0,
+    "note": "The shipped R3 reads win[p], win[p+1], win[p+2] and win[p+3] per op; LLVM hoists the four bounds checks into four `cmp %rdi,<stack slot>` / `je <panic>` pairs in the hot loop, which is 8 instructions per op. inputs/small.bin has stride 74, so cap = (74 - 8) / 4 = 16 ops per call and the static prediction is 8 * 16 = 128.00 Ir/call. \u2b50 THE ANSWER TO *spelling or mechanism* IS SPELLING: every respelling that collapses those checks recovers it in SAFE Rust, with no unsafe token and no trusted item. r3_head_slice is the null that localises it -- the same lever applied to the two HEAD words changes nothing, because LLVM already proves len >= 8 from cap = (len - 8) / 4 and emits no check for them."
+  },
+  "witness_cost_pct_w1": {
+    "shipped_two_bool": 0.621306,
+    "note": "Per cent whole-program Ir/call above controls/r4_nowitness.rs on inputs/small.bin at O3/isolated, both cells from THIS pipeline. NOTES.md section 8g publishes +0.622 per cent W1 and +0.632 per cent B1. \u26a0 MEASURED CORPUS ONLY: r4_nowitness is not equivalent on an uncovered blob, which is what the witness is for, so this is a cost comparison and not a ladder rung. \u26d4 AND IT IS THE CEILING ON THE ONE R4 LEVER NOT BUILT HERE: ph53's u32-bitmask witness bought -11.40 per cent A1 because its witness is an ARRAY, one byte per slot, re-read per consumer iteration; ph52's is two bools for the whole kernel, so a perfectly free witness representation could buy at most the figure above. UNTESTED bound, not a measured variant."
+  },
+  "gate_rules_computed": "harness/check.py's TWO structural refusals, computed with its own _is_trusted, vparse.parse, vparse.blank_noncode and _UNSAFE_RE: 5-tcb-unsafe (_scan_unsafe_sites -- every `unsafe` token in a pinned Verus source must sit inside a trusted body, no hatch) and 5c-twin (check_trusted_twins -- if every trusted item is excused by verus.twin_justifications and n_twins == 0 the stage checked the strength of NOTHING, no hatch). They are the two a spec.md re-declaration could NOT remove, which is why they are the two computed; this is NOT the whole gate and does not reproduce the verus.items pins, the contract-sha stages, stage 3c or Miri. gate_rule_selftest drives the function over 8 synthetic sources on every invocation (4 must-FIRE including an unparseable source, 4 must-NOT-fire including ../verus.rs itself).",
+  "toolchain": "rustc 1.97.1 / LLVM 22.1.6; Verus 0.2026.08.09.92f466f. The largest lever found is an LLVM decision -- how many bounds checks survive a sub-slice -- so every figure here is about this toolchain.",
+  "variants": [
+    {
+      "side": "R3",
+      "name": "v0_shipped",
+      "why": "the shipped R3, unmodified",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[0] `*constructed = true;`",
+        "required[0] `ensures`",
+        "required[0] `s.1.c ==> final(expr_copy).mem_contents().is_init()`",
+        "required[1] `slot_read_unchecked`",
+        "required[1] `MaybeUninit::assume_init_ref`",
+        "required[1] `controls/mu_unwrapped.rs`",
+        "required[1] `unsafe`",
+        "required[2] `bool`",
+        "required[3] `req == 0`",
+        "required[3] `empty_string`",
+        "required[3] `efree`"
+      ],
+      "in_contract": true,
+      "english_verdict": null,
+      "built": true,
+      "kernel_insns": 412,
+      "kernel_panic_calls": 5,
+      "kernel_digest": "4664d8975683",
+      "trusted_call_sites": 0,
+      "accessors_defined": 0,
+      "accessor_names": [],
+      "unsafe_tokens": 0,
+      "answers": {
+        "adversarial-dblfree.bin": "272040826666539789",
+        "adversarial-nowin.bin": "0",
+        "adversarial-safe.bin": "254123829775225275",
+        "adversarial-trunc.bin": "",
+        "large.bin": "2957760381129677675",
+        "small.bin": "15768976536999838170"
+      },
+      "diverges_on": [],
+      "declared_divergences": [],
+      "ir_per_call_small": 2085.03776,
+      "ir_per_call_small_wp": 2113.17568,
+      "ir_per_call_large": 5600.4719,
+      "ir_per_call_large_wp": 5649.8125,
+      "pct_vs_r4ship_a1": 6.714305663174971,
+      "pct_vs_r4ship_wp": 6.619095798713253,
+      "pct_vs_own_side_a1": 0.0,
+      "inside_share_pct": 98.6685
+    },
+    {
+      "side": "R3",
+      "name": "r3_oprec_slice",
+      "why": "the op record as ONE 4-byte &[u8] sub-slice: the four per-op window bounds checks collapse to one",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[0] `*constructed = true;`",
+        "required[0] `ensures`",
+        "required[0] `s.1.c ==> final(expr_copy).mem_contents().is_init()`",
+        "required[1] `slot_read_unchecked`",
+        "required[1] `MaybeUninit::assume_init_ref`",
+        "required[1] `controls/mu_unwrapped.rs`",
+        "required[1] `unsafe`",
+        "required[2] `bool`",
+        "required[3] `req == 0`",
+        "required[3] `empty_string`",
+        "required[3] `efree`"
+      ],
+      "in_contract": true,
+      "english_verdict": null,
+      "built": true,
+      "kernel_insns": 372,
+      "kernel_panic_calls": 2,
+      "kernel_digest": "152c14b56781",
+      "trusted_call_sites": 0,
+      "accessors_defined": 0,
+      "accessor_names": [],
+      "unsafe_tokens": 0,
+      "answers": {
+        "adversarial-dblfree.bin": "272040826666539789",
+        "adversarial-nowin.bin": "0",
+        "adversarial-safe.bin": "254123829775225275",
+        "adversarial-trunc.bin": "",
+        "large.bin": "2957760381129677675",
+        "small.bin": "15768976536999838170"
+      },
+      "diverges_on": [],
+      "declared_divergences": [],
+      "ir_per_call_small": 2067.29932,
+      "ir_per_call_small_wp": 2095.43568,
+      "ir_per_call_large": 5565.9622,
+      "ir_per_call_large_wp": 5615.2989,
+      "pct_vs_r4ship_a1": 5.806434667041119,
+      "pct_vs_r4ship_wp": 5.72403403107586,
+      "pct_vs_own_side_a1": -0.8507491010618475,
+      "inside_share_pct": 98.6573
+    },
+    {
+      "side": "R3",
+      "name": "r3_oprec_array",
+      "why": "the same lever with &[u8; OP_BYTES] + try_into, ph45's own spelling -- expected BYTE-IDENTICAL to r3_oprec_slice",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[0] `*constructed = true;`",
+        "required[0] `ensures`",
+        "required[0] `s.1.c ==> final(expr_copy).mem_contents().is_init()`",
+        "required[1] `slot_read_unchecked`",
+        "required[1] `MaybeUninit::assume_init_ref`",
+        "required[1] `controls/mu_unwrapped.rs`",
+        "required[1] `unsafe`",
+        "required[2] `bool`",
+        "required[3] `req == 0`",
+        "required[3] `empty_string`",
+        "required[3] `efree`"
+      ],
+      "in_contract": true,
+      "english_verdict": null,
+      "built": true,
+      "kernel_insns": 372,
+      "kernel_panic_calls": 2,
+      "kernel_digest": "152c14b56781",
+      "trusted_call_sites": 0,
+      "accessors_defined": 0,
+      "accessor_names": [],
+      "unsafe_tokens": 0,
+      "answers": {
+        "adversarial-dblfree.bin": "272040826666539789",
+        "adversarial-nowin.bin": "0",
+        "adversarial-safe.bin": "254123829775225275",
+        "adversarial-trunc.bin": "",
+        "large.bin": "2957760381129677675",
+        "small.bin": "15768976536999838170"
+      },
+      "diverges_on": [],
+      "declared_divergences": [],
+      "ir_per_call_small": 2067.29932,
+      "ir_per_call_small_wp": 2095.43568,
+      "ir_per_call_large": 5565.9622,
+      "ir_per_call_large_wp": 5615.2989,
+      "pct_vs_r4ship_a1": 5.806434667041119,
+      "pct_vs_r4ship_wp": 5.72403403107586,
+      "pct_vs_own_side_a1": -0.8507491010618475,
+      "inside_share_pct": 98.6573
+    },
+    {
+      "side": "R3",
+      "name": "r3_chunks_exact",
+      "why": "chunks_exact(OP_BYTES).take(n_ops) -- deletes the per-op offset arithmetic as well as all four checks, leaving ONE panic site, the same count as the unsafe rung",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[0] `*constructed = true;`",
+        "required[0] `ensures`",
+        "required[0] `s.1.c ==> final(expr_copy).mem_contents().is_init()`",
+        "required[1] `slot_read_unchecked`",
+        "required[1] `MaybeUninit::assume_init_ref`",
+        "required[1] `controls/mu_unwrapped.rs`",
+        "required[1] `unsafe`",
+        "required[2] `bool`",
+        "required[3] `req == 0`",
+        "required[3] `empty_string`",
+        "required[3] `efree`"
+      ],
+      "in_contract": true,
+      "english_verdict": null,
+      "built": true,
+      "kernel_insns": 388,
+      "kernel_panic_calls": 1,
+      "kernel_digest": "e553ff858db5",
+      "trusted_call_sites": 0,
+      "accessors_defined": 0,
+      "accessor_names": [],
+      "unsafe_tokens": 0,
+      "answers": {
+        "adversarial-dblfree.bin": "272040826666539789",
+        "adversarial-nowin.bin": "0",
+        "adversarial-safe.bin": "254123829775225275",
+        "adversarial-trunc.bin": "",
+        "large.bin": "2957760381129677675",
+        "small.bin": "15768976536999838170"
+      },
+      "diverges_on": [],
+      "declared_divergences": [],
+      "ir_per_call_small": 1930.23228,
+      "ir_per_call_small_wp": 1958.36812,
+      "ir_per_call_large": 5192.674,
+      "ir_per_call_large_wp": 5242.0094,
+      "pct_vs_r4ship_a1": -1.2087927228487623,
+      "pct_vs_r4ship_wp": -1.1916329666324776,
+      "pct_vs_own_side_a1": -7.424588799773113,
+      "inside_share_pct": 98.5633
+    },
+    {
+      "side": "R3",
+      "name": "r3_head_slice",
+      "why": "the same lever on the two HEAD words -- THE CALIBRATION NULL, and a null because LLVM already emits no check for them",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[0] `*constructed = true;`",
+        "required[0] `ensures`",
+        "required[0] `s.1.c ==> final(expr_copy).mem_contents().is_init()`",
+        "required[1] `slot_read_unchecked`",
+        "required[1] `MaybeUninit::assume_init_ref`",
+        "required[1] `controls/mu_unwrapped.rs`",
+        "required[1] `unsafe`",
+        "required[2] `bool`",
+        "required[3] `req == 0`",
+        "required[3] `empty_string`",
+        "required[3] `efree`"
+      ],
+      "in_contract": true,
+      "english_verdict": null,
+      "built": true,
+      "kernel_insns": 412,
+      "kernel_panic_calls": 5,
+      "kernel_digest": "4664d8975683",
+      "trusted_call_sites": 0,
+      "accessors_defined": 0,
+      "accessor_names": [],
+      "unsafe_tokens": 0,
+      "answers": {
+        "adversarial-dblfree.bin": "272040826666539789",
+        "adversarial-nowin.bin": "0",
+        "adversarial-safe.bin": "254123829775225275",
+        "adversarial-trunc.bin": "",
+        "large.bin": "2957760381129677675",
+        "small.bin": "15768976536999838170"
+      },
+      "diverges_on": [],
+      "declared_divergences": [],
+      "ir_per_call_small": 2085.03776,
+      "ir_per_call_small_wp": 2113.17568,
+      "ir_per_call_large": 5600.4719,
+      "ir_per_call_large_wp": 5649.8125,
+      "pct_vs_r4ship_a1": 6.714305663174971,
+      "pct_vs_r4ship_wp": 6.619095798713253,
+      "pct_vs_own_side_a1": 0.0,
+      "inside_share_pct": 98.6685
+    },
+    {
+      "side": "R3",
+      "name": "r3_both",
+      "why": "r3_oprec_slice + r3_head_slice, so the null's independence is checked rather than assumed",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[0] `*constructed = true;`",
+        "required[0] `ensures`",
+        "required[0] `s.1.c ==> final(expr_copy).mem_contents().is_init()`",
+        "required[1] `slot_read_unchecked`",
+        "required[1] `MaybeUninit::assume_init_ref`",
+        "required[1] `controls/mu_unwrapped.rs`",
+        "required[1] `unsafe`",
+        "required[2] `bool`",
+        "required[3] `req == 0`",
+        "required[3] `empty_string`",
+        "required[3] `efree`"
+      ],
+      "in_contract": true,
+      "english_verdict": null,
+      "built": true,
+      "kernel_insns": 372,
+      "kernel_panic_calls": 2,
+      "kernel_digest": "152c14b56781",
+      "trusted_call_sites": 0,
+      "accessors_defined": 0,
+      "accessor_names": [],
+      "unsafe_tokens": 0,
+      "answers": {
+        "adversarial-dblfree.bin": "272040826666539789",
+        "adversarial-nowin.bin": "0",
+        "adversarial-safe.bin": "254123829775225275",
+        "adversarial-trunc.bin": "",
+        "large.bin": "2957760381129677675",
+        "small.bin": "15768976536999838170"
+      },
+      "diverges_on": [],
+      "declared_divergences": [],
+      "ir_per_call_small": 2067.29932,
+      "ir_per_call_small_wp": 2095.43568,
+      "ir_per_call_large": 5565.9622,
+      "ir_per_call_large_wp": 5615.2989,
+      "pct_vs_r4ship_a1": 5.806434667041119,
+      "pct_vs_r4ship_wp": 5.72403403107586,
+      "pct_vs_own_side_a1": -0.8507491010618475,
+      "inside_share_pct": 98.6573
+    },
+    {
+      "side": "R3",
+      "name": "r3_loop_for",
+      "why": "A SECOND NULL from a different direction: `while o < n_ops` becomes `for _o in 0..n_ops`",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[0] `*constructed = true;`",
+        "required[0] `ensures`",
+        "required[0] `s.1.c ==> final(expr_copy).mem_contents().is_init()`",
+        "required[1] `slot_read_unchecked`",
+        "required[1] `MaybeUninit::assume_init_ref`",
+        "required[1] `controls/mu_unwrapped.rs`",
+        "required[1] `unsafe`",
+        "required[2] `bool`",
+        "required[3] `req == 0`",
+        "required[3] `empty_string`",
+        "required[3] `efree`"
+      ],
+      "in_contract": true,
+      "english_verdict": null,
+      "built": true,
+      "kernel_insns": 412,
+      "kernel_panic_calls": 5,
+      "kernel_digest": "f8b49fc0ec5a",
+      "trusted_call_sites": 0,
+      "accessors_defined": 0,
+      "accessor_names": [],
+      "unsafe_tokens": 0,
+      "answers": {
+        "adversarial-dblfree.bin": "272040826666539789",
+        "adversarial-nowin.bin": "0",
+        "adversarial-safe.bin": "254123829775225275",
+        "adversarial-trunc.bin": "",
+        "large.bin": "2957760381129677675",
+        "small.bin": "15768976536999838170"
+      },
+      "diverges_on": [],
+      "declared_divergences": [],
+      "ir_per_call_small": 2085.03776,
+      "ir_per_call_small_wp": 2113.17568,
+      "ir_per_call_large": 5600.4719,
+      "ir_per_call_large_wp": 5649.8125,
+      "pct_vs_r4ship_a1": 6.714305663174971,
+      "pct_vs_r4ship_wp": 6.619095798713253,
+      "pct_vs_own_side_a1": 0.0,
+      "inside_share_pct": 98.6685
+    },
+    {
+      "side": "R4",
+      "name": "v0_shipped",
+      "why": "the shipped R4, unmodified",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[0] `Option`",
+        "required[0] `ensures`",
+        "required[0] `s.1.c ==> final(expr_copy).mem_contents().is_init()`",
+        "required[1] `MaybeUninit::assume_init_ref`",
+        "required[1] `controls/mu_unwrapped.rs`",
+        "required[2] `Option`",
+        "required[2] `Some`",
+        "required[2] `None`",
+        "required[3] `req == 0`",
+        "required[3] `empty_string`",
+        "required[3] `efree`"
+      ],
+      "in_contract": true,
+      "english_verdict": null,
+      "built": true,
+      "kernel_insns": 444,
+      "kernel_panic_calls": 1,
+      "kernel_digest": "2f8fbf60a9eb",
+      "trusted_call_sites": 11,
+      "accessors_defined": 2,
+      "accessor_names": [
+        "slot_read_unchecked",
+        "win_get_unchecked"
+      ],
+      "unsafe_tokens": 2,
+      "external_body_items": 4,
+      "gate_refusals": [],
+      "gate_refusal_detail": [],
+      "gate_facts": {
+        "trusted": [
+          "slot_read_unchecked",
+          "win_get_unchecked"
+        ],
+        "twins": [
+          "slb_twin_win_get_unchecked"
+        ],
+        "n_twins": 1,
+        "excused_by_spec": [
+          "slot_read_unchecked"
+        ],
+        "stray_unsafe_lines": []
+      },
+      "answers": {
+        "adversarial-dblfree.bin": "272040826666539789",
+        "adversarial-nowin.bin": "0",
+        "adversarial-safe.bin": "254123829775225275",
+        "adversarial-trunc.bin": "",
+        "large.bin": "2957760381129677675",
+        "small.bin": "15768976536999838170"
+      },
+      "diverges_on": [],
+      "declared_divergences": [],
+      "ir_per_call_small": 1953.85028,
+      "ir_per_call_small_wp": 1981.98612,
+      "ir_per_call_large": 5264.678,
+      "ir_per_call_large_wp": 5314.0134,
+      "pct_vs_r4ship_a1": 0.0,
+      "pct_vs_r4ship_wp": 0.0,
+      "pct_vs_own_side_a1": 0.0,
+      "inside_share_pct": 98.5804,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 33 verified, 0 errors",
+      "verus_unsupported": false,
+      "verus_kernel_insns": 444,
+      "verus_kernel_panic_calls": 1,
+      "verus_kernel_digest": "25368fd7cb4b",
+      "twin_identity_level": "norel",
+      "twin_identity_evidence": {
+        "counts_a": [
+          433,
+          425,
+          1685
+        ],
+        "counts_b": [
+          433,
+          425,
+          1685
+        ],
+        "md5_raw_equal": false
+      },
+      "twin_identity_meets_pin": true
+    },
+    {
+      "side": "R4",
+      "name": "r4_slot_byval",
+      "why": "THE R4-SIDE CALIBRATION NULL: the one trusted read takes its MaybeUninit<Pr> BY VALUE -- assume_init() instead of *assume_init_ref() -- same surface, same twin count",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[0] `Option`",
+        "required[0] `ensures`",
+        "required[0] `s.1.c ==> final(expr_copy).mem_contents().is_init()`",
+        "required[1] `MaybeUninit::assume_init_ref`",
+        "required[1] `controls/mu_unwrapped.rs`",
+        "required[2] `Option`",
+        "required[2] `Some`",
+        "required[2] `None`",
+        "required[3] `req == 0`",
+        "required[3] `empty_string`",
+        "required[3] `efree`"
+      ],
+      "in_contract": true,
+      "english_verdict": null,
+      "built": true,
+      "kernel_insns": 444,
+      "kernel_panic_calls": 1,
+      "kernel_digest": "2f8fbf60a9eb",
+      "trusted_call_sites": 11,
+      "accessors_defined": 2,
+      "accessor_names": [
+        "slot_read_unchecked",
+        "win_get_unchecked"
+      ],
+      "unsafe_tokens": 2,
+      "external_body_items": 4,
+      "gate_refusals": [],
+      "gate_refusal_detail": [],
+      "gate_facts": {
+        "trusted": [
+          "slot_read_unchecked",
+          "win_get_unchecked"
+        ],
+        "twins": [
+          "slb_twin_win_get_unchecked"
+        ],
+        "n_twins": 1,
+        "excused_by_spec": [
+          "slot_read_unchecked"
+        ],
+        "stray_unsafe_lines": []
+      },
+      "answers": {
+        "adversarial-dblfree.bin": "272040826666539789",
+        "adversarial-nowin.bin": "0",
+        "adversarial-safe.bin": "254123829775225275",
+        "adversarial-trunc.bin": "",
+        "large.bin": "2957760381129677675",
+        "small.bin": "15768976536999838170"
+      },
+      "diverges_on": [],
+      "declared_divergences": [],
+      "ir_per_call_small": 1953.85028,
+      "ir_per_call_small_wp": 1981.98612,
+      "ir_per_call_large": 5264.678,
+      "ir_per_call_large_wp": 5314.0134,
+      "pct_vs_r4ship_a1": 0.0,
+      "pct_vs_r4ship_wp": 0.0,
+      "pct_vs_own_side_a1": 0.0,
+      "inside_share_pct": 98.5804,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 33 verified, 0 errors",
+      "verus_unsupported": false,
+      "verus_kernel_insns": 444,
+      "verus_kernel_panic_calls": 1,
+      "verus_kernel_digest": "25368fd7cb4b",
+      "twin_identity_level": "norel",
+      "twin_identity_evidence": {
+        "counts_a": [
+          433,
+          425,
+          1685
+        ],
+        "counts_b": [
+          433,
+          425,
+          1685
+        ],
+        "md5_raw_equal": false
+      },
+      "twin_identity_meets_pin": true
+    },
+    {
+      "side": "R4",
+      "name": "r4_oprec_checked",
+      "why": "THE MIRROR OF THE R3 RESULT: the four per-op window reads become CHECKED win[p], rd32 left unchecked -- the same four checks the R3 search deletes, put back into R4, at an UNCHANGED trusted surface",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[0] `Option`",
+        "required[0] `ensures`",
+        "required[0] `s.1.c ==> final(expr_copy).mem_contents().is_init()`",
+        "required[1] `MaybeUninit::assume_init_ref`",
+        "required[1] `controls/mu_unwrapped.rs`",
+        "required[2] `Option`",
+        "required[2] `Some`",
+        "required[2] `None`",
+        "required[3] `req == 0`",
+        "required[3] `empty_string`",
+        "required[3] `efree`"
+      ],
+      "in_contract": true,
+      "english_verdict": null,
+      "built": true,
+      "kernel_insns": 481,
+      "kernel_panic_calls": 5,
+      "kernel_digest": "5749e68502da",
+      "trusted_call_sites": 7,
+      "accessors_defined": 2,
+      "accessor_names": [
+        "slot_read_unchecked",
+        "win_get_unchecked"
+      ],
+      "unsafe_tokens": 2,
+      "external_body_items": 4,
+      "gate_refusals": [],
+      "gate_refusal_detail": [],
+      "gate_facts": {
+        "trusted": [
+          "slot_read_unchecked",
+          "win_get_unchecked"
+        ],
+        "twins": [
+          "slb_twin_win_get_unchecked"
+        ],
+        "n_twins": 1,
+        "excused_by_spec": [
+          "slot_read_unchecked"
+        ],
+        "stray_unsafe_lines": []
+      },
+      "answers": {
+        "adversarial-dblfree.bin": "272040826666539789",
+        "adversarial-nowin.bin": "0",
+        "adversarial-safe.bin": "254123829775225275",
+        "adversarial-trunc.bin": "",
+        "large.bin": "2957760381129677675",
+        "small.bin": "15768976536999838170"
+      },
+      "diverges_on": [],
+      "declared_divergences": [],
+      "ir_per_call_small": 2105.661,
+      "ir_per_call_small_wp": 2133.79892,
+      "ir_per_call_large": 5651.6792,
+      "ir_per_call_large_wp": 5701.0198,
+      "pct_vs_r4ship_a1": 7.769823591600884,
+      "pct_vs_r4ship_wp": 7.659629826267408,
+      "pct_vs_own_side_a1": 7.769823591600884,
+      "inside_share_pct": 98.6813,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 33 verified, 0 errors",
+      "verus_unsupported": false,
+      "verus_kernel_insns": 481,
+      "verus_kernel_panic_calls": 5,
+      "verus_kernel_digest": "a1ede14878ca",
+      "twin_identity_level": "norel",
+      "twin_identity_evidence": {
+        "counts_a": [
+          472,
+          467,
+          1943
+        ],
+        "counts_b": [
+          472,
+          467,
+          1943
+        ],
+        "md5_raw_equal": false
+      },
+      "twin_identity_meets_pin": true
+    },
+    {
+      "side": "R4",
+      "name": "r4_win_checked",
+      "why": "NOTES.md 8f's -7.12 per cent repair REVERSED: win_get_unchecked deleted outright, one fewer trusted item and ZERO twins",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[0] `Option`",
+        "required[0] `ensures`",
+        "required[0] `s.1.c ==> final(expr_copy).mem_contents().is_init()`",
+        "required[1] `MaybeUninit::assume_init_ref`",
+        "required[1] `controls/mu_unwrapped.rs`",
+        "required[2] `Option`",
+        "required[2] `Some`",
+        "required[2] `None`",
+        "required[3] `req == 0`",
+        "required[3] `empty_string`",
+        "required[3] `efree`"
+      ],
+      "in_contract": true,
+      "english_verdict": null,
+      "built": true,
+      "kernel_insns": 481,
+      "kernel_panic_calls": 5,
+      "kernel_digest": "5749e68502da",
+      "trusted_call_sites": 2,
+      "accessors_defined": 1,
+      "accessor_names": [
+        "slot_read_unchecked"
+      ],
+      "unsafe_tokens": 1,
+      "external_body_items": 3,
+      "gate_refusals": [
+        "5c-twin"
+      ],
+      "gate_refusal_detail": [
+        "check.py::check_trusted_twins: every trusted item (['slot_read_unchecked']) is excused by verus.twin_justifications (['slot_read_unchecked']) and n_twins == 0, so stage 5c-twin would check the strength of NOTHING and hard-fails. This is F104: the rule refuses the configuration whose trusted base is SMALLEST."
+      ],
+      "gate_facts": {
+        "trusted": [
+          "slot_read_unchecked"
+        ],
+        "twins": [],
+        "n_twins": 0,
+        "excused_by_spec": [
+          "slot_read_unchecked"
+        ],
+        "stray_unsafe_lines": []
+      },
+      "answers": {
+        "adversarial-dblfree.bin": "272040826666539789",
+        "adversarial-nowin.bin": "0",
+        "adversarial-safe.bin": "254123829775225275",
+        "adversarial-trunc.bin": "",
+        "large.bin": "2957760381129677675",
+        "small.bin": "15768976536999838170"
+      },
+      "diverges_on": [],
+      "declared_divergences": [],
+      "ir_per_call_small": 2105.661,
+      "ir_per_call_small_wp": 2133.79892,
+      "ir_per_call_large": 5651.6792,
+      "ir_per_call_large_wp": 5701.0198,
+      "pct_vs_r4ship_a1": 7.769823591600884,
+      "pct_vs_r4ship_wp": 7.659629826267408,
+      "pct_vs_own_side_a1": 7.769823591600884,
+      "inside_share_pct": 98.6813,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 33 verified, 0 errors",
+      "verus_unsupported": false,
+      "verus_kernel_insns": 481,
+      "verus_kernel_panic_calls": 5,
+      "verus_kernel_digest": "a1ede14878ca",
+      "twin_identity_level": "norel",
+      "twin_identity_evidence": {
+        "counts_a": [
+          472,
+          467,
+          1943
+        ],
+        "counts_b": [
+          472,
+          467,
+          1943
+        ],
+        "md5_raw_equal": false
+      },
+      "twin_identity_meets_pin": true
+    },
+    {
+      "side": "R4",
+      "name": "r4_win_oprec",
+      "why": "the same trusted-surface reduction with the R3 winner's sub-slice spelling, so the surface reduction and the bounds-check spelling are SEPARABLE",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[0] `Option`",
+        "required[0] `ensures`",
+        "required[0] `s.1.c ==> final(expr_copy).mem_contents().is_init()`",
+        "required[1] `MaybeUninit::assume_init_ref`",
+        "required[1] `controls/mu_unwrapped.rs`",
+        "required[2] `Option`",
+        "required[2] `Some`",
+        "required[2] `None`",
+        "required[3] `req == 0`",
+        "required[3] `empty_string`",
+        "required[3] `efree`"
+      ],
+      "in_contract": true,
+      "english_verdict": null,
+      "built": true,
+      "kernel_insns": 464,
+      "kernel_panic_calls": 2,
+      "kernel_digest": "6fc9d5fdcfdb",
+      "trusted_call_sites": 2,
+      "accessors_defined": 1,
+      "accessor_names": [
+        "slot_read_unchecked"
+      ],
+      "unsafe_tokens": 1,
+      "external_body_items": 3,
+      "gate_refusals": [
+        "5c-twin"
+      ],
+      "gate_refusal_detail": [
+        "check.py::check_trusted_twins: every trusted item (['slot_read_unchecked']) is excused by verus.twin_justifications (['slot_read_unchecked']) and n_twins == 0, so stage 5c-twin would check the strength of NOTHING and hard-fails. This is F104: the rule refuses the configuration whose trusted base is SMALLEST."
+      ],
+      "gate_facts": {
+        "trusted": [
+          "slot_read_unchecked"
+        ],
+        "twins": [],
+        "n_twins": 0,
+        "excused_by_spec": [
+          "slot_read_unchecked"
+        ],
+        "stray_unsafe_lines": []
+      },
+      "answers": {
+        "adversarial-dblfree.bin": "272040826666539789",
+        "adversarial-nowin.bin": "0",
+        "adversarial-safe.bin": "254123829775225275",
+        "adversarial-trunc.bin": "",
+        "large.bin": "2957760381129677675",
+        "small.bin": "15768976536999838170"
+      },
+      "diverges_on": [],
+      "declared_divergences": [],
+      "ir_per_call_small": 2033.661,
+      "ir_per_call_small_wp": 2061.79736,
+      "ir_per_call_large": 5471.6792,
+      "ir_per_call_large_wp": 5521.0159,
+      "pct_vs_r4ship_a1": 4.084792003612474,
+      "pct_vs_r4ship_wp": 4.0268314290717635,
+      "pct_vs_own_side_a1": 4.084792003612474,
+      "inside_share_pct": 98.6353,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 33 verified, 0 errors",
+      "verus_unsupported": false,
+      "verus_kernel_insns": 464,
+      "verus_kernel_panic_calls": 2,
+      "verus_kernel_digest": "576a5559e5a4",
+      "twin_identity_level": "norel",
+      "twin_identity_evidence": {
+        "counts_a": [
+          451,
+          446,
+          1875
+        ],
+        "counts_b": [
+          451,
+          446,
+          1875
+        ],
+        "md5_raw_equal": false
+      },
+      "twin_identity_meets_pin": true
+    },
+    {
+      "side": "R4",
+      "name": "r4_no_wrapper",
+      "why": "external_body comes OFF slot_read_unchecked and nothing else changes: Verus checks the body against the pinned vstd's own assume_specification for MaybeUninit::assume_init_ref. One fewer trusted item at a byte-identical kernel",
+      "rung_candidate": true,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[0] `Option`",
+        "required[0] `ensures`",
+        "required[0] `s.1.c ==> final(expr_copy).mem_contents().is_init()`",
+        "required[1] `MaybeUninit::assume_init_ref`",
+        "required[1] `controls/mu_unwrapped.rs`",
+        "required[2] `Option`",
+        "required[2] `Some`",
+        "required[2] `None`",
+        "required[3] `req == 0`",
+        "required[3] `empty_string`",
+        "required[3] `efree`"
+      ],
+      "in_contract": true,
+      "english_verdict": null,
+      "built": true,
+      "kernel_insns": 444,
+      "kernel_panic_calls": 1,
+      "kernel_digest": "2f8fbf60a9eb",
+      "trusted_call_sites": 11,
+      "accessors_defined": 2,
+      "accessor_names": [
+        "slot_read_unchecked",
+        "win_get_unchecked"
+      ],
+      "unsafe_tokens": 2,
+      "external_body_items": 3,
+      "gate_refusals": [
+        "5-tcb-unsafe"
+      ],
+      "gate_refusal_detail": [
+        "check.py::_scan_unsafe_sites: 1 `unsafe` token(s) at line(s) [548] sit outside every item _is_trusted accepts (['win_get_unchecked']), and that stage has NO hatch. This is F97's collision: the operation is specified by the pinned vstd, so Verus is content, and the GATE is not."
+      ],
+      "gate_facts": {
+        "trusted": [
+          "win_get_unchecked"
+        ],
+        "twins": [
+          "slb_twin_win_get_unchecked"
+        ],
+        "n_twins": 1,
+        "excused_by_spec": [],
+        "stray_unsafe_lines": [
+          548
+        ]
+      },
+      "answers": {
+        "adversarial-dblfree.bin": "272040826666539789",
+        "adversarial-nowin.bin": "0",
+        "adversarial-safe.bin": "254123829775225275",
+        "adversarial-trunc.bin": "",
+        "large.bin": "2957760381129677675",
+        "small.bin": "15768976536999838170"
+      },
+      "diverges_on": [],
+      "declared_divergences": [],
+      "ir_per_call_small": 1953.85028,
+      "ir_per_call_small_wp": 1981.98612,
+      "ir_per_call_large": 5264.678,
+      "ir_per_call_large_wp": 5314.0134,
+      "pct_vs_r4ship_a1": 0.0,
+      "pct_vs_r4ship_wp": 0.0,
+      "pct_vs_own_side_a1": 0.0,
+      "inside_share_pct": 98.5804,
+      "verus_verifies": true,
+      "verus_msg": "verification results:: 34 verified, 0 errors",
+      "verus_unsupported": false,
+      "verus_kernel_insns": 444,
+      "verus_kernel_panic_calls": 1,
+      "verus_kernel_digest": "25368fd7cb4b",
+      "twin_identity_level": "norel",
+      "twin_identity_evidence": {
+        "counts_a": [
+          433,
+          425,
+          1685
+        ],
+        "counts_b": [
+          433,
+          425,
+          1685
+        ],
+        "md5_raw_equal": false
+      },
+      "twin_identity_meets_pin": true
+    },
+    {
+      "side": "CTL",
+      "name": "ctl_r3_unchecked",
+      "why": "THE CEILING OF THE R3 SEARCH: the shipped R3 with win.get_unchecked in place of every window index -- what the R3 side would cost if the four per-op bounds checks did not exist",
+      "rung_candidate": false,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[0] `*constructed = true;`",
+        "required[0] `ensures`",
+        "required[0] `s.1.c ==> final(expr_copy).mem_contents().is_init()`",
+        "required[1] `slot_read_unchecked`",
+        "required[1] `MaybeUninit::assume_init_ref`",
+        "required[1] `controls/mu_unwrapped.rs`",
+        "required[2] `bool`",
+        "required[3] `req == 0`",
+        "required[3] `empty_string`",
+        "required[3] `efree`"
+      ],
+      "in_contract": true,
+      "english_verdict": "NOT A RUNG AND CANNOT BECOME ONE, AND THE REASON IS THE LADDER's DEFINITION AND NOT THIS ROW's CONTRACT: R3 is SAFE Rust (.memory/01-ladder.md), and this variant reads the window through `get_unchecked` inside an `unsafe` block, so it is an R4 wearing R3's name -- unsafe_tokens() counts 8 where every other R3 variant counts 0, which stage 1 asserts. Its side is CTL so cheapest_in_contract and cheaper_than_shipped refuse it by construction. PRICED ON PURPOSE: it isolates the bounds-check term AT THE SHIPPED SPELLING, which is what makes the 128-of-131 Ir attribution checkable rather than asserted. \u26d4 IT IS NOT AN UPPER BOUND ON THE R3 SEARCH AND THIS FILE'S FIRST DRAFT CALLED IT ONE: r3_chunks_exact is CHEAPER than it, because chunks_exact deletes the per-op OFFSET ARITHMETIC as well as the checks. See ctl_r3_unchecked_is_not_an_upper_bound in the sidecar.",
+      "built": true,
+      "kernel_insns": 385,
+      "kernel_panic_calls": 1,
+      "kernel_digest": "cd515bad6c34",
+      "trusted_call_sites": 8,
+      "accessors_defined": 0,
+      "accessor_names": [],
+      "unsafe_tokens": 8,
+      "answers": {
+        "adversarial-dblfree.bin": "272040826666539789",
+        "adversarial-nowin.bin": "0",
+        "adversarial-safe.bin": "254123829775225275",
+        "adversarial-trunc.bin": "",
+        "large.bin": "2957760381129677675",
+        "small.bin": "15768976536999838170"
+      },
+      "diverges_on": [],
+      "declared_divergences": [],
+      "ir_per_call_small": 1946.17372,
+      "ir_per_call_small_wp": 1974.30956,
+      "ir_per_call_large": 5245.9994,
+      "ir_per_call_large_wp": 5295.3348,
+      "pct_vs_r4ship_a1": -0.3928939734317876,
+      "pct_vs_r4ship_wp": -0.3873165368080433,
+      "pct_vs_own_side_a1": -6.660025188224896,
+      "inside_share_pct": 98.5749
+    },
+    {
+      "side": "CTL",
+      "name": "ctl_nowitness",
+      "why": "the witness-free program, so NOTES.md 8g's witness cost can be re-priced in THIS pipeline instead of across two runs",
+      "rung_candidate": false,
+      "forbidden_hits": [],
+      "required_absent": [
+        "required[0] `*constructed = true;`",
+        "required[0] `Option`",
+        "required[0] `ensures`",
+        "required[0] `s.1.c ==> final(expr_copy).mem_contents().is_init()`",
+        "required[1] `MaybeUninit::assume_init_ref`",
+        "required[1] `controls/mu_unwrapped.rs`",
+        "required[2] `Option`",
+        "required[2] `Some`",
+        "required[2] `None`",
+        "required[3] `req == 0`",
+        "required[3] `empty_string`",
+        "required[3] `efree`"
+      ],
+      "in_contract": true,
+      "english_verdict": "NOT A RUNG AND CANNOT BECOME ONE: it is zend.c:243 with nothing between, which IS the defect -- it reads a MaybeUninit with no test at all, Miri is loud on it (NOTES.md 7d) and Verus refuses it (NOTES.md 11). Its side is CTL so cheapest_in_contract and cheaper_than_shipped refuse it by construction.",
+      "built": true,
+      "kernel_insns": 423,
+      "kernel_panic_calls": 1,
+      "kernel_digest": "5950307c582e",
+      "trusted_call_sites": 11,
+      "accessors_defined": 2,
+      "accessor_names": [
+        "slot_read_unchecked",
+        "win_get_unchecked"
+      ],
+      "unsafe_tokens": 2,
+      "answers": {
+        "adversarial-dblfree.bin": "272040826665440682",
+        "adversarial-nowin.bin": "0",
+        "adversarial-safe.bin": "254123829775225275",
+        "adversarial-trunc.bin": "",
+        "large.bin": "2957760381129677675",
+        "small.bin": "15768976536999838170"
+      },
+      "diverges_on": [
+        "adversarial-dblfree.bin"
+      ],
+      "declared_divergences": [
+        "adversarial-dblfree.bin"
+      ],
+      "ir_per_call_small": 1941.61212,
+      "ir_per_call_small_wp": 1969.74796,
+      "ir_per_call_large": 5235.7531,
+      "ir_per_call_large_wp": 5285.0885,
+      "pct_vs_r4ship_a1": -0.6263611969285644,
+      "pct_vs_r4ship_wp": -0.6174695108359339,
+      "pct_vs_own_side_a1": -0.6263611969285644,
+      "inside_share_pct": 98.5716
+    }
+  ],
+  "problems": [],
+  "invariant": "Every variant's `forbidden_hits` is empty by harness/check.py::spelling_matches, which is what `in_contract` MEANS here (the field is literally `not forb`, and it never consults required_absent); `required_absent` is reported BESIDE it and is judged against each entry's English, because `required` is presence-only and cannot fail the gate (check.py::idiom_audit, which measures the naive every-span-in-every-rung reading at 41 misses of 158 obligations, all 41 non-defects). Where a reading has been made it is recorded in `english_verdict` and NOT in `in_contract`; where a MECHANICAL gate refusal exists it is in `gate_refusals` and in neither -- _admissible requires all three, which is .memory-php/02-ladder.md item 90's rule with a third field added. Every variant returns the SHIPPED checksum on all six inputs, R3 v0_shipped included, which on this row is a declared property (idiom.required[7]) rather than a convenience. Every variant is priced in BOTH families by one callgrind run per cell, and every R3 variant carries ZERO `unsafe` tokens, which stage 1 asserts rather than assumes -- ctl_r3_unchecked is on the CTL side for exactly that reason. Every R4 variant additionally has its substitution applied to verus.rs and is put through Verus, and the ERROR TEXT is read: `is not supported` and `does not yet support` disqualify, a failed postcondition does not. An R4 variant with NO twin file is inadmissible BY RULE (r4_no_twin_reason), which ph45's copy leaves as a silent skip. The twin must reach the identity level ../spec.md PINS and the gate record MEASURES -- `norel` on this row -- computed by harness/asm.py::identity_level, IMPORTED, and `norel` is NOT byte identity. TWO quantities ship in each family, labelled: the fixed-R4 bound and the R3-side span. NO PAIR INTERVAL."
+}

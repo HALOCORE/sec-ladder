@@ -388,7 +388,7 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
     "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
-    "patterns/ph52-concat-copy-uninit/NOTES.md": "fa71e15c7b72c27e25c11f771a7d9f929afca4e405d76072dbe4b57f844e1a0f",
+    "patterns/ph52-concat-copy-uninit/NOTES.md": "8a0510c21d893cf3ac9e59502a4a0140cb46bdcaddc54a38fda54609bdfd1374",
     "patterns/ph52-concat-copy-uninit/README.md": "8802c301a771ee29883303cc83b2cd48ce3985cd548a3abb12d679bf266b0091",
     "patterns/ph52-concat-copy-uninit/c/emalloc_shim.h": "aa9abf48535e8df93c9398e96c044697a784d73c40d7a7ccc830b5ee308c378f",
     "patterns/ph52-concat-copy-uninit/c/kernel.c": "036d52d1b99bac545453ef3c50c3df4fa642ce7c9b430e336a86fbdcd59df668",
@@ -406,6 +406,7 @@
     "patterns/ph52-concat-copy-uninit/controls/negatives.py": "5150ad61d6bb95d6b9181595ebc9f4a23d19c173d492be73a7b1545fb78b70bc",
     "patterns/ph52-concat-copy-uninit/controls/r1h_onelinedel.py": "a0997601cf2c890bd39e042b48378cb8744cd88c0e334599d0bdc9042d3f1387",
     "patterns/ph52-concat-copy-uninit/controls/r4_nowitness.rs": "ff26f3b206cd6f3ab8dea72a80493f8dbf3ae0c8bd14642f510784a54c47415c",
+    "patterns/ph52-concat-copy-uninit/controls/spellings.py": "afe4ddbfced485a5ed71392f417f3f5c7802e59043f0d96d3cbfc8217704ab6e",
     "patterns/ph52-concat-copy-uninit/controls/tag_sweep.c": "09a52b6339c017f9918fceb4eb72832cf3638e8d0eb40451993c0b79099d2aa2",
     "patterns/ph52-concat-copy-uninit/controls/tag_sweep.py": "bd952a5f30da7bd7520186bcc8ab0072b44f28732acf95d4067f83dc636a41b7",
     "patterns/ph52-concat-copy-uninit/controls/tu_boundary.sh": "090ea86b84faf97be3635ecbb8fb1a911da4f058ff5db46a16dd16b450ec3f1f",
@@ -1463,7 +1464,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2425688==ERROR: AddressSanitizer: heap-use-after-free on address 0x506000000390 at pc 0x560b9f59f9ce bp 0x7fff02e4a450 sp 0x7fff02e4a440 READ of size 4 at 0x506000000390 thread T0 #0 0x560b9f59f9cd in php_shim_efree /home/apt/repos_",
+      "diagnostic": "================================================================= ==2472903==ERROR: AddressSanitizer: heap-use-after-free on address 0x506000000390 at pc 0x560fd46bc9ce bp 0x7ffd469cdb30 sp 0x7ffd469cdb20 READ of size 4 at 0x506000000390 thread T0 #0 0x560fd46bc9cd in php_shim_efree /home/apt/repos_",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1474,7 +1475,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==2425689==ERROR: AddressSanitizer: heap-use-after-free on address 0x503000000050 at pc 0x55f45007f9ce bp 0x7ffda8c490c0 sp 0x7ffda8c490b0 READ of size 4 at 0x503000000050 thread T0 #0 0x55f45007f9cd in php_shim_efree /home/apt/repos_",
+      "diagnostic": "================================================================= ==2472904==ERROR: AddressSanitizer: heap-use-after-free on address 0x503000000050 at pc 0x561c0c3db9ce bp 0x7ffd6090eac0 sp 0x7ffd6090eab0 READ of size 4 at 0x503000000050 thread T0 #0 0x561c0c3db9cd in php_shim_efree /home/apt/repos_",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1586,7 +1587,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.2,
+        "seconds": 0.1,
         "stdout": "18129742712333982528",
         "model_stdout": "18129742712333982528",
         "stderr": ""
@@ -1634,7 +1635,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.3,
+        "seconds": 0.2,
         "stdout": "7925096518602173862",
         "model_stdout": "7925096518602173862",
         "stderr": ""
@@ -1668,7 +1669,9 @@
     "published_sha256": "5103c9b27251c21005c549f889db27b6c9f571d80ffb8bce8fbaa69d14c163e2",
     "verdict": "FRESH"
   },
-  "controls_json": {},
+  "controls_json": {
+    "spellings.json": "FRESH"
+  },
   "failures": [],
   "notes": [],
   "loud": [

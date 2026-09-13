@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F104** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F106** live in `RECAP_PHP.md`
 > ⭐ **and the statistic decision is `.tasks-php/STATISTICS_001.md`, committed**
 > (⚠ this said *F1–F41* for seven findings, then *F1–F48* for forty-two
 > more, then *F1–F90* for eleven more — `PROTOCOL.md` rule 13, **and it
@@ -737,3 +737,38 @@
   is not self-interpreting — committed while establishing it**, and it is why
   `02-ladder`'s pin rule above says *read the entry, not the report*: here, read
   **both** fields, not one. (`TASK_PHP_044` §4, item 90.)
+
+- ⭐⭐⭐ **A *SAFE* RESPELLING CAN BEAT THE SAME RUNG WITH EVERY BOUNDS CHECK
+  REMOVED — SO `get_unchecked` IS NOT A CEILING ON THE SAFE SIDE.** Measured on
+  `ph52`: `ctl_r3_unchecked` (the shipped R3 with `win.get_unchecked` everywhere) is
+  **`−6.66 %`** while the safe `r3_chunks_exact` is **`−7.42 %`** — **the safe
+  spelling wins by `0.82 %`**, because `get_unchecked` deletes the checks and
+  **leaves the offset arithmetic**, where the safe respelling deletes both.
+  ⛔ **So a control built as *"the ceiling of the R3 search"* bounds nothing**, and
+  the task that built it retracted the claim in its own sidecar under
+  `ctl_r3_unchecked_is_not_an_upper_bound`. ✅ **It is still the right CONTROL** —
+  it isolates the bounds-check term *at the shipped spelling*, which is what makes
+  that row's `128.00` of `131.19 Ir/call` attribution checkable — **but it is not a
+  bound.** (F105, `TASK_PHP_046` §3.3.)
+
+- ⚠⚠ **THE R3−R4 GAP IS SOMETIMES A SPELLING AND SOMETIMES A MECHANISM, SO THE
+  QUESTION IS WORTH ASKING ON EVERY ROW.** `ph53`: **mechanism** — nine window
+  bounds checks at `281.8 Ir/call`, larger than the whole R3−R4 gap, and the
+  prediction's spelling *was* what shipped. `ph52`: **spelling** — four per-op
+  window bounds checks, `8 instructions × 16 ops = 128.00 Ir/call` against a measured
+  `131.19`, **97.6 % attributed**, with two independent nulls localising it (one
+  variant **byte-identical** to the shipped rung; the mirror puts the same checks
+  back into R4 at `+7.77 %`). ⭐ **Both rows' answers corrected the row's own prose**
+  — `ph52`'s §8c/§10 had framed its gap as `Option` vs `MaybeUninit`+witness.
+  ▶ **Name the term and attribute a percentage of the gap to it, or the answer is
+  an adjective.** (F100, F105.)
+
+- ⭐⭐ **SEARCH REVERSES THE `fixed-R4 bound`'s ORDERING ON 2 OF 4 ROWS SEARCHED
+  (`n = 2`, NOT AN ANECDOTE).** `ph45` (F87) and `ph52` (F105): published, R3 is
+  dearer than R4; cheapest in-contract R3, R3 is **cheaper**. ⛔ **ORDERING, NEVER AN
+  INTERVAL** — the shared `why` forbids publishing a pair interval and neither row
+  computes one. ▶ **So a row that publishes the bound without a search publishes an
+  ordering that a search can flip**, which is the argument for the search being part
+  of a row rather than an optional extra. ⓘ Score so far: `ph29` R4 moved, `ph45`
+  both moved, `ph53` R3 moved, `ph52` R3 moved; **`ph07`, `ph16` and now `ph52`'s R4
+  are degenerate and that is on file too.**

@@ -800,13 +800,75 @@ always*.
 ⚠ **A row's spread over respellings is a fact about its variants, not about the
 statistic** (item 82) — `ph45`'s A1 spread is `0.000000` pp over nine and `ph53`'s is
 `39.9`/`45.3` pp over 20. **Neither is evidence about family A and this row quotes
-neither.** ⚠⚠ **AND THIS ROW SHIPS NO RESPELLING SEARCH AT ALL**, which is a gap and is §13's
-first item: **`controls/spellings.py` DOES NOT EXIST IN THIS ROW** — that is a
-statement of absence and the only such citation in the row — so the row publishes a
-headline with **no in-contract spread beside it**. That is a real omission measured
-against `ph45`'s 128-case and `ph53`'s 161-case suites, and open item 81's prediction
-that a new suite would find a fifth shared defect is therefore **UNTESTED by this
-row**.
+neither.**
+
+### §9a ✅ THE RESPELLING SEARCH LANDED AT `TASK_PHP_046` — AND IT PUTS **A1** BESIDE §9's **W1**, WITH BOTH RIGHT
+
+> ⚠⚠ **THIS SECTION REPLACES A STATEMENT OF ABSENCE THAT WAS TRUE WHEN THE ROW
+> LANDED AND IS NOW FALSE.** §9 read *"`controls/spellings.py` DOES NOT EXIST IN
+> THIS ROW … the row publishes a headline with no in-contract spread beside it"*,
+> and §13.1 carried it as the row's largest single gap (`RECAP_PHP.md` item 102).
+> **`controls/spellings.py` and `controls/spellings.json` now exist** and the gap
+> is closed; what the search found is below, and `.tasks-php/TASK_PHP_046_REPORT.md`
+> is the whole of it.
+
+⭐⭐⭐ **AND THE SEARCH PUBLISHES IN A DIFFERENT FAMILY FROM THE ROW, WHICH IS NOT A
+CONTRADICTION — IT IS `.memory-php/03-numbers.md`'s OWN RULE.** `inside_share` is
+**PER-CELL**: §8a's **22.24 %** is the **C** rungs, where `PH52_NOINLINE` puts three
+callees in their own symbols, and the **Rust** rungs inline everything, so
+`controls/spellings.py` stage 2b measures **98.56 %–98.68 % on all 15 Rust cells it
+builds**. ▶ **The row publishes R1-vs-R1h in W1, correctly; a respelling search of
+the Rust rungs lands where A1 resolves to the instruction.** Both figures are in the
+sidecar for every comparison.
+
+| | |
+|---|---|
+| `r3_endpoint_degenerate` | **`false`** — `r3_chunks_exact`, **`−7.42 %` A1** (`1930.232` vs the shipped `2085.038` Ir/call) |
+| `r4_endpoint_degenerate` | **`true`**, with *and* without the gate-rule filter — the best R4 variant is a **byte-identical tie** |
+| `a1_spread_pp` | R3 **`7.92`**, R4 **`7.77`** — unfiltered, as `ph45`'s and `ph53`'s copies compute it; the `in_contract`-filtered twins are **identical to the digit** on this row |
+| `wp_spread_pp` | R3 **`7.81`**, R4 **`7.66`** |
+
+⛔⛔ **AND THE `fixed-R4 bound`'s ORDERING REVERSES.** §8's R3-vs-R4 is **`+6.71 %`**
+A1 (R3 dearer); the cheapest in-contract R3 is **`−1.21 %`** against the shipped R4.
+⚠ **Ordering, never interval** — `min(R3) − min(R4)` differences two upper bounds.
+
+⭐⭐⭐ **THE MECHANISM, AND IT CORRECTS THIS ROW'S OWN READING OF THE GAP.** §8c
+attributes R2→R3 to four named things and §10 frames R3-vs-R4 as `Option` against
+`MaybeUninit` + witness. **The 6.71 % is neither.** The shipped R3 reads `win[p]`,
+`win[p + 1]`, `win[p + 2]`, `win[p + 3]` per op and LLVM emits **four
+`cmp %rdi,<stack slot>` / `je <panic>` pairs — 8 instructions per op**, which on
+`small.bin`'s 16 ops is **128.00 Ir/call against a measured gap of 131.19, i.e.
+97.6 %**. The panic-site count is the whole argument in one column: shipped R3 **5**,
+shipped R4 **1**, `r3_chunks_exact` **1**. ▶ **So the gap is a SPELLING, and the
+safe rung recovers it with no `unsafe` token and no trusted item.**
+⭐ `r3_head_slice` is the null that localises it — the same sub-slice lever on the two
+head words is **byte-identical** to the shipped rung, because LLVM already proves
+`len >= 8` from `cap = (len − 8) / 4`.
+
+⚠⚠ **WHAT THE R4 SIDE FOUND INSTEAD IS ON THE TCB AXIS, AND IT IS F97 AND F104
+MEASURED RATHER THAN ARGUED.** All three variants with a **smaller** trusted base are
+refused by `harness/check.py`, computed with the gate's own `_is_trusted` / `vparse` /
+`_UNSAFE_RE`:
+
+| variant | `external_body` | A1 vs shipped R4 | refused by |
+|---|---:|---:|---|
+| `r4_no_wrapper` — `external_body` comes **off** `slot_read_unchecked`, Verus checks the body against the pinned vstd's own `assume_specification`; **34 verified / 0 errors** | **3** | **`+0.00 %`, byte-identical** | `_scan_unsafe_sites` (**F97**) |
+| `r4_win_oprec` — `win_get_unchecked` deleted, sub-slice reads | **3** | `+4.08 %` | 5c-twin `n_twins == 0` (**F104**) |
+| `r4_win_checked` — `win_get_unchecked` deleted, safe indexing; §8f's `−7.12 %` reversed | **3** | `+7.77 %` | 5c-twin `n_twins == 0` (**F104**) |
+
+⭐⭐ **`r4_no_wrapper` IS THE SHARPEST OBJECT THIS ROW HAS PRODUCED ON THE TCB AXIS:
+ONE FEWER AXIOM, NOT ONE BYTE OF DIFFERENCE, AND THE ONLY OBSTACLE IS A GATE RULE.**
+§11d and §11f argued that collision from the shipped configuration; this prices it as
+a rung candidate. ⛔⛔ **Nothing in the search enlarges the trusted base to satisfy a
+stage** — that is cost-selection on the TCB axis, which is the pressure §11f reports
+and the TCB is a published axis.
+
+⚠ **The one R4 lever NOT built, with its ceiling stated**: `ph53`'s `u32`-bitmask
+witness bought `−11.40 %` A1 because its witness is an **array**, one byte per slot,
+re-read per consumer iteration. ph52's is two `bool`s for the whole kernel, and §8g
+prices the **whole** witness at `+0.622 %` W1 — so a perfectly free witness
+representation could buy at most that. **`UNTESTED`, and a bound rather than a
+measurement.** ▶ That is §11c's two-row law holding in a second way.
 
 ## §10 The ladder — four answers to one question
 
@@ -1196,13 +1258,20 @@ rather than claimed as covered; §13.7 carries it.
 ⚠ **`UNTESTED` and *"I could not tell"* are valued answers.** The full list is
 `.tasks-php/TASK_PHP_045_REPORT.md` §12; the ones a reader of this row needs are:
 
-1. ⛔⛔ **THIS ROW SHIPS NO RESPELLING SEARCH.** There is no `controls/spellings.py`,
-   so the row publishes its headlines with **no in-contract spread beside them** —
-   measured against `ph45`'s 128-case and `ph53`'s 161-case suites. ▶ **Open item
-   81's prediction that a new suite would find a FIFTH shared defect in the
-   machinery is therefore UNTESTED by this row**, and so is the question of how much
-   of §8b's `−0.342 %` and §8g's `+0.622 %` survives a search over the variants the
-   declaration leaves free. **That is the largest single gap in the row.**
+1. ✅ **CLOSED AT `TASK_PHP_046` — §9a.** This item read *"THIS ROW SHIPS NO
+   RESPELLING SEARCH … that is the largest single gap in the row"*.
+   `controls/spellings.py` now exists (15 variants, 24 §H arms inside the
+   validator) and §9a carries the result: **R3 moves `−7.42 %` A1 and the R4
+   endpoint is degenerate.** ⭐ **And open item 81's prediction that a new suite
+   would find a further shared defect in the machinery is UPHELD, twice, and both
+   were in the NEW file rather than inherited**: an `english_verdict` rule keyed
+   on the `required` ENTRY instead of on the SPAN, which fired on all six R4
+   variants including the shipped spelling (item 100's class — `required[0].rust`
+   quotes `` `Option` `` incidentally); and **F101's path-sensitive digest, which
+   produced a false negative and a false positive in the same run**. ⚠ What
+   remains open is the half this search does not reach: **how much of §8b's
+   `−0.342 %` survives a search over the two C rungs' spellings is still
+   UNTESTED**, because `controls/spellings.py` searches the Rust rungs only.
 2. ⚠ **§11c's two-row law rests on n = 2.** *The cost of a safety witness tracks the
    number of witness READS and whether they are indexed, not the number of slots* is
    a hypothesis with two points on it. `quota.py` says three `T3` candidates remain
