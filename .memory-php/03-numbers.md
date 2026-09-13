@@ -98,3 +98,19 @@
   whole-program figure to more than 2 dp**, and note that a row publishing **only**
   the whole-program column publishes the unstable one. ⚠ **UNEXPLAINED — the
   cause was not isolated.** (Item 99, `TASK_PHP_044` §8.2.)
+
+- ⭐⭐⭐ **`inside_share` IS PER-**CELL**, NOT PER-**ROW**, AND ONE ROW CAN NEED
+  DIFFERENT COLUMNS FOR DIFFERENT COMPARISONS.** `ph52` measures **22.24 %** on its
+  **C** rungs — `PH52_NOINLINE` puts three callees in their own symbols, 62.35 % of
+  the program — and **≈98.6 %** on its **Rust** rungs, which inline everything
+  (`unsafe` A1 `48,846,257` against W1 `49,549,469`). ▶ **So the row publishes its
+  **R1-vs-R1h** column in **W1**, correctly, while a **respelling search of its Rust
+  rungs** lands in the 98.6 % region where **A1** is the resolving statistic.**
+  ⚠⚠ **The rule above is right as written — *to the extent the difference lands
+  inside the kernel symbol* — but `ph45` (9.5 %), `ph53` (89.5 %) and `ph52` were all
+  first discussed as ONE number per row, and that is the reading to drop.**
+  ▶ **Compute `inside_share` for the CELLS the comparison actually spans, then
+  choose.** ⓘ And note *why* `ph52`'s C figure is low: the same three-TU boundary
+  that makes the defect reproducible at all — **`inside_share` is not independent of
+  the extraction's fidelity choices**, so it is a measurement and never a constant.
+  (`TASK_PHP_045` §4 + §6.2, manager-verified from `results-php/ph52-…json`.)
