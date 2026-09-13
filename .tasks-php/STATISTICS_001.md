@@ -10,10 +10,21 @@
 > analysis.**
 >
 > ⚠⚠⚠ **STATUS: NOT AUTHORITATIVE.** `.memory-php/` is the authoritative layer
-> and this is not in it. F83–F86 have had an engineer→reviewer cycle and are
-> **UPHELD-NARROWED**; **F88, F89 and F90 have not been reviewed at all**, and
-> F90 **disagrees with the reviewer**. ▶ **Read this for the argument and the
-> numbers; do not cite it as settled.**
+> and this is not in it. ▶ **Read this for the argument and the numbers; do not
+> cite it as settled.**
+>
+> ✅✅ **UPDATED 2026-09-13 — `TASK_PHP_043` REVIEWED TWELVE OF THE FOURTEEN.**
+> F83–F86 UPHELD-NARROWED (`_038`); **F88 · F93 · F95 · F99 UPHELD**; **F89 · F91 ·
+> F92 · F94 · F98 · F100 · F101 UPHELD-NARROWED**; **F96 · F97 still UNREVIEWED.**
+> ⛔⛔ **AND THE SENTENCE THIS BOX USED TO CARRY — *“F90 disagrees with the
+> reviewer”* — WAS STALE BY 145 LINES OF ITS OWN FILE: §5 settles item 68 `NO`
+> and F90 is REFUTED on its operative half by F92.** ▶ **This box read a
+> refuted finding as live, which is item 73's exact shape — a correction that
+> landed in `RECAP_PHP.md` and not here** (`_043` §5.4).
+> ⚠ **F92's own narrowing applies to §5: *“hopeless”* is TARGET-DEPENDENT — for
+> an ABSOLUTE 1-pp target the probe's TABLE 7 gives `W ≤ 574` on every pair.
+> The `NO` survives on F93's and F91's BIAS, which no width fixes** (item 86:
+> **that probe is gitignored and no longer selftests**).
 >
 > Sources: `RECAP_PHP.md` **F71, F74, F80, F82–F90**, open items **52, 54, 60,
 > 62, 63, 65, 67, 68**, `TASK_PHP_037_REPORT.md` §5.4, `TASK_PHP_038_REPORT.md`
@@ -47,7 +58,7 @@ needles (`kernel`, `main`). **C is not built** (item 62). **W1 exists only insid
 
 | | definitional gap | the measurement that shows it |
 |---|---|---|
-| **A** | ⛔ **blind to callees** | `ph45`'s `inside_share` is **0.055–0.094**, and A1's spread over **nine** searched R3/R4 variants is **`0.000000` pp** against 66.7/44.5 pp whole-program (F87, `_037` §5.4) |
+| **A** | ⚠ **blind to work OUTSIDE THE KERNEL SYMBOL — which is a property of the ROW, measurable before any search** | `ph45`'s `inside_share` is **0.055–0.094** — **A sees 9.5 % of that row** — and A1 reports a whole-program effect of `+23.37 %` as `+0.000 %` (F86's **BLIND** class, § below). ⓘ A1's spread over `ph45`'s **nine** searched variants is also `0.000000` pp against 66.7/44.5 pp whole-program, which is **the same BLIND class on a respelling population** and is **a fact about a row whose every searched lever lives in the callee `dec`, NOT about A**: on `ph53`, whose `kernel` carries **89.5 %**, the same statistic spreads **39.9/45.3 pp** over 20 variants. ▶ **The gap is real; its measure is `inside_share`, not the spread** (F100, item 82, `_043` §2). ⛔⛔ **THE CLAUSE THIS REPLACED SAID *“blind to callees”* WITH THE SPREAD AS *“the measurement that shows it”* — an inferential role `RECAP_PHP.md:2465` had already withdrawn, and this file is where the withdrawal failed to land (item 73's shape, third instance)** |
 | **C** | ⛔ **blind to `main`** | the `−1.00` class: **one instruction per kernel call in `main`**, `main_exclusive_ir` Δ/n = **−1.0000** on `ph00` and `p11`. **C cannot see it; B can** (F84 as corrected by `_038` §4.2) |
 | **W1** | ⛔ **carries a language-dependent fixed term** | **≈176 k `Ir`**, two rows agreeing to **0.45 %** (`_038` §1.3). ▶ **So C and W1 are NESTED SCOPES OF ONE RUN, not independent** — my *"three independent statistics"* was wrong |
 | **B** | ✅ **none found** | it cancels the fixed term and charges everything. Its flaw is **`probe_iters`**, a `spec.md` **parameter** — see §5 |
