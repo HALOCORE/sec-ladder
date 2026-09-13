@@ -707,6 +707,23 @@
   file.** ▶ **Search both endpoints on every row; do not manufacture a variant to
   have something to report.**
 
+
+> ⛔⛔⛔ **EVERYTHING FROM HERE TO THE END OF THIS FILE IS `UNREVIEWED`, MANAGER, 2026-09-13.**
+> It comes from `TASK_PHP_044`, `_045` and `_046`, which are **ENGINEER** tasks:
+> `PROTOCOL.md` **rule 9** requires an engineer→reviewer cycle and **these have had
+> only the engineer half.** ⭐ It is kept here rather than held back, under the same
+> convention `02-ladder.md`'s family-B sensitivity paragraph used — **marked, not
+> hidden** — because a later session needs the rule and the mark tells it what the
+> rule is worth.
+>
+> ⚠⚠ **AND THE MARK IS HERE BECAUSE I LANDED THIS MATERIAL UNMARKED FIRST.** I
+> wrote the RULE-9 STATE block one day earlier, landed `04-process.md` law 12
+> (*a manager finding from one probe or two rows should be assumed narrowable until
+> a reviewer has had it*) — **and then put seven unreviewed entries into the layer
+> that supersedes everything.** ▶ **Caught by auditing before a handoff, which is
+> the only reason it is marked at all.** → the RULE-9 STATE block in `RECAP_PHP.md`
+> names which findings these are and what a review round owes.
+
 - ⛔⛔⛔ **A BACKTICK IN AN `idiom.required` / `forbidden` ENTRY *IS* A PIN,
   INCLUDING AROUND A FILENAME, A TYPE NAME OR A FIELD NAME — SO ANY DRAFT OF
   THAT PROSE GOES THROUGH `idiom_audit` BEFORE IT LANDS.** `harness/check.py::spelling_matches`

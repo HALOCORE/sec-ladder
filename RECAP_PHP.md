@@ -118,6 +118,41 @@ READ    RULE-9 block · .memory-php/ · F1-F106 · items 1-109 · _046_REPORT §
 > engineer→reviewer cycle.** ⚠ `grep -c UNREVIEWED RECAP_PHP.md` is NOT an index
 > — it cannot tell a *closed* cycle from an open one. **This table can.**
 
+> ### ⛔⛔⛔ STATE AS OF 2026-09-13, AFTER `_044`–`_046` — **SEVEN UNREVIEWED, AND SOME OF IT IS ALREADY IN THE LAYER**
+>
+> | | findings | where |
+> |---|---|---|
+> | ⛔ **UNREVIEWED, cycle OPEN** | **F96 · F97** (carried from `_043`) · **F102 · F103 · F104 · F105 · F106** | — |
+> | ⚠⚠ **UNREVIEWED *AND ALREADY LANDED*** | the material behind **F103 · F105 · F106** and items **90 · 97 · 99 · 100** | `02-ladder.md`, `03-numbers.md`, `04-process.md` — **now marked with an explicit `UNREVIEWED` banner** |
+>
+> ⛔⛔ **I LANDED SEVEN ENTRIES INTO THE AUTHORITATIVE LAYER WITHOUT MARKING THEM,
+> ONE DAY AFTER WRITING THIS BLOCK AND AFTER LANDING `04-process.md` LAW 12**
+> (*a manager finding from one probe or two rows should be assumed narrowable until
+> a reviewer has had it*). `_044`, `_045` and `_046` are **ENGINEER** tasks: rule 9
+> wants an engineer→reviewer cycle and they have had only the engineer half.
+> ✅ **Caught by auditing before a handoff — which is the only reason it is marked
+> at all, and is the argument for doing the audit.** ▶ **They are MARKED rather than
+> removed**, under the convention the family-B sensitivity paragraph already used:
+> a later session needs the rule, and the mark tells it what the rule is worth.
+>
+> ⭐⭐ **WHAT A REVIEW ROUND SHOULD ATTACK FIRST, and it is a smaller list than last
+> time:**
+> 1. ⛔⛔ **F106 / item 105** — it is the only finding on file that asks the USER for
+>    a decision, and it rests on `_046`'s reading of `check.py`'s own
+>    `_is_trusted` / `vparse` / `_UNSAFE_RE`. **If that reading is wrong, the
+>    decision evaporates.** ▶ **Verify the three refusals independently.**
+> 2. **F105's `128.00` of `131.19 Ir/call`** — a 97.6 % attribution to one named
+>    term is F83's shape, and F83 was the finding that attributed a difference to
+>    the wrong term.
+> 3. **F103's witness decomposition** — it replaced a law of mine with
+>    `(slots) × (per-slot)`, and the engineer says the data **cannot separate its two
+>    candidate mechanisms at `n = 2`.** ▶ **Check that the decomposition is not
+>    itself over-read.**
+> 4. **F97**, still, and now load-bearing twice: F104 and F106 both rest on it.
+>
+> ⓘ **And the backlog trend is the good news: 14 → 2 → 7.** The `_043` round worked;
+> what grew it again is three productive engineer tasks, not deferral.
+
 ✅✅ **`TASK_PHP_043` CLOSED THE CYCLE ON 12 OF 14.** 1408 lines; **8 findings got
 a genuine second method** (F91 F92 F94 F95 F98 F99 F100 F101), **4 got the bounded
 bar** (F88 F89 F90 F93), **2 are UNREVIEWED** (F96 F97). ⛔ **It obeyed the stop

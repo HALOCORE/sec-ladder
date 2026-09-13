@@ -58,7 +58,7 @@ needles (`kernel`, `main`). **C is not built** (item 62). **W1 exists only insid
 
 | | definitional gap | the measurement that shows it |
 |---|---|---|
-| **A** | ⚠ **blind to work OUTSIDE THE KERNEL SYMBOL — which is a property of the ROW, measurable before any search** | `ph45`'s `inside_share` is **0.055–0.094** — **A sees 9.5 % of that row** — and A1 reports a whole-program effect of `+23.37 %` as `+0.000 %` (F86's **BLIND** class, § below). ⓘ A1's spread over `ph45`'s **nine** searched variants is also `0.000000` pp against 66.7/44.5 pp whole-program, which is **the same BLIND class on a respelling population** and is **a fact about a row whose every searched lever lives in the callee `dec`, NOT about A**: on `ph53`, whose `kernel` carries **89.5 %**, the same statistic spreads **39.9/45.3 pp** over 20 variants. ▶ **The gap is real; its measure is `inside_share`, not the spread** (F100, item 82, `_043` §2). ⛔⛔ **THE CLAUSE THIS REPLACED SAID *“blind to callees”* WITH THE SPREAD AS *“the measurement that shows it”* — an inferential role `RECAP_PHP.md:2465` had already withdrawn, and this file is where the withdrawal failed to land (item 73's shape, third instance)** |
+| **A** | ⚠ **blind to work OUTSIDE THE KERNEL SYMBOL — measurable before any search, ⛔⛔ and it is a property of the CELL, NOT of the ROW.** I wrote *“a property of the ROW”* here on 2026-09-13 and **`ph52` measured it false two rows later**: `inside_share` is **22.24 %** on that row's **C** cells and **≈98.6 %** on its **Rust** cells, so the row publishes its R1-vs-R1h column in **W1** while a respelling search of its Rust rungs is resolved by **A1** — both correct, in one row. ▶ **Compute it for the CELLS a comparison spans, then choose** (F103/F105, `TASK_PHP_045` §4, `_046` §2) | `ph45`'s `inside_share` is **0.055–0.094** — **A sees 9.5 % of that row** — and A1 reports a whole-program effect of `+23.37 %` as `+0.000 %` (F86's **BLIND** class, § below). ⓘ A1's spread over `ph45`'s **nine** searched variants is also `0.000000` pp against 66.7/44.5 pp whole-program, which is **the same BLIND class on a respelling population** and is **a fact about a row whose every searched lever lives in the callee `dec`, NOT about A**: on `ph53`, whose `kernel` carries **89.5 %**, the same statistic spreads **39.9/45.3 pp** over 20 variants. ▶ **The gap is real; its measure is `inside_share`, not the spread** (F100, item 82, `_043` §2). ⛔⛔ **THE CLAUSE THIS REPLACED SAID *“blind to callees”* WITH THE SPREAD AS *“the measurement that shows it”* — an inferential role `RECAP_PHP.md:2465` had already withdrawn, and this file is where the withdrawal failed to land (item 73's shape, third instance)** |
 | **C** | ⛔ **blind to `main`** | the `−1.00` class: **one instruction per kernel call in `main`**, `main_exclusive_ir` Δ/n = **−1.0000** on `ph00` and `p11`. **C cannot see it; B can** (F84 as corrected by `_038` §4.2) |
 | **W1** | ⛔ **carries a language-dependent fixed term** | **≈176 k `Ir`**, two rows agreeing to **0.45 %** (`_038` §1.3). ▶ **So C and W1 are NESTED SCOPES OF ONE RUN, not independent** — my *"three independent statistics"* was wrong |
 | **B** | ✅ **none found** | it cancels the fixed term and charges everything. Its flaw is **`probe_iters`**, a `spec.md` **parameter** — see §5 |
@@ -226,3 +226,44 @@ file.**
   exist.** ✅ **Both are now DISCHARGED, for free, in `PROTOCOL_PHP.md` §B1a and
   §H1.** ⭐ **And this file could itself move into `PROTOCOL_PHP.md` at no gate
   cost** — the obstacle is rule 9's review, not a digest.
+
+---
+
+## §7 — THE AXIS, SETTLED (added 2026-09-13; `RECAP_PHP.md` open item 78, ANSWERED)
+
+⚠ **UNREVIEWED for F103/F105/F106; the item-78 ruling itself came through
+`TASK_PHP_043`, a REVIEW, and is in `.memory-php/03-numbers.md`.**
+
+⭐⭐⭐ **THE OPERATIVE PREDICATE IS `inside_share`, AND BOTH AXES THIS DOCUMENT
+PREVIOUSLY REASONED WITH ARE REFUTED.**
+
+| candidate axis | verdict |
+|---|---|
+| *same-language vs cross-language* (F91's) | ⛔ **REFUTED on its own table** — all nine of its cells are **same-language** and they separate by **`|Δ|` magnitude**, not by language |
+| *does the callee work diverge* (the rival, item 78) | ⛔ **REFUTED three times over** — **a sign flip ENTAILS callee divergence** (`a·b < 0` on all 38), so the rival's variable **does not vary**; and on the 3 cells with `Δnopad` ground truth the callee-inclusive column is wrong by **50–400×** |
+| ⭐ **`inside_share`** | ✅ **catches all nine same-language flips, is language-agnostic, and is ALREADY COMPUTED FOR EVERY CELL IN EVERY RECORD** |
+
+▶ **So the rule is: family A resolves a code difference exactly to the extent the
+difference lands INSIDE THE KERNEL SYMBOL** — measured per **cell**, before the
+search, not argued after it.
+✅ **Three rows have now obeyed it and all three were right**: `ph45` at **9.5 %**
+published W1; `ph53` at **89.5 %** published A1; `ph52` at **22.24 % (C) / 98.6 %
+(Rust)** published W1 for its C column **and** searched its Rust rungs in A1.
+⚠⚠ **SCOPE, which the ruling states itself:** the nine cells come from **two
+rows**, both with known statistic pathologies, and **`ph00`/`ph03`/`ph07`/`ph16`/
+`ph29` contribute ZERO same-language flips** — the phenomenon is concentrated, and a
+third row could still move this.
+ⓘ **And `inside_share` is not a constant of a row**: `ph52`'s low C figure is
+produced by the same three-TU boundary that makes its defect reproducible at all,
+so **it is a measurement and depends on the extraction's fidelity choices.**
+
+⛔ **WHAT IS STILL OWED BEFORE ITEM 62 (family C) IS BUILT** — unchanged and now
+the only precondition: **measure C's SENSITIVITY, not just its null.** F91's own
+open demand.
+
+⚠⚠ **AND THIS SECTION EXISTS BECAUSE THE CORRECTION KEPT LANDING SOMEWHERE ELSE.**
+Open item **73**'s shape — *a correction lands in `RECAP_PHP.md` and not in the
+document `RECAP_PHP.md` calls “the whole argument”* — has now fired **four times**,
+and **twice in this file**: §5's `F90` status, §2's *“blind to callees”* cell, and
+now §2's *“property of the ROW”* clause. ▶ **When a statistic finding lands in
+`RECAP_PHP.md`, it lands HERE in the same commit or it is not landed.**

@@ -88,6 +88,23 @@
   i.i.d. noise and `−0.9799` from endpoint noise, so the experiment does
   distinguish *a weak lever* from *measuring its own null*.** (F92 narrowed.)
 
+
+> ⛔⛔⛔ **EVERYTHING FROM HERE TO THE END OF THIS FILE IS `UNREVIEWED`, MANAGER, 2026-09-13.**
+> It comes from `TASK_PHP_044`, `_045` and `_046`, which are **ENGINEER** tasks:
+> `PROTOCOL.md` **rule 9** requires an engineer→reviewer cycle and **these have had
+> only the engineer half.** ⭐ It is kept here rather than held back, under the same
+> convention `02-ladder.md`'s family-B sensitivity paragraph used — **marked, not
+> hidden** — because a later session needs the rule and the mark tells it what the
+> rule is worth.
+>
+> ⚠⚠ **AND THE MARK IS HERE BECAUSE I LANDED THIS MATERIAL UNMARKED FIRST.** I
+> wrote the RULE-9 STATE block one day earlier, landed `04-process.md` law 12
+> (*a manager finding from one probe or two rows should be assumed narrowable until
+> a reviewer has had it*) — **and then put seven unreviewed entries into the layer
+> that supersedes everything.** ▶ **Caught by auditing before a handoff, which is
+> the only reason it is marked at all.** → the RULE-9 STATE block in `RECAP_PHP.md`
+> names which findings these are and what a review round owes.
+
 - ⚠⚠ **A IS REPRODUCIBLE AND THE WHOLE-PROGRAM COLUMN IS NOT — SO *"QUOTE BOTH,
   LABELLED"* HAS A REPRODUCIBILITY REASON BESIDE ITS RESOLUTION REASON.** Over
   **four** regenerations of one row's sidecar, **every A1 figure was
