@@ -104,6 +104,13 @@ CLASS = {
     "040": "PENDING",          # R1h hunt + build brief for row 7 (ph52/ph53)
     "041": {"ph53": 1.0},      # BUILD row 7 = ph53 -- row LANDED, so charged
     "042": {"ph53": 1.0},      # search ph53's endpoints + its batched debt (DONE)
+    # ⭐ THE REVIEW ROUNDS ARE `METH` AND THAT IS THE WHOLE POINT OF THE
+    #    CORRECTION RECAP_PHP.md's tasks cell carries: a review round is charged
+    #    to METHODOLOGY, not to the rows it reviews, which is precisely why the
+    #    per-row series cannot see the methodology a row OPENS. _043 reviewed 12
+    #    findings from ph53's and ph45's rounds and retracted F100's R4 half --
+    #    none of that cost lands on ph53 here.
+    "043": "METH",             # THE review round, F88-F101 (DONE)
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them
@@ -198,12 +205,61 @@ def report():
     print()
     p3, o3, _, _ = spread(PESSIMISM[-1][1])
     worst = sum(p3.values()) / len(ROWS)
-    owed = 34          # QUOTA_001 floor 40 - built 6, re-derived by quota.py
-    print(f"  ▶ THE 40-ROW FLOOR ({owed} rows still owed, `quota.py`):")
+    owed = owed_rows()
+    marg = rowsum / len(ROWS)
+    print(f"  ▶ THE {FLOOR}-ROW FLOOR ({owed} rows still owed, `quota.py`):")
     print(f"      at the PUBLISHED 6.2 :  ~{owed * tot / len(ROWS):.0f} more tasks")
-    print(f"      at the MARGINAL      :  ~{owed * rowsum / len(ROWS):.0f} more tasks")
+    print(f"      at the MARGINAL      :  ~{owed * marg:.0f} more tasks")
     print(f"      at the WORST reading :  ~{owed * worst:.0f} more tasks")
+    print()
+    print("  --- AND THE FIRST-IN-FAMILY SPLIT, because the marginal rate cannot")
+    print("      see the methodology a row OPENS (ph64 cost 2.00 built, ~4.00")
+    print("      charged what it opened) ---")
+    first = EMPTY_FAMILIES
+    follow = owed - first
+    print(f"      {first} FIRST-IN-FAMILY at {OPENER_RATE:.2f} + {follow} follow-on "
+          f"at {marg:.2f}")
+    print(f"      =  ~{first * OPENER_RATE + follow * marg:.0f} more tasks   "
+          f"<-- the premium-weighted middle")
+    print(f"  ▶ PUBLISH THE RANGE: ~{owed * marg:.0f} .. "
+          f"~{owed * worst:.0f}, middle ~{first * OPENER_RATE + follow * marg:.0f}")
     return per
+
+
+# --- THE FLOOR, COMPUTED AND NOT PINNED -------------------------------------
+#
+# ⛔⛔ `owed` USED TO BE THE LITERAL `34`, commented "floor 40 - built 6".
+# `built` became 7 when ph53 landed and the literal did not move, so this tool
+# printed ~97 more tasks while RECAP_PHP.md's own prose said 33 rows were owed
+# -- a cell that stated the right count and published a figure from the wrong
+# one (RECAP_PHP.md open item 93).
+#
+# ⭐ THE FOURTH HARDCODED FIGURE IN A VALIDATOR TO GO STALE IN ONE SESSION,
+# after preimage_screen.py's N10e ("26/17"), this file's own N7
+# ("total/rows ~ 6.5", stale THREE TIMES WITHIN THE HOUR) and citecheck.py's
+# N1. Every one of the four was repaired the same way and it is the rule now:
+# A FIGURE A VALIDATOR ASSERTS IS COMPUTED FROM THE TREE, OR IT IS NOT
+# ASSERTED. N9 below is what stops this one coming back.
+QUOTA_FAMILIES = 20          # QUOTA_001: the 20 families in patterns-php/CATALOGUE.md
+QUOTA_MIN_PER_FAMILY = 2     # QUOTA_001: "min 2, cap 4"
+FLOOR = QUOTA_FAMILIES * QUOTA_MIN_PER_FAMILY
+
+# Families with ZERO built rows, from quota.py's own table: S4 S5 S6 T2 T4 T5
+# T6 E2 E3 E4 E5 E6 E7 E8. One FIRST-IN-FAMILY row is owed by each.
+# ⚠ NOT a rate and not a claim -- a count, and N10 checks it against `owed`.
+EMPTY_FAMILIES = 14
+
+# ph64's cost CHARGED WHAT IT OPENED (RECAP_PHP.md's tasks cell): it measured
+# 2.00 by the per-row series while breaking §B1a's O(1)-allocation
+# precondition, publishing the only B1 headline and triggering the whole
+# statistic thread. ⚠⚠ n = 1. IT IS ONE ROW'S EVIDENCE AND IS LABELLED SO
+# EVERYWHERE IT IS QUOTED.
+OPENER_RATE = 4.00
+
+
+def owed_rows():
+    """Rows still owed to reach the QUOTA_001 floor. COMPUTED, never pinned."""
+    return FLOOR - len(ROWS)
 
 
 def selftest():
@@ -288,6 +344,31 @@ def selftest():
     #    row-attributable total -- at which point the figure needs restating,
     #    not defending.
     rowsum = sum(per.values())
+    # ⛔ N9 MUST FIRE IF `owed` IS EVER RE-PINNED. It is the negative item 93
+    # exists to install: the figure has to move when a row lands.
+    owed_now = owed_rows()
+    check("N9", owed_now == FLOOR - len(ROWS) and owed_now == 40 - len(ROWS),
+          f"owed={owed_now} is COMPUTED from FLOOR={FLOOR} minus the "
+          f"{len(ROWS)} rows in ROWS -- a pinned literal fails here the moment "
+          f"a row lands, which is exactly how `owed = 34` survived ph53")
+
+    # ⛔ N10: the split must PARTITION the owed rows, or the middle estimate
+    # double-counts. Catches EMPTY_FAMILIES drifting past `owed` as rows land.
+    check("N10", 0 <= EMPTY_FAMILIES <= owed_now,
+          f"EMPTY_FAMILIES={EMPTY_FAMILIES} must be within owed={owed_now}, so "
+          f"first-in-family + follow-on partitions it rather than overlapping")
+
+    # ⚠ N11: the premium must lie between the marginal and the worst reading.
+    # If it escapes that interval it is not a premium, it is a third estimate,
+    # and the range stops meaning what the tasks cell says it means.
+    mg = rowsum / len(ROWS)
+    wr = max(worsts)
+    mid = (EMPTY_FAMILIES * OPENER_RATE + (owed_now - EMPTY_FAMILIES) * mg) / owed_now
+    check("N11", mg <= mid <= wr,
+          f"the premium-weighted rate {mid:.2f} sits inside "
+          f"[marginal {mg:.2f}, worst {wr:.2f}] -- outside it, the published "
+          f"range is three estimates and not a range")
+
     check("N8", pend <= 0.25 * rowsum,
           f"PENDING={pend:.0f} is at most a quarter of ROW={rowsum:.0f} — past "
           f"that, the marginal figure understates and must be restated rather "

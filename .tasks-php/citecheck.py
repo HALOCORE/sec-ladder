@@ -142,7 +142,19 @@ if warn:
 # hand-maintained list that would go stale the moment the block is edited.
 specs = sorted(glob.glob('patterns-php/*/spec.md'))
 per_spec = {d: set(temp_cites(d)) for d in specs}
-inherited = set.intersection(*per_spec.values()) if per_spec else set()
+# ⛔⛔ THE `>= 2` IS LOAD-BEARING AND IT IS WHY `N2b` EXISTS.
+# `set.intersection` over ONE set IS that set, so at a single row EVERY citation
+# classifies as "inherited" and ALL of them are suppressed -- and the old `N2`
+# still passed, because its own condition ("each present in all rows") is
+# VACUOUSLY TRUE of one row. A checker that silently checks nothing
+# (RECAP_PHP.md F10's shape, open item 88, found by TASK_PHP_043 §5.3).
+# ⚠ I had asked whether the ADD direction breaks this. It does, and it breaks
+#   LOUD, which is safe. The degenerate direction was the one I did not ask
+#   about -- so a guard audit enumerates the DEGENERATE inputs (0 rows, 1 row,
+#   all-identical), not the interesting ones.
+INHERIT_MIN_ROWS = 2
+inherited = (set.intersection(*per_spec.values())
+             if len(per_spec) >= INHERIT_MIN_ROWS else set())
 rowwarn = []
 for doc in ROW_CLAIMS:
     for q in temp_cites(doc):
@@ -210,6 +222,26 @@ def selftest():
         all(q in per_spec[d] for d in per_spec) for q in inherited),
        f'{len(inherited)} inherited citation(s), each present in ALL '
        f'{len(specs)} rows: {sorted(inherited)}')
+    # ⛔ N2b MUST-FIRE ON THE DEGENERATE INPUT -- the negative item 88 installs.
+    #    Re-run the split over ONE row and over ZERO rows and assert that
+    #    NOTHING is suppressed. Without `INHERIT_MIN_ROWS` the one-row case
+    #    suppresses EVERY citation and `N2` above still passes.
+    def _inherited_over(sets):
+        return (set.intersection(*sets)
+                if len(sets) >= INHERIT_MIN_ROWS else set())
+
+    one = [per_spec[specs[0]]] if specs else [{'x'}]
+    ck('N2b', _inherited_over(one) == set() and _inherited_over([]) == set(),
+       f'at ONE row ({len(one[0])} citation(s)) and at ZERO rows the inherited '
+       f'set is EMPTY, so nothing is suppressed -- the old code returned the '
+       f'single row\'s whole set here and hid every citation in it')
+
+    # ⚠ N2c MUST-NOT-FIRE: the guard must not change today's real answer.
+    #    If it did, the repair would be buying safety with a false report.
+    ck('N2c', _inherited_over(list(per_spec.values())) == inherited,
+       f'the guard is inert at the real {len(specs)}-row corpus: still '
+       f'{len(inherited)} inherited')
+
     # N3 MUST-NOT-FIRE: a committed `controls/` citation must NOT be reported.
     #    `ph53` retargeted two of its three citations at
     #    `controls/mu_unwrapped.rs`; if those showed up, the check would be

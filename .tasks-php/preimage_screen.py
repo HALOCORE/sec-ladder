@@ -550,6 +550,12 @@ def bracketed(src, section_texts, cited_nums, window=60):
 
 _FUNCHEAD = re.compile(r"^[A-Za-z_$]")
 
+# ⛔ The minimum leading CONTEXT lines a hunk must carry before `same_function`
+# will read its `xfuncname` label as evidence. git's default is 3; 1 is enough
+# to tell whether the label describes the edited region. At 0 the check cannot
+# tell, and a screen that cannot tell must NOT return a proof (open item 87).
+MIN_LEADING_CONTEXT = 1
+
 
 def enclosing_header(src, n):
     """The line git's default C `xfuncname` heuristic would print in a hunk
@@ -630,14 +636,40 @@ def same_function(src, section_texts, cited_nums):
             # this hunk is no evidence that the commit's window reaches the
             # cited site.  Text-only, like the rest of the screen.
             hdr = None
+            lead = 0                           # leading CONTEXT lines seen
             for ln in lines[1:]:
                 if not ln:
                     continue
                 tag, body = ln[0], ln[1:]
                 if tag in "-+":
                     break                      # the first changed line
-                if tag == " " and _FUNCHEAD.match(body):
-                    hdr = body.strip()
+                if tag == " ":
+                    lead += 1
+                    if _FUNCHEAD.match(body):
+                        hdr = body.strip()
+            # ⛔⛔ FAIL CLOSED ON ZERO LEADING CONTEXT. The guard above looks
+            # for a definition header BEFORE the first changed line -- so with
+            # NO leading context there is nothing to look at and the check
+            # passed VACUOUSLY, returning True. `xfuncname` scans BACKWARDS
+            # from the hunk's first line, so with no context the label may have
+            # been picked up anywhere above the hunk and is no evidence at all.
+            # ⚠⚠ THE GUARD WAS THEREFORE NECESSARY AND NOT SUFFICIENT, which
+            # is the same defect F95 exists to name -- a soundness test
+            # promoting an exclusion to a proof -- recurring INSIDE F95's own
+            # repair. Found by TASK_PHP_043 §4.2 (`.temp/php43/samefunc_hole.py`),
+            # measured reach on the real corpus 0, so LATENT not live.
+            # RECAP_PHP.md open item 87. N12/N13 below are its negatives.
+            if hdr is None and lead < MIN_LEADING_CONTEXT:
+                crossed = {"hunk_context": ctx, "5.0.0_enclosing": w,
+                           "crossed_into": None,
+                           "why": f"the matched hunk has {lead} leading "
+                                  f"context line(s), under the "
+                                  f"{MIN_LEADING_CONTEXT} this check needs to "
+                                  f"see whether its `xfuncname` label describes "
+                                  f"the EDITED region -- so it is NO evidence "
+                                  f"either way, and a screen may not promote "
+                                  f"that to a proof"}
+                continue
             if hdr is not None:
                 crossed = {"hunk_context": ctx, "5.0.0_enclosing": w,
                            "crossed_into": hdr,
@@ -1171,6 +1203,62 @@ def selftest():
             n11.append((short, sha, got, want_sf, crossed))
     if n11:
         print(f"       ❌ N11 FAILED: {n11}")
+        ok = False
+
+    # ---- N12 MUST-FIRE: the ZERO-LEADING-CONTEXT hole (open item 87).
+    #      ⚠⚠ N11 above does NOT catch this. N11's must-not-fire case is a
+    #      hunk that DOES have leading context and crosses a definition header;
+    #      with NO leading context the old loop broke at the first body line,
+    #      never found a header, and returned True -- a PROOF from a hunk that
+    #      carries no evidence. `TASK_PHP_043` §4.2 built exactly that case and
+    #      the guard accepted it. This is the regression test, in the committed
+    #      file rather than in gitignored scratch, for the same reason N11 is.
+    print("  N12 MUST-FIRE: a hunk with ZERO leading context must NOT be read")
+    print("       as proof that the commit's window reaches the cited site --")
+    print("       with no context there is no header to check and `xfuncname`")
+    print("       could have been picked up anywhere above the hunk.")
+    # ⚠ `src` is a LIST OF LINES here (enclosing_header indexes it), not a
+    #   string -- passing a string silently indexes CHARACTERS and `want` comes
+    #   back empty, which makes BOTH arms return False and the negative look
+    #   like it passed for the right reason. It did not; I hit exactly that.
+    _src = (["static void other(void)"] * 3
+            + ["void zend_do_implements_interface(x)",
+               "{",
+               "    cited_line_here();",
+               "}"])
+    _cited = 6                      # 1-indexed: `cited_line_here();`
+    _zero = ("@@ -1,4 +1,3 @@ void zend_do_implements_interface(x)\n"
+             "-    cited_line_here();\n"
+             "+    replaced();\n")
+    _withctx = ("@@ -1,5 +1,4 @@ void zend_do_implements_interface(x)\n"
+                " {\n"
+                "-    cited_line_here();\n"
+                "+    replaced();\n")
+    sf0, ev0 = same_function(_src, [_zero], [_cited])
+    sf1, ev1 = same_function(_src, [_withctx], [_cited])
+    n12_ok = (sf0 is False) and (sf1 is True)
+    print(f"       {'✅' if sf0 is False else '❌'} zero-context hunk: "
+          f"same_function={sf0} (want False), reason="
+          f"{(ev0 or {}).get('why', '')[:48]!r}")
+    print(f"       {'✅' if sf1 is True else '❌'} SAME hunk with ONE context "
+          f"line: same_function={sf1} (want True) -- so the guard rejects the "
+          f"absence of evidence, not the hunk")
+    if not n12_ok:
+        print(f"       ❌ N12 FAILED: zero={sf0}/{ev0}, withctx={sf1}")
+        ok = False
+
+    # ---- N13 MUST-NOT-FIRE: the new branch is INERT on the real corpus.
+    #      The reviewer measured live reach 0; if that ever changes, a record's
+    #      verdict has moved and the change must be deliberate, not noticed.
+    zc = [(r.get("row"), r.get("fix_commit") or r.get("sha")) for r in allres
+          if (r.get("same_function_evidence") or {}).get("crossed_into", "x")
+          is None]
+    print("  N13 MUST-NOT-FIRE: the zero-context branch must reach NOTHING in")
+    print("       the real corpus -- reach was measured 0, so a hit here means")
+    print("       a verdict moved.")
+    print(f"       records hitting the zero-context branch: {len(zc)} {zc}")
+    if zc:
+        print(f"       ❌ N13 FAILED: {zc}")
         ok = False
 
     # ---- N10f MUST-NOT-FIRE: the control path is untouched.
