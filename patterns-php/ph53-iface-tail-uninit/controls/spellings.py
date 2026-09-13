@@ -218,8 +218,10 @@ WHAT IT ASSERTS, and it exits non-zero if any of it stops holding
     ⚠ A `forbidden` hit DISQUALIFIES; a `required` miss is REPORTED and does not.
     That is `check.py`'s own semantics and not a stricter invention: this row's
     `required` C pins are ABSENT from `c/kernel_hardened.c` BY DESIGN and the
-    shipped gate record carries 8 such absences and calls the row
-    `PASS-WITH-BLOCKED-ROWS`.
+    shipped gate record carries 10 such absences and calls the row
+    `PASS-WITH-BLOCKED-ROWS`. (It was 8 until `TASK_PHP_044` added `[bool; MAXD]`
+    to `required[4]`, which is absent from the two safe rungs and present in the
+    two unsafe ones -- i.e. the entry's declared scope, reported as absence.)
     ⚠ `admissible` is THREE-VALUED. The token audit decides what a grep can
     decide; the third value is a sentence, and `english_verdict` is where a
     variant carries one. **Two variants use it and both are declared.**
@@ -425,11 +427,30 @@ R3_VARIANTS = [
      "grow-as-you-add schedule, a LOWER BOUND on it (Vec doubles; erealloc "
      "does not)",
      {"rs": [(_S_CAP, _S_NOCAP, 1)]},
-     "OUT OF CONTRACT BY ENGLISH: idiom.required[8] DECLARES the allocation "
-     "order as O(1) per kernel call and PROTOCOL_PHP.md B1a's precondition for "
-     "this row's cross-language column rests on it. Priced because "
-     "TASK_PHP_041 section 8.6 left the 5.2.0 schedule's cost as an open "
-     "uncertainty, and reported because A1 and W1 disagree in SIGN on it."),
+     "OUT OF CONTRACT BY ENGLISH, ON TWO INDEPENDENT ENTRIES. (i) "
+     "idiom.required[8] DECLARES the allocation order as O(1) per kernel call "
+     "and PROTOCOL_PHP.md B1a's precondition for this row's cross-language "
+     "column rests on it. (ii) ⭐ ADDED AT TASK_PHP_044, AND IT IS THE TEST OF "
+     "WHETHER ITEM 83's RULING WAS A RULE OR A PATCH: idiom.required[0]'s rust "
+     "key backticks `Vec::with_capacity(num_interfaces)` and its English says "
+     "\"present in safe_tuned.rs, unsafe.rs and verus.rs\" and then \"The set of "
+     "rungs lives in this English\", so the entry is R3-scoped AMONG OTHERS and "
+     "safe_tuned.rs IS the R3 rung -- and this variant's whole substitution is "
+     "to delete that spelling. required_absent records the miss. ⚠ The entry "
+     "also names a rung that does NOT match (safe_naive.rs \"writes a vector of "
+     "None instead\"), which cuts both ways, and the reading is that it does NOT "
+     "weaken the pin: the two PAT precedents for a non-discriminating required "
+     "entry (p19-state-machine/required[2], p46-bignum-mac/required[4]) both "
+     "carry the sentence \"that is the declaration working, not failing\", and "
+     "this entry says the OPPOSITE -- \"which is the R2/R3 distinction this row "
+     "exists to price\". It declares its discriminating power rather than "
+     "disclaiming it. ⛔ NOTHING MECHANICAL MOVES ON (ii): this variant already "
+     "carried (i), so it was already outside _admissible, and its A1 of 1369.65 "
+     "is interior to the R3 span either way -- which is an INDEPENDENT "
+     "corroboration that item 83's ruling does not reach the R3 endpoint. "
+     "Priced because TASK_PHP_041 section 8.6 left the 5.2.0 schedule's cost as "
+     "an open uncertainty, and reported because A1 and W1 disagree in SIGN "
+     "on it."),
 ]
 
 # ======== R4, from ../unsafe.rs (exec) and ../verus.rs (twin) =================
@@ -1325,9 +1346,10 @@ def audit(chk, decl, src, lang="rust"):
 
     ⚠ Getting this backwards is not a conservative error. This row's `required`
     C pins are ABSENT from `c/kernel_hardened.c` BY DESIGN and the shipped gate
-    record carries 8 `required_absent` pairs and calls the row
-    `PASS-WITH-BLOCKED-ROWS`. An audit that treated a `required` miss as
-    disqualifying would refuse the row's own hardened rung."""
+    record carries 10 `required_absent` pairs and calls the row
+    `PASS-WITH-BLOCKED-ROWS` (8 until `TASK_PHP_044`; see the module docstring).
+    An audit that treated a `required` miss as disqualifying would refuse the
+    row's own hardened rung."""
     forb, miss = [], []
     for key, sink in (("required", miss), ("forbidden", forb)):
         for i, e in enumerate(decl.get(key) or []):
@@ -1366,7 +1388,227 @@ NO_VERUS_PROBLEM = (
 
 #: ⚠ Variants excluded by English rather than by grep. A module constant so a
 #: negative can assert the exclusion actually reaches `cheapest_in_contract`.
-ENGLISH_VERDICTS = {}
+#:
+#: ⭐⭐ **POPULATED AT `TASK_PHP_044`, ON `TASK_PHP_043` §1's RULING OF OPEN
+#: ITEM 83, AND IT COSTS THIS ROW ITS R4 HEADLINE.** `../spec.md`'s
+#: `idiom.required[4]` pins the witness **REPRESENTATION** -- its leading
+#: appositive is *"THE ONE-BYTE-PER-SLOT WITNESS, `[bool; MAXD]`"*, and since
+#: `TASK_PHP_044` the entry says so in terms -- so a `u32` bitmask witness, one
+#: BIT per slot, is out of contract on that entry even though it discharges the
+#: identical obligation, and `required_absent` records the miss on exactly these
+#: three and on no other R4 variant.
+#:
+#: ⛔⛔ **THE PIN WAS NOT WEAKENED TO MATCH A WINNER, AND THE DIRECTION IS THE
+#: PROOF**: all three excluded variants are CHEAPER than the shipped R4
+#: (-11.40 %, -8.37 %, -3.12 % A1) and two of them also have a SMALLER trusted
+#: surface, so applying the ruling makes `r4_endpoint_degenerate` TRUE and
+#: deletes the row's *"both endpoints move"* headline.
+#: `.memory/02-bench-rules.md`'s *a rung is never cost-selected* binds a pin the
+#: same way it binds a rung, and it binds in the expensive direction here.
+#:
+#: ⚠ **WHAT THIS IS NOT.** It is not a mechanical reading of `required_absent`.
+#: `harness/check.py::idiom_audit` (`:2198-2212`) measures the naive
+#: every-span-in-every-rung reading at **41 misses of 158 obligations, all 41
+#: non-defects and 17 of them ANTI-signal**, so a ruling can never be read off
+#: the presence report. The SCOPE comes from each entry's English and is a
+#: reading; `english_verdict_problems()` below only enforces that a reading, once
+#: made, is applied to every variant it reaches.
+#:
+#: ⓘ `r3_no_capacity` is excluded too and is NOT here: its verdict is declared
+#: inline in `R3_VARIANTS` because it predates this ruling and rests on a second,
+#: independent entry (`required[8]`). `english_verdict` is
+#: `eng or ENGLISH_VERDICTS.get(name)`, so the inline declaration wins.
+_BITMASK_VERDICT = (
+    "OUT OF CONTRACT BY ENGLISH (open item 83, ruled at TASK_PHP_043 section 1, "
+    "applied at TASK_PHP_044): ../spec.md's idiom.required[4] pins the witness "
+    "REPRESENTATION -- `wrote[i]`, THE ONE-BYTE-PER-SLOT WITNESS, `[bool; "
+    "MAXD]` -- and not merely the role, so a u32 bitmask witness at one BIT per "
+    "slot establishes the same slot-coverage fact by a DIFFERENT expression and "
+    "is out of contract on that entry even though its twin verifies and even "
+    "though it is CHEAPER. The named-spelling standard in idiom.why names this "
+    "exact case and resolves it against the challenger; the entry's own English "
+    "agrees with its backticks, because \"indexed SAFELY on purpose\" also fails "
+    "on a witness that performs no indexed access. PRICED AND REPORTED ANYWAY: "
+    "required_absent records the miss, witness_cost_pct_w1 keeps the cost, and "
+    "variants[].trusted_items keeps the surface, so this is a CONTROL-CLASS "
+    "result -- a witness-representation change that would be cheaper and "
+    "smaller-surface is out of this row's contract -- and not an endpoint.")
+
+ENGLISH_VERDICTS = {
+    "r4_bitmask": _BITMASK_VERDICT,
+    "r4_bitmask_pool": _BITMASK_VERDICT,
+    "r4_bitmask_min": _BITMASK_VERDICT,
+}
+
+#: The entry the ruling turns on, and the side its English scopes to. A pair and
+#: not two literals inside a function, so `english_verdict_problems` and the
+#: selftest cannot drift apart.
+WITNESS_PIN = ("required[4]", "R4")
+
+
+def english_verdict_problems(rows, pin=WITNESS_PIN, verdicts=None):
+    """`[problem, ...]` -- is the item-83 ruling applied CONSISTENTLY?
+
+    ⚠⚠ **THE MUST-FIRE ARM FOR `ENGLISH_VERDICTS`, AND THE EDIT IT EXISTS TO
+    CATCH IS *EMPTYING THE CONSTANT AGAIN*.** `PROTOCOL_PHP.md` §H: a change to
+    a validator lands with its must-fire negatives. This file's verdict is
+    `cheapest_in_contract` / `cheaper_than_shipped`, `ENGLISH_VERDICTS` is now
+    the only thing standing between the bitmask variants and the R4 endpoint,
+    and **nothing else in the pipeline would notice its removal** -- the
+    exclusion is English, `required` is presence-only and cannot fail the gate,
+    and the numbers would simply come back looking like a searched endpoint.
+    So `main` runs this on the REAL rows on every invocation and appends to
+    `problems`, which `harness/check.py::control_json_verdict` turns into
+    `FRESH+VERDICT-FAILED` at gate stage 9b.
+
+    ⭐ **THE RULE IS DERIVED FROM THE AUDIT, NOT FROM A NAME LIST**, which is
+    what makes it a check rather than a restatement: every variant on the pinned
+    entry's own side, other than that side's shipped rung, that records
+    `required[4]` in `required_absent` must carry an `english_verdict`. That
+    fires if the constant is emptied AND it fires for a FOURTH bitmask variant
+    somebody adds later and forgets to exclude -- which a hardcoded name list
+    would not.
+
+    ⛔ **IT IS DELIBERATELY SCOPED TO ONE ENTRY AND ONE SIDE.** Generalising it
+    to every backticked `required` span is the reading `check.py::idiom_audit`
+    measured at 41 misses of 158 obligations, all 41 non-defects -- every R3
+    variant misses `required[4]` because the entry is R4-scoped, and
+    `ctl_nowitness` misses it because it has no witness at all, and neither is a
+    defect. The SCOPE is the reading; this function is the bookkeeping.
+
+    ⚠ **AND IT CHECKS THE KEYS TOO.** A typo'd key in `ENGLISH_VERDICTS`
+    excludes nothing and reads exactly like a populated constant, which is the
+    silent-failure shape this whole file is written against."""
+    tag, side = pin
+    verdicts = ENGLISH_VERDICTS if verdicts is None else verdicts
+    out = []
+    declared = {n for n, _s, _w, _su, _e in
+                (list(R3_VARIANTS) + list(R4_VARIANTS) + list(FILE_VARIANTS))}
+    for k in sorted(verdicts):
+        if k not in declared:
+            out.append(
+                f"ENGLISH_VERDICTS names `{k}`, which is not a declared "
+                f"variant, so it excludes NOTHING while reading as an "
+                f"exclusion -- a typo here is silent")
+    for (s, name), r in sorted(rows.items()):
+        if s != side or name == "v0_shipped":
+            continue
+        missed = any(m.startswith(tag + " ")
+                     for m in (r.get("required_absent") or []))
+        if missed and not r.get("english_verdict"):
+            out.append(
+                f"{s} {name} records `{tag}` in required_absent and carries NO "
+                f"english_verdict, so it is still counted as a rung candidate. "
+                f"../spec.md's {tag} pins the witness REPRESENTATION (open item "
+                f"83, ruled at TASK_PHP_043 section 1) and that ruling is "
+                f"either applied to every variant it reaches or it is a patch "
+                f"on the three that embarrassed the headline. Fix: add "
+                f"`{name}` to ENGLISH_VERDICTS.")
+    return out
+
+
+def english_verdict_selftest():
+    """`[problem, ...]` -- the §H battery for the exclusion PATH, on synthetic
+    rows, run on every invocation because a green row exercises a validator and
+    does not attack it.
+
+    Seven arms. The three must-FIRE ones are the point: **E1** the emptied
+    constant, **E2** a falsy verdict string, **E3** a typo'd key. The four
+    must-NOT-fire ones pin what the ruling may NOT do: **E4** the R3 half stays
+    searched with `r3_chunks_mask` cheapest, **E5** the inline `R3_VARIANTS`
+    declaration still beats `ENGLISH_VERDICTS`, **E6** an R3 variant missing the
+    R4-scoped pin is not a problem, **E7** `ctl_nowitness` is not either.
+
+    ⚠ **The A1 figures are the row's own committed ones** so that E1's "the
+    endpoint comes back" is the real arithmetic and not a toy: the shipped R4 is
+    1116.94724 and the three bitmask variants are the only R4 cells below it."""
+    A1 = {"v0_shipped": 1116.94724, "r4_bitmask": 989.67032,
+          "r4_bitmask_pool": 1023.46856, "r4_bitmask_min": 1082.0678,
+          "r4_set_checked": 1122.58028, "r4_win_checked": 1495.79284}
+
+    def mk(verdicts):
+        rows = {}
+        for n, a in A1.items():
+            rows[("R4", n)] = {
+                "side": "R4", "name": n, "ir_per_call_small": a,
+                "in_contract": True, "verus_rs": "x",
+                "required_absent": (["required[4] `wrote[i]`"]
+                                    if "bitmask" in n else []),
+                "english_verdict": verdicts.get(n)}
+        return rows
+    bad = []
+
+    def want(tag, cond, why):
+        if not cond:
+            bad.append(f"{tag}: {why}")
+
+    full = {k: "out by English" for k in ENGLISH_VERDICTS}
+    rows = mk(full)
+    want("E0 (must-NOT-fire)", not english_verdict_problems(rows),
+         "the shipped constant leaves a consistency problem")
+    want("E0b (must-fire consequence)", not cheaper_than_shipped(rows, "R4"),
+         "with the three excluded, an R4 candidate still beats shipped")
+
+    rows = mk({})
+    probs = english_verdict_problems(rows, verdicts={})
+    want("E1 (must-FIRE: the constant emptied)", len(probs) == 3,
+         f"emptying ENGLISH_VERDICTS reported {len(probs)} problems, want 3 "
+         f"(one per bitmask variant)")
+    beat = cheaper_than_shipped(rows, "R4")
+    want("E1b (must-FIRE: and the endpoint comes back)",
+         beat and beat[0]["name"] == "r4_bitmask",
+         "emptying the constant did not restore r4_bitmask as the cheaper "
+         "candidate, so E1 is not measuring the path that publishes the number")
+
+    rows = mk({k: "" for k in ENGLISH_VERDICTS})
+    want("E2 (must-FIRE: a falsy verdict string)",
+         len(english_verdict_problems(
+             rows, verdicts={k: "" for k in ENGLISH_VERDICTS})) == 3,
+         "an empty-string verdict read as an exclusion; `_admissible` tests "
+         "`not r.get('english_verdict')`, so only a TRUTHY string excludes")
+
+    want("E3 (must-FIRE: a typo'd key)",
+         any("not a declared variant" in p for p in english_verdict_problems(
+             mk(full), verdicts=dict(full, r4_bitmsak="typo"))),
+         "a misspelled ENGLISH_VERDICTS key was accepted silently")
+
+    r3 = {"v0_shipped": 1387.67508, "r3_chunks_mask": 942.47724,
+          "r3_slice_param": 1388.13536}
+    rows = mk(full)
+    for n, a in r3.items():
+        rows[("R3", n)] = {
+            "side": "R3", "name": n, "ir_per_call_small": a,
+            "in_contract": True,
+            "required_absent": ["required[4] `wrote[i]`"],
+            "english_verdict": None}
+    c3 = cheapest_in_contract(rows, "R3")
+    want("E4 (must-NOT-fire: the R3 half is UNTOUCHED)",
+         c3 and c3["name"] == "r3_chunks_mask"
+         and bool(cheaper_than_shipped(rows, "R3")),
+         "the ruling moved the R3 endpoint; item 83 does not reach it and "
+         "F100's R3 half must stay searched")
+    want("E6 (must-NOT-fire: R3 misses an R4-scoped pin)",
+         not any(" r3_" in p for p in english_verdict_problems(rows)),
+         "an R3 variant missing the R4-scoped required[4] was reported as a "
+         "problem -- that is check.py's measured 41-of-41 failure mode")
+
+    rows[("CTL", "ctl_nowitness")] = {
+        "side": "CTL", "name": "ctl_nowitness", "ir_per_call_small": 888.082,
+        "in_contract": True, "required_absent": ["required[4] `wrote[i]`"],
+        "english_verdict": "not a rung"}
+    want("E7 (must-NOT-fire: the CTL side)",
+         not any("ctl_nowitness" in p for p in english_verdict_problems(rows)),
+         "the witness-free control was judged against an R4-scoped pin")
+
+    inline = [e for n, _s, _w, _su, e in R3_VARIANTS if n == "r3_no_capacity"]
+    want("E5 (must-NOT-fire: inline beats the constant)",
+         inline and inline[0]
+         and (inline[0] or ENGLISH_VERDICTS.get("r3_no_capacity"))
+         == inline[0],
+         "`eng or ENGLISH_VERDICTS.get(name)` no longer prefers the inline "
+         "R3_VARIANTS declaration, so r3_no_capacity's two independent grounds "
+         "cannot both be recorded")
+    return bad
 
 
 def r4_no_twin_reason(r):
@@ -1566,8 +1808,33 @@ def main():
               + (", ".join(m.split("`")[1] for m in miss) or "none")
               + ("   ⚠ OUT BY ENGLISH" if rows[(side, name)]["english_verdict"]
                  else ""))
+
+    # ---- §H: the exclusion PATH, attacked and then checked ------------------
+    # ⚠⚠ TWO DIFFERENT CHECKS AND BOTH RUN ON EVERY INVOCATION. The selftest
+    # drives the verdict functions over SYNTHETIC rows, which is the only way to
+    # see the arms fire -- the shipped tree's `problems` is empty, so a green run
+    # is not evidence that any of this CAN fire (check.py's own argument for
+    # `_CONTROL_VERDICT_CASES`). The consistency check then runs on the REAL
+    # rows, and it is the one that fires if ENGLISH_VERDICTS is emptied again.
+    st = english_verdict_selftest()
+    ev = english_verdict_problems(rows)
+    print(f"\n0c. THE ITEM-83 EXCLUSION (`ENGLISH_VERDICTS`), §H.\n"
+          f"  selftest   {'PASS' if not st else 'FAIL'}   "
+          f"7 arms over synthetic rows (3 must-FIRE, 4 must-NOT-fire)\n"
+          f"  consistency {'ok  ' if not ev else 'FAIL'}  "
+          f"{WITNESS_PIN[0]} is {WITNESS_PIN[1]}-scoped; every "
+          f"{WITNESS_PIN[1]} variant that misses it carries a verdict\n"
+          f"  excluded    "
+          + (", ".join(sorted(ENGLISH_VERDICTS)) or "NOTHING -- see §H"))
+    for p in st + ev:
+        print(f"    *** {p}")
+    problems.extend(st)
+    problems.extend(ev)
+
     if args.audit_only:
-        return 0
+        for p in problems:
+            print(f"  *** {p}", file=sys.stderr)
+        return 1 if problems else 0
 
     print("\n1. BUILD + CHECKSUM + KERNEL FINGERPRINT + TRUSTED SURFACE.\n"
           "   ⚠⚠ THE REFERENCE CHECKSUM IS PER SIDE: this row's R3 and R4\n"
@@ -2017,6 +2284,25 @@ def main():
         # that can rank anything; here A1's spread is the larger of the two on
         # the R3 side. The default key of cheapest_in_contract is A1 BECAUSE of
         # this number, and a negative pins that.
+        #
+        # ⛔⛔ NO `in_contract` AND NO `english_verdict` FILTER, DELIBERATELY,
+        # AND TASK_PHP_044 LEFT IT THAT WAY RATHER THAN BY OVERSIGHT. The
+        # question this field answers is whether the STATISTIC can rank
+        # respellings at all -- i.e. whether A1 is respelling-blind the way ph45
+        # found it to be -- and that is a property of the statistic and the
+        # search space, not of the contract. Filtering it would make it answer a
+        # different question, would stop it comparing with ph45's copy (which
+        # does not filter either), and would couple a measurement-resolution
+        # diagnostic to a contract ruling so that restating an idiom entry moved
+        # a number about instruction counts. ⚠ THE CONSEQUENCE, STATED SO IT IS
+        # NOT READ AS A RESULT: item 83's ruling excludes the three CHEAPEST R4
+        # variants, so the R4 figure here (45.313019) is over a population that
+        # includes three out-of-contract cells and one never-verified one, and
+        # the in-contract R4 spread is 33.917949 pp. TASK_PHP_043 section 1.9
+        # quotes the latter. BOTH ARE TENS OF pp, so item 82's conclusion -- that
+        # A1 is not respelling-blind on this row, against ph45's 0.000000 -- is
+        # insensitive to the choice, which is why the choice is recorded rather
+        # than defended as load-bearing.
         "a1_spread_pp": {
             side: (None if not vals else round(max(vals) - min(vals), 6))
             for side, vals in (
@@ -2068,9 +2354,29 @@ def main():
             for r in rows.values()],
         "problems": problems,
         "invariant":
-            "Every variant is in contract by harness/check.py::spelling_matches "
-            "over EVERY backticked idiom entry, returns ITS OWN SIDE's shipped "
-            "checksum on all seven inputs (this row's R3 and R4 diverge on "
+            "⚠⚠ REPAIRED AT TASK_PHP_044 (open item 89) AND THE CLAUSE IT "
+            "REPLACES WAS FALSE AS WRITTEN. It read \"Every variant is in "
+            "contract by harness/check.py::spelling_matches over EVERY "
+            "backticked idiom entry\", which is false on this file's own data: "
+            "13 of 20 variants record a non-empty required_absent, INCLUDING "
+            "R3's v0_shipped. What is true: every variant's `forbidden_hits` is "
+            "empty by harness/check.py::spelling_matches, which is what "
+            "`in_contract` MEANS here (the field is literally `not forb`, and "
+            "it never consults required_absent); `required_absent` is reported "
+            "BESIDE it and is judged against each entry's English, because "
+            "`required` is presence-only and cannot fail the gate "
+            "(check.py::idiom_audit, which measures the naive "
+            "every-span-in-every-rung reading at 41 misses of 158 obligations, "
+            "all 41 non-defects). Where a reading has been made it is recorded "
+            "in `english_verdict` and NOT in `in_contract` -- `_admissible` "
+            "requires both -- so the two halves stay distinguishable. ⭐ THE "
+            "CLAUSE WAS BYTE-IDENTICAL IN ALL FIVE PHP ROWS' spellings.json and "
+            "is repaired HERE ONLY, because each of the other four costs its own "
+            "re-gate and batches with that row's next task; RECAP_PHP.md item 89 "
+            "carries them. It entered with the php copy and was cloned four "
+            "times, which is F101's law at a fifth generation. AND THE REST OF "
+            "THE INVARIANT STANDS AS WRITTEN: every variant returns ITS OWN "
+            "SIDE's shipped checksum on all seven inputs (this row's R3 and R4 diverge on "
             "adversarial-cmp.bin by declaration, so a cross-side reference "
             "would be this control's defect and not a variant's), and is priced "
             "in BOTH families by one callgrind run per cell. Every R4 variant "

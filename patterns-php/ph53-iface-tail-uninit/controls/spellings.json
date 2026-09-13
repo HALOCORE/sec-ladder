@@ -3,19 +3,19 @@
     "regenerate": "python3 patterns-php/ph53-iface-tail-uninit/controls/spellings.py --verus",
     "note": "The pin covers the two rung sources the variants are derived from, verus.rs (the R4 admissibility half), spec.md (the declaration the audit runs against AND the `identity` pin the admissibility rule reads), NOTES.md (whose section 8e carries the whole-program total stage 3 reproduces), inputs/gen.py (the corpus every number is measured over), the four controls/ files that are variants or open-item-79 arms, and this script. It does NOT cover results-php/ph53-iface-tail-uninit.json: stage 3 compares against that record at run time and prints the delta, which is a stronger check than a hash of it."
   },
-  "measured_utc": "2026-09-12T11:35:32Z",
+  "measured_utc": "2026-09-13T06:18:13Z",
   "derived_from_sha256": {
     "patterns/ph53-iface-tail-uninit/safe_tuned.rs": "ae6707af5b62a387dd343ae2f11e57e5eb78cc9b6f99b43db8e9252c1650a955",
     "patterns/ph53-iface-tail-uninit/unsafe.rs": "f509176cc89dbeffbaac6d0b42f4ebc1fb6c56e24d069f3f66678c21ca6878dd",
     "patterns/ph53-iface-tail-uninit/verus.rs": "532d0ca8ccd71a90e01c68bd4191a7cd9dd0cb465bb17ea9a6a36077e7b322b5",
-    "patterns/ph53-iface-tail-uninit/spec.md": "d67240517c729f8103407fe96547405284ca18964ee4913f4820fd3e5d0364be",
-    "patterns/ph53-iface-tail-uninit/NOTES.md": "dfe3970f3e1226c426159fc4b9e97c63c1908b9f9eeaebd1f6ad9b25656e98e0",
+    "patterns/ph53-iface-tail-uninit/spec.md": "54d47152e60fe046234d8520d8ba334f29a6afe90b555666c067e04d932c5d5b",
+    "patterns/ph53-iface-tail-uninit/NOTES.md": "843c06c4c33bb731baed2e2e699471b01a4cef3e001ae345289dd48bae608c02",
     "patterns/ph53-iface-tail-uninit/inputs/gen.py": "e5f69d4188acf25e01af86f75d28b9cef95e4811c7789b2eb509d6631346993b",
     "patterns/ph53-iface-tail-uninit/controls/mu_ref.rs": "c78aec3a726da7216a1b349d675c0874cf377b2f7caf0fb59d9fa56572fc0748",
     "patterns/ph53-iface-tail-uninit/controls/mu_ref_cmp.rs": "5c370939bd7e0a294a936f281d87e6d0ca5fbfd3961f606edd4f991721118cd8",
     "patterns/ph53-iface-tail-uninit/controls/mu_ref_exec.rs": "cd9751644dc97a8436ac922c10cefc9623c13556d5a327a4f725c02a63d9a896",
     "patterns/ph53-iface-tail-uninit/controls/r4_nowitness.rs": "128dee0ec591e561c97c38c5b46cc4807bea63b85e18f897a44a322fe3f35fb8",
-    "patterns/ph53-iface-tail-uninit/controls/spellings.py": "f78d361f8e7b10762d759512822e0c2b8ca030a9d66fce432456a5556a606519"
+    "patterns/ph53-iface-tail-uninit/controls/spellings.py": "829dc43205ffd2c9f742c327faf09e7c3e3c591b8ca1ffc6b182e7af676c2940"
   },
   "probes": [
     {
@@ -45,22 +45,12 @@
   "headline_statistic": "ir_per_call_small",
   "reproduces_shipped_record": true,
   "reproduces_shipped_record_scope": "TWO Ir FAMILIES AT 0.5 PER CENT TOLERANCE, AND NOT THE STATIC COUNTS. A1 is compared against results-php/ph53-iface-tail-uninit.json in four cells (safe_tuned and unsafe, small.bin and large.bin) and W1 against NOTES.md section 8e. `kernel_insns` below is a raw disassembled instruction count over the `kernel` symbol INCLUDING the int3 pad and is NOT comparable to the record's n_fn_nopad (766 against 758). ALSO NOT IN SCOPE: NOTES.md publishes two different whole-program totals for the same shipped R4 cell -- section 8e's 31 997 489 and section 8f's 31 997 125, 0.0011 per cent apart, with kernel counts 760 and 762 -- because they come from two different controls/negatives.py runs. This file pins section 8e.",
-  "r4_endpoint_degenerate": false,
+  "r4_endpoint_degenerate": true,
   "r3_endpoint_degenerate": false,
   "cheapest_r3_in_contract": "r3_chunks_mask",
-  "cheapest_r4_in_contract": "r4_bitmask",
+  "cheapest_r4_in_contract": "v0_shipped",
   "dearest_r3_in_contract": "r3_slice_param",
   "smaller_surface_in_contract": [
-    {
-      "name": "r4_bitmask_pool",
-      "trusted_items": 5,
-      "pct_vs_own_side_a1": -8.369122
-    },
-    {
-      "name": "r4_bitmask_min",
-      "trusted_items": 3,
-      "pct_vs_own_side_a1": -3.122747
-    },
     {
       "name": "r4_set_checked",
       "trusted_items": 5,
@@ -92,8 +82,8 @@
     "R4": 45.313019
   },
   "wp_spread_pp": {
-    "R3": 67.930558,
-    "R4": 39.543977
+    "R3": 67.930588,
+    "R4": 39.543994
   },
   "kernel_digests_distinct": {
     "R3": 8,
@@ -101,8 +91,8 @@
   },
   "oprec_array_byte_identical_to_slice": true,
   "witness_cost_pct_w1": {
-    "shipped_bool_array": 21.775124,
-    "u32_bitmask": 9.665408,
+    "shipped_bool_array": 21.775135,
+    "u32_bitmask": 9.665413,
     "note": "Per cent whole-program Ir/call above controls/r4_nowitness.rs on inputs/small.bin at O3/isolated, both cells from THIS pipeline. NOTES.md section 8e publishes +21.775 per cent for the shipped witness and calls it the row's largest single number; the bitmask witness is the cheaper spelling section 8e itself names and does not build. \u26a0 MEASURED CORPUS ONLY: r4_nowitness is not equivalent to either on an uncovered blob, which is what the witness is for, so this is a cost comparison and not a ladder rung."
   },
   "open_item_79_arms": [
@@ -133,7 +123,8 @@
         "required[1] `idx[d0] = num_interfaces;`",
         "required[2] `assume_init()`",
         "required[2] `unsafe`",
-        "required[4] `wrote[i]`"
+        "required[4] `wrote[i]`",
+        "required[4] `[bool; MAXD]`"
       ],
       "in_contract": true,
       "english_verdict": null,
@@ -154,11 +145,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 1387.67508,
-      "ir_per_call_small_wp": 1550.63992,
+      "ir_per_call_small_wp": 1550.63936,
       "ir_per_call_large": 3308.5953,
-      "ir_per_call_large_wp": 3511.6469,
+      "ir_per_call_large_wp": 3511.6455,
       "pct_vs_r4ship_a1": 24.238194097690773,
-      "pct_vs_r4ship_wp": 21.152213046893323,
+      "pct_vs_r4ship_wp": 21.15222230163753,
       "pct_vs_own_side_a1": 0.0
     },
     {
@@ -171,7 +162,8 @@
         "required[1] `idx[d0] = num_interfaces;`",
         "required[2] `assume_init()`",
         "required[2] `unsafe`",
-        "required[4] `wrote[i]`"
+        "required[4] `wrote[i]`",
+        "required[4] `[bool; MAXD]`"
       ],
       "in_contract": true,
       "english_verdict": null,
@@ -192,11 +184,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 985.42016,
-      "ir_per_call_small_wp": 1148.38376,
+      "ir_per_call_small_wp": 1148.3832,
       "ir_per_call_large": 2426.1484,
-      "ir_per_call_large_wp": 2629.1969,
+      "ir_per_call_large_wp": 2629.1955,
       "pct_vs_r4ship_a1": -11.775585747452132,
-      "pct_vs_r4ship_wp": -10.276246498856809,
+      "pct_vs_r4ship_wp": -10.276250995030928,
       "pct_vs_own_side_a1": -28.987687809454645
     },
     {
@@ -209,7 +201,8 @@
         "required[1] `idx[d0] = num_interfaces;`",
         "required[2] `assume_init()`",
         "required[2] `unsafe`",
-        "required[4] `wrote[i]`"
+        "required[4] `wrote[i]`",
+        "required[4] `[bool; MAXD]`"
       ],
       "in_contract": true,
       "english_verdict": null,
@@ -230,11 +223,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 985.42016,
-      "ir_per_call_small_wp": 1148.38376,
+      "ir_per_call_small_wp": 1148.3832,
       "ir_per_call_large": 2426.1484,
-      "ir_per_call_large_wp": 2629.1969,
+      "ir_per_call_large_wp": 2629.1955,
       "pct_vs_r4ship_a1": -11.775585747452132,
-      "pct_vs_r4ship_wp": -10.276246498856809,
+      "pct_vs_r4ship_wp": -10.276250995030928,
       "pct_vs_own_side_a1": -28.987687809454645
     },
     {
@@ -247,7 +240,8 @@
         "required[1] `idx[d0] = num_interfaces;`",
         "required[2] `assume_init()`",
         "required[2] `unsafe`",
-        "required[4] `wrote[i]`"
+        "required[4] `wrote[i]`",
+        "required[4] `[bool; MAXD]`"
       ],
       "in_contract": true,
       "english_verdict": null,
@@ -272,7 +266,7 @@
       "ir_per_call_large": 3248.9269,
       "ir_per_call_large_wp": 3451.9803,
       "pct_vs_r4ship_a1": 22.579014564734504,
-      "pct_vs_r4ship_wp": 19.704343081733576,
+      "pct_vs_r4ship_wp": 19.704395456067875,
       "pct_vs_own_side_a1": -1.3354826549165946
     },
     {
@@ -285,7 +279,8 @@
         "required[1] `idx[d0] = num_interfaces;`",
         "required[2] `assume_init()`",
         "required[2] `unsafe`",
-        "required[4] `wrote[i]`"
+        "required[4] `wrote[i]`",
+        "required[4] `[bool; MAXD]`"
       ],
       "in_contract": true,
       "english_verdict": null,
@@ -306,11 +301,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 962.888,
-      "ir_per_call_small_wp": 1125.84464,
+      "ir_per_call_small_wp": 1125.84576,
       "ir_per_call_large": 2362.48,
-      "ir_per_call_large_wp": 2565.5127,
+      "ir_per_call_large_wp": 2565.5155,
       "pct_vs_r4ship_a1": -13.79288425476569,
-      "pct_vs_r4ship_wp": -12.03723835319362,
+      "pct_vs_r4ship_wp": -12.03711236062262,
       "pct_vs_own_side_a1": -30.611422379942134
     },
     {
@@ -323,7 +318,8 @@
         "required[1] `idx[d0] = num_interfaces;`",
         "required[2] `assume_init()`",
         "required[2] `unsafe`",
-        "required[4] `wrote[i]`"
+        "required[4] `wrote[i]`",
+        "required[4] `[bool; MAXD]`"
       ],
       "in_contract": true,
       "english_verdict": null,
@@ -344,11 +340,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 969.39872,
-      "ir_per_call_small_wp": 1132.36104,
+      "ir_per_call_small_wp": 1132.36216,
       "ir_per_call_large": 2410.1676,
-      "ir_per_call_large_wp": 2613.2129,
+      "ir_per_call_large_wp": 2613.2157,
       "pct_vs_r4ship_a1": -13.209981162583825,
-      "pct_vs_r4ship_wp": -11.528109011870603,
+      "pct_vs_r4ship_wp": -11.527982796539849,
       "pct_vs_own_side_a1": -30.1422405020057
     },
     {
@@ -361,7 +357,8 @@
         "required[1] `idx[d0] = num_interfaces;`",
         "required[2] `assume_init()`",
         "required[2] `unsafe`",
-        "required[4] `wrote[i]`"
+        "required[4] `wrote[i]`",
+        "required[4] `[bool; MAXD]`"
       ],
       "in_contract": true,
       "english_verdict": null,
@@ -382,11 +379,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 942.47724,
-      "ir_per_call_small_wp": 1105.43956,
+      "ir_per_call_small_wp": 1105.439,
       "ir_per_call_large": 2318.0618,
-      "ir_per_call_large_wp": 2521.1071,
+      "ir_per_call_large_wp": 2521.1057,
       "pct_vs_r4ship_a1": -15.620254364028863,
-      "pct_vs_r4ship_wp": -13.631496676814555,
+      "pct_vs_r4ship_wp": -13.631502641013894,
       "pct_vs_own_side_a1": -32.082282547006606
     },
     {
@@ -399,7 +396,8 @@
         "required[1] `idx[d0] = num_interfaces;`",
         "required[2] `assume_init()`",
         "required[2] `unsafe`",
-        "required[4] `wrote[i]`"
+        "required[4] `wrote[i]`",
+        "required[4] `[bool; MAXD]`"
       ],
       "in_contract": true,
       "english_verdict": null,
@@ -420,11 +418,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 1388.13536,
-      "ir_per_call_small_wp": 1551.10104,
+      "ir_per_call_small_wp": 1551.10048,
       "ir_per_call_large": 3309.8468,
-      "ir_per_call_large_wp": 3512.9005,
+      "ir_per_call_large_wp": 3512.8991,
       "pct_vs_r4ship_a1": 24.27940284807007,
-      "pct_vs_r4ship_wp": 21.188240565442037,
+      "pct_vs_r4ship_wp": 21.188249835949406,
       "pct_vs_own_side_a1": 0.03316914792474414
     },
     {
@@ -438,10 +436,11 @@
         "required[1] `idx[d0] = num_interfaces;`",
         "required[2] `assume_init()`",
         "required[2] `unsafe`",
-        "required[4] `wrote[i]`"
+        "required[4] `wrote[i]`",
+        "required[4] `[bool; MAXD]`"
       ],
       "in_contract": true,
-      "english_verdict": "OUT OF CONTRACT BY ENGLISH: idiom.required[8] DECLARES the allocation order as O(1) per kernel call and PROTOCOL_PHP.md B1a's precondition for this row's cross-language column rests on it. Priced because TASK_PHP_041 section 8.6 left the 5.2.0 schedule's cost as an open uncertainty, and reported because A1 and W1 disagree in SIGN on it.",
+      "english_verdict": "OUT OF CONTRACT BY ENGLISH, ON TWO INDEPENDENT ENTRIES. (i) idiom.required[8] DECLARES the allocation order as O(1) per kernel call and PROTOCOL_PHP.md B1a's precondition for this row's cross-language column rests on it. (ii) \u2b50 ADDED AT TASK_PHP_044, AND IT IS THE TEST OF WHETHER ITEM 83's RULING WAS A RULE OR A PATCH: idiom.required[0]'s rust key backticks `Vec::with_capacity(num_interfaces)` and its English says \"present in safe_tuned.rs, unsafe.rs and verus.rs\" and then \"The set of rungs lives in this English\", so the entry is R3-scoped AMONG OTHERS and safe_tuned.rs IS the R3 rung -- and this variant's whole substitution is to delete that spelling. required_absent records the miss. \u26a0 The entry also names a rung that does NOT match (safe_naive.rs \"writes a vector of None instead\"), which cuts both ways, and the reading is that it does NOT weaken the pin: the two PAT precedents for a non-discriminating required entry (p19-state-machine/required[2], p46-bignum-mac/required[4]) both carry the sentence \"that is the declaration working, not failing\", and this entry says the OPPOSITE -- \"which is the R2/R3 distinction this row exists to price\". It declares its discriminating power rather than disclaiming it. \u26d4 NOTHING MECHANICAL MOVES ON (ii): this variant already carried (i), so it was already outside _admissible, and its A1 of 1369.65 is interior to the R3 span either way -- which is an INDEPENDENT corroboration that item 83's ruling does not reach the R3 endpoint. Priced because TASK_PHP_041 section 8.6 left the 5.2.0 schedule's cost as an open uncertainty, and reported because A1 and W1 disagree in SIGN on it.",
       "built": true,
       "kernel_insns": 337,
       "kernel_fingerprint": "8f6934323652",
@@ -459,11 +458,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 1369.65364,
-      "ir_per_call_small_wp": 1974.88992,
+      "ir_per_call_small_wp": 1974.88936,
       "ir_per_call_large": 3290.6145,
-      "ir_per_call_large_wp": 3932.8571,
+      "ir_per_call_large_wp": 3932.8557,
       "pct_vs_r4ship_a1": 22.62473919538044,
-      "pct_vs_r4ship_wp": 54.29906146876582,
+      "pct_vs_r4ship_wp": 54.299085226276375,
       "pct_vs_own_side_a1": -1.2986786503365026
     },
     {
@@ -498,9 +497,9 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 1116.94724,
-      "ir_per_call_small_wp": 1279.91052,
+      "ir_per_call_small_wp": 1279.90996,
       "ir_per_call_large": 2835.9515,
-      "ir_per_call_large_wp": 3038.9992,
+      "ir_per_call_large_wp": 3038.9978,
       "pct_vs_r4ship_a1": 0.0,
       "pct_vs_r4ship_wp": 0.0,
       "pct_vs_own_side_a1": 0.0,
@@ -518,10 +517,11 @@
       "rung_candidate": true,
       "forbidden_hits": [],
       "required_absent": [
-        "required[4] `wrote[i]`"
+        "required[4] `wrote[i]`",
+        "required[4] `[bool; MAXD]`"
       ],
       "in_contract": true,
-      "english_verdict": null,
+      "english_verdict": "OUT OF CONTRACT BY ENGLISH (open item 83, ruled at TASK_PHP_043 section 1, applied at TASK_PHP_044): ../spec.md's idiom.required[4] pins the witness REPRESENTATION -- `wrote[i]`, THE ONE-BYTE-PER-SLOT WITNESS, `[bool; MAXD]` -- and not merely the role, so a u32 bitmask witness at one BIT per slot establishes the same slot-coverage fact by a DIFFERENT expression and is out of contract on that entry even though its twin verifies and even though it is CHEAPER. The named-spelling standard in idiom.why names this exact case and resolves it against the challenger; the entry's own English agrees with its backticks, because \"indexed SAFELY on purpose\" also fails on a witness that performs no indexed access. PRICED AND REPORTED ANYWAY: required_absent records the miss, witness_cost_pct_w1 keeps the cost, and variants[].trusted_items keeps the surface, so this is a CONTROL-CLASS result -- a witness-representation change that would be cheaper and smaller-surface is out of this row's contract -- and not an endpoint.",
       "built": true,
       "kernel_insns": 296,
       "kernel_fingerprint": "7b7197acac34",
@@ -545,11 +545,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 989.67032,
-      "ir_per_call_small_wp": 1152.63204,
+      "ir_per_call_small_wp": 1152.63148,
       "ir_per_call_large": 2446.6456,
-      "ir_per_call_large_wp": 2649.6894,
+      "ir_per_call_large_wp": 2649.688,
       "pct_vs_r4ship_a1": -11.395070012438548,
-      "pct_vs_r4ship_wp": -9.944326420568835,
+      "pct_vs_r4ship_wp": -9.944330771517706,
       "pct_vs_own_side_a1": -11.395070012438548,
       "verus_verifies": true,
       "verus_msg": "verification results:: 31 verified, 0 errors",
@@ -565,10 +565,11 @@
       "rung_candidate": true,
       "forbidden_hits": [],
       "required_absent": [
-        "required[4] `wrote[i]`"
+        "required[4] `wrote[i]`",
+        "required[4] `[bool; MAXD]`"
       ],
       "in_contract": true,
-      "english_verdict": null,
+      "english_verdict": "OUT OF CONTRACT BY ENGLISH (open item 83, ruled at TASK_PHP_043 section 1, applied at TASK_PHP_044): ../spec.md's idiom.required[4] pins the witness REPRESENTATION -- `wrote[i]`, THE ONE-BYTE-PER-SLOT WITNESS, `[bool; MAXD]` -- and not merely the role, so a u32 bitmask witness at one BIT per slot establishes the same slot-coverage fact by a DIFFERENT expression and is out of contract on that entry even though its twin verifies and even though it is CHEAPER. The named-spelling standard in idiom.why names this exact case and resolves it against the challenger; the entry's own English agrees with its backticks, because \"indexed SAFELY on purpose\" also fails on a witness that performs no indexed access. PRICED AND REPORTED ANYWAY: required_absent records the miss, witness_cost_pct_w1 keeps the cost, and variants[].trusted_items keeps the surface, so this is a CONTROL-CLASS result -- a witness-representation change that would be cheaper and smaller-surface is out of this row's contract -- and not an endpoint.",
       "built": true,
       "kernel_insns": 312,
       "kernel_fingerprint": "dac057d352bf",
@@ -591,11 +592,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 1023.46856,
-      "ir_per_call_small_wp": 1186.43088,
+      "ir_per_call_small_wp": 1186.432,
       "ir_per_call_large": 2562.7468,
-      "ir_per_call_large_wp": 2765.7921,
+      "ir_per_call_large_wp": 2765.7949,
       "pct_vs_r4ship_a1": -8.369122251468204,
-      "pct_vs_r4ship_wp": -7.303607442807801,
+      "pct_vs_r4ship_wp": -7.303479379127571,
       "pct_vs_own_side_a1": -8.369122251468204,
       "verus_verifies": true,
       "verus_msg": "verification results:: 31 verified, 0 errors",
@@ -611,10 +612,11 @@
       "rung_candidate": true,
       "forbidden_hits": [],
       "required_absent": [
-        "required[4] `wrote[i]`"
+        "required[4] `wrote[i]`",
+        "required[4] `[bool; MAXD]`"
       ],
       "in_contract": true,
-      "english_verdict": null,
+      "english_verdict": "OUT OF CONTRACT BY ENGLISH (open item 83, ruled at TASK_PHP_043 section 1, applied at TASK_PHP_044): ../spec.md's idiom.required[4] pins the witness REPRESENTATION -- `wrote[i]`, THE ONE-BYTE-PER-SLOT WITNESS, `[bool; MAXD]` -- and not merely the role, so a u32 bitmask witness at one BIT per slot establishes the same slot-coverage fact by a DIFFERENT expression and is out of contract on that entry even though its twin verifies and even though it is CHEAPER. The named-spelling standard in idiom.why names this exact case and resolves it against the challenger; the entry's own English agrees with its backticks, because \"indexed SAFELY on purpose\" also fails on a witness that performs no indexed access. PRICED AND REPORTED ANYWAY: required_absent records the miss, witness_cost_pct_w1 keeps the cost, and variants[].trusted_items keeps the surface, so this is a CONTROL-CLASS result -- a witness-representation change that would be cheaper and smaller-surface is out of this row's contract -- and not an endpoint.",
       "built": true,
       "kernel_insns": 323,
       "kernel_fingerprint": "d73621d9f448",
@@ -636,11 +638,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 1082.0678,
-      "ir_per_call_small_wp": 1245.03192,
+      "ir_per_call_small_wp": 1245.03136,
       "ir_per_call_large": 2693.3836,
-      "ir_per_call_large_wp": 2896.4334,
+      "ir_per_call_large_wp": 2896.432,
       "pct_vs_r4ship_a1": -3.122747319739107,
-      "pct_vs_r4ship_wp": -2.725081125202409,
+      "pct_vs_r4ship_wp": -2.7250823175092727,
       "pct_vs_own_side_a1": -3.122747319739107,
       "verus_verifies": true,
       "verus_msg": "verification results:: 32 verified, 0 errors",
@@ -679,11 +681,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 1190.68932,
-      "ir_per_call_small_wp": 1353.655,
+      "ir_per_call_small_wp": 1353.65444,
       "ir_per_call_large": 3040.0165,
-      "ir_per_call_large_wp": 3243.0702,
+      "ir_per_call_large_wp": 3243.0688,
       "pct_vs_r4ship_a1": 6.602109514143209,
-      "pct_vs_r4ship_wp": 5.761690278161013,
+      "pct_vs_r4ship_wp": 5.76169279907784,
       "pct_vs_own_side_a1": 6.602109514143209,
       "verus_verifies": true,
       "verus_msg": "verification results:: 28 verified, 0 errors",
@@ -723,11 +725,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 1150.74548,
-      "ir_per_call_small_wp": 1313.70936,
+      "ir_per_call_small_wp": 1313.71048,
       "ir_per_call_large": 2952.0527,
-      "ir_per_call_large_wp": 3155.1019,
+      "ir_per_call_large_wp": 3155.1047,
       "pct_vs_r4ship_a1": 3.0259477609703462,
-      "pct_vs_r4ship_wp": 2.6407189777610514,
+      "pct_vs_r4ship_wp": 2.640851392390134,
       "pct_vs_own_side_a1": 3.0259477609703462,
       "verus_verifies": true,
       "verus_msg": "verification results:: 27 verified, 0 errors",
@@ -767,11 +769,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 1122.58028,
-      "ir_per_call_small_wp": 1285.54492,
+      "ir_per_call_small_wp": 1285.54436,
       "ir_per_call_large": 2841.5693,
-      "ir_per_call_large_wp": 3044.6204,
+      "ir_per_call_large_wp": 3044.619,
       "pct_vs_r4ship_a1": 0.5043246268283842,
-      "pct_vs_r4ship_wp": 0.44021827400872854,
+      "pct_vs_r4ship_wp": 0.4402184666177722,
       "pct_vs_own_side_a1": 0.5043246268283842,
       "verus_verifies": true,
       "verus_msg": "verification results:: 27 verified, 0 errors",
@@ -815,7 +817,7 @@
       "ir_per_call_large": 2917.3612,
       "ir_per_call_large_wp": 3120.4133,
       "pct_vs_r4ship_a1": 2.9877830218730783,
-      "pct_vs_r4ship_wp": 2.607504155837398,
+      "pct_vs_r4ship_wp": 2.6075490497784704,
       "pct_vs_own_side_a1": 2.9877830218730783,
       "verus_verifies": true,
       "verus_msg": "verification results:: 27 verified, 0 errors",
@@ -855,11 +857,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 1495.79284,
-      "ir_per_call_small_wp": 1658.75956,
+      "ir_per_call_small_wp": 1658.759,
       "ir_per_call_large": 3740.6835,
-      "ir_per_call_large_wp": 3943.7398,
+      "ir_per_call_large_wp": 3943.7384,
       "pct_vs_r4ship_a1": 33.91794942794255,
-      "pct_vs_r4ship_wp": 29.59965045056432,
+      "pct_vs_r4ship_wp": 29.599663401322395,
       "pct_vs_own_side_a1": 33.91794942794255,
       "verus_verifies": true,
       "verus_msg": "verification results:: 27 verified, 0 errors",
@@ -899,11 +901,11 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 1136.97052,
-      "ir_per_call_small_wp": 1299.92652,
+      "ir_per_call_small_wp": 1299.92596,
       "ir_per_call_large": 2878.4123,
-      "ir_per_call_large_wp": 3081.4438,
+      "ir_per_call_large_wp": 3081.4424,
       "pct_vs_r4ship_a1": 1.7926791242171936,
-      "pct_vs_r4ship_wp": 1.5638593235408424,
+      "pct_vs_r4ship_wp": 1.563860007777428,
       "pct_vs_own_side_a1": 1.7926791242171936,
       "verus_msg": "R4 with NO TWIN FILE: an R4 is a program whose obligations a prover can discharge, and nothing was put through Verus for this one. Inadmissible by rule, not by measurement."
     },
@@ -914,7 +916,8 @@
       "rung_candidate": false,
       "forbidden_hits": [],
       "required_absent": [
-        "required[4] `wrote[i]`"
+        "required[4] `wrote[i]`",
+        "required[4] `[bool; MAXD]`"
       ],
       "in_contract": true,
       "english_verdict": "NOT A RUNG AND CANNOT BECOME ONE: it answers differently on an uncovered blob, which is what the witness is for (NOTES.md 8e). Its side is CTL so cheapest_in_contract and cheaper_than_shipped refuse it by construction.",
@@ -940,14 +943,14 @@
         "small.bin": "6006732414664575180"
       },
       "ir_per_call_small": 888.082,
-      "ir_per_call_small_wp": 1051.04432,
+      "ir_per_call_small_wp": 1051.04376,
       "ir_per_call_large": 2151.9941,
-      "ir_per_call_large_wp": 2355.0394,
+      "ir_per_call_large_wp": 2355.038,
       "pct_vs_r4ship_a1": -20.490246253708456,
-      "pct_vs_r4ship_wp": -17.881421898149565,
+      "pct_vs_r4ship_wp": -17.88142972182199,
       "pct_vs_own_side_a1": -20.490246253708456
     }
   ],
   "problems": [],
-  "invariant": "Every variant is in contract by harness/check.py::spelling_matches over EVERY backticked idiom entry, returns ITS OWN SIDE's shipped checksum on all seven inputs (this row's R3 and R4 diverge on adversarial-cmp.bin by declaration, so a cross-side reference would be this control's defect and not a variant's), and is priced in BOTH families by one callgrind run per cell. Every R4 variant additionally has its substitution applied to verus.rs and is put through Verus, and the ERROR TEXT is read: `is not supported` and `does not yet support` disqualify, a failed postcondition does not. An R4 variant with NO twin file is inadmissible BY RULE (r4_no_twin_reason), which ph45's copy leaves as a silent skip. Byte-identity between an R4 variant and its twin is RECORDED and is not a bar, because spec.md pins `identity: differ` at both levels and the gate record measures `differ` -- both are read at run time by identity_premise() rather than assumed. TWO quantities ship in each family, labelled: the fixed-R4 bound and the R3-side span. NO PAIR INTERVAL."
+  "invariant": "\u26a0\u26a0 REPAIRED AT TASK_PHP_044 (open item 89) AND THE CLAUSE IT REPLACES WAS FALSE AS WRITTEN. It read \"Every variant is in contract by harness/check.py::spelling_matches over EVERY backticked idiom entry\", which is false on this file's own data: 13 of 20 variants record a non-empty required_absent, INCLUDING R3's v0_shipped. What is true: every variant's `forbidden_hits` is empty by harness/check.py::spelling_matches, which is what `in_contract` MEANS here (the field is literally `not forb`, and it never consults required_absent); `required_absent` is reported BESIDE it and is judged against each entry's English, because `required` is presence-only and cannot fail the gate (check.py::idiom_audit, which measures the naive every-span-in-every-rung reading at 41 misses of 158 obligations, all 41 non-defects). Where a reading has been made it is recorded in `english_verdict` and NOT in `in_contract` -- `_admissible` requires both -- so the two halves stay distinguishable. \u2b50 THE CLAUSE WAS BYTE-IDENTICAL IN ALL FIVE PHP ROWS' spellings.json and is repaired HERE ONLY, because each of the other four costs its own re-gate and batches with that row's next task; RECAP_PHP.md item 89 carries them. It entered with the php copy and was cloned four times, which is F101's law at a fifth generation. AND THE REST OF THE INVARIANT STANDS AS WRITTEN: every variant returns ITS OWN SIDE's shipped checksum on all seven inputs (this row's R3 and R4 diverge on adversarial-cmp.bin by declaration, so a cross-side reference would be this control's defect and not a variant's), and is priced in BOTH families by one callgrind run per cell. Every R4 variant additionally has its substitution applied to verus.rs and is put through Verus, and the ERROR TEXT is read: `is not supported` and `does not yet support` disqualify, a failed postcondition does not. An R4 variant with NO twin file is inadmissible BY RULE (r4_no_twin_reason), which ph45's copy leaves as a silent skip. Byte-identity between an R4 variant and its twin is RECORDED and is not a bar, because spec.md pins `identity: differ` at both levels and the gate record measures `differ` -- both are read at run time by identity_premise() rather than assumed. TWO quantities ship in each family, labelled: the fixed-R4 bound and the R3-side span. NO PAIR INTERVAL."
 }

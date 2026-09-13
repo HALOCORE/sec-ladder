@@ -116,6 +116,32 @@ CLAIMS = ['patterns-php/CATALOGUE.md', 'patterns-php/SOURCES.md', 'PLAN_PHP.md',
 ROW_CLAIMS = sorted(glob.glob('patterns-php/*/spec.md')) + \
              sorted(glob.glob('patterns-php/*/NOTES.md'))
 
+# ⛔⛔ AND THE LAYER THIS CHECKER COULD NOT SEE, WHICH IS WHERE THE WORST
+# INSTANCE LIVES. `ROW_CLAIMS` is `spec.md` + `NOTES.md`, so a `.temp/` citation
+# inside a COMMITTED `controls/*` file was invisible -- and `TASK_PHP_044` §3.2
+# found `ph53/controls/spellings.py:1349` citing its own must-fire negatives
+# suite at `.temp/php42/negatives_spellings.py`, which is GITIGNORED and due for
+# deletion under CLAUDE.md constraint 6.
+#
+# ⭐⭐ THE SUBCLASS IS WORSE THAN A DANGLING POINTER AND IT IS WHY THIS SCAN
+# EXISTS: `PROTOCOL_PHP.md` §H says a validator change lands with its must-fire
+# negatives OR IT DOES NOT LAND. If those negatives live in gitignored scratch,
+# §H is satisfied in a way that DOES NOT SURVIVE A CHECKOUT -- the validator
+# ships and the evidence that it can fail does not. RECAP_PHP.md open item 97.
+#
+# ⚠ Reported as a WARNING and in its own class, deliberately. Many of the 50-odd
+# hits are historical notes about where work happened, which are harmless; the
+# §H subclass is the one that costs something, so it is flagged separately
+# instead of being drowned.
+CONTROL_CLAIMS = sorted(d for d in glob.glob('patterns-php/*/controls/*')
+                        if os.path.isfile(d) and '__pycache__' not in d)
+
+# A citation is in the §H subclass when the CITING LINE is about the thing that
+# makes a validator trustworthy. Matched on the line, not the path, because the
+# path is often just `.temp/phNN/` -- it is the role that matters.
+SEC_H_WORDS = re.compile(r'negative|must-fire|must-NOT-fire|selftest|self-test',
+                         re.I)
+
 COMMITTED = [d for d in CLAIMS if os.path.exists(d)]
 
 
@@ -171,6 +197,41 @@ if rowwarn:
     print('   ⛔ A `spec.md` citation is HASHED into `contract_sha256`, so '
           'repairing one\n      costs that row a re-gate -- which is exactly '
           'why it should not be written.')
+# ---- the controls/ layer (item 97) -------------------------------------------
+ctlwarn, ctl_h = [], []
+for doc in CONTROL_CLAIMS:
+    try:
+        lines = open(doc, encoding='utf-8', errors='replace').read().split('\n')
+    except OSError:
+        continue
+    for i, ln in enumerate(lines, 1):
+        for q in {c for c in cited(ln) if c.startswith('.temp/')}:
+            st = 'resolves TODAY' if exists(q) else 'ALREADY GONE'
+            rec = (doc, i, q, st)
+            ctlwarn.append(rec)
+            if SEC_H_WORDS.search(ln):
+                ctl_h.append(rec)
+if ctl_h:
+    print('\n⛔⛔ §H AT RISK -- a COMMITTED validator cites its NEGATIVES in '
+          'gitignored `.temp/`:')
+    for doc, i, q, st in ctl_h:
+        print(f'   {doc}:{i}  ->  {q}   [{st}]')
+    print('   ⛔ `PROTOCOL_PHP.md` §H: a validator change lands with its '
+          'must-fire negatives\n      OR IT DOES NOT LAND. If they are '
+          'gitignored, the validator ships and the\n      evidence that it can '
+          'FAIL does not. Commit the suite, or move the arms\n      into the '
+          'validator so they run on every invocation (RECAP_PHP.md item 97).')
+if ctlwarn:
+    others = len(ctlwarn) - len(ctl_h)
+    gone = sum(1 for r in ctlwarn if r[3] == 'ALREADY GONE')
+    print(f'\nⓘ `.temp/` citations inside committed `controls/*`: '
+          f'{len(ctlwarn)} total across '
+          f'{len({r[0] for r in ctlwarn})} file(s) -- {len(ctl_h)} in the §H '
+          f'subclass above, {others} historical, {gone} ALREADY GONE.')
+    print('   ⓘ `controls/*` is in `source_sha256`, so repairing one costs that '
+          'row a\n      RE-GATE and not a re-measure. Batch with the row\'s next '
+          'task.')
+
 if inherited:
     print(f'\nⓘ {len(inherited)} `.temp/` citation(s) are INHERITED by all '
           f'{len(specs)} rows\' `spec.md`')
@@ -248,6 +309,38 @@ def selftest():
     #    punishing the repair.
     ck('N3', not [q for _, q, _ in rowwarn if 'controls/' in q],
        'no `controls/` citation is reported -- the repair is not punished')
+    # ⛔ N5 MUST-FIRE (capability): the scan REACHES `controls/*` at all.
+    #    Without this arm, narrowing CONTROL_CLAIMS back to nothing would pass.
+    ck('N5', len(ctlwarn) >= 1 and len({r[0] for r in ctlwarn}) >= 2,
+       f'the scan reaches committed `controls/*`: {len(ctlwarn)} citation(s) '
+       f'across {len({r[0] for r in ctlwarn})} file(s) -- e.g. '
+       f'{ctlwarn[0][0].split("/")[-1] if ctlwarn else "-"}')
+
+    # ⛔⛔ N5b MUST-FIRE: the §H subclass is DETECTED, and it is not one row.
+    #    This is the arm that matters. `TASK_PHP_044` §3.2 reported ONE instance
+    #    (ph53); the scan finds it is systemic -- every row's `spellings.py` and
+    #    `negatives.py` cites its must-fire suite in gitignored `.temp/`.
+    #    ⚠ If this arm ever reads 0, either the debt is discharged (check the
+    #    rows) or the detector broke (check SEC_H_WORDS).
+    h_rows = {r[0].split('/')[1] for r in ctl_h}
+    ck('N5b', len(ctl_h) >= 1,
+       f'the §H subclass is detected: {len(ctl_h)} citation(s) across '
+       f'{len(h_rows)} row(s) {sorted(h_rows)} -- a committed validator whose '
+       f'must-fire negatives are gitignored satisfies §H in a way that does not '
+       f'survive a checkout')
+
+    # ⚠ N5c MUST-NOT-FIRE: `__pycache__` is not a claim. A `.pyc` carries the
+    #   same strings as its source and would double every hit.
+    ck('N5c', not [d for d in CONTROL_CLAIMS if '__pycache__' in d
+                   or d.endswith('.pyc')],
+       'no `__pycache__` / `.pyc` in CONTROL_CLAIMS -- a compiled copy carries '
+       'the same strings and would double every hit')
+
+    # ⚠ N5d MUST-NOT-FIRE: the new layer is a WARNING, like the row layer.
+    #   It must not change the LIVE-doc failure count.
+    ck('N5d', rot == 0,
+       f'the controls/ layer leaves the LIVE-doc rot count untouched: {rot}')
+
     # N4 MUST-NOT-FIRE: the extension is a WARNING and must not change the
     #    failure count for the live manager docs.
     ck('N4', rot == 0,

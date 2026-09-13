@@ -87,3 +87,14 @@
   F52 control is what makes the exponent believable: it recovers `−0.5047` from
   i.i.d. noise and `−0.9799` from endpoint noise, so the experiment does
   distinguish *a weak lever* from *measuring its own null*.** (F92 narrowed.)
+
+- ⚠⚠ **A IS REPRODUCIBLE AND THE WHOLE-PROGRAM COLUMN IS NOT — SO *"QUOTE BOTH,
+  LABELLED"* HAS A REPRODUCIBILITY REASON BESIDE ITS RESOLUTION REASON.** Over
+  **four** regenerations of one row's sidecar, **every A1 figure was
+  bit-identical** while the whole-program column moved by a constant
+  **±14–28 Ir** — the per-call stack-alignment bistability
+  `check.py::check_marginal_ir` names, almost certainly the argv/env block, i.e.
+  **the path length of whatever invoked the gate.** ▶ **Do not quote a
+  whole-program figure to more than 2 dp**, and note that a row publishing **only**
+  the whole-program column publishes the unstable one. ⚠ **UNEXPLAINED — the
+  cause was not isolated.** (Item 99, `TASK_PHP_044` §8.2.)

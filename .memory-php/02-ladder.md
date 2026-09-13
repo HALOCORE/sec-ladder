@@ -706,3 +706,34 @@
   review). ⛔ **`ph07` and `ph16` found their R4 degenerate, and that is on
   file.** ▶ **Search both endpoints on every row; do not manufacture a variant to
   have something to report.**
+
+- ⛔⛔⛔ **A BACKTICK IN AN `idiom.required` / `forbidden` ENTRY *IS* A PIN,
+  INCLUDING AROUND A FILENAME, A TYPE NAME OR A FIELD NAME — SO ANY DRAFT OF
+  THAT PROSE GOES THROUGH `idiom_audit` BEFORE IT LANDS.** `harness/check.py::spelling_matches`
+  matches every backticked span against every rung of the entry's language, so
+  a span quoted merely to *refer* to something becomes a declared obligation.
+  **Two failure modes, both measured:** a span that matches **every** rung is a
+  pin that cannot discriminate — the **ANTI-signal** class `idiom_audit` counts
+  at **17 of 41** — and a span that matches **none** is a `pins nothing` entry.
+  ⭐⭐ **THE INSTANCE IS THE STRONGEST POSSIBLE ONE: the review that established
+  *"a backticked span pins the representation"* then drafted three spans it did
+  not mean to pin — `` `u32` `` (matches every rung), `` `controls/spellings.json` ``
+  and `` `required_absent` `` (match none) — inside the very sentence
+  establishing the rule.** ⭐ **And the engineer applying it caught one of its own
+  the same way: a meta-sentence saying *"ONLY `x` AND `y` ARE BACKTICKED HERE"*
+  re-backticked and duplicated both.** ▶ **Neither was found by reasoning. Both
+  were found by running `controls/spellings.py --audit-only` and READING THE
+  OUTPUT.** ⓘ The convention was already on file — `p42`'s `required[1]`:
+  *"quoting a file name or a retracted span would pin it too"*. **It is the
+  checking step that was missing, not the rule.** (`TASK_PHP_044` §2, item 100.)
+
+- ⚠⚠ **ADMISSION NEEDS **BOTH** FIELDS: `in_contract` AND `english_verdict`.
+  READING EITHER ALONE GIVES THE WRONG ANSWER.** A `spellings.py` variant is
+  admissible only if `forbidden_hits` is empty **and** no `english_verdict`
+  excludes it. ⭐ **`_043` read `in_contract: true` on `r3_no_capacity` and
+  concluded it was admitted; it had already been excluded on a different entry's
+  `english_verdict`** — so the repair it asked for was already in place.
+  ⭐⭐ **That is the same class as `_043`'s own ruling — that `required_absent`
+  is not self-interpreting — committed while establishing it**, and it is why
+  `02-ladder`'s pin rule above says *read the entry, not the report*: here, read
+  **both** fields, not one. (`TASK_PHP_044` §4, item 90.)

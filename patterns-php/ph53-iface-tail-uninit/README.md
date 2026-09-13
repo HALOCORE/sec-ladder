@@ -71,24 +71,32 @@ search: `−1.253 %` A1. Third row in the corpus where that happens; `NOTES.md`
 | `controls/negatives.py` | four must-fire Verus mutants, TWO must-NOT-fire, four Miri arms, the witness's cost, and a guarded kernel fingerprint |
 | `controls/mu_unwrapped.rs` | ⭐ the obligation **unwrapped** — the same `MaybeUninit` operations with **no trusted item at all**, letting vstd's own spec carry it, 7/0. It is what stands in for `slot_read_unchecked`'s twin, which cannot exist (`NOTES.md` §11.5) |
 | `controls/r4_nowitness.rs` | the faithful unsafe port — **a control, never a rung** |
-| `controls/spellings.py` `.json` | ⭐⭐ **the endpoint search: 20 variants, BOTH endpoints move** — `NOTES.md` §8j. Run it with `--verus` or its R4 column means nothing |
+| `controls/spellings.py` `.json` | ⭐⭐ **the endpoint search: 20 variants — the R3 endpoint MOVES, the R4 endpoint is DEGENERATE** (`r4_endpoint_degenerate: true`, since `TASK_PHP_044` applied open item 83's ruling) — `NOTES.md` §8j. Run it with `--verus` or its R4 column means nothing. ⭐ `ENGLISH_VERDICTS` is where the R4 exclusion lives and `english_verdict_problems` is the arm that fires if it is emptied |
 | `controls/mu_ref.rs` `mu_ref_cmp.rs` `mu_ref_exec.rs` | ⭐ **open item 79 measured** — the `MaybeUninit<&Iface>` representation: the half that verifies (8/0), the half Verus REFUSES, and the exec rung that prices it (+1.79 %). `NOTES.md` §8k |
 | `NOTES.md` | the measurements and the four trusted-item arguments |
 
 ## ⚠ What this row does not have
 
-* ⭐⭐ **BOTH ENDPOINTS ARE NOW SEARCHED AND BOTH MOVE** (`controls/spellings.py`,
-  20 variants, `NOTES.md` §8j) — so this is no longer a gap, but the published
-  `fixed-R4 bound` **still holds both endpoints fixed BY FIAT**, which is what
-  makes it a bound, and it must be quoted as one. What the search adds:
-  `r3_chunks_mask` is **−32.08 %** against the shipped R3, `r4_bitmask` is
-  **−11.40 %** against the shipped R4, and **the ordering between the two sides
+* ⭐⭐ **BOTH ENDPOINTS ARE NOW SEARCHED; THE R3 ONE MOVES AND THE R4 ONE IS
+  DEGENERATE** (`controls/spellings.py`, 20 variants, `NOTES.md` §8j) — so this
+  is no longer a gap, but the published `fixed-R4 bound` **still holds both
+  endpoints fixed BY FIAT**, which is what makes it a bound, and it must be
+  quoted as one. What the search adds: `r3_chunks_mask` is **−32.08 %** against
+  the shipped R3; **no in-contract R4 variant beats the shipped R4** (the nearest
+  is `r4_set_checked` at **+0.50 %**); and **the ordering between the two sides
   REVERSES** — an ordering, never an interval.
-  ⭐ **The cheaper R4 the row itself named and did not build is the one that
-  wins**: the `u32` bitmask witness, twin at 31/0 with two `by (bit_vector)`
-  lemmas and no new trusted item. ⭐⭐ **And `r4_bitmask_min` is cheaper AND has
-  one trusted accessor instead of four** (`external_body` items 3 against 6),
-  twin at 32/0.
+  ⛔⛔ **THIS BULLET SAID *"BOTH MOVE"* UNTIL `TASK_PHP_044`.** The cheaper R4 the
+  row itself named and did not build — the `u32` bitmask witness, twin at 31/0
+  with two `by (bit_vector)` lemmas and no new trusted item — **is OUT OF
+  CONTRACT**: `idiom.required[4]` pins the witness **representation**
+  (*"THE ONE-BYTE-PER-SLOT WITNESS, `[bool; MAXD]`"*), open item 83, ruled by
+  `TASK_PHP_043` §1. ⭐ **So what was the R4 endpoint is now a CONTROL-CLASS
+  result, and a sharper one**: *a witness-representation change that would be
+  **cheaper** (−11.40 %) and **smaller-surface** (`r4_bitmask_min`, 3
+  `external_body` items against 6, −3.12 %, twin 32/0) is outside this row's
+  contract.* ⚠ **The pin was not weakened to match a winner** — the ruling is the
+  reading under which the cheap variants lose, and `.memory/02-bench-rules.md`'s
+  *a rung is never cost-selected* binds a pin the same way.
   ⛔ **Two mechanism claims in `NOTES.md` are REFUTED by that work** — §8c's
   *"R3's scan loops vectorise"* and §8e's *"the reason is lost vectorisation"*.
   Nothing vectorises inside a scan loop in any rung of this row; §8c and §8e

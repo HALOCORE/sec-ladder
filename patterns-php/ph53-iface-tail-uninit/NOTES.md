@@ -143,15 +143,34 @@ guard), so the residual the heuristic cannot see is one include guard.
 | | |
 |---|---|
 | **R1h** | `d09cdd9f71f34deab4b99f4e63523fb94164a724` — Dmitry Stogov, 2005-06-08, *"Fixed valgrind errors"*, 1 file, 1 hunk, **2 insertions, 1 deletion**, first shipped in **php-5.0.5**. `controls/d09cdd9f71f3.patch`, sha256 `4f97b625fc9772d6…`, 1 026 B |
-| ⛔ **the corpus column** | `be8daf1f47fa` — Dmitry Stogov, 2008-03-12, *"Optimized ZEND_FETCH_CLASS + ZEND_ADD_INTERFACE into single ZEND_ADD_INTERFACE opcode"*. `controls/be8daf1f47fa.patch`, sha256 `42190b44ad8068c3…`, 7 397 B. **EXCLUDED, twice independently** |
+| ⛔ **the corpus column** | `be8daf1f47fa` — Dmitry Stogov, 2008-03-12, *"Optimized ZEND_FETCH_CLASS + ZEND_ADD_INTERFACE into single ZEND_ADD_INTERFACE opcode"*. `controls/be8daf1f47fa.patch`, sha256 `42190b44ad8068c3…`, 7 397 B. **EXCLUDED, on one route** |
 
-Both excluded for reasons that do not depend on each other:
+⛔⛔ **THIS SAID *"EXCLUDED, twice independently"* UNTIL `TASK_PHP_044`, AND THE
+SECOND ROUTE IS WITHDRAWN — NOT REFUTED.** The exclusion itself is unchanged and
+so is R1h; what was overstated is the evidence base, by one route.
 
-* `.tasks-php/preimage_screen.py` labels it `NOT-THE-REPAIR` — neither cited
-  5.0.0 line is in the pre-image of its `Zend/zend_compile.c` hunk;
-* the release-tag walk is decisive on its own: the cited `erealloc` line is
-  present at `php-5.0.0` … `php-5.0.4` and **gone at `php-5.0.5`**, two years
-  and nine months before that commit.
+* ✅ **THE ROUTE THAT STANDS — the release-tag walk, and it is decisive on its
+  own**: the cited `erealloc` line is present at `php-5.0.0` … `php-5.0.4` and
+  **gone at `php-5.0.5`**, two years and nine months before that commit. A 2008
+  commit cannot be the fix for a line that left the release series in 2005.
+* ⛔ **THE ROUTE THAT IS GONE — `.tasks-php/preimage_screen.py`'s
+  `NOT-THE-REPAIR` label.** The screen's own `same_function` soundness repair
+  demoted **this exact record** to `INAPPLICABLE-SAME-FILE`, because the
+  commit's hunk crosses into `zend_do_implements_interface`; the screen prints
+  that class as *"**NOT** exclusions … the screen says nothing about these"* and
+  banners *"CITE 0 EXCLUSIONS, NOT 1"*. Measured by `TASK_PHP_043` §4.1 by
+  running the screen.
+
+⚠ **The two routes were NOT the same evidence twice** — different artefacts
+(the patch plus its own parent tree, against the release tags), different
+propositions, neither derivable from the other — which is why losing one costs a
+qualifier and not the conclusion. ⭐⭐ **AND THE TRANSFERABLE LESSON IS THE POINT:
+a repair to a screen can silently withdraw a route a finding is still citing,
+and nothing re-checks the finding.** ⛔ **The withdrawn route is still cited in
+`c/kernel_hardened.c`'s header comment, which is in the MEASUREMENT digest and
+therefore cannot be repaired in a re-gate** — a 32-cell re-measure for a
+comment. `RECAP_PHP.md` carries it as an open item; it is recorded here so a
+reader who finds it knows it is known.
 
 The 2005 commit's removed line is **byte-identical to 5.0.0's `:2571`**, and
 `patch -p1 --dry-run` on the pristine tarball gives `Hunk #1 succeeded at 2568
@@ -225,6 +244,22 @@ slot of a live allocation, which is MSan's class; what ASan reports is the
 *dereference of the value that came out*, and it is deterministic only because
 ASan fills fresh allocations with `0xbe`. **§9 is the Miri arm that sees the
 read itself.**
+
+> ⭐ **`0xbe` IS THE DETECTOR'S BYTE, NOT THIS ROW'S, AND IT IS A RUNTIME
+> SETTING — MEASURED AT `TASK_PHP_044` RATHER THAN ASSERTED.** Four arms of one
+> source on this box: a fresh `malloc(64)` reads `be be be be be be be be` under
+> **both** `gcc -O1 -fsanitize=address,undefined` and
+> `clang -O1 -fsanitize=address`; reads **zero** with the sanitizer off under
+> either compiler; and reads **zero** under ASan with
+> `ASAN_OPTIONS=malloc_fill_byte=0`. ▶ **So it is ASan's `malloc_fill_byte`
+> default and not even a compile-time constant**, which is why the `0xbe…be`
+> in the table above and in `provenance.cwe_note` must be read as an artefact of
+> *how the fault was observed*. ⚠ **And the allocator shim contributes nothing
+> either way**: `common-php/emalloc_shim.h`'s `emalloc` arm is plain `malloc` —
+> it neither zeroes nor poisons, and the debug build's
+> `memset(ptr, 0x5a, p->size)` on free is in that header's own **DELIBERATELY
+> NOT MODELLED** list. **What the row claims is the indeterminacy, not the
+> bytes.**
 
 ### 5b. ⭐⭐ `controls/wild_choice.py --selftest --reps 5` — `SELFTEST PASS`, and it says something 5a cannot
 
@@ -415,16 +450,27 @@ number is fractions of a percent and why it can go either way.
 LABELLED, beside a cheapest-found counterpart.**
 
 > ⭐⭐⭐ **BOTH ENDPOINTS HAVE NOW BEEN SEARCHED (`TASK_PHP_042`,
-> `controls/spellings.py`, 20 variants) AND BOTH MOVE — §8j.** The bound below
-> is still the figure the row PUBLISHES, because `.memory/02-bench-rules.md`
-> holds the shipped rungs fixed by fiat and that fiat is what makes it a bound;
-> what the search changes is what may be said *beside* it.
-> **`r3_endpoint_degenerate: false`, `r4_endpoint_degenerate: false`.**
-> ⚠⚠ **AND THE ORDERING REVERSES**: the cheapest in-contract R3 found
-> (`r3_chunks_mask`, **−32.08 %** A1 against the shipped R3) is **cheaper than** the
-> cheapest in-contract R4 found (`r4_bitmask`, −11.40 %), where the shipped
-> bound below says R3 is **+24.238 %** DEARER. ⚠ That is an ORDERING and **not
-> an interval**: a difference of two minima bounds nothing in either direction.
+> `controls/spellings.py`, 20 variants) AND ONE OF THEM MOVES — §8j.** The bound
+> below is still the figure the row PUBLISHES, because
+> `.memory/02-bench-rules.md` holds the shipped rungs fixed by fiat and that
+> fiat is what makes it a bound; what the search changes is what may be said
+> *beside* it.
+> **`r3_endpoint_degenerate: false`, `r4_endpoint_degenerate: true`.**
+> ⛔⛔ **THIS BOX SAID `r4_endpoint_degenerate: false` AND *"BOTH MOVE"* UNTIL
+> `TASK_PHP_044`**, which applied `TASK_PHP_043` §1's ruling of open item 83:
+> `idiom.required[4]` pins the witness **representation**, so the three bitmask
+> variants that were the R4 endpoint are out of contract and every remaining
+> in-contract R4 variant is **dearer**. **§8j's opening box is the full
+> statement and it is the authority for this line.**
+> ⚠⚠ **THE ORDERING STILL REVERSES, AND NOW IT DOES SO AGAINST THE SHIPPED R4**:
+> the cheapest in-contract R3 found (`r3_chunks_mask`, **−32.08 %** A1 against
+> the shipped R3, **942.477 Ir/call**) is **cheaper than** the cheapest
+> in-contract R4, which is now the **shipped** R4 itself (**1 116.947**), where
+> the bound below says R3 is **+24.238 %** DEARER. ⚠ That is an ORDERING and
+> **not an interval**: a difference of two minima bounds nothing in either
+> direction. ⭐ And the reversal is **stronger** under the ruling than it was
+> before it — the R4 side no longer has a cheaper in-contract spelling to close
+> any of the gap.
 
 | | A1, small.bin, O3 | A1, large.bin, O3 | A1, small.bin, O0 |
 |---|---:|---:|---:|
@@ -685,7 +731,52 @@ points now read: uniform 0.03 % (`ph03`), nearly uniform ~1 % (`ph53`, one
 window in sixteen differing), heterogeneous 32 % (`ph29`)** — a hypothesis with
 three supporting points, not a measured mechanism.
 
-### 8j. ⭐⭐⭐ THE ENDPOINT SEARCH — BOTH SIDES MOVE (`controls/spellings.py`, `TASK_PHP_042`)
+### 8j. ⭐⭐⭐ THE ENDPOINT SEARCH — THE R3 SIDE MOVES, THE R4 SIDE IS **DEGENERATE** (`controls/spellings.py`, `TASK_PHP_042`, ruled `TASK_PHP_043`, applied `TASK_PHP_044`)
+
+> ⛔⛔ **THIS SECTION PUBLISHED *"BOTH SIDES MOVE"* AND THE R4 HALF OF THAT IS
+> RETRACTED. The heading above said so until `TASK_PHP_044`.** Open item 83
+> asked what `spec.md`'s `idiom.required[4]` pins — the backticked span
+> `` `wrote[i]` `` or the role its English describes — and `TASK_PHP_043` §1
+> ruled that it pins the **REPRESENTATION**: its leading appositive, the clause
+> that defines what the backticked span *is*, reads *"THE ONE-BYTE-PER-SLOT
+> WITNESS"*, and the challenger is declared *"a `u32` bitmask witness instead of
+> `[bool; MAXD]`"* — **one bit per slot against one byte**. The entry's English
+> is 2-to-1 against the bitmask (representation, and *"indexed SAFELY on
+> purpose"*, which a bitmask does not do at all) and therefore **agrees with its
+> backticks**. `required[4]` now says this in terms, and
+> `controls/spellings.py::ENGLISH_VERDICTS` applies it.
+>
+> ⛔ **SO `r4_bitmask`, `r4_bitmask_pool` and `r4_bitmask_min` ARE OUT OF
+> CONTRACT, `r4_endpoint_degenerate` IS `true`, AND EVERY REMAINING IN-CONTRACT
+> R4 VARIANT IS DEARER** — `r4_set_checked` +0.50 %, `r4_win_oprec` +2.99 %,
+> `r4_pool_checked` +3.03 %, `r4_min_trusted` +6.60 %, `r4_win_checked`
+> +33.92 %. The margin to the nearest candidate is **+0.50 %** against a
+> `TIE_PCT` of 0.05 %, in the wrong direction, so the degeneracy is not close.
+>
+> ⛔⛔ **AND THE PIN WAS NOT WEAKENED TO MATCH A WINNER — the direction is the
+> proof.** All three excluded variants are **cheaper** than the shipped R4 and
+> two also have a **smaller** trusted surface, so this ruling costs the row its
+> R4 headline. `.memory/02-bench-rules.md`'s *a rung is never cost-selected*
+> binds a pin the same way it binds a rung.
+>
+> ✅ **WHAT SURVIVES UNCHANGED, each checked rather than assumed:** the **whole
+> R3 half** (`r3_chunks_mask` −32.08 %, `r3_endpoint_degenerate: false`,
+> `dearest_r3_in_contract: r3_slice_param`); every **measurement** in the table
+> below, which was never in dispute; and `r4_bitmask_min`'s *cheaper **and**
+> smaller-surface* result — **as a CONTROL-CLASS result rather than an
+> endpoint**, i.e. *a witness-representation change that would be cheaper and
+> smaller-surface is out of this row's contract*, which is a more interesting
+> sentence than the one it replaces. Its cost half lives on in
+> `witness_cost_pct_w1.u32_bitmask` and its surface half in
+> `variants[].trusted_items`.
+>
+> ⓘ **The route to the ruling is NOT the one the item proposed.** `TASK_PHP_043`
+> §1.2 records that arguing *"English decides scope, backticks decide
+> spelling"* from the `why`'s *"WHAT NO GREP SETTLES"* sentence is an over-read,
+> because `harness/check.py::idiom_audit` (`:2198-2212`) measures that naive
+> reading at **41 misses of 158 obligations, all 41 non-defects and 17 of them
+> ANTI-signal**. What decides it is the named-spelling standard's main rule plus
+> this entry's own English. **A ruling cannot be read off `required_absent`.**
 
 `controls/spellings.py --verus`: **20 variants**, 9 on the R3 side, 10 on the
 R4 side and one `CTL`, every one produced by **exact text substitution** from
@@ -718,9 +809,9 @@ against `results-php/ph53-iface-tail-uninit.json` in **four** cells, all to
 | **`v0_shipped`** | **R3** | **1 387.675** | — | — | — |
 | `r3_slice_param` | R3 | 1 388.135 | +0.03 % **TIE** | — | — |
 | `r3_no_capacity` ⛔ | R3 | 1 369.654 | −1.30 % A1 / **+27.36 % W1** | — | — |
-| `r4_bitmask` | R4 | **989.670** | **−11.40 %** | 6 | **31 / 0** |
-| `r4_bitmask_pool` | R4 | 1 023.469 | **−8.37 %** | **5** | **31 / 0** |
-| `r4_bitmask_min` | R4 | 1 082.068 | **−3.12 %** | **3** | **32 / 0** |
+| `r4_bitmask` ⛔ | R4 | **989.670** | **−11.40 %** | 6 | **31 / 0** |
+| `r4_bitmask_pool` ⛔ | R4 | 1 023.469 | **−8.37 %** | **5** | **31 / 0** |
+| `r4_bitmask_min` ⛔ | R4 | 1 082.068 | **−3.12 %** | **3** | **32 / 0** |
 | **`v0_shipped`** | **R4** | **1 116.947** | — | 6 | 27 / 0 |
 | `r4_set_checked` | R4 | 1 122.580 | +0.50 % | **5** | 27 / 0 |
 | `r4_win_oprec` | R4 | 1 150.319 | +2.99 % | **5** | 27 / 0 |
@@ -731,12 +822,23 @@ against `results-php/ph53-iface-tail-uninit.json` in **four** cells, all to
 | `ctl_nowitness` (CTL) | — | 888.082 | −20.49 % | — | — |
 
 ⛔ = out of contract by **English**, priced anyway and never counted as a rung.
+⚠ **The three bitmask rows carry it since `TASK_PHP_044`** (the box at the head
+of this section). Their `31 / 0` and `32 / 0` twin verdicts are unaffected and
+are the reason the ruling was not obvious: **the bitmask witness verifies.** It
+is out of contract on the REPRESENTATION the entry pins, not on provability.
 **TCB** = `#[verifier::external_body]` items in the twin, the shipped rung's
 being **6** (four unchecked accessors plus `load_input` and `emit`).
 
 **THE FOUR RESULTS, IN ORDER OF WHAT THEY ARE WORTH:**
 
-**1. ⭐⭐⭐ `r4_bitmask_min` IS CHEAPER *AND* HAS A SMALLER TRUSTED SURFACE.**
+**1. ⭐⭐⭐ `r4_bitmask_min` IS CHEAPER *AND* HAS A SMALLER TRUSTED SURFACE — AND
+SINCE `TASK_PHP_044` IT IS A CONTROL-CLASS RESULT AND NOT AN ENDPOINT.**
+⛔ It is **out of contract** on `idiom.required[4]`, which pins the witness
+representation (the box at the head of this section), so what this result now
+says is *a witness-representation change that would be cheaper **and**
+smaller-surface is outside this row's contract* — which is a sharper sentence
+than *"the R4 endpoint moves"*, and it is the sentence
+`.memory/02-bench-rules.md` permits. **Every number in this paragraph stands.**
 −3.12 % A1 with **one** unchecked accessor against the shipped rung's **four**
 (TCB 3 against 6), twin at **32 verified / 0 errors**, no `assume`, no
 `is not supported`, and the twin compiles under `build.py`'s own flags. Only the
@@ -752,7 +854,12 @@ the two contributions are separable rather than buried in one number.
 
 **2. ⭐⭐ THE SECTION THAT NAMED A CHEAPER WITNESS AND DID NOT BUILD IT WAS
 RIGHT** — §8e, and the figure it calls the row's largest goes from **+21.78 %**
-to **+9.67 %**.
+to **+9.67 %**. ⚠ **As a CONTROL figure since `TASK_PHP_044`**: `+21.78 %` is
+still what this row's witness costs and still the published number, because the
+bitmask spelling is out of contract on `idiom.required[4]` (§8j's box).
+**`+9.67 %` is what a cheaper witness representation *would* cost, and the gap
+between the two is the price of the pin — which is a thing worth publishing and
+is now the only thing this pair says.**
 
 **3. ⭐⭐ THE R3 SIDE MOVES BY THE LARGEST MARGIN IN EITHER PROGRAMME, AND THE
 MECHANISM IS A TERM NO REASONING ABOUT THE SLOT REPRESENTATION COULD REACH** —
@@ -812,9 +919,34 @@ on the shipped R3 / `small.bin`) because every helper is `#[inline(always)]`
 into `kernel`. `spellings.json` MEASURES the spread rather than assuming it:
 
 ```
-a1_spread_pp   {"R3": 39.899657, "R4": 45.313019}
-wp_spread_pp   {"R3": 67.930558, "R4": 39.543977}
+a1_spread_pp   {"R3": 39.899657, "R4": 45.313019}   (exact, and REPRODUCIBLE)
+wp_spread_pp   {"R3": 67.93,     "R4": 39.54}       (2 dp -- see below)
 ```
+
+> ⭐ **WHY `a1_spread_pp` IS QUOTED EXACTLY AND `wp_spread_pp` IS NOT, AND IT IS
+> A MEASUREMENT RATHER THAN TIDINESS.** `controls/spellings.py --verus` was
+> regenerated **twice** at `TASK_PHP_044`, against the same tree, toolchain and
+> build directory as `TASK_PHP_042`'s run.
+>
+> * ✅ **A1 is bit-identical across ALL THREE runs** — every one of the 20
+>   variants, both inputs, to the last digit. `reproduces_shipped_record: true`.
+> * ✅ **The two `TASK_PHP_044` runs agree with EACH OTHER exactly, in both
+>   families** — every printed per-variant figure is byte-identical between them,
+>   so this is not run-to-run noise.
+> * ⚠ **But every W1 figure differs from `TASK_PHP_042`'s run**, by a CONSTANT
+>   offset of **±14 to ±28 whole-program `Ir`** out of ~30 million — about
+>   **5 × 10⁻⁷ relative**, and constant rather than proportional. That is the
+>   environment-block residual the `collapse.note` in `spec.md` declares and
+>   `p01` measured at ~0.1–0.2 `Ir`: **W1 counts the process, so it counts the
+>   process's environment, and the invoking shell is not part of this row.**
+>
+> ▶ **So the rule this box records is: A1 may be quoted to six decimals and W1
+> may not**, because a document that pins `wp_spread_pp` exactly goes stale every
+> time the control is re-run for an unrelated reason — which is how
+> `TASK_PHP_044` found this, by re-running it for item 83. **Read the full
+> precision out of `controls/spellings.json`; nothing in this file depends on
+> it**, and §8e's whole-program totals are compared at a 0.5 % tolerance for the
+> same reason.
 
 ▶ **A1 resolves this row in both families' regime** — on `ph45` the same field
 reads **`{"R3": 0.0, "R4": 0.0}`** over nine variants, and only the
@@ -825,6 +957,19 @@ a §H case pins that default so it cannot change family silently.**
 SHIPPED R4, which is why the R3 figure (39.90) is smaller than the R3 side's
 range against its own shipped rung (−32.08 % .. +0.03 %, 32.11 pp) — **two
 different quantities, and the field name says which one it is.**
+⚠⚠ **AND BOTH SPREADS ARE OVER *EVERY PRICED VARIANT*, WITH NO `in_contract`
+AND NO `english_verdict` FILTER — which `TASK_PHP_044` LEFT ALONE DELIBERATELY
+RATHER THAN BY OVERSIGHT.** The question the field answers is whether the
+*statistic* can rank respellings at all — whether A1 is respelling-blind the way
+`ph45` found it to be — and that is a property of the statistic and the search
+space, not of the contract; filtering it would also stop it comparing with
+`ph45`'s copy, which does not filter either. ⛔ **The consequence, stated so it
+is not read as a result:** since §8j's ruling the R4 population includes three
+out-of-contract cells and one never-verified one, and the **in-contract** R4
+spread is **33.917949 pp** (`TASK_PHP_043` §1.9). **Both are tens of pp**, so
+what this section claims — that A1 is not respelling-blind on this row, against
+`ph45`'s `0.000000` — is insensitive to the choice. **The choice is recorded,
+not defended as load-bearing.**
 
 **⚠ FOUR MORE SPELLINGS WERE PRICED AND NOT SHIPPED, AND TWO OF THEM ANSWER
 QUESTIONS THIS FILE LEFT OPEN.** A1, `small.bin`, `O3`/`isolated`:
@@ -906,7 +1051,11 @@ from `MaybeUninit<T>` to `T`, so **ONE trusted accessor is the floor for a
 shippable `verus.rs` on this row** — §11.5. Zero is reachable only in a control
 (`controls/mu_unwrapped.rs`). ▶ **And one accessor is already reached WITHOUT
 the reference representation, by `r4_bitmask_min`, at −3.12 % instead of
-+1.79 %.**
++1.79 %** — ⚠ **though since `TASK_PHP_044` `r4_bitmask_min` is itself out of
+contract on `idiom.required[4]` (§8j's box), so the comparison is between two
+controls and neither is a rung.** The point it makes is unchanged: **one**
+trusted accessor is reachable and `r4_min_trusted` (+6.60 %, in contract)
+reaches it with the shipped witness.
 
 **4. ✅ THE ONE ADVERTISED BENEFIT IS REAL AND IT IS MEASURED HERE.**
 `controls/mu_ref.rs` verifies the faulting consumer on this representation at
@@ -1210,11 +1359,15 @@ no rung of this row reproduces the defect except R1, and `controls/` is where
 the Rust-side reproduction lives.
 
 ⚠ **The unsearched-endpoint debt is DISCHARGED** (`controls/spellings.py`, §8j)
-and it discharged into a finding rather than a confirmation: **both endpoints
-move, the ordering reverses, and two mechanism claims this file published are
-refuted** (§8c's vectorisation story and §8e's). ▶ **What replaces the debt is a
-narrower caveat: the published `fixed-R4 bound` holds both endpoints fixed BY
-FIAT, which is what makes it a bound, and §8j is what may be said beside it.**
+and it discharged into a finding rather than a confirmation: **the R3 endpoint
+moves by the largest margin in either programme, the R4 endpoint is DEGENERATE,
+the ordering reverses, and two mechanism claims this file published are refuted**
+(§8c's vectorisation story and §8e's). ⛔ **This paragraph said *"both endpoints
+move"* until `TASK_PHP_044`**, which applied open item 83's ruling that
+`idiom.required[4]` pins the witness representation — §8j's opening box.
+▶ **What replaces the debt is a narrower caveat: the published `fixed-R4 bound`
+holds both endpoints fixed BY FIAT, which is what makes it a bound, and §8j is
+what may be said beside it.**
 
 ---
 

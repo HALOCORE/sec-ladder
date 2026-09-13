@@ -155,3 +155,48 @@ successive versions of a size rule** and was never measured (`p01`'s is 2 057).
     a measurement.** ▶ **The operational consequence: the review round is not
     optional tidying and deferring it compounds** — the backlog went 5 → 14 in
     one round, and rule 9 bars every one of those from this layer while it grows.
+
+13. ⛔⛔⛔ **§H CAN BE SATISFIED BY GITIGNORED EVIDENCE, AND ON FOUR OF FIVE ROWS
+    IT WAS.** `PROTOCOL_PHP.md` §H says *a validator change lands with its
+    must-fire negatives, or it does not land.* ▶ **If those negatives live under
+    `.temp/`, the validator ships and the proof that it can FAIL does not.**
+    **Measured: 13 §H-at-risk citations across `ph16`, `ph29`, `ph45` and `ph53`,
+    out of 30 `.temp/` citations in 11 committed `controls/*` files.**
+    ⭐⭐ **AND `citecheck.py` — the checker that exists to find exactly this —
+    scanned `spec.md` + `NOTES.md` only, so it was blind to the layer holding the
+    worst instance.** F10's *a checker that silently checks nothing*, third
+    instance. ✅ Repaired 2026-09-13 with negatives; the §H subclass is matched on
+    the **citing line**, not the path, because the role is what matters.
+    ⭐ **THE RIGHT PER-ROW REPAIR IS NOT "COMMIT THE SUITE" BUT "MOVE THE ARMS
+    INSIDE THE VALIDATOR"**, so they run on every invocation and feed `problems`
+    — then emptying the guarded constant is a **red gate** (stage 9b
+    `FRESH+VERDICT-FAILED`), not a better-looking number. (Item 97.)
+
+14. ⛔⛔ **A C KERNEL'S COMMENTS ARE HASHED AT **MEASUREMENT** PRICE, SO
+    PROVENANCE PROSE INSIDE ONE IS EFFECTIVELY FROZEN.** `c/*` is in the
+    measurement digest, so correcting a *comment* that has aged costs a **32-cell
+    re-measure**. **First instance: `ph53`'s `c/kernel_hardened.c:8-9` asserts a
+    screen route that F95's own repair withdrew, and it cannot be repaired at
+    re-gate price.** ▶ **THE RULE GOING FORWARD: a C kernel comment carries NO
+    provenance claim that can age — point at `spec.md` instead.** ⓘ That is what
+    the rest of the corpus already does, so it is nearly free. ⚠ **And when one
+    is already stuck, say so in the two places that CAN be edited** (`spec.md`'s
+    `provenance` note and `NOTES.md`), so a later reader finds it **known** rather
+    than undetected. (Item 98.)
+
+15. ⚠⚠ **READ THE BODY, NOT THE PROSE BESIDE IT — AND A LIST OF WHAT A FILE DOES
+    **NOT** DO IS NOT A LIST OF WHAT IT DOES.** The manager asserted in a task
+    file that `common-php/emalloc_shim.h` *"zeroes fresh blocks and poisons `0x5a`
+    on free"*. **Both halves are false**: the `memset(p, 0, …)` is inside
+    `php_shim_ecalloc`, where zeroing is the *contract* — `emalloc` does not zero
+    — and `0x5a` appears in the header's own **"WHAT IS DELIBERATELY NOT
+    MODELLED"** section, as a ZEND_DEBUG behaviour the shim omits **on purpose**.
+    ⭐ **Same class as `spelling_matches`'s *a comment is not code*, and the
+    SECOND time in one session**: a textual guard written for `width.py` fired on
+    the comment documenting the very defect it was written to catch.
+    ⚠⚠ **It was a rule-14 premise — a task-file assertion an engineer has no
+    reason to doubt — and the engineer checked it anyway, which is the only
+    reason it was caught.** ⓘ The corrected reason is **stronger**: the shim uses
+    plain `malloc`, so ASan's `0xbe` is a **runtime option default**
+    (`ASAN_OPTIONS=malloc_fill_byte=0` gives zeros), not a compile-time property.
+    (Item 96.)
