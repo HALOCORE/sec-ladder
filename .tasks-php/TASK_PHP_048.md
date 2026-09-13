@@ -234,8 +234,32 @@ PASSES CLEANLY here.** ⚠⚠ **REGISTER THE PREDICTION AND REPORT THE OUTCOME
 EITHER WAY.** ⛔ **If it fails, that is a much bigger finding than F104** — it
 would mean the collision is not about `MaybeUninit` at all.
 
-⚠ `_047` is reviewing F97/F104/F106 as this is written. **Re-read its coverage
-table before relying on this section.**
+✅✅ **UPDATED AFTER `_047` (2026-09-13) — AND THE PREDICTION IS NOW BETTER
+FOUNDED, NOT WORSE.** F97 is **UPHELD-NARROWED**, and the narrowing is exactly the
+part this row depends on:
+
+> **The joint unsatisfiability is a property of the ITEM, not of the pattern.**
+> *As shipped*, **neither `ph53` nor `ph52` hard-fails** — each takes the
+> `twin_justifications` hatch and pays **one BLOCKED row**. It becomes a
+> **pattern-level HARD FAILURE only when the untwinnable item is the LAST trusted
+> item**, which is `ph52`'s `r4_win_checked` variant. ▶ **F97 now reads:
+> *jointly unsatisfiable for the operation; a BLOCKED row where another twinnable
+> item exists, a HARD FAILURE where it does not.***
+
+▶ **So the sharpened prediction for this row: `slb_twin_*` for an `Option<fn>`
+accessor is `t.unwrap()` — safe, same signature — so `n_twins ≥ 1`, NO hatch, NO
+blocked row, and a CLEAN stage 5c-twin.** ⛔ **If this row takes a blocked row
+anyway, F97's narrowing is wrong and that is the finding.**
+
+⚠ **AND ONE MORE NARROWING TO CARRY, because it is a claim this row might
+restate:** F97's *"there is no safe exec route from `MaybeUninit<T>` to `T`; that
+is what the type MEANS"* is **one step too strong.** The pinned vstd **does** ship
+a safe exec route from uninitialised memory to a value — `vstd::cell::PCell<V>` /
+`vstd::cell::pcell_maybe_uninit`, wrapping `UnsafeCell<MaybeUninit<V>>` behind a
+ghost `PointsTo` permission. It is unavailable to `ph52`/`ph53` **only because a
+twin must have the SAME SIGNATURE** and that API does not take `&MaybeUninit<T>`.
+▶ **So it is as much a fact about the twin rule as about the type. Do not
+restate the strong version.**
 
 ### 2.7 ⭐⭐⭐ WHICH STATISTIC — **MEASURE `inside_share` FIRST AND LET IT DECIDE. DO NOT ASSUME A1.**
 

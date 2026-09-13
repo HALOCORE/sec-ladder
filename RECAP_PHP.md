@@ -47,12 +47,12 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 8 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
         ph45 (T1) + ph53+ph52 (T3, CLOSED). 6 of 20 fam. .memory-php/ AUTHORITATIVE.
-NEXT    NOTHING RUNNING. _047 LANDED: 6 VERDICTED, NOT ONE SURVIVED AS WRITTEN.
+NEXT    ⏳ _049 RUNNING (ANALYST, ALONE): ATTACK ITEM 111, MY OWN 1-PROBE WORK.
         ▶ (1) ⛔⛔ ITEM 105 NEEDS A USER DECISION AND IT IS NOW (a) OR (c) --
         ⛔ MY RECOMMENDED (b) DOES NOT EXIST (F107). (a) = edit check.py, a
         33-PATTERN RE-GATE, and it BUYS PUBLISHING THE SMALLER TCB. (c) = leave
         it, which is what gate.py's OWN HEADER PRESCRIBES. _047 §1.8 drafted (a).
-        ▶ (2) _048 IS WRITTEN: ROW 9 `ph55` (T5). ▶ (3) ITEM 111. 32 owed ~99-122.
+        ▶ (2) _048 WRITTEN, QUEUED: ROW 9 `ph55` (T5). 32 owed, ~99-122 tasks.
 ⚠ NEW   F107 ⛔ F103's DECOMPOSITION REFUTED (8.19/3 as a product); F105's 97.6%
         REFUTED (2 errors cancelling; 102.4% on large.bin) but its 0.82% UPHELD
         and GROWS to 1.02%; F106 UPHELD and UNDER-STATED (_is_trusted 2->1, and
