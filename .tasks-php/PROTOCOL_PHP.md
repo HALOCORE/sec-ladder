@@ -999,6 +999,43 @@ through. **The rule exists because of the census, not because of that row.**
 row's citations with that row's next re-gate. **What this rule binds is the NEXT
 row**, and `citecheck.py` is what makes that enforceable rather than remembered.
 
+### F6a. ⭐ A `c/*` COMMENT MAY **POINT** AT AN ARGUMENT; IT MAY NOT **STATE** THAT ARGUMENT'S VERDICT
+
+**`c/*` is in the MEASUREMENT digest, so a comment inside a C kernel is frozen at
+32-cell re-measure price.** Any claim in one that a later task can refute is
+therefore *effectively unrepairable* — which is `RECAP_PHP.md` **F98**, where
+`ph53/c/kernel_hardened.c:8-9` still asserts *"and `preimage_screen.py` labels it
+`NOT-THE-REPAIR` independently"*, a route `F95`'s own repair withdrew.
+
+▶ **THE RULE, AND IT IS A DISTINCTION RATHER THAN A BAN:**
+
+| | example | at risk? |
+|---|---|---|
+| ✅ **POINTER** | *"`NOTES.md` §7 says so in terms"* · *"`controls/fortify.py` measures both configurations"* | **NO** — it asserts nothing, so it cannot age into falsehood. If the target changes, the pointer is stale and the C file is still true |
+| ✅ **SPAN CITATION** | `/* ==== basic_functions.c:2102-2137 ==== */` | **NO** — it cites the **pinned** tarball, which cannot change |
+| ⛔ **VERDICT** | *"`preimage_screen.py` labels it `NOT-THE-REPAIR` independently"* | **YES** — it asserts another artefact's **conclusion**, and that artefact is not in this digest |
+
+✅ **THE CORPUS ALREADY FOLLOWS THIS**, measured 2026-09-13 by
+`.tasks-php/contract_audit.py`: **27 pointers against 6 raw verdict hits, of which
+exactly 2 are real — and both are the two lines of F98's own known sentence.**
+⭐ **So this ratifies practice rather than changing it, and NO ROW OWES A REPAIR.**
+▶ **It binds the NEXT kernel comment.** ⓘ `contract_audit.py` adjudicates every
+verdict hit by hand and fails on an **unfiled** or **stale** one, because the
+classifier is a grep and greps have spellings (`RECAP_PHP.md` **F10**).
+
+### F6b. ⓘ `results-php/preflight/_norow.preflight.json` IS **EXPECTED TO MOVE**, AND IT IS IN NO DIGEST
+
+Taking the bracket reading this protocol requires **writes** to that file, so
+`git status` shows it modified after any task that obeys its own instructions.
+✅ **That is correct and costs nothing: measured 2026-09-13 over all 18 gate and
+measurement records — 0 mention `preflight` at all, and 0 digest entries name a
+preflight path.** ▶ **So a moved preflight record can never stale a measurement,
+and it is not evidence that anything went wrong.**
+⚠ **It is a DE-DUPLICATING LEDGER, not a per-invocation log** — `runs` de-dupes on
+content, so **counting `runs` UNDERCOUNTS gate invocations** (`RECAP_PHP.md` item
+103). ⓘ `contract_audit.py`'s `N7` fails if a preflight path is ever hashed, so
+this ruling cannot go stale silently.
+
 ---
 
 ## G. Is this candidate a duplicate of a built or catalogued row?

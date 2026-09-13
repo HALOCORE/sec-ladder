@@ -121,29 +121,53 @@ def main():
     # MECHANISM, so one corpus report can legitimately feed two rows. This
     # warning used to print three ids with nothing saying which were settled and
     # where, so every reader re-derived the same answer. Carry the verdict.
+    # ⛔⛔ RATCHET, added 2026-09-13 (RECAP_PHP.md item 110).  This dict used to
+    # carry a note per pair and `bad` counted EVERY duplicate -- so the script
+    # printed its own adjudication and then failed on it, and had exited 1 in its
+    # intended steady state since 2026-09-10.  An exit code that is always red
+    # cannot distinguish "coverage is fine" from "coverage broke".
+    #
+    # Now the STATUS decides, and only three things fail:
+    #   UNRECORDED  -- a NEW duplicate nobody has read.  This is the whole point.
+    #   STALE       -- an adjudication whose pair no longer appears: either the
+    #                  catalogue changed (update it and say so) or the scanner
+    #                  went blind, and those two look identical without this arm.
+    #   OPEN        -- does NOT fail; it is a recorded question tracked as an
+    #                  open item, and failing on it forever is the defect above.
     ADJUDICATED = {
-        frozenset(('ph77', 'ph83')):
+        frozenset(('ph77', 'ph83')): ('SETTLED',
             "ADJUDICATED in CATALOGUE.md -- ph83's risk note: the ids are SITES "
             "in ph77 (the zval *garbage[2] resurrect-and-queue) and the "
             "MECHANISM in ph83 (the unbalanced PZVAL_LOCK). Corroborated: they "
             "resolve to DIFFERENT fix commits, and PROTOCOL_PHP §G1 says a "
-            "distinct fix IS evidence for DIFFERENT.",
-        frozenset(('ph49', 'ph50')):
+            "distinct fix IS evidence for DIFFERENT."),
+        frozenset(('ph49', 'ph50')): ('OPEN',
             "OPEN -- RECAP_PHP.md: 'nobody has checked these two are distinct. "
             "Flagged, not judged.' Both resolve to the SAME commit 86434be9462c, "
             "and §G1 says a shared fix is NOT evidence for SAME, so that adds "
-            "nothing. This one is still a real question.",
+            "nothing. This one is still a real question."),
     }
     dup = {k: v for k, v in covered.items() if len(v) > 1}
+    unrecorded_dups = []
     print(f'\nids claimed by MORE THAN ONE catalogue row : {len(dup)}')
     for k, v in sorted(dup.items()):
-        note = ADJUDICATED.get(frozenset(v), "⚠ UNRECORDED -- no verdict on file "
-                                             "for this pair; adjudicate it under "
-                                             "PROTOCOL_PHP.md §G before relying "
-                                             "on either row")
-        print(f'   {k:<11} {v}')
+        status, note = ADJUDICATED.get(frozenset(v), ('UNRECORDED',
+            "⚠ UNRECORDED -- no verdict on file for this pair; adjudicate it "
+            "under PROTOCOL_PHP.md §G before relying on either row"))
+        if status == 'UNRECORDED':
+            unrecorded_dups.append((k, sorted(v)))
+        print(f'   {k:<11} {v}   [{status}]')
         for line in textwrap.wrap(note, 74):
             print(f'      {line}')
+
+    # STALE: an adjudication whose pair no longer double-claims anything.
+    live_pairs = {frozenset(v) for v in dup.values()}
+    stale_adj = sorted(('+'.join(sorted(p)) for p in ADJUDICATED if p not in live_pairs))
+    if stale_adj:
+        print(f'\n⛔ STALE adjudication(s), no longer double-claimed: {stale_adj}')
+        print('   Either the catalogue changed (update ADJUDICATED and say so in')
+        print('   the commit) or this scan went blind. Those look identical without')
+        print('   this arm, which is why it exists.')
 
     # ---- row sanity. `ph\d+`, and gaps from the observed RANGE.
     rows = re.findall(r'^\| (ph\d+) \|', text, re.M)
@@ -165,7 +189,16 @@ def main():
               f' {len(wide)} rows, missing {sorted(set(wide) - set(narrow))}'
               f'\n  -- and would still have printed `gaps: none`. That is F49.')
 
-    bad = bool(missing or unknown or dup or gaps or set(rows) - set(blocks))
+    # ⭐ `dup` is NO LONGER a failure condition on its own -- see the RATCHET
+    # comment above.  What fails is an UNRECORDED duplicate or a STALE
+    # adjudication, i.e. a state nobody has read.
+    bad = bool(missing or unknown or unrecorded_dups or stale_adj
+               or gaps or set(rows) - set(blocks))
+    if unrecorded_dups:
+        print(f'\n⛔ {len(unrecorded_dups)} UNRECORDED duplicate(s): '
+              f'{unrecorded_dups}')
+    print('\n' + ('⛔ FAIL' if bad else
+          '✅ PASS -- 0 unrecorded duplicates, 0 stale adjudications'))
     return 1 if bad else 0
 
 

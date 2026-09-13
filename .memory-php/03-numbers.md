@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F106** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F107** live in `RECAP_PHP.md`
 > (⚠ this said *F1–F41* for **forty-nine** findings, then *F1–F90* for **eleven** more — `PROTOCOL.md` rule 13, **and it has now rotted THREE TIMES.** ✅ **`.tasks-php/boxcheck.py` CHECKS THIS LINE against the actual highest finding as of 2026-09-13, so it is the last time.**
 > **Count it yourself: `grep -c '^### F' RECAP_PHP.md`.**)
 > ⭐ **And the statistic decision — which column every row publishes in — is
@@ -89,7 +89,14 @@
   distinguish *a weak lever* from *measuring its own null*.** (F92 narrowed.)
 
 
-> ⛔⛔⛔ **EVERYTHING FROM HERE TO THE END OF THIS FILE IS `UNREVIEWED`, MANAGER, 2026-09-13.**
+> ✅✅ **CYCLE CLOSED 2026-09-13 BY `TASK_PHP_047`. THE MATERIAL BELOW IS NOW
+> REVIEWED** — F97/F102/F104 **UPHELD-NARROWED**, F106 **UPHELD and under-stated**,
+> F105 **REFUTED in its `97.6 %` clause** (repaired in `02-ladder.md`, not here),
+> F103's decomposition **REFUTED** (it was never in this layer), F96 **still
+> UNREVIEWED**. ⭐⭐ **Law 12 held: not one of the five survived unchanged.**
+> ⚠ **The banner below is kept because the defect it records was the manager's.**
+>
+> ⛔⛔⛔ **EVERYTHING FROM HERE TO THE END OF THIS FILE WAS `UNREVIEWED`, MANAGER, 2026-09-13.**
 > It comes from `TASK_PHP_044`, `_045` and `_046`, which are **ENGINEER** tasks:
 > `PROTOCOL.md` **rule 9** requires an engineer→reviewer cycle and **these have had
 > only the engineer half.** ⭐ It is kept here rather than held back, under the same

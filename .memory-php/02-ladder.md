@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F106** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F107** live in `RECAP_PHP.md`
 > ⭐ **and the statistic decision is `.tasks-php/STATISTICS_001.md`, committed**
 > (⚠ this said *F1–F41* for seven findings, then *F1–F48* for forty-two
 > more, then *F1–F90* for eleven more — `PROTOCOL.md` rule 13, **and it
@@ -708,21 +708,27 @@
   have something to report.**
 
 
-> ⛔⛔⛔ **EVERYTHING FROM HERE TO THE END OF THIS FILE IS `UNREVIEWED`, MANAGER, 2026-09-13.**
-> It comes from `TASK_PHP_044`, `_045` and `_046`, which are **ENGINEER** tasks:
-> `PROTOCOL.md` **rule 9** requires an engineer→reviewer cycle and **these have had
-> only the engineer half.** ⭐ It is kept here rather than held back, under the same
-> convention `02-ladder.md`'s family-B sensitivity paragraph used — **marked, not
-> hidden** — because a later session needs the rule and the mark tells it what the
-> rule is worth.
+> ✅✅ **CYCLE CLOSED 2026-09-13 BY `TASK_PHP_047` — THE BANNER BELOW IS KEPT AS A
+> RECORD, AND THE MATERIAL IS NOW REVIEWED, WITH ONE CLAUSE REFUTED AND REPAIRED
+> IN PLACE.**
 >
-> ⚠⚠ **AND THE MARK IS HERE BECAUSE I LANDED THIS MATERIAL UNMARKED FIRST.** I
-> wrote the RULE-9 STATE block one day earlier, landed `04-process.md` law 12
-> (*a manager finding from one probe or two rows should be assumed narrowable until
-> a reviewer has had it*) — **and then put seven unreviewed entries into the layer
-> that supersedes everything.** ▶ **Caught by auditing before a handoff, which is
-> the only reason it is marked at all.** → the RULE-9 STATE block in `RECAP_PHP.md`
-> names which findings these are and what a review round owes.
+> | finding | verdict | what it cost this file |
+> |---|---|---|
+> | **F105** | ⛔ **REFUTED in part** | the `97.6 % attributed` clause is **gone** — it was two errors cancelling on one input. ✅ The `0.82 %` is **UPHELD and grows to `1.02 %`** |
+> | **F106** | ✅ **UPHELD, and UNDER-STATED** | the relocation objection is adjudicated in `.memory/04-verus.md`; see the `tcb_items` entry below |
+> | **F97 · F102 · F104** | ⚠ **UPHELD-NARROWED** | narrowings applied where they touch this file |
+> | **F103** | ⛔ **REFUTED** (the decomposition) | ⓘ **never in this layer** — it lives in `RECAP_PHP.md` only, so it cost a RECAP edit and no removal here |
+> | **F96** | ⛔ **still UNREVIEWED** | not in this file |
+>
+> ⚠⚠ **THE BANNER THIS REPLACES IS WORTH KEEPING IN SUBSTANCE, BECAUSE THE DEFECT
+> IT RECORDS WAS MINE.** I wrote the RULE-9 STATE block one day before landing
+> `04-process.md` law 12 (*a manager finding from one probe or two rows should be
+> assumed narrowable until a reviewer has had it*) — **and then put seven
+> unreviewed entries into the layer that supersedes everything.** ▶ **Caught by
+> auditing before a handoff, which is the only reason it was marked at all.**
+> ⭐⭐ **AND LAW 12 HELD AGAIN: of the five findings in this file's unreviewed
+> block, ONE was refuted outright, ONE lost its headline clause, and THREE were
+> narrowed. Not one survived unchanged.**
 
 - ⛔⛔⛔ **A BACKTICK IN AN `idiom.required` / `forbidden` ENTRY *IS* A PIN,
   INCLUDING AROUND A FILENAME, A TYPE NAME OR A FIELD NAME — SO ANY DRAFT OF
@@ -765,17 +771,28 @@
   the task that built it retracted the claim in its own sidecar under
   `ctl_r3_unchecked_is_not_an_upper_bound`. ✅ **It is still the right CONTROL** —
   it isolates the bounds-check term *at the shipped spelling*, which is what makes
-  that row's `128.00` of `131.19 Ir/call` attribution checkable — **but it is not a
-  bound.** (F105, `TASK_PHP_046` §3.3.)
+  that row's bounds-check attribution checkable — **and the check REFUTED the
+  `128.00` of `131.19` framing** (see the next bullet) — **but it is not a
+  bound.** ⭐ **The `0.82 %` itself is REVIEWED AND UPHELD, and it GROWS to
+  `1.02 %` on `large.bin`, ~14 000× the noise floor.** (F105, `TASK_PHP_046` §3.3;
+  reviewed `TASK_PHP_047` §2.4.)
 
 - ⚠⚠ **THE R3−R4 GAP IS SOMETIMES A SPELLING AND SOMETIMES A MECHANISM, SO THE
   QUESTION IS WORTH ASKING ON EVERY ROW.** `ph53`: **mechanism** — nine window
   bounds checks at `281.8 Ir/call`, larger than the whole R3−R4 gap, and the
   prediction's spelling *was* what shipped. `ph52`: **spelling** — four per-op
-  window bounds checks, `8 instructions × 16 ops = 128.00 Ir/call` against a measured
-  `131.19`, **97.6 % attributed**, with two independent nulls localising it (one
-  variant **byte-identical** to the shipped rung; the mirror puts the same checks
-  back into R4 at `+7.77 %`). ⭐ **Both rows' answers corrected the row's own prose**
+  window bounds checks, measured directly by the row's own `ctl_r3_unchecked`
+  control at **138.86 Ir/call on `small.bin`** and **354.47 on `large.bin`**: a
+  two-input slope of **7.99 instructions per op against a predicted 8**, plus a
+  fixed **`+11.1 Ir/call`** the model omits. ⚠⚠ **That term is 105.8 % / 105.6 %
+  of the R3−R4 gap it is offered to explain**, because R4 carries an
+  opposite-signed second term — the R3 rung with its window checks removed is
+  **cheaper than the shipped R4** on both inputs. ⛔⛔ **DO NOT QUOTE
+  `128.00 of 131.19 = 97.6 %`: that ratio is TWO ERRORS CANCELLING on `small.bin`,
+  and on `large.bin` the same construction gives `102.4 %` with the residual
+  CHANGING SIGN** (`TASK_PHP_047` §2.1–2.3 refuted it; ⭐ **the slope is what
+  survives, and a slope needs two inputs, which is why one input could not see
+  the error**). ⭐ **Both rows' answers corrected the row's own prose**
   — `ph52`'s §8c/§10 had framed its gap as `Option` vs `MaybeUninit`+witness.
   ▶ **Name the term and attribute a percentage of the gap to it, or the answer is
   an adjective.** (F100, F105.)
@@ -789,3 +806,32 @@
   of a row rather than an optional extra. ⓘ Score so far: `ph29` R4 moved, `ph45`
   both moved, `ph53` R3 moved, `ph52` R3 moved; **`ph07`, `ph16` and now `ph52`'s R4
   are degenerate and that is on file too.**
+
+- ⭐⭐⭐ **THE PUBLISHED TRUSTED-SURFACE AXIS IS THE GATE'S OWN `tcb_items`, IT
+  DELIBERATELY DOES NOT COUNT `vstd`, AND THAT IS A MEASURED DECISION RATHER THAN
+  AN OVERSIGHT — SO "REMOVING A WRAPPER JUST RELOCATES THE AXIOM INTO vstd" IS
+  ALREADY ADJUDICATED AND THE ANSWER IS NO.** `.memory/04-verus.md`: *"what ships
+  instead: one headline number — the gate's own `tcb_items`"*, reported as
+  **`TCB: N lines across M items`**, counted over `verus.rs` only. ⛔ **Two richer
+  proposals were built and REJECTED**: a second column for *"vstd assumed
+  specifications relied upon"* (**refuted with a census — the pinned vstd holds
+  402 `assume_specification` sites, 272 `external_body` items and 545 `broadcast`
+  proof fns; *"relied upon"* is undecidable from the text, and every rung depends
+  on the same vstd core so the column would not discriminate**) and a `tcb_reach`
+  classification (`safe`/`local-external-body`/`vstd-axiom`), rejected at
+  `TASK_055_REVIEW` for the same undecidability. ⭐⭐ **AND THE PRECEDENT IS
+  EXACT**: `p06` deleted a hand-written `external_body` wrapper because the pinned
+  vstd already specified the operation (`copy_from_slice`), shipping
+  **`18 verified, 0 errors` at BYTE-IDENTICAL `-O3` machine code, TCB 6 → 5** —
+  and the project counted that as a reduction and published it. ▶ **So deleting a
+  hand-written wrapper whose contract the pinned vstd already proves is a STRICT
+  REDUCTION, not a relocation.** ⭐ **The machine proof, not the argument, is what
+  settles it**: `ph52`'s `r4_no_wrapper` verifies **34/0 with its contract
+  textually unchanged**, so the hand-written axiom was a **theorem**, and deleting
+  a theorem that was being asserted as an axiom takes something real out.
+  ⚠⚠ **QUOTE IT AS *"a reduction on the published `tcb_items` axis"*, NEVER as
+  *"a reduction in the trusted base"* full stop** — `unsafe_tokens` (2) and
+  `trusted_call_sites` (11) do **not** move on that variant, and
+  `.memory/04-verus.md` marks the accounting rule itself **PROVISIONAL**.
+  (F106; ruled `TASK_PHP_047` §1.3–1.4, which found the adjudication the manager
+  had not cited.)
