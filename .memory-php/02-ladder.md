@@ -418,12 +418,20 @@
   >
   > ⭐⭐ **AND THE SENSITIVITY HALF FOR FAMILY B, WHICH THIS SECTION NEVER
   > MEASURED** (`.tasks-php/php_null.py`, `--selftest` PASS, 12 negatives;
-  > ⚠ UNREVIEWED, manager, 2026-09-12). On the same four cells: **A resolves the
+  > ✅ **REVIEWED AND UPHELD at `TASK_PHP_043` §2.5 — the ratio was re-derived
+  > from the table's OWN population (`Δnopad`, `unsafe` vs `verus`, 9 cells,
+  > zero respellings), so it does NOT rest on `ph45`'s respelling spread**).
+  > ⛔⛔ **BUT THE *AXIS* THIS PARAGRAPH ONCE CARRIED IS REFUTED — see the
+  > `inside_share` ruling at the end of this block.** On the same four cells:
+  > **A resolves the
   > static difference to the instruction while `|B/A|` is 49.6×–393.9×**, and it
   > is **0.2×–3.0×** at every large-Δ cell (`ph03`/`ph07`/`ph16`/`ph45`/`ph64` at
   > `-O0`, Δnopad `+17`…`−170`). ▶ **A clean regime separation with no overlap:
   > B loses a SMALL code difference completely, and small-Δ is exactly where a
-  > `fixed-R4 bound` operates.** ⚠ **B is not "wrong"** — it is a whole-program
+  > `fixed-R4 bound` operates.** ⛔⛔ **AND THE SEPARATING VARIABLE IS `|Δ|`, NOT
+  > LANGUAGE: all nine of these cells are SAME-LANGUAGE** (`TASK_PHP_043` §3.5),
+  > **so the *"same-language ⇒ only A resolves it"* axis this evidence was once
+  > read as supporting is FALSE ON THIS VERY TABLE.** ⚠ **B is not "wrong"** — it is a whole-program
   > slope, so its true value is not `−2`; the defensible statement is that **at
   > most `|Δnopad|` Ir/call of B's reading can be the code change**, so on
   > `ph45/O3/large` at least **785.86 of 787.86** is something else. ⚠ **The
@@ -446,11 +454,17 @@
   > `TASK_PHP_037` DISCHARGED ITEM 58 ON `ph45`, AND THEN `TASK_PHP_038`
   > REVIEWED THE LOT AND REFUTED THREE MORE OF MY CLAIMS.**
   >
-  > ⚠ **STATUS, precisely, because rule 9 turns on it:** F83–F86 have now had
-  > an engineer→reviewer cycle and are **UPHELD-NARROWED** — they are
-  > eligible for this layer once someone writes them in properly. **F88 is
-  > the REVIEWER'S OWN finding, so its cycle has NOT closed.** ⚠⚠ **Nothing
-  > below is authoritative yet; this is still a FLAG.**
+  > ✅✅ **STATUS, 2026-09-13: THIS BLOCK IS NOW AUTHORITATIVE.** F83–F86 were
+  > UPHELD-NARROWED at `TASK_PHP_038`; **`TASK_PHP_043` closed the cycle on
+  > twelve more** — **F88 · F93 · F95 · F99 UPHELD**, **F89 · F91 · F92 · F94 ·
+  > F98 · F100 · F101 UPHELD-NARROWED**, **F90 REFUTED**, and **F96 · F97 still
+  > UNREVIEWED and therefore still excluded.** ⚠⚠ **Every narrowing is APPLIED
+  > IN THE SENTENCE IT NARROWS below, not appended** (`RECAP_PHP.md` item 73),
+  > because a correction appended leaves the old number readable — which this
+  > layer has now done four times.
+  > ⚠ **The 2026-09-12 wording said *"Nothing below is authoritative yet; this
+  > is still a FLAG"*. It is no longer a flag; the parts that are still open say
+  > so individually.**
   >
   > ⛔⛔ **WHAT THE REVIEW REFUTED, and all three were mine:**
   > **(1) F84's `−1.00` mechanism.** It is **not** the slope — it is exactly
@@ -476,6 +490,10 @@
   > (manager-verified), the driver picks its window by a pseudo-random
   > function of a running accumulator, and on `ph29` the slope level moves
   > **32 % across draws with the published draw the LARGEST of seven.**
+  > ⚠⚠ **NAME THE DENOMINATOR: that `32 %` is `range / mean`, re-derived by the
+  > reviewer as `31.42 %` on an INDEPENDENT 8-span sweep (`TASK_PHP_043` §5.6,
+  > F88 UPHELD). A second normalisation, `38.6 %`, is also in circulation and
+  > NEITHER document said which it was using** — `RECAP_PHP.md` item **92**.
   > `ph03` reads **0.03 %** because its per-window work is uniform — **that
   > contrast is the control.** ⚠⚠ **So `inside_share` is ARITHMETICALLY FINE
   > AND INTERPRETIVELY VOID on any row with heterogeneous per-window work:
@@ -484,12 +502,45 @@
   > present"* is the DRAW.** ✅ Signs stable over seven draws, so **no flip
   > verdict moves.**
   >
-  > ▶ **THE DECISION, as the reviewer would have it: publish both, and the
-  > second column MUST BE FAMILY C.** Family B is now disqualified twice —
-  > it misses real work (F84) and it is one unstable draw (F88) — and W1 is
-  > not independent of C. ⚠⚠ **So the only admissible second column is the
-  > one nobody has built (item 62), and `ph64`'s published B1 headline may
-  > be a single outlier draw (item 66, UNTESTED and cheapest).**
+  > ▶ **THE DECISION: publish both, and the second column MUST BE FAMILY C.**
+  > Family B is disqualified twice — it misses real work (F84) and it is one
+  > unstable draw (F88) — and W1 is not independent of C. ⚠⚠ **So the only
+  > admissible second column is the one nobody has built (item 62).**
+  > ✅ **`ph64`'s B1 headline: item 66 ANSWERED NO — the draw CANCELS in a
+  > same-language ratio and does NOT cross-language (F89, reviewed, and the
+  > contrast reproduces at `55.6×` by a different design).** ⚠ **F89's
+  > `0.07 pp` is `1.95×` from the reviewer's `0.1365 pp` over a DIFFERENT span
+  > set, so quote it as *that sweep's* same-language spread and never as *the*
+  > same-language spread.**
+  >
+  > ### ⭐⭐⭐ AND THE AXIS IS SETTLED, AT `TASK_PHP_043` §3 — **IT IS `inside_share`, AND BOTH EARLIER CANDIDATES LOSE**
+  >
+  > **The rule, and it is the one to apply from here on:** ⭐ **a code difference
+  > is resolved by family A exactly to the extent the difference lands INSIDE
+  > THE KERNEL SYMBOL, and the measure of that is `inside_share` — which is
+  > ALREADY COMPUTED FOR EVERY CELL IN EVERY RECORD.** The two-condition
+  > conjunction this file already states is the operative test; **it is
+  > language-agnostic, it is measurable PER COMPARISON with no new machinery,
+  > and it catches all nine same-language flips.**
+  >
+  > ⛔ **REFUTED: *"same-language vs cross-language"*** (F91's axis) — all nine
+  > of its own cells are same-language and separate by `|Δ|`.
+  > ⛔ **REFUTED: *"does the callee work diverge"*** (the rival, item 78) —
+  > **a flip ENTAILS callee divergence** (`a·b < 0` on all 38), **so the rival's
+  > variable does not vary**; and on the 3 cells with `Δnopad` ground truth the
+  > callee-inclusive column is wrong by **50–400×**.
+  > ⭐ **CONSEQUENCE FOR ITEM 62 (family C): narrower and cheaper. The condition
+  > is `inside_share`, not a per-comparison declaration** — and **F91's own open
+  > demand is the only thing item 62 must do FIRST: measure C's SENSITIVITY, not
+  > just its null.**
+  > ⚠⚠ **SCOPE: the nine cells are from TWO rows** — `ph45` (7) and `ph64` (2),
+  > both with known statistic pathologies — and **`ph00`/`ph03`/`ph07`/`ph16`/
+  > `ph29` contribute ZERO same-language flips.** ▶ **The phenomenon is
+  > concentrated, and a third row could still move this.**
+  >
+  > ⭐ **A PRE-SEARCH PREDICATE, because this is usable before a row's endpoint
+  > search runs:** compute `inside_share` first; **`ph45` at 9.5 % published in
+  > W1 and `ph53` at 89.5 % published in A1, and both were right.**
   >
   > ⚠ **The count of my corrections this round is SEVEN, and not one was
   > arithmetic.** Every one came from a second method applied to something I
@@ -498,8 +549,17 @@
   > `RECAP_PHP.md` **F83–F87**, `.temp/mgr172/NOTES.md`, probes
   > `identity_null.py` · `inclusive_ir.py` · `bc_sweep.py` · `flip_exact.py`,
   > all `--selftest` PASS. ⚠ **The statistic decision is
-  > `.tasks-php/STATISTICS_001.md`, WHICH IS COMMITTED AND MARKED NOT
-  > AUTHORITATIVE — it must not enter this file until reviewed.** ⓘ This line
+  > `.tasks-php/STATISTICS_001.md`, COMMITTED.** ✅ **AS OF 2026-09-13 TWELVE OF
+  > ITS FOURTEEN UNREVIEWED FINDINGS HAVE CLOSED THEIR CYCLE, so the parts quoted
+  > in this file ARE authoritative** — ⚠ **but that file is still marked NOT
+  > AUTHORITATIVE as a whole and still carries F96/F97's open material.**
+  > ⛔⛔ **AND IT HAS NOW BEEN THE STALE COPY TWICE:** its status box read *"F90
+  > disagrees with the reviewer"* while **its own §5, 145 lines later, settled
+  > item 68 `NO` and F90 is REFUTED**; and its §2 table cell published A as
+  > *"blind to callees"* on evidence `RECAP_PHP.md` had already withdrawn.
+  > ▶ **Both repaired 2026-09-13. This is item 73's shape for the third time:
+  > the correction lands in `RECAP_PHP.md` and not in the document `RECAP_PHP.md`
+  > calls "the whole argument".** ⓘ This line
   > used to cite that file's **gitignored predecessor draft** (named in
   > `STATISTICS_001.md`'s own header), i.e. **the authoritative layer rested on
   > a gitignored draft** — open item **65**'s defect, live. Re-pointed at the
@@ -584,3 +644,65 @@
   forbidden) are searchable today, and `ph45` has no `spellings.py` at all** —
   which makes it the **cheapest of the three**, since there is no declaration
   repair to do first (open item 58).
+
+---
+
+## Landed 2026-09-13 from `TASK_PHP_043` — the pin, and the endpoint search
+
+- ⭐⭐⭐ **AN `idiom.required` ENTRY'S BACKTICKED SPAN PINS THE *REPRESENTATION*,
+  AND ITS ENGLISH DECIDES WHICH RUNGS IT SCOPES TO — BUT THE PRESENCE REPORT
+  DECIDES NOTHING.** `ph53`'s `required[4]` reads `` `wrote[i]` `` — *"THE
+  ONE-BYTE-PER-SLOT WITNESS"* — and a `u32` bitmask that discharges the identical
+  obligation **more cheaply and with a smaller trusted surface** is **OUT OF
+  CONTRACT**, because the named-spelling standard resolves exactly that case:
+  *"a rung that establishes the same fact by a different expression is out of
+  contract even when it is semantically identical and even when it compiles to
+  the same bytes."* ▶ **So `r4_endpoint_degenerate` is TRUE on that row and
+  F100's *"both endpoints move"* keeps only its R3 half.**
+  ⛔⛔ **AND THE WAY *NOT* TO REACH THAT ANSWER, because the manager tried it:**
+  the `why`'s *"WHAT NO GREP SETTLES"* sentence does **not** license reading every
+  backticked `required` span as a spelling pin. **Its own final clause says
+  *"which spelling … is a reading"*, and `harness/check.py::idiom_audit`
+  (`check.py:2198-2212`) measures the naive every-span-in-every-rung reading at
+  **41 misses of 158 obligations, all 41 non-defects, 17 of them ANTI-signal**
+  (a `required` entry may quote a span **in order to say it is ABSENT**).
+  ⭐ **`required` is PRESENCE-ONLY, cannot fail the gate, and is judged against
+  the entry's English by a reader. `required_absent` is a raw presence report
+  that fires on shipped rungs too** — on `ph53` it fires on R3's `v0_shipped`.
+  ▶ **Read the entry, not the report.** (F100 narrowed, item 83 closed.)
+
+- ⚠⚠ **WHAT DECIDED IT WAS THE ENTRY'S *LEADING APPOSITIVE*, SO WRITE THAT
+  CLAUSE DELIBERATELY.** *"THE ONE-BYTE-PER-SLOT WITNESS"* defines **what the
+  backticked span IS** — a representation — and the challenger was declared *"a
+  u32 bitmask **instead of `[bool; MAXD]`**"*, one bit per slot; a further clause,
+  *"It is **indexed** SAFELY on purpose"*, also fails on a bitmask, which performs
+  no indexed access. ▶ **English 2-to-1 against the challenger, AGREEING with the
+  backticks — so there was never a spelling-versus-purpose conflict**, and the
+  claim that there was is what made the question look undecidable for two tasks.
+  ⭐ **When you write a `required` entry, the appositive is the pin's definition;
+  everything after it is commentary.**
+
+- ⭐ **A COST-SELECTION TRAP THE RULING AVOIDS, AND IT IS WHY THE RULING IS
+  CREDIBLE.** `.memory/02-bench-rules.md`'s *a rung is never cost-selected*
+  applies to its **pins** too. The reading that won is the one under which the
+  **cheaper** variants LOSE — ▶ **so the row's headline was retracted in the
+  direction that costs it something**, which is the only direction in which a
+  pin ruling can be trusted.
+
+- ⭐⭐ **A WITNESS-REPRESENTATION CHANGE THAT IS CHEAPER *AND* SMALLER-SURFACE
+  CAN BE OUT OF CONTRACT, AND THAT IS A PUBLISHABLE RESULT RATHER THAN A
+  PROBLEM.** `ph53`'s `r4_bitmask_min` is **3 trusted call sites against the
+  shipped rung's 10 and 2 accessors against 4**, and it is out of contract.
+  ▶ **Publish it as a CONTROL-class result**: *"a cheaper, smaller-surface
+  witness exists and this row's contract excludes it"* — which says more than an
+  endpoint would. ⚠ **And the four reductions that KEEP the shipped witness are
+  all dearer** (+0.50 / +2.99 / +3.03 / +6.60 %), **so *"a smaller trusted
+  surface costs something"* is not a law — it is what you measure when you change
+  ONE thing.**
+
+- ⚠ **AN ENDPOINT SEARCH STILL PAYS, AND THE SCORE IS NOW 3 OF 4 ROWS WITH A
+  MOVING ENDPOINT** — `ph29`'s R4 (byte-identically, F77), `ph45`'s R4 **and** R3
+  with the bound's sign reversing (F87), and `ph53`'s **R3 only** (F100, after
+  review). ⛔ **`ph07` and `ph16` found their R4 degenerate, and that is on
+  file.** ▶ **Search both endpoints on every row; do not manufacture a variant to
+  have something to report.**

@@ -35,3 +35,55 @@
   a detector**: *"does this row use the allocator?"* was answered twice (a string
   search, then `gcc -MM`) and bypassed twice. **The question is not meant to be
   load-bearing.** (F10, F16.)
+
+---
+
+## Landed 2026-09-13 from `TASK_PHP_043` — which column, and what a figure owes
+
+- ⭐⭐⭐ **WHICH STATISTIC RESOLVES A CODE DIFFERENCE IS DECIDED BY
+  `inside_share`, AND IT IS ALREADY COMPUTED FOR EVERY CELL IN EVERY RECORD.**
+  **Family A resolves a difference exactly to the extent the difference lands
+  INSIDE THE KERNEL SYMBOL.** ▶ **So compute `inside_share` BEFORE choosing the
+  column, not after the search disagrees**: `ph45` at **9.5 %** published in
+  **W1**, `ph53` at **89.5 %** published in **A1**, and both were right.
+  ⛔ **Two earlier candidate axes are REFUTED**: *same-language vs
+  cross-language* (all nine of its own cells are same-language and separate by
+  `|Δ|`) and *does the callee work diverge* (**a sign flip ENTAILS callee
+  divergence, so the variable does not vary**). **Details and scope —
+  two rows, nine cells — in `02-ladder.md`.** (F91 narrowed, item 78 answered.)
+
+- ⚠⚠⚠ **A ROW'S SPREAD OVER RESPELLINGS IS A FACT ABOUT THAT ROW'S VARIANTS, NOT
+  ABOUT THE STATISTIC.** `ph45`'s A1 spread over nine searched variants is
+  **`0.000000` pp** against 66.7/44.5 pp whole-program; **`ph53`'s is `39.9`/`45.3`
+  pp over 20.** ▶ **Same statistic, opposite answers, and the difference is
+  `inside_share`** — every lever `ph45`'s search found lives in the callee `dec`.
+  ⓘ **`ph45`'s `0.000000` is an instance of F86's `BLIND` class** (*A is exactly
+  `0` while the whole-program figure is not*, 14 of 366), **which the programme
+  already had a name for.** ⛔ **Do not quote either row's spread as evidence
+  about family A.** (F100, item 82.)
+
+- ⛔⛔ **EVERY PERCENTAGE OWES FOUR THINGS AND A PUBLISHED FINDING SHIPPED
+  WITHOUT ANY OF THEM: THE STATISTIC, THE INPUT, THE OPT/MODE LEVEL, AND THE
+  BASE IT IS AGAINST.** F98's *"the shipped R4/R5 carry a coverage witness the C
+  rung does not have, and it costs `+21.8 %`"* is **W1**, on **`small.bin`**, at
+  **`O3/isolated`**, **against `controls/r4_nowitness.rs` — a RUST control, NOT
+  against the C** — and **only ~44 % of it is the witness** (`+101.59` of
+  `+228.87` `Ir`/call; the rest is the array being in memory at all).
+  ⭐ **The headline invited an R1-vs-R4 reading it could not support, and the
+  attribution of a whole difference to one named cause is F83's shape.**
+  (F98 narrowed.)
+
+- ⚠ **NAME THE DENOMINATOR.** `ph29`'s family-B draw spread is **`range / mean`**
+  — `31.42 %` on an independent 8-span sweep. **A second normalisation, `38.6 %`,
+  is also in circulation and neither document said which it used.** (F88 upheld,
+  item 92.)
+
+- ⚠⚠ **`probe_iters` CANNOT BE WIDENED OUT OF THE PROBLEM, AND *"HOPELESS"* IS
+  TARGET-DEPENDENT.** The width→spread exponent is **≈ −0.5** on both rows, so a
+  *relative* target needs an unreachable width — ⚠ **but for an ABSOLUTE 1-pp
+  target the probe's own TABLE 7 gives `W ≤ 574` on every pair.** ▶ **The `NO`
+  on open item 68 stands anyway, and for a better reason: the lever cannot fix a
+  BIAS at any width** — F93's start-of-run transient and F91's bias. ⭐ **And the
+  F52 control is what makes the exponent believable: it recovers `−0.5047` from
+  i.i.d. noise and `−0.9799` from endpoint noise, so the experiment does
+  distinguish *a weak lever* from *measuring its own null*.** (F92 narrowed.)

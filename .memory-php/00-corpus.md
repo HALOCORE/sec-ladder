@@ -69,3 +69,37 @@
   `ext/standard/`** — 2 156 are inside `libmysqlclient.so.14`'s XML charset
   parser, a different shared object. Every spatial `hotness` field is
   **reasoned**, and the census is not evidence for it. (F9.)
+
+---
+
+## Landed 2026-09-13 from `TASK_PHP_043` — the `fix_commit` column, and how an exclusion is held
+
+- ⛔⛔ **THE CORPUS'S `fix_commit` COLUMN NAMES *A* FIX AND IS SOMETIMES THE WRONG
+  COMMIT ENTIRELY.** `ph53` / CRASH-158 is the measured instance: the column gives
+  **`be8daf1f47fa` (2008-03-12)**, and the real R1h is
+  **`d09cdd9f71f34deab4b99f4e63523fb94164a724` (Dmitry Stogov, 2005-06-08,
+  *"Fixed valgrind errors"*, first shipped php-5.0.5)** — 1 file, 1 hunk, 2
+  insertions / 1 deletion, and it **`patch -p1`es onto the pristine tarball at
+  ZERO FUZZ, exit 0** (offset −14). ▶ **Bisect the one-release bracket; do not
+  take the column on faith.** (F94, `PROTOCOL_PHP.md` §F5(iii).)
+
+- ⚠⚠ **AND THE EXCLUSION OF THE WRONG COMMIT RESTS ON **ONE** ROUTE, NOT TWO.**
+  F94 published *"REFUTED TWICE INDEPENDENTLY"* — the pre-image screen's
+  `NOT-THE-REPAIR` **and** the 5.0.x tag walk. ⛔ **The screen route is GONE: the
+  `same_function` soundness repair correctly demoted that record to
+  `INAPPLICABLE-SAME-FILE`, which the screen prints as *"NOT exclusions … says
+  nothing about these"*.** ✅ **The exclusion STANDS on the tag walk alone** — the
+  cited `erealloc` line survives php-5.0.1–5.0.4 and is **gone at php-5.0.5**,
+  **2 years 9 months before** the commit. ⭐ **The lesson is about the bookkeeping,
+  not the verdict: a repair to a screen can silently withdraw a route a finding
+  is still citing, and nothing re-checks the finding.** ▶ **When a screen's
+  labelling changes, grep the findings that cite its verdicts.** (Items 85, 87.)
+
+- ✅ **THE TWO ROUTES ARE NOT THE SAME EVIDENCE TWICE, AND THE SCREEN *DOES*
+  DISAMBIGUATE MULTIPLE CITED SITES** — by 5.0.0 line number plus full text,
+  *"better than the tag walk does"*. ⚠⚠ **The tag walk alone cannot**: a naive
+  count read 2 occurrences of `erealloc(ce->interfaces` at php-5.0.4 and 1 at
+  php-5.0.5 and looked self-contradictory until the **two distinct sites** were
+  separated — the survivor is the inheritance-merge line at **`:1944`**, not the
+  cited one. ▶ **A count-based tag walk needs site disambiguation or it is not a
+  walk, it is a tally.**

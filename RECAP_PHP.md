@@ -47,11 +47,11 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 7 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
         ph45 (T1) + ph53 (T3) TYPE. 6 of 20 families. .memory-php/ AUTHORITATIVE.
-NEXT    NOTHING RUNNING. _043 LANDED + manager-verified. ▶ (1) LAND
-        `.memory-php/`: F83-F86 eligible since _038 and STILL UNLANDED, +12 more;
-        ITEM 73 APPLY DON'T APPEND; RULE-9 block says which. ▶ (2) ONE `ph53`
-        RE-GATE: items 83+85+89+90, drafts in _043 §1.8. ▶ (3) ROW 8 `ph52`,
-        brief staged .temp/mgr176/. ▶ (4) ROW 9 `ph55` (T5). 33 owed, 94-127.
+NEXT    NOTHING RUNNING. _043 LANDED; `.memory-php/` LANDED (16 findings, the
+        oldest debt gone); 3 validators repaired w/ negatives. ▶ (1) ONE `ph53`
+        RE-GATE: items 83+85+89+90 batched, drafts in _043 §1.8 -- a row is
+        publishing a RETRACTED pin. ▶ (2) ROW 8 `ph52`, brief staged in
+        .temp/mgr176/. ▶ (3) ROW 9 `ph55` (T5). 33 owed, 94-127 tasks.
 ⚠ NEW   _043 COST ONE HEADLINE + 4 QUALIFIERS. F100's "BOTH ENDPOINTS MOVE"
         LOSES ITS R4 HALF (83 ruled (a)). F94 "twice"->ONCE. F98's +21.8% is
         W1/small/O3 vs a RUST CONTROL, ~44% witness. F101's consequence was
@@ -129,9 +129,9 @@ research consequence.
 
 | | findings | may enter `.memory-php/`? |
 |---|---|---|
-| ⭐ **reviewed, eligible AS WRITTEN** | **F93 · F95 · F99** · **F90** (as a struck record) · and the older **F83 · F84 · F85 · F86** | ✅ **YES.** ⚠⚠ **F83–F86 have been eligible since `_038` and are STILL NOT LANDED — the oldest rule-9 debt in the programme** |
-| ⚠ **reviewed, eligible ONLY WITH THE NARROWING IN THE SAME SENTENCE** | **F88 · F89 · F91 · F92 · F94 · F98 · F100 · F101** | ✅ **YES, but item 73 binds: APPLY, DO NOT APPEND.** ⛔ Landing F100's headline or F98's `+21.8 %` unqualified would publish a retracted claim in the layer that supersedes everything |
-| ⛔ **cycle still OPEN** | **F96 · F97** | ⛔ **NO.** F96 is a build record plus a four-prediction ledger with no cheap second method; **F97 needs `verus_run.py` and `controls/r4_nowitness.rs`'s error text, and F100 promotes it from argument to a MEASURED FLOOR on three arms nobody has re-run** |
+| ⭐ **reviewed, eligible AS WRITTEN** | **F93 · F95 · F99** · **F90** (as a struck record) · and the older **F83 · F84 · F85 · F86** | ✅✅ **LANDED 2026-09-13.** The oldest rule-9 debt is discharged |
+| ⚠ **reviewed, eligible ONLY WITH THE NARROWING IN THE SAME SENTENCE** | **F88 · F89 · F91 · F92 · F94 · F98 · F100 · F101** | ✅✅ **LANDED 2026-09-13, narrowings APPLIED and not appended** (item 73) — `00-corpus` F94 · `02-ladder` item 83 + the `inside_share` ruling + the endpoint law · `03-numbers` F98's four qualifiers, F88's denominator, F92's target-dependence · `04-process` laws 6–12. ⛔ **The 2026-09-12 *"still a FLAG … nothing below is authoritative yet"* banner in `02-ladder` is REMOVED** |
+| ⛔ **cycle still OPEN — THE ONLY THING STILL BARRED** | **F96 · F97** | ⛔ **NO.** F96 is a build record plus a four-prediction ledger with no cheap second method; **F97 needs `verus_run.py` and `controls/r4_nowitness.rs`'s error text, and F100 promotes it from argument to a MEASURED FLOOR on three arms nobody has re-run** |
 
 ### ▶ WHAT THE ROUND COST THE PUBLISHED RECORD — **ONE HEADLINE AND FOUR QUALIFIERS**
 
