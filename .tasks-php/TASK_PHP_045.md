@@ -105,7 +105,10 @@ for open item 86's reason; `~/tools/llvm/bin/clang -O1 -fsanitize=address`):
 > ⛔⛔⛔ **THEREFORE: A CLEAN STACK SLOT READS ZERO, ZERO IS `IS_NULL`, AND
 > `zval_dtor` IS A NO-OP ON IT. ⭐ THE DEFECT IS SILENT ON A FRESH STACK.**
 > ▶ **It fires only when a prior frame left a freeing tag at that offset, and
-> `ph53`'s `0xbe` determinism came from ASan's malloc fill — a mechanism that
+> `ph53`'s `0xbe` determinism came from ASan's malloc fill — ⭐ **and it is a
+> RUNTIME OPTION DEFAULT, not even a compile-time property: the same binary under
+> `ASAN_OPTIONS=malloc_fill_byte=0` returns zeros** (`_044` §7.1, re-measured by
+> me) — a mechanism that
 > does not exist for the stack.**
 
 ⭐⭐⭐ **THE MANAGER'S HYPOTHESIS FOR HOW TO GET DETERMINISM, AND IT IS FREE IF
