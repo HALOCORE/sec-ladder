@@ -1601,6 +1601,96 @@ The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
 
+### F102 — ⭐⭐⭐ ROW 8's GROUNDWORK: `ph52` IS ADMITTED ON THE C — AND **THE DEFECT IS SILENT ON A CLEAN STACK**, WHICH IS WHY LOGIC-007 HAS NO CRASH ANCHOR
+
+Manager, 2026-09-13, while `_043` ran. ⚠ **UNREVIEWED** (rule 9).
+✅ **Read from the PRISTINE TARBALL** (`5783e0c0ba94f165…`), **not** from
+`CATALOGUE.md`, not from `index.csv`, not from the Rust port. Staged notes and the
+full build brief: `.temp/mgr176/{NOTES.md,PH52_BUILD_BRIEF.md}`.
+
+**The C.** `Zend/zend_operators.c:1146` `concat_function` declares **`zval
+op1_copy, op2_copy;`** — bare stack locals, **no `= {0}`, no `INIT_ZVAL`, no
+`memset`** — and passes `&op1_copy` to `zend_make_printable_zval`, which writes
+`expr_copy->value.str.*` on every arm and `expr_copy->type` **once, at `:263`,
+after the switch**. The faulting arm is `:242-247`:
+`if (EG(exception)) { zval_dtor(expr_copy); … break; }` — **a tag-dispatched
+teardown over a tag byte nobody has written.** ⓘ On the COMMON path
+(`:190-193`, `expr` already a string) **`expr_copy` is never written at all**, so
+the function's own convention is *constructed only if `*use_copy`* — and the
+early exit destructs it anyway. ✅ **ADMITTED on all three C-side conditions
+(`CLAUDE.md` rule 6), and distinct from its own family-mate `ph53` on four
+counts**: heap vs **stack** · a pointer value vs a **discriminant** · a fold vs a
+**dispatch** · a wild deref vs a **wrong-arm teardown**.
+
+> ### ⛔⛔⛔ THE MEASURED RESULT, AND IT CHANGES THE ROW: **A CLEAN STACK SLOT IS `IS_NULL`, AND `zval_dtor` NO-OPS ON IT**
+>
+> **Measured on this box** (`.temp/mgr176/asanfill.c`, generator kept, binaries
+> deleted), `clang -O1 -fsanitize=address`: fresh `malloc(64)` reads
+> **`be be be be be be be be`**; an un-initialised `stack[64]` reads
+> **`00 00 00 00 00 00 00 00`** — **with and without the sanitizer.**
+> **And from the pristine C**: `Zend/zend.h:387-392` gives **`IS_NULL 0`**,
+> `IS_STRING 3`, `IS_ARRAY 4`, `IS_OBJECT 5`; `Zend/zend_variables.c:36-57`
+> `_zval_dtor` switches on `zvalue->type & ~IS_CONSTANT_INDEX` over
+> `IS_STRING`/`IS_CONSTANT`/`IS_ARRAY`/`IS_CONSTANT_ARRAY`/`IS_OBJECT` and has
+> **no `case IS_NULL`**.
+>
+> ▶ **THREE CONSEQUENCES.**
+> **(1)** ⛔ **The adversarial input is not a blob property, it is a CALL-HISTORY
+> property** — a prior frame must leave a freeing tag at that offset. **That is
+> row 8's deliverable #0, and it must hold on all four C cells**, because the
+> offset is a compiler layout decision.
+> **(2)** ⭐ **It EXPLAINS the missing fidelity anchor rather than excusing it.**
+> LOGIC-007 records `uninit-read-silent` **because the real bug usually IS
+> silent**: most garbage is zero or is not one of the freeing tags. ▶ **That is a
+> better §A4 answer than a divergence note.**
+> **(3)** ⭐⭐ **And it gives the row a number no built row has: the harm is
+> CONDITIONAL ON THE GARBAGE VALUE, and the condition is small and countable** —
+> five named cases out of a byte, widened by the mask. ▶ **A `controls/` sweep
+> over the tag byte `0..255` counting which values free is the whole control.**
+> ⭐ **That figure is the answer to *why do uninitialised-read bugs survive for
+> years in shipped code*** — which is exactly what a reader of this ladder needs.
+> ⚠ **UNTESTED: the five-of-256 is read off the `switch` and the mask and has not
+> been compiled.**
+
+⛔⛔ **AND `ph53`'s OWN DETERMINISM DID NOT COME FROM THIS TREE EITHER — REPORTED
+FOR ROUTING, `ph53` NOT EDITED.** Its R1 reports `0xbebebebebebebebe`, and
+**`0xbe` is ASan's malloc fill byte, measured above.** The shim **zeroes** fresh
+blocks and poisons **`0x5a` on free**; it has no fresh-garbage pattern. ▶ **So
+`ph53`'s `cwe_note` describes a DETECTOR-DEPENDENT observation as a row
+property.** → item **96**.
+
+⚠⚠ **TWO EXTRACTION TRAPS `CATALOGUE.md` DOES NOT STATE** (it states only
+*"an extraction that zero-initialises the slot for tidiness deletes it"*):
+**(a)** ⛔ **the defect lives in the WRITE ORDER** — the tag is written **last**,
+so **any kernel that writes it early, which is the tidy ordering a careful author
+reaches for, deletes the defect while keeping every line that looks
+load-bearing.** ▶ **`value`-first / `tag`-last is a PINNED ORDERING.**
+⚠ **And the trap applies to the COMPILER too**: `-ftrivial-auto-var-init` or any
+stack-poisoning mode removes it.
+**(b)** ⛔ **the faulting operation is a tag-dispatched *FREE*, not a read** —
+the freeing arms **release a pointer read out of the same uninitialised slot**, so
+a kernel whose teardown merely *branches* has built a weaker row.
+
+⭐⭐ **AND A PREDICTION REGISTERED BEFORE ANY RUNG EXISTS, so it can fail.** The
+uninitialised datum here is a **discriminant**, so **F97/F98 should recur**:
+R2/R3 cannot reproduce it at all (ⓘ **a FINDING, never a kill**), and R4/R5 need
+`MaybeUninit::<Tag>::assume_init`'s `is_init()`, which is a property of the
+failure flag — attacker data — exactly as on `ph53`. ⚠⚠ **BUT A WAY IT SHOULD
+DIFFER, WHICH IS WHAT MAKES IT FALSIFIABLE: `ph53`'s witness is PER-SLOT (`n`
+bits, priced at F98's `+21.775 %`); `ph52`'s is ONE SLOT, ONE BIT —
+`constructed: bool`.** ▶ **Predicted ~FREE here.** ⭐ **If free on `ph52` and
+dear on `ph53`, the cost of a safety witness is O(the number of slots) and not a
+constant — a better statement than either row gives alone.**
+
+⛔⛔ **AND *"CHEAPEST CANDIDATE"* IS WITHDRAWN FROM THE START HERE BOX.** `_040`
+§7.2 ranked `ph52` **below** `ph53` on three measured grounds and I carried only
+one forward: its R1h is a **hand reconstruction**, not a `patch -p1` (§C owes an
+argument), and it has **no fidelity anchor**. ▶ **The honest phrasing is *lowest-risk
+R1h, highest-risk adversarial input*.** ⭐ **And the deeper correction is to my own
+cost model: `ph52` is SECOND-in-family and METHODOLOGY-OPENING ANYWAY, so
+*first-in-family* is itself a proxy — the operative axis is *does this row need a
+mechanism the tree does not have*.** ⚠ **Registered before the row is built.**
+
 ### F101 — ⚠ **REVIEWED AND NARROWED:** A **FOURTH** DEFECT IN THE SHARED `spellings.py` MACHINERY: `kernel_fingerprint`'s DIGEST IS **PATH-SENSITIVE**, AND ON `ph29` THAT IS A **LIVE FALSE NEGATIVE — BUT ITS STATED CONSEQUENCE IS BACKWARDS AND F77 IS SAFE**
 
 > ### ⛔⛔ REVIEWED AT `TASK_PHP_043` §5.1 — **UPHELD-NARROWED, AND THE DIRECTION I WAS WORRIED ABOUT WAS THE RIGHT WORRY.**
@@ -5667,3 +5757,6 @@ the wrong one.
 | 91 | ⚠ **READING (c) REFUTED AS STATED, BUT ITS NARROWED FORM IS A REAL DEFECT CLASS — `idiom.required` ENTRIES THAT PIN RUST-SIDE CHOICES** | `_043` §1.7. My third reading — *an entry saying "IT IS NOT IN THE C AND IT IS NOT UPSTREAM" does not belong in `idiom.required` at all* — is **refuted as stated**: the block legitimately carries per-language keys and a Rust key is not an error. ⚠ **But the narrowed form survives and is worth a corpus sweep**: an entry whose **only** key is `rust` and whose subject is a rung's own invented artefact pins an implementation choice inside a contract whose name says *idiom*. ▶ **Owed: count them across both programmes**, and decide whether they want a distinct field (`rung_required`?) rather than living in `idiom`. ⓘ Cheap to COUNT, and counting costs nothing |
 | 92 | ⚠ **TWO NORMALISATIONS FOR F88's `32 %`, AND NEITHER DOCUMENT NAMES ITS DENOMINATOR** | `_043` §5.6. `ph29`'s family-B draw spread re-derives as **`range/mean = 31.42 %`** on an independent 8-span sweep — ✅ **F88 UPHELD** — but **`31.4 %` and `38.6 %` are both in play and neither document says which normalisation it is using.** ▶ **Owed: name the denominator wherever the figure appears.** ⭐ **Same class as item 84 and as F98's four missing qualifiers — which makes three instances this round of *a number published without the thing that makes it a number*.** ⓘ Free |
 | 93 | ⛔⛔ **A STALE HARDCODED FIGURE IN `task_cost.py` — THE FOURTH IN THIS SESSION — AND IT INFLATED THE PUBLISHED PROJECTION** | Manager, this round. `.tasks-php/task_cost.py:201` reads `owed = 34  # QUOTA_001 floor 40 - built 6`, and **built is 7**. `quota.py` says **33**; the tasks cell said **33** in its own prose **and quoted `~97`, which is `34 × 2.86`.** ⭐ **Fourth stale hardcode in a validator this session**, after `preimage_screen.py`'s `N10e` (*"26/17"*), `task_cost.py`'s own `N7` (*"total/rows ≈ 6.5"*, stale **three times within the hour**) and `citecheck.py`'s `N1`. ▶ **Repair is the one those three got: COMPUTED, not re-pinned** — `owed = FLOOR - len(ROWS)` with `FLOOR = 20 * 2` named — **plus a must-fire negative that catches a pinned `owed` again** (§H). ✅ **The projection is already re-derived in the tasks cell as `~94–127`.** ⓘ Free — `.tasks-php/*.py` is in no digest |
+| 94 | ⭐⭐ **ROW 9 = `ph55` (T5), AND MY FIRST PICK WAS WRONG FOR EXACTLY THE REASON I TOLD `_043` TO HUNT FOR** | Manager, 2026-09-13, `.temp/mgr176/NOTES.md` §§5–7. I surveyed the **14 empty families** and first recommended **`ph32`** — on **one line of `ph53`'s own `why`** calling it *"same C shape … cross-reference, do not merge"* — **then read `ph32`'s own catalogue entry, which says the opposite about cost: THREE short tables (not the one the corpus records), and an R1h of FOUR COMMITS, one of which is *invisibly incomplete*** (`56adfe1f3cf1` rewrites the table to 65 **and leaves `/* 376 (0x0178)` unterminated in the same hunk, so it compiles to 41**; `bd07142b9128` then *"fixes the `/*`-within-comment warning"* by closing it **after** the swallowed block — **silencing GCC while keeping the defect**, which is how php-5.0.4 shipped at 41 with no diagnostic). ⛔ **Rule 14's failure mode, committed by me within the hour of dispatching a task about it. Fifth self-correction of the day.** ✅ **REVISED: `ph55`**, and the screen is run — R1h **`4f68f3774c34`, 2004, 1 file, same file** (the best shape in the catalogue, against `ph32`'s worst), and **all four mechanism facts verified on the pristine C**: `increment_opline = 0` at `:1728`, set at `:1749`, the **error** exit at `:1765-1770` calls `NEXT_OPCODE()` without consulting it, the **normal** exit at `:1792-1795` does; `NEXT_OPCODE()` = `EX(opline)++`, `INC_OPCODE()` = one more; and **`:4427` is `zend_opcode_handlers[ZEND_OP_DATA] = NULL;`**. ⭐⭐ **THREE USES OF ONE LOCAL FLAG AND ONE OF TWO EXITS FORGETS TO CONSULT IT — the smallest self-contained mechanism in the catalogue and the best crash-course specimen in it.** ⭐ **It needs NONE of `ph52`'s trouble**: no zvals, no allocator, **no garbage determinism** (the fault is a NULL indirect call), no stack-layout dependence — and the **Rust ladder is clean rather than blocked**, because a dispatch table of `Option<fn>` **cannot be called without unwrapping**. ⭐ **T5's SECOND row is nearly free** (`ph56`, 2004, 1 file; ⛔ **not `ph57` — 2013, 4 files**), so entering T5 discharges **2** of the 33. ⚠⚠ **THE SCREEN IS NOT COMPLETE: `preimage_screen.py` must confirm the cited lines are in the pre-image** (F38's lesson) — **deferred because that script was `_043`'s own subject.** ⚠ **AND THE §5.2 RANKING OF THE OTHER 12 FAMILIES IS UNRELIABLE** — it came from one line of prose each, which is what just failed; **read each candidate's OWN entry and OWN R1h before dispatching it** |
+| 95 | ⚠ **ONE THING IN `ph55` I FOUND AND COULD NOT SETTLE — IT MAY BE A *SECOND* INSTANCE OF THE SAME DEFECT** | Manager, 2026-09-13, from the pristine C. **`INC_OPCODE()` is itself guarded: `if (!EG(exception)) { EX(opline)++; }`** — so **when an exception is pending the NORMAL exit also advances by only ONE word**, the same single stride the error exit takes unconditionally. ⚠⚠ **I do not know whether that is a second instance of the defect or a deliberate hand-off to exception dispatch, because I have not traced what reads `EX(opline)` once `EG(exception)` is set.** ▶ **It is the FIRST question row 9 must answer, and the answer changes the row: if the exception path is also defective the kernel needs TWO error exits, not one.** ⓘ **UNTESTED** |
+| 96 | ⚠⚠ **`ph53`'s ADVERSARIAL EVIDENCE IS DETECTOR-DEPENDENT AND ITS `cwe_note` READS AS A ROW PROPERTY — REPORTED FOR ROUTING, ROW NOT EDITED** | F102. `ph53`'s R1 reports `member access within misaligned address **0xbebebebebebebebe**`, and **`0xbe` is ASan's malloc fill byte** — measured on this box (`.temp/mgr176/asanfill.c`): fresh `malloc` under ASan reads `be be be …`, **without ASan it reads zero**. ⛔ **The `emalloc_shim` does NOT produce it**: it zeroes fresh blocks and poisons `0x5a` **on free** only. ▶ **So the specific wild value the row cites is the DETECTOR's pattern, not the row's or the shim's**, and a reader of `cwe_note` would reasonably take it for a property of the program. ✅ **Nothing about the row's verdict changes** — the slot genuinely is indeterminate and ASan genuinely reports it. ⚠ **What is owed is one clause saying WHOSE pattern it is.** ⓘ `cwe_note` is inside the hashed block → **batch with items 83/85/89/90's `ph53` re-gate** |
