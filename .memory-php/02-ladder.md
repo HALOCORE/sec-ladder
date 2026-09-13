@@ -9,11 +9,13 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F90** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F101** live in `RECAP_PHP.md`
 > ⭐ **and the statistic decision is `.tasks-php/STATISTICS_001.md`, committed**
-> (⚠ this said *F1–F41* for seven findings and then *F1–F48* for forty-two more —
-> `PROTOCOL.md` rule 13, headers rot, twice in one file;
-> count it with `grep -c '^### F' RECAP_PHP.md` rather than trusting the line).
+> (⚠ this said *F1–F41* for seven findings, then *F1–F48* for forty-two
+> more, then *F1–F90* for eleven more — `PROTOCOL.md` rule 13, **and it
+> has now rotted THREE TIMES IN THIS FILE.** ✅ **`.tasks-php/boxcheck.py`
+> CHECKS THIS LINE against the actual highest finding as of 2026-09-13,
+> so it is the last time.** Count it: `grep -c '^### F' RECAP_PHP.md`).
 
 ---
 

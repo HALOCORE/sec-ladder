@@ -48,23 +48,23 @@ between them read `CLAUDE.md`'s top table.
 STATE   ⭐ ROWS BUILT 7 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
         ph45 (T1) + ph53 (T3) TYPE. 6 of 20 families. .memory-php/ AUTHORITATIVE.
 NEXT    NOTHING RUNNING. _039..._042 ALL LANDED + manager-verified.
-        ▶ BUILD ROW 8. ⭐ `ph52` IS CHEAPEST: R1h ALREADY SETTLED (F94), and
-        item 76 predicts a `0.00%` R1h column -- the first measurement that the
-        fix for an UNREACHED ERROR PATH IS FREE. ⚠ 33 owed, 14 of 20 families
-        empty, 2.86 tasks/row. ⛔ NOT item 62 (78 may narrow it).
-⚠ NEW   F100 ⭐⭐⭐ ph53's BOTH ENDPOINTS MOVE (2nd row ever), and the R3
-        PREDICTION'S MECHANISM WAS WRONG: nine window bounds checks, 281.8
-        Ir/call, BIGGER THAN THE R3-R4 GAP. `r4_bitmask_min` is CHEAPER *AND*
-        SMALLER-SURFACE -- ⚠⚠ its R4 half UNDECIDED on a pin that spells one
-        thing and argues another (83). ⭐ A1's SPREAD 39.9/45.3pp HERE vs
-        0.000000 ON ph45 (82). F101 kernel_fingerprint PATH-SENSITIVE (81).
-⚠ WRONG MY F90 REFUTED by F92. F91's probe made TWO scoping errors, the 2nd the
-        one MY OWN F82 forbids. F87 under-attributed (99) AND over-read (82).
+        ▶ (1) THE REVIEW ROUND -- 14 UNREVIEWED findings, and items 83/82/78
+        would EACH RETRACT SOMETHING PUBLISHED. See the RULE-9 STATE block.
+        One task, no builds. ▶ (2) THEN ROW 8: `ph52`, R1h settled (F94), and
+        item 76 predicts a `0.00%` R1h column. ⚠ 33 owed, 14 of 20 families
+        empty, 2.86 tasks/row. ⛔ NOT item 62 yet -- 78 may narrow it.
+⚠ NEW   F100 ⭐⭐⭐ ph53's BOTH ENDPOINTS MOVE (2nd row ever); the R3 PREDICTION'S
+        MECHANISM WAS WRONG -- nine window bounds checks, 281.8 Ir/call, bigger
+        than the whole R3-R4 gap. `r4_bitmask_min` is CHEAPER *AND* SMALLER-
+        SURFACE. ⚠⚠ ITS R4 HALF IS UNDECIDED ON A PIN (83). ALSO 82, 81.
+⚠ WRONG EIGHT corrections to my own work this round, 0 arithmetic. F90 REFUTED
+        by F92; F87 under-attributed (99) AND over-read (82); rule 11 broken x2.
 ⚠ TRAPS `grep -a` ALWAYS (41 corpus files). A PROBE WHOSE SETUP ENCODES THE
         ANSWER is WRONG. A CORRECTION APPENDED LEAVES THE OLD NUMBER (73, x3).
 BAR     C-SIDE ONLY: nothing Rust/Verus/Miri/cost kills a row -- "safe Rust
         can't express it" is F96's POINT. ⚠ .web/ CONCURRENT: NEVER `git add -A`.
-READ    .memory-php/ · PROTOCOL_PHP.md §B1a+§F6+§H1 · F1-F101 · items 1-83.
+READ    RULE-9 STATE block · .memory-php/ · PROTOCOL_PHP.md §B1a+§F6+§H1 ·
+        F1-F101 · items 1-83 · STATISTICS_001.md.
 ```
 
 ---
@@ -74,12 +74,12 @@ READ    .memory-php/ · PROTOCOL_PHP.md §B1a+§F6+§H1 · F1-F101 · items 1-83
 | | |
 |---|---|
 | **rows built** | **7 — `ph03` + `ph07` (both `S1`), `ph16`, `ph29` spatial · `ph64` TEMPORAL · `ph45` (`T1`) + `ph53` (`T3`) TYPE. ⭐ ALL THREE AXES OPEN, and TYPE now has TWO families.** Each five rungs + R1h. ⚠⚠ **THIS ROW SAID *"3"* FOR TEN TASKS** — `PROTOCOL.md` rule 13, and the box above warns about exactly this. **Count it: `ls results-php/gate/ | grep -av ph00 | wc -l`.** ⚠ **The lesson that outlived the arithmetic, kept because it did**: at n = 2 both rows were `ph03-uudecode-bound` and `ph07-strcut-cursor`, **the SAME family** (`S1`, unbounded cursor walk, 1 of the catalogue's 20) — and **no document said so for four tasks.** That cost, and the quota rule out of it, are open item 34 and `QUOTA_001.md`. ⓘ `ph00-smoke` is a relocated PAT calibration kernel — throwaway, **no PHP provenance**, and it prices nothing. ⚠ It IS in `results-php/gate/`, which is why the count command excludes it |
-| **tasks** | **41 written, `_001`–`_041`; all have reported; NOTHING RUNNING.** ⚠⚠ **THIS CELL HAD ACCRETED TWO GENERATIONS OF TEXT** — it gave *"28 written"* and *"`_023` is RUNNING"* in the same breath. Rewritten, and **count it rather than trust it**: `ls .tasks-php/TASK_PHP_*.md | grep -av REPORT | wc -l`. ⛔⛔ **AND THE `6.2 … AND RISING` I WROTE HERE LAST SESSION WAS THE WRONG QUANTITY — corrected 2026-09-12, `python3 .tasks-php/task_cost.py`.** `total / rows` **charges 19 ONE-TIME tasks** (Phase 0 `_002`–`_010`, the mining wave, the whole catalogue) **to six rows.** It answers *"what has this cost so far"* and is quoted to answer *"what will row 7 cost"*. ⭐⭐ **THE MARGINAL COST IS `20 / 7 = 2.86`, WHICH IS `PLAN_PHP.md` §8's PAT-MEASURED ~3 — SO THE PLAN WAS RIGHT and the sentence saying the php side costs *twice* what it assumed was mine and was wrong.** ⛔ **And *"RISING"* is a DENOMINATOR ARTEFACT**: `total/rows` rises whenever one-time tasks accumulate while rows lag — **it would rise if every row cost exactly 3.** The series a trend claim needs is per-row, in build order: **`ph03` 2.83 · `ph07` 5.50 · `ph16` 1.33 · `ph29` 3.33 · `ph64` 2.00 · `ph45` 3.00 · `ph53` 2.00 — flat, if anything FALLING, with one expensive row**, and `N6` is the control (**`ph07` was named as the dearest BEFORE running**, being the only *rebuilt* row). ✅ **Survives the worst reading of the classification (2.86 / 3.29 / 3.86)**, and the residual error points the **forgiving** way — `_033`/`_035`/`_037` are charged wholly to rows and all three carried statistic work. ⭐ **For the 40-row floor (33 owed): ~97 more tasks at the marginal rate, not the ~198 the total-cost ratio implies.** ⚠ Still a large programme, and `quota.py` calls the floor *"the cheapest possible programme, not the expected one"* — but *"twice as expensive as planned"* is **withdrawn**. ⓘ `PENDING = 1` (`_042`, charged to a row-in-progress) and `N8` fails if that pile passes a quarter of `ROW`. ⚠⚠ **AND `N7` HAD TO BE REWRITTEN FOR ITEM 73's REASON**: it pinned `total/rows ≈ 6.5` as a literal *"to reproduce the published figure"*, and that went stale **three times within the hour** (6.50 → 6.67 → 6.83 → 6.00). ▶ **It now asserts the scale-free claim — the total-cost ratio must be ≥ 1.5× the marginal one, computed** — which is the third hardcoded figure in a validator to go stale this session (`preimage_screen.py`'s `N10e` was the second). ⓘ Recent: `_033`–`_036` the `ph45` round · **`_037` searched `ph45`'s R4 AND R3 endpoints** (F87) · **`_038` REVIEWED the statistic findings and refuted three manager claims** (F88, and the corrections inside F83/F84/F86) |
+| **tasks** | **42 written, `_001`–`_042`; all have reported; NOTHING RUNNING.** ⚠⚠ **THIS CELL HAD ACCRETED TWO GENERATIONS OF TEXT** — it gave *"28 written"* and *"`_023` is RUNNING"* in the same breath. Rewritten, and **count it rather than trust it**: `ls .tasks-php/TASK_PHP_*.md | grep -av REPORT | wc -l`. ⛔⛔ **AND THE `6.2 … AND RISING` I WROTE HERE LAST SESSION WAS THE WRONG QUANTITY — corrected 2026-09-12, `python3 .tasks-php/task_cost.py`.** `total / rows` **charges 19 ONE-TIME tasks** (Phase 0 `_002`–`_010`, the mining wave, the whole catalogue) **to six rows.** It answers *"what has this cost so far"* and is quoted to answer *"what will row 7 cost"*. ⭐⭐ **THE MARGINAL COST IS `20 / 7 = 2.86`, WHICH IS `PLAN_PHP.md` §8's PAT-MEASURED ~3 — SO THE PLAN WAS RIGHT and the sentence saying the php side costs *twice* what it assumed was mine and was wrong.** ⛔ **And *"RISING"* is a DENOMINATOR ARTEFACT**: `total/rows` rises whenever one-time tasks accumulate while rows lag — **it would rise if every row cost exactly 3.** The series a trend claim needs is per-row, in build order: **`ph03` 2.83 · `ph07` 5.50 · `ph16` 1.33 · `ph29` 3.33 · `ph64` 2.00 · `ph45` 3.00 · `ph53` 2.00 — flat, if anything FALLING, with one expensive row**, and `N6` is the control (**`ph07` was named as the dearest BEFORE running**, being the only *rebuilt* row). ✅ **Survives the worst reading of the classification (2.86 / 3.29 / 3.86)**, and the residual error points the **forgiving** way — `_033`/`_035`/`_037` are charged wholly to rows and all three carried statistic work. ⭐ **For the 40-row floor (33 owed): ~97 more tasks at the marginal rate, not the ~198 the total-cost ratio implies.** ⚠ Still a large programme, and `quota.py` calls the floor *"the cheapest possible programme, not the expected one"* — but *"twice as expensive as planned"* is **withdrawn**. ⓘ `PENDING = 1` (`_042`, charged to a row-in-progress) and `N8` fails if that pile passes a quarter of `ROW`. ⚠⚠ **AND `N7` HAD TO BE REWRITTEN FOR ITEM 73's REASON**: it pinned `total/rows ≈ 6.5` as a literal *"to reproduce the published figure"*, and that went stale **three times within the hour** (6.50 → 6.67 → 6.83 → 6.00). ▶ **It now asserts the scale-free claim — the total-cost ratio must be ≥ 1.5× the marginal one, computed** — which is the third hardcoded figure in a validator to go stale this session (`preimage_screen.py`'s `N10e` was the second). ⓘ Recent: `_033`–`_036` the `ph45` round · **`_037` searched `ph45`'s R4 AND R3 endpoints** (F87) · **`_038` REVIEWED the statistic findings and refuted three manager claims** (F88, and the corrections inside F83/F84/F86) |
 | **infrastructure** | **built and reviewed TWICE**: `harness-php/{root,gate,provenance}.py` · `common-php/` · `patterns-php/{SOURCES.md,php-5.0.0.manifest}` (1170 files, 109 KB) · `.tasks-php/PROTOCOL_PHP.md` · `results-php/`. ⚠ **Reviewed is not the same as correct — the second review found a blocker in the first review's own fix.** ⚠ There used to be a SECOND row in this table also labelled `infrastructure` saying *"not yet built — Phase 0"* (`TASK_PHP_003` m1); it is gone |
 | **candidates** | **54** delivered across three axes. ⚠ **`.tasks-php/ADJUDICATION_001.md` takes that to ≈ 80**: +6 splits, −2 merges, **+17 kills reversed**, +1 dropped with no reason recorded, +4 that fell between axes. Evidence in `.tasks-php/TASK_PHP_001_MINE/` |
 | **catalogue** | ✅ **`patterns-php/CATALOGUE.md` — 102 rows, LANDED AND VERIFIED** by `TASK_PHP_023` (⚠ this line has said **91** and **93**; count it, do not trust it: `python3 .tasks-php/quota.py`). **20 mechanism families**, unchanged by the landing — spatial **42** · type **29** · temporal **31**. ✅ **Part A and Part B agree row-for-row, and every row is filed under the same axis in both** — the `ph92`/`ph93` mismatch is gone. ✅ `coverage.py` **166/166, MISSING 0**; all 8 withdrawn `C.1` kills present in place with their notes. ⚠⚠ **Two landed sentences were measured FALSE and are corrected in `CATALOGUE.md` AND in `land_019_020.py`** (F52 `ph94`'s trigger, F53 `ph32`'s *"one commit"*) — a landing script left carrying a refuted claim is a cited artefact. ⚠ **`_023` reviewed the nine admissions and would overturn NONE of `_019`'s reversals**; ~70 citations opened across 15 files, including the ones `_019` called correct. ⚠ **Parts A/B beyond the nine are still UNREVIEWED**, and `_020` measured the mechanism sentences right and the `▸ trigger` lines wrong (F46). Part A is a scannable table, Part B a ~150-word block per row, Part C the kill list with a re-derived criterion per kill |
 | **citation base** | PHP 5.0.0, pristine tarball, sha256 `5783e0c0…d6919`, 5595997 B, 3815 entries. **4.0.x ignored** (`DP-06`) |
-| ⭐ **which statistic** | ⚠⚠ **FOUR families are in use and THREE are published** — `ph03`/`ph16`/`ph29` in **A1**, `ph07` in **A3**, `ph64` in **B1**, `ph45` in **A1 + W1** labelled. ▶ **`.tasks-php/STATISTICS_001.md` is the whole argument and it is COMMITTED** (it was in gitignored `.temp/`). **The rule: publish BOTH, labelled, always** — `inside_share` explains a disagreement and never gates one, because `s ≡ A/B` so certifying A needs B already. ⚠⚠⚠ **THE BIGGEST OPEN THREAD IN THE PROGRAMME: A1 is the WRONG COLUMN for the CROSS-LANGUAGE comparison — 29 of 38 sign flips live there and 28 of 29 survive family C.** On `ph29/large` A says C is **+33 % dearer** than naive safe Rust while three other statistics say **~1 % cheaper**. ✅✅ **SETTLED 2026-09-12 — THE REVIEWER WAS RIGHT AND I WAS WRONG.** `TASK_PHP_039` measured the `probe_iters` lever's gain at **`W^(−0.5)`** (F92), so item **68 ANSWERS NO** and **F90 is refuted on its operative half**; **family C (item 62) is the second column.** ⚠ **With one thing added by F91 that neither side had: test C's SENSITIVITY, not just its null** — `|B/A|` is **49.6–393.9×** in the small-Δ regime, and if C fails it too then **C is the second column CROSS-LANGUAGE and A stands alone SAME-LANGUAGE.** ⭐⭐ **THE AXIS: same-language differences are 1–2 instructions under 50–394× of callee noise, so only A resolves them; cross-language the callee work IS the effect. F85's 29-of-38 split is that axis, not just a count** (item **72**) |
+| ⭐ **which statistic** | ⚠⚠ **FOUR families are in use and THREE are published** — `ph03`/`ph16`/`ph29` in **A1**, `ph07` in **A3**, `ph64` in **B1**, `ph45` in **A1 + W1** labelled. ▶ **`.tasks-php/STATISTICS_001.md` is the whole argument and it is COMMITTED** (it was in gitignored `.temp/`). **The rule: publish BOTH, labelled, always** — `inside_share` explains a disagreement and never gates one, because `s ≡ A/B` so certifying A needs B already. ⚠⚠⚠ **THE BIGGEST OPEN THREAD IN THE PROGRAMME: A1 is the WRONG COLUMN for the CROSS-LANGUAGE comparison — 29 of 38 sign flips live there and 28 of 29 survive family C.** On `ph29/large` A says C is **+33 % dearer** than naive safe Rust while three other statistics say **~1 % cheaper**. ✅✅ **SETTLED 2026-09-12 — THE REVIEWER WAS RIGHT AND I WAS WRONG.** `TASK_PHP_039` measured the `probe_iters` lever's gain at **`W^(−0.5)`** (F92), so item **68 ANSWERS NO** and **F90 is refuted on its operative half**; **family C (item 62) is the second column.** ⚠ **With one thing added by F91 that neither side had: test C's SENSITIVITY, not just its null** — `|B/A|` is **49.6–393.9×** in the small-Δ regime, and if C fails it too then **C is the second column CROSS-LANGUAGE and A stands alone SAME-LANGUAGE.** ⭐⭐ **THE AXIS: same-language differences are 1–2 instructions under 50–394× of callee noise, so only A resolves them; cross-language the callee work IS the effect. F85's 29-of-38 split is that axis, not just a count** (item **72**). ⚠⚠ **TWO LIVE CAVEATS ON THAT AXIS, BOTH FROM ROWS BUILT SINCE:** (a) **item 78** — on `ph53` A and B **agree** on every cross-language cell, because §B1a's O(1)-allocation precondition holds, so **the axis may be a PROXY for *does the callee work diverge*** and language merely correlates with it; (b) **item 82** — **A is NOT respelling-blind**: `ph53`'s A1 spread is `39.9`/`45.3` pp against `ph45`'s `0.000000`, so **F87 published a row fact as a statistic fact** and one clause of F91's own evidence table is withdrawn |
 | **rungs** | all five, R4/R5 may land as findings (`DP-02`). ⚠ **UPDATED — `DP-02` UNDERSTATES IT: the R4 endpoint MOVES on two rows now.** `ph29`'s `r4_fold_iter` is **5.63 pp cheaper** and byte-identical (F77); `ph45`'s `r4_buf_slice_inline` is **−23.47 %** with **10 unchecked-dereference sites against the shipped 12** — cheaper *and* a smaller trusted surface — **and its R3 endpoint moves too, the first row where both do, with the bound's SIGN REVERSING under search** (F87). ⭐ **So a `fixed-R4 bound` over an UNSEARCHED endpoint is a bound over a number nobody has tried to move**; `ph03` and `ph64` are still unsearched (item 58's residue) |
 | **PAT tree** | untouched and must stay so — `harness/*.py` and `common/*.py` are hashed into all 33 gate records (`PLAN_PHP.md` §2.1) |
 
@@ -106,6 +106,52 @@ READ    .memory-php/ · PROTOCOL_PHP.md §B1a+§F6+§H1 · F1-F101 · items 1-83
 - ⚠ Historical citations of the old names in `.tasks/`, `patterns/*/`,
   `pilot/` and inside findings are **left on purpose** and resolve to the
   `_PAT` files. Do not "fix" them.
+
+---
+
+## ⚠⚠⚠ RULE-9 STATE — WHICH FINDINGS MAY ENTER `.memory-php/`, AND THE REVIEW ROUND THAT IS OWED
+
+> ⛔⛔ **THIS BLOCK EXISTS BECAUSE THIS STATE WAS LIVING IN GITIGNORED
+> `.temp/mgr175/NOTES.md`** — which is **F99's own defect**, applied to the one
+> piece of process state that governs what may enter the authoritative layer.
+> `PROTOCOL.md` rule 9: **nothing reaches `.memory-php/` until it survives an
+> engineer→reviewer cycle.** ⚠ `grep -c UNREVIEWED RECAP_PHP.md` returns **35**
+> and that is NOT an index — it cannot tell a *closed* cycle from an open one.
+
+| | findings | state |
+|---|---|---|
+| ✅ **reviewed, UPHELD-NARROWED** | **F83 · F84 · F85 · F86** | `TASK_PHP_038` closed the cycle. ⭐ **ELIGIBLE FOR `.memory-php/` AND STILL NOT LANDED THERE** — the oldest outstanding rule-9 debt. ⚠ **Apply, do not append** (item 73) |
+| ⛔ **UNREVIEWED — 14 findings** | **F88 F89 F90 F91 F92 F93 F94 F95 F96 F97 F98 F99 F100 F101** | ⛔ **NONE may enter `.memory-php/`.** ⓘ **F90 is already REFUTED** by F92 and stays as a struck record. ⚠ The one paragraph of this material already in `02-ladder.md` (family B's sensitivity) is marked `⚠ UNREVIEWED, manager, 2026-09-12` for exactly this reason |
+
+### ▶ A REVIEW ROUND IS OWED, AND IT IS THE LARGEST ONE YET
+
+`TASK_PHP_038` reviewed **five** findings and **refuted three manager claims**.
+**Fourteen** is now outstanding, and **seven of them are the manager's own**
+(F90, F91, F94's verification, F99, and the three corrections inside F87/F91).
+
+⭐⭐ **THE THREE HIGHEST-VALUE TARGETS, because each would RETRACT SOMETHING
+PUBLISHED:**
+
+1. **Item 83** — does `ph53`'s `required[4]` pin a **spelling** or a
+   **purpose**? ⛔ **It decides whether F100's R4 result stands at all**: under
+   the spelling reading, `r4_endpoint_degenerate` becomes **true** and the
+   *"both endpoints move"* headline loses half.
+2. **Item 82** — **F87 published a row fact as a statistic fact** (`ph45`'s
+   `0.000000` pp). ▶ Check whether F91's `|B/A|` regime claim depends on the
+   wrong reading. **It should not** — that claim is measured on the R4/R5 pair's
+   `Δnopad`, not on respellings — **but say so rather than assume it.**
+3. **Item 78** — is F91's **same-language vs cross-language** axis a **proxy**
+   for *does the callee work diverge*? `ph53` says A and B agree on every
+   cross-language cell of that row. ▶ **If it holds, item 62's deliverable gets
+   narrower and cheaper**, so it is worth answering **before** building
+   family C.
+
+⚠ **AND ONE THING A REVIEWER SHOULD BE TOLD ABOUT THE MANAGER'S OWN RECORD THIS
+ROUND**, because it is the argument for the round: **eight corrections to my own
+work, none of them arithmetic** — F90 refuted by an experiment written to be
+able to refute it; two scoping errors in one probe, the second being the one
+**my own F82 exists to forbid**; F87 under-attributed *and* over-read; a
+truncated `ls` read as a deletion; and `rule 11` broken **twice**.
 
 ---
 
@@ -2414,7 +2460,7 @@ NO DEFINITIONAL GAP.**
 
 | | definitional gap | measured |
 |---|---|---|
-| **A** | ⛔ blind to callees | `inside_share` **0.055** on `ph45`; spread **0.000000** pp over 9 variants |
+| **A** | ⛔ blind to callees | `inside_share` **0.055** on `ph45` — i.e. **94.5 % of the work is in callees**, which is the load-bearing evidence. ⚠⚠ **The second clause this row used to carry — *"spread `0.000000` pp over 9 variants"* — IS WITHDRAWN as evidence for blindness: `ph53` reads `39.9`/`45.3` pp on the same statistic over 20 variants, so that was a fact about `ph45`'s nine variants and not about A** (item **82**) |
 | **C** | ⛔ blind to `main` | the `−1.00` class — **1 insn/call in `main`**, which C cannot see |
 | **W1** | ⛔ carries a language-dependent fixed term | **≈176 k `Ir`**, two rows agreeing to 0.45 % |
 | **B** | ✅ **none found** — it cancels the fixed term and charges everything | its flaw is **`probe_iters`**, a `spec.md` **parameter** |

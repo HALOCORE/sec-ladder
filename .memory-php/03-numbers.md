@@ -9,9 +9,9 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F90** live in `RECAP_PHP.md`
-> (⚠ this said *F1–F41* for **forty-nine** findings — `PROTOCOL.md` rule 13,
-> headers rot. **Count it: `grep -c '^### F' RECAP_PHP.md`.**)
+> The narrative, the open items and findings **F1–F101** live in `RECAP_PHP.md`
+> (⚠ this said *F1–F41* for **forty-nine** findings, then *F1–F90* for **eleven** more — `PROTOCOL.md` rule 13, **and it has now rotted THREE TIMES.** ✅ **`.tasks-php/boxcheck.py` CHECKS THIS LINE against the actual highest finding as of 2026-09-13, so it is the last time.**
+> **Count it yourself: `grep -c '^### F' RECAP_PHP.md`.**)
 > ⭐ **And the statistic decision — which column every row publishes in — is
 > `.tasks-php/STATISTICS_001.md`, committed. It was in gitignored `.temp/`.**
 
