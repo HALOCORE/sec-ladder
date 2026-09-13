@@ -47,12 +47,12 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 8 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
         ph45 (T1) + ph53+ph52 (T3, CLOSED). 6 of 20 fam. .memory-php/ AUTHORITATIVE.
-NEXT    NOTHING RUNNING. _046 LANDED: ph52 SEARCHED, R3 MOVES, R4 DEGENERATE.
-        ▶ (1) ⛔ ITEM 105 NEEDS A USER DECISION -- F106 priced it: the gate pins
-        a VERIFIED BYTE-IDENTICAL TCB REDUCTION out of the corpus. I recommend
-        (b) harness-php override; it FORKS A GATE RULE so I won't take it unasked.
-        ▶ (2) REVIEW: 7 unreviewed (F96,F97,F102-F106). ▶ (3) ROW 9 `ph55` (T5,
-        screened 94). 32 owed, ~99-122 tasks. ⛔ NOT 62 til F91's SENSITIVITY.
+NEXT    ⏳ _047 RUNNING (REVIEWER, ALONE): the 7 unreviewed F96,F97,F102-F106.
+        ▶ (1) ⛔ ITEM 105 STILL NEEDS A USER DECISION -- F106 priced it: the gate
+        pins a VERIFIED BYTE-IDENTICAL TCB REDUCTION out. I recommend (b)
+        harness-php override; FORKS A GATE RULE so I won't take it unasked.
+        ⓘ _047 §1 ATTACKS F106's PREMISE -- all I can do without you.
+        ▶ (2) ROW 9 `ph55` (T5, 94). 32 owed, ~99-122. ⛔ NOT 62 til F91 SENSIT.
 ⚠ NEW   F105 ph52's R3 MOVES (-7.42% A1), R4 DEGENERATE, and the gap is a
         SPELLING (128 of 131 Ir = 4 bounds checks) -- OPPOSITE of ph53's answer.
         ⭐⭐ A SAFE RESPELLING BEATS THE SAME RUNG WITH EVERY CHECK REMOVED by
