@@ -59,7 +59,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 ROWS = ["ph03", "ph07", "ph16", "ph29", "ph64", "ph45", "ph53",
-        "ph52"]  # BUILD order
+        "ph52", "ph55", "ph56"]  # BUILD order
 
 # ---------------------------------------------------------------------------
 # THE CLASSIFICATION. `ONCE` = paid once for the programme. A dict = the row
@@ -122,6 +122,22 @@ CLASS = {
     "044": {"ph53": 1.0},      # the five-debt ph53 re-gate (DONE)
     "045": {"ph52": 1.0},      # BUILD row 8 = ph52 -- row LANDED, so charged
     "046": {"ph52": 1.0},      # search ph52's endpoints + its missing control
+
+    # --- 2026-09-13/14 -----------------------------------------------------
+    # ⚠ N1 CAUGHT THESE SEVEN UNCLASSIFIED, which is exactly what it is for:
+    # ROWS had gone stale at 8 while ph55 and ph56 were built and gated.
+    "047": "METH",             # THE review round, F96/F97/F102-F106 (DONE)
+    "048": {"ph55": 1.0},      # BUILD row 9 = ph55 -- row LANDED, so charged
+    "049": "METH",             # attack item 111: is the C BASELINE a free
+                               # parameter? corpus-wide, charged to no row
+    "050": "METH",             # the item-112 family-B alignment sweep + review;
+                               # produced PROTOCOL_PHP §B5, a corpus-wide rule
+    # ⚠⚠ ROW 10 COST TWO TASKS AND BOTH ARE CHARGED TO IT. _051 stopped
+    # mid-row by design and _052 resumed; splitting 0.5/0.5 would hide that the
+    # row cost two, which is the only honest reading of a resumed build.
+    "051": {"ph56": 1.0},      # BUILD row 10 = ph56, stopped at 5 of 6 rungs
+    "052": {"ph56": 1.0},      # FINISH row 10: R5, spec.md, gate, statistic
+    "053": "METH",             # THE review round, F96/F110/F111/F112 (DONE)
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them
@@ -309,10 +325,37 @@ QUOTA_FAMILIES = 20          # QUOTA_001: the 20 families in patterns-php/CATALO
 QUOTA_MIN_PER_FAMILY = 2     # QUOTA_001: "min 2, cap 4"
 FLOOR = QUOTA_FAMILIES * QUOTA_MIN_PER_FAMILY
 
-# Families with ZERO built rows, from quota.py's own table: S4 S5 S6 T2 T4 T5
-# T6 E2 E3 E4 E5 E6 E7 E8. One FIRST-IN-FAMILY row is owed by each.
-# ⚠ NOT a rate and not a claim -- a count, and N10 checks it against `owed`.
-EMPTY_FAMILIES = 14
+# Families with ZERO built rows. One FIRST-IN-FAMILY row is owed by each.
+#
+# ⛔⛔ WAS `EMPTY_FAMILIES = 14`, HARDCODED, AND IT WENT STALE THE MOMENT `ph55`
+# ENTERED T5 -- the FIFTH stale literal in a `.tasks-php/` validator, and the
+# one law 6 (`.memory-php/04-process.md`) exists to forbid: A FIGURE A VALIDATOR
+# ASSERTS IS COMPUTED FROM THE TREE, OR IT IS NOT ASSERTED.
+# ⚠⚠ AND N10 DID NOT CATCH IT: it asserts `0 <= EMPTY_FAMILIES <= owed`, which
+# a value drifting DOWNWARD satisfies forever. A bound is not a derivation.
+# ⭐ Now computed the way `quota.py` computes it -- Part A's family sections
+# against the GATE RECORDS (not the row directories; item 114).
+def _empty_families():
+    import os as _os, re as _re, glob as _glob
+    root = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+    cat = _os.path.join(root, "patterns-php", "CATALOGUE.md")
+    built = {m.group(1) for f in _glob.glob(_os.path.join(root, "results-php", "gate", "ph*.json"))
+             for m in [_re.match(r".*/(ph\d+)", f)] if m and "smoke" not in f}
+    fam, cur = {}, None
+    for line in open(cat, encoding="utf-8", errors="replace"):
+        h = _re.match(r"^###\s+([STE]\d+)\b", line)
+        if h:
+            cur = h.group(1); fam.setdefault(cur, set()); continue
+        r = _re.match(r"^\*\*(ph\d+)\s", line)
+        if r and cur:
+            fam[cur].add(r.group(1))
+    if not fam:
+        raise SystemExit("task_cost: no `### <FAM>` sections in CATALOGUE.md -- "
+                         "the format changed and this count would be silently wrong")
+    return sum(1 for rs in fam.values() if not (rs & built)), fam
+
+
+EMPTY_FAMILIES, _FAM_TABLE = _empty_families()
 
 # ph64's cost CHARGED WHAT IT OPENED (RECAP_PHP.md's tasks cell): it measured
 # 2.00 by the per-row series while breaking §B1a's O(1)-allocation
@@ -419,6 +462,11 @@ def selftest():
 
     # ⛔ N10: the split must PARTITION the owed rows, or the middle estimate
     # double-counts. Catches EMPTY_FAMILIES drifting past `owed` as rows land.
+    # ⭐ N10b: the count must be DERIVED, not pinned. If CATALOGUE.md's family
+    # sections stop parsing this reads 0 or 20 and the arm says so.
+    check("N10b", 0 < len(_FAM_TABLE) == QUOTA_FAMILIES,
+          f"parsed {len(_FAM_TABLE)} family sections from CATALOGUE.md, want "
+          f"{QUOTA_FAMILIES}; EMPTY_FAMILIES={EMPTY_FAMILIES} is derived from them")
     check("N10", 0 <= EMPTY_FAMILIES <= owed_now,
           f"EMPTY_FAMILIES={EMPTY_FAMILIES} must be within owed={owed_now}, so "
           f"first-in-family + follow-on partitions it rather than overlapping")
