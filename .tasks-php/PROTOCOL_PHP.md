@@ -1033,6 +1033,18 @@ WHOSE KERNEL ALLOCATES** — `ph64`'s is `+193.36` / `−28.77` while A1 is
 and `ph07` only, and no published family-B number was wrong.** (`TASK_PHP_050`;
 `RECAP_PHP.md` item 112, F110.)
 
+⛔⛔ **AND THE GROUND THIS RULE WAS FIRST GIVEN IS REFUTED (`TASK_PHP_053` §1).**
+It was defended as *"`argv` and `envp` are the same knob"*. **They are not:**
+`ph07`'s `verus` cell steps **`34.49` under `argv[1]`, `20.08` under `argv[0]`,
+`0.00` under `envp`.** ▶ ⭐⭐ **THE STEP IS A PROPERTY OF THE `(cell, axis)`
+PAIR.** ✅ **The rule's VERDICTS are unaffected and were confirmed on two further
+axes** — 12 `0.00`-`argv` cells swept on `envp` and on `argv[0]`, **24
+cell-sweeps, no counterexample.** ⚠⚠ **So a `0.00` reading on the `argv[1]`
+sweep is NECESSARY and heavily corroborated, and NOT PROVED SUFFICIENT.**
+⭐ **Say it the way `harness/check.py::_env_block` already says it about
+`envp_stack_bytes`: three equal fields mean *this record cannot tell the two
+draws apart*, not *the two draws are the same*.**
+
 ---
 
 ### F6a. ⭐ A `c/*` COMMENT MAY **POINT** AT AN ARGUMENT; IT MAY NOT **STATE** THAT ARGUMENT'S VERDICT

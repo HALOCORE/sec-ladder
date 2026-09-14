@@ -47,23 +47,23 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 10 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL · ph45
         (T1)+ph53+ph52 (T3)+ph55+ph56 (T5) TYPE. 7 of 20 fam. 30 owed.
-NEXT    ⏳ _053 RUNNING (REVIEWER): 4 UNREVIEWED. ▶ (1) ⛔⛔ ITEM 105 NEEDS A
+NEXT    NOTHING RUNNING. _053 CLOSED 3 OF 4. ▶ (1) ⛔⛔ ITEM 105 NEEDS A
         USER DECISION, NOW (a) OR (c) -- MY RECOMMENDED (b) DOES NOT EXIST (F107).
         (a)=edit check.py, a 33-PATTERN RE-GATE, BUYS PUBLISHING THE SMALLER TCB;
         (c)=leave it, what gate.py's OWN HEADER PRESCRIBES. ⭐ I PROCEED UNDER (c).
         ▶ (2) AFTER _053: ROW 11, A NEW FAMILY (13 UNENTERED) -- SCREEN IT
         FIRST; ph55/ph56 BOTH SHOW WHY. 30 owed, 10 built, 7 of 20 families.
-⚠ NEW   F112 ⭐⭐⭐ ROW 10: R4->R5 COSTS EXACTLY 0.000 Ir/call ON BOTH INPUTS, AND
-        THE ROW HAD TO BUY IT (one modulus spelling across all 4 Rust rungs;
-        ph55 shipped two and paid +0.071%). ⛔ THE CROSS-LANGUAGE SIGN FLIPS
-        BETWEEN THE TWO C COMPILERS INSIDE W1 (-8.423% vs c-gcc-h, +3.811% vs
-        c-clang-h) AND THE ROW PUBLISHES BOTH -- F108 WORKING ON THE NEXT ROW.
-⚠ WRONG MY ph64 DEFENCE: "TWO COMPILERS AND TWO INPUTS" -- THE TWO-INPUT HALF IS
-        NOT EVIDENCE (SAME-LENGTH PROBE NAMES). RIGHT ANSWER, WORTHLESS REASON.
+⚠ NEW   F113 ⛔⛔ argv AND envp ARE **NOT** THE SAME KNOB: ph07's verus CELL STEPS
+        34.49 (argv1) / 20.08 (argv0) / 0.00 (envp). THE STEP IS A PROPERTY OF THE
+        (cell,axis) PAIR. ✅ §B5's VERDICTS SURVIVE -- 24 CELL-SWEEPS, NO
+        COUNTEREXAMPLE, ph64 FLAT ON ALL THREE. F112 ⭐ ROW 10: R4->R5 = 0.000
+        Ir/call; CROSS-LANG SIGN FLIPS BETWEEN THE 2 C COMPILERS, ROW PUBLISHES BOTH.
+⚠ WRONG 4TH ROUND RUNNING WHERE THE CONCLUSION LIVES AND ITS REASON DIES. 115:
+        A CONTROL'S GUARD MATCHED A COMMENT (4th). 116: req-mut IS ONE-AT-A-TIME.
 ⚠ TRAPS `grep -a` ALWAYS; a line-grep MISSES A WRAPPED PHRASE. APPENDING A
         CORRECTION LEAVES THE OLD NUMBER (73,x4). NAME THE FILE EVERY FIELD CAME
         FROM (84). ⚠ .web/ CONCURRENT: NEVER `git add -A`.
-READ    RULE-9 block · .memory-php/ · F1-F112 · items 1-114 · _047 §1.7 · _049 §1.3+§4.2
+READ    RULE-9 block · .memory-php/ · F1-F113 · items 1-117 · _047 §1.7 · _049 §1.3+§4.2
         · PROTOCOL_PHP §B1a+§F6+§F6a+§H · STATISTICS_001 · CLAUDE.md r6.
 ```
 
@@ -146,7 +146,7 @@ READ    RULE-9 block · .memory-php/ · F1-F112 · items 1-114 · _047 §1.7 · 
 >
 > ⭐⭐ **F109 WAS HELD BACK BECAUSE THE LAST TIME A ROW LANDED I PUT ITS MATERIAL
 > IN THE LAYER UNMARKED. HOLDING IT BACK WAS RIGHT: the refinement turned out to
-> be a rule the layer already carried.** ▶ **Next review scope: `F96 · F110 · F111 · F112` — FOUR open, and `F110`–`F112` are three consecutive ENGINEER tasks.**
+> be a rule the layer already carried.** ✅✅ **`TASK_PHP_053` CLOSED THE CYCLE ON THREE OF FOUR:** **F110 UPHELD-NARROWED** (verdicts confirmed on three axes; its *“same knob”* ground **REFUTED**, and the layer is corrected), **F112 UPHELD-NARROWED** (the `rlimit` floor is **3** not 2 and the `n = 2` coincidence is **REFUTED**; its control is **broken**), **F111 UPHELD offline / UNTESTED on the four upstream-history claims**. ⛔ **F96 UNREVIEWED for the FOURTH time** — ⭐ **and that is now the finding: it has no cheap second method and needs a dedicated task or a permanent mark.** ▶ **Next review scope: `F96 · F113`.**
 >
 > ⭐⭐⭐ **THE ROUND'S OWN HEADLINE: OF THE SIX FINDINGS IT VERDICTED, ONE WAS
 > REFUTED OUTRIGHT, ONE LOST ITS HEADLINE CLAUSE, THREE WERE NARROWED AND ONE WAS
@@ -1652,6 +1652,79 @@ The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
 
+### F113 — ⭐⭐⭐ **THE DECISIVE TEST WENT BOTH WAYS: `§B5`'s VERDICTS ARE CONFIRMED ON THREE AXES AND ITS STATED GROUND IS REFUTED — `argv` AND `envp` ARE *NOT* THE SAME KNOB**
+
+`TASK_PHP_053`, 808 lines. ⚠ **UNREVIEWED** (rule 9). Brackets **`66/0`** and
+**`22/0`**, first and last, unmoved; nothing measured or re-gated.
+
+> ### ✅ THE RULE SURVIVES, AND IT SURVIVES BY MEASUREMENT
+>
+> **12 `0.00`-`argv` cells swept on `envp` AND on `argv[0]` — 24 cell-sweeps, NO
+> COUNTEREXAMPLE.** ⭐ **`ph64` — on which the whole item-112 verdict rests — is
+> flat on all three axes**, so its clearance is **confirmed**, not merely
+> un-refuted.
+
+> ### ⛔⛔ AND THE GROUND IT WAS GIVEN IS **REFUTED**
+>
+> `ph07`'s `verus` cell steps **`34.49` under `argv[1]`, `20.08` under
+> `argv[0]`, `0.00` under `envp`** — flat over **96 consecutive bytes**.
+> ✅ **Four rival explanations ruled out by measurement**: a dead instrument
+> (`ph55` stepped `7.00` under `envp` in the same session, same period and
+> window, constant `+6` phase on **both** cells), the added variable (the `argv`
+> sweep re-run with it present still reads `34.49`), a longer period, and *"the
+> program reads `argv[1]`"*. ▶ ⭐⭐ **THE STEP IS A PROPERTY OF THE
+> `(cell, axis)` PAIR, NOT OF A CELL.** ⚠ **The mechanism is UNEXPLAINED and the
+> reviewer says so.**
+>
+> ⚠⚠ **CONSEQUENCE: a `0.00` on the `argv[1]` sweep is NECESSARY and heavily
+> corroborated, NOT PROVED SUFFICIENT.** ⭐⭐⭐ **And the right way to say that
+> was already written in this project, about this exact quantity** —
+> `harness/check.py::_env_block`'s caution that **three equal fields mean *this
+> record cannot tell the two draws apart*, not *the two draws are the same*.**
+> ⛔ **§B5 did not inherit it. It does now.** ⓘ **Second un-inherited caution in
+> three rounds** (F108 was the first).
+
+⭐⭐⭐ **THIS IS THE FOURTH CONSECUTIVE ROUND WHERE A CONCLUSION SURVIVED AND THE
+REASON GIVEN FOR IT DID NOT** — `_047` (F103's decomposition), `_049` (item 111's
+headline), `_050` (my `ph64` two-input defence), and now `_053`. ▶ **That is no
+longer a run of luck; it is the programme's characteristic failure mode, and it
+argues for reviewing REASONS separately from CONCLUSIONS.**
+
+**AND IT CORRECTED F112 IN TWO PLACES** — see F112: the `rlimit` floor is **3**,
+not 2, so the *"`n = 2` about the proof shape"* coincidence is **refuted**; and
+`controls/rlimit_bisect.sh` **cannot run on its own shipped file**.
+⛔ **`req-mut` deletes preconditions ONE AT A TIME** (`check.py:6718`) — **a real
+hole, since two preconditions can be individually removable and jointly
+necessary** — ⓘ **but it does not bite `ph56`, whose shipped file verifies
+without both.** ⚠ **A `harness/` finding: reported, not edited.**
+
+⭐ **AND THE REVIEWER REFUSED AN ATTACK I HANDED IT.** I suggested checking
+whether `ph55`'s `+0.071 %` clears its own `7.00 Ir/call` step; **it misfires** —
+that is an **A1** figure and the pair is `0.00`-step on both axes. ▶ **Reported
+as a NON-refutation rather than dressed up as one.** ⚠ **The *"the row had to buy
+it"* causal story is still UNPROVEN** — `ph55` never measured a one-spelling
+variant — **and `0.000 Ir/call` is EXACT but ENTAILED BY THE `norel` PIN, not
+independent of it.** ✅ *"Nine expressions, three files"* is **exactly right**.
+
+**F111's offline half UPHELD** by re-running the row's own `census.py`
+(`problems: none`), including the declaration-order asymmetry **measured on a
+pristine 5.0.0 CLI**, and `0x14 = offsetof(zval, type)` **confirmed by an
+independent probe built from the pinned tarball**. ⛔ **The four
+upstream-history claims are UNTESTED (network) and reported as UNTESTED, not as
+confirmations.**
+
+⭐⭐ **F96 IS UNREVIEWED FOR THE FOURTH TIME — AND THE ROUND FOUND WHY IT KEEPS
+BEING.** `ph56` **is** the cross-language row `_050` §7.3 said was missing, and
+**6 of 12 pairs disagree in sign between A1 and B1 on a NON-ALLOCATING kernel**,
+which **refutes F96 result 2's stated REASON.** ⭐ **The real mechanism is
+`inside_share`, exact to the digit: `+128.179 − (409.666 − 83.617) = −197.87`,
+the recorded B1.** ▶ **Fourth honest `UNREVIEWED` is the finding: F96 has no
+cheap second method and needs a dedicated task or a permanent mark.**
+
+ⓘ **`_050`'s seven uncertainties triaged: only two are load-bearing. #1 is now
+closed (the wrong way). #2 — `ph53`'s A1 `unsafe→verus` being exactly `−14.000`
+where `14 = 2 × 7` — is the one thing left to route** (item **117**).
+
 ### F112 — ⭐⭐⭐ **ROW 10 IS BUILT — T5 CLOSED AT 2 — AND `R4 → R5` COSTS *EXACTLY NOTHING*, WHICH THE ROW HAD TO *BUY*
 
 `TASK_PHP_052`, 508 lines. ⚠ **UNREVIEWED** (rule 9). ✅ **Manager-verified from
@@ -1704,9 +1777,17 @@ VERIFYING — at the `assert forall` that re-establishes `operand_present`.**
 ✅ `pristine` re-verifies the shipped file at **66/0** (and **76/0** twin) on
 every run, **so a broken toolchain cannot read as a clean sweep.**
 
-⭐ **AND AN `rlimit` ERROR IS A SYMPTOM, NOT A SIZE.** The floor bisects to
-**2** — ⭐ **the same as `ph55`, so `n = 2` about the proof SHAPE** — and the
-first draft's overrun was **a wrong loop invariant**: two clauses that cannot
+⭐ **AND AN `rlimit` ERROR IS A SYMPTOM, NOT A SIZE.** ⛔⛔ **CORRECTED
+`TASK_PHP_053` §2.5: THE FLOOR IS `3`, NOT `2` — `65/1` at rlimit 2 (twice),
+`66/0` at 3, with a `pristine` control matching the gate record exactly. `ph55`
+verifies at `2`, SO THE *"`n = 2` about the proof SHAPE"* COINCIDENCE IS
+REFUTED.** ⚠⚠ **And the control that produced the wrong number CANNOT RUN ON
+ITS OWN SHIPPED FILE** — reproduced by the manager: *"insertion matched 2x, want
+1 -- verus.rs has been respelled and this script is measuring the wrong file"*.
+**Its guard greps `verifier::rlimit` and the file's own COMMENT matches.**
+⭐⭐⭐ ***A COMMENT IS NOT CODE*, AGAIN — and `ph55`'s copy is WORSE (two
+comments).** ✅ **What survives, and it is the part that mattered:** the first
+draft's overrun was **a wrong loop invariant**: two clauses that cannot
 hold at a `break` were declared `invariant` instead of `invariant_except_break`,
 so Z3 spent the budget failing to prove them. ⛔⛔ **The obvious repair — raise
 the limit — would have shipped a WRONG INVARIANT under a 20× budget.**
@@ -6476,3 +6557,6 @@ the wrong one.
 | 112 | ⛔⛔⛔ **`marginal_ir_per_call` IS BIMODAL, EVERY ROW'S FAMILY-B FIGURES ARE DIFFERENCES OF TWO CELLS FROM ONE RECORD, AND NOBODY HAS SWEPT IT** | `TASK_PHP_048` §12 item 6 — **the engineer's own uncertainty, flagged and explicitly NOT swept.** ⭐ `ph55` caught it only because it happened to own a control measuring the step (`controls/argv_align.py`); **no other row has one.** ⛔ **The step is `7.0029 Ir/call` on `ph55`'s clang cells, and item 99 measured the same phenomenon at `±14–28 Ir` on `ph53`** — so a family-B difference **of that order is not distinguishable from alignment.** ⚠⚠ **THE ROW THAT WORRIES ME, AND I CHECKED IT RATHER THAN ASSERTING IT: `patterns-php/ph64-callback-frees-cursor/NOTES.md:414-415` publishes `R1h − R1` at `+15.98` / `+16.95` Ir/call (gcc) and `+18.34` / `+18.33` (clang) — the SAME ORDER AS THE ARTEFACT.** ⭐ **BUT IT HAS INTERNAL CORROBORATION THAT AN ALIGNMENT ARTEFACT WOULD NOT PRODUCE: four cells across TWO COMPILERS and TWO INPUTS agreeing within `2.4 Ir`, all the same sign.** ▶ **So it is a REAL RISK AND NOT A REFUTATION, and the sweep is what decides it.** ⓘ ✅ `ph64`'s **B1 headline** (`safe_tuned` vs `unsafe`) is a **different quantity** and is separately checked: F89's table records it reproducing to **`0.0087 pp`**, 64× the sample. ▶▶ **THE TASK, AND IT IS CHEAP AND READ-ONLY: (1) sweep every `ph*` gate record's `marginal_ir_per_call` and flag every published family-B difference whose magnitude is within ~3× the alignment step; (2) clone `argv_align.py`'s TWO-VERDICT design — *magnitude resolvable?* and *sign stable?* — because `ph55` showed a single verdict throws away a real result to avoid quoting an unreal one; (3) rule on whether a family-B figure may be published at all without such a control.** ✅✅ **SWEPT AND CLOSED 2026-09-14 BY `TASK_PHP_050` — UPHELD, AND ITS `ph64` SUB-WORRY REFUTED BY MEASUREMENT.** `.tasks-php/php50_align_sweep.py`: **all ten rows, both inputs, 32 pads = a FULL 32-byte period, `-O3 isolated` — 5 120 callgrind runs, 180 family-B differences, NO BUILD NEEDED** (every binary already existed). The pipeline **reproduces the committed `marginal_ir_per_call` exactly**. ⛔ **`ph64`: step `0.00` on EVERY cell, all four published figures reproduced to the hundredth — it has no alignment-sensitive cell at all. THE FIGURES ARE REAL.** ✅ **The instrument is live**: `ph55`'s clang cells step **exactly `7.00 Ir/call`**, **period 32, window 16, phase differing per binary** — the PAT bistability model reproducing in family B on a row nobody had measured. ⭐⭐ **AND THREE EXPOSED ROWS NOBODY SUSPECTED: `ph45` (four **Rust** cells at `7.00`, with UNEQUAL PHASES, so two of its differences carry a `14.00` range), `ph07` (**`34.49 Ir/call`, the largest step in the corpus and NOT A MULTIPLE OF 7**) and `ph29` (`0.02`, PAT's heap class).** ✅✅ **`4` of `180` differences flagged, all on `ph55` and `ph07`, NONE on `ph64` — AND NO PUBLISHED FAMILY-B NUMBER IN THE CORPUS IS WRONG**, because the only row that both publishes family B and owns an exposed cell is `ph55`, which already refuses to quote it. ▶ **THE RULING IS NOW IN `.memory-php/03-numbers.md`**: publishable iff the two cells have a measured step of `0.00` over a full 32-residue sweep, or the difference clears it by the stable ratio. ⛔ **A MAGNITUDE FLOOR — the cheaper alternative — IS REFUTED BY MEASUREMENT: it would have to be ≥ `7` to protect `ph55`, but `ph53/small` publishes `+2.80 Ir/call` at range `0.00` soundly, and the step takes FOUR values corpus-wide (`0.00`, `0.02`, `7.00`, `34.49`). Too strict and too loose at once.** ⛔⛔ **AND I MUST RETRACT HALF OF MY OWN ARGUMENT FOR `ph64`: I wrote *“four cells across two compilers AND TWO INPUTS agreeing … which an alignment artefact would not produce”*. The two-compiler half is good evidence; THE TWO-INPUT HALF IS NOT EVIDENCE AT ALL** — `probe.small.bin.100.bin` and `probe.large.bin.100.bin` are **the same length (23)**, so both inputs run at the **same** stack alignment, and `ph55` is the counter-example that proves it (its artefact agrees across both inputs perfectly). ⭐⭐ **THE CONCLUSION WAS RIGHT AND THE SUPPORT FOR IT WAS WORTHLESS — which is a defect, because THE REASON IS WHAT GETS REUSED.** ⓘ Same shape as `_049`: the effect upheld, the story about it refuted |
 | 113 | ⚠⚠ **A `pgrep … \| head` HID A LIVE PROCESS AND RACED A GATE AGAINST ITSELF — `CLAUDE.md`'s *"a truncated `ls`/`head` is not evidence of absence"*, NOW IN THE PROCESS-CONTROL LAYER** | `TASK_PHP_048` §4f. The engineer ran `pgrep -af '…' \| head`, **the list truncated and hid a still-running `final2.sh`**, and on that evidence launched a "resume". **Two `check.py` runs then shared `.temp/clausemut/ph55/` and both reported FAIL — with DIFFERENT failures.** ⭐⭐ **The raced numbers are their own fingerprint: the clean run records `oset ensures[0] load-bearing (49 verified, 4 errors)` and the two raced runs SWAPPED exactly that reading with the `53/0` baseline between them.** ✅ **Re-run from `build` with a preflight that is `pgrep` with NO `head` → `PASS, 307 ok, 0 FAIL`, stage 5c identical to the clean run.** ▶ **THE LAW: a liveness check may never be truncated. `pgrep` output feeding a decision gets no `head`, no `\| head -N`, no `tail`.** ⭐ **This is the same defect class as the manager reading `ls … \| head -30` as a deletion** (`_043`), **and as F35's `grep -a`: a tool that silently reports less than it found.** ⚠ **Third instance; the first two were READ operations and this one CORRUPTED A GATE RUN.** ⭐⭐ **AND `TASK_PHP_050` HIT THE MIRROR IMAGE THE SAME WEEK: a `pgrep` guard that MATCHED ITS OWN LAUNCHER'S COMMAND TEXT and span forever.** ▶ **SO THE LAW HAS TWO HALVES: a liveness check may not be TRUNCATED, and it may not MATCH ITSELF.** ✅ The repair for both is the one `CLAUDE.md` already mandates — **confirm `/proc/<pid>/cmdline` for an EXACT PID and act on that PID only** — and the cleanest version needs no `pgrep` at all |
 | 114 | ⛔⛔ **`quota.py` COUNTED A *DIRECTORY* AS A BUILT ROW, AND AGREED WITH THE TRUTH FOR NINE ROWS ONLY BECAUSE NO ROW HAD EVER BEEN HALF-BUILT** | Manager, 2026-09-14, found while landing `_051`. `quota.py:84-85` derived `built` from `glob.glob('patterns-php/ph*/')` — **directory presence**. ⭐ **The right definition was already written down in this file's own STATE cell** — *"count it: `ls results-php/gate/ \| grep -av ph00 \| wc -l`"* — **so the repo knew it and the tool used a different one.** ⛔ **It was latent for nine rows because every previous row went from nothing to fully gated inside ONE task; `_051` is the first to stop mid-row, and `quota.py` immediately reported `built 10` for a row with no `spec.md`, no `verus.rs` and no gate record.** ⚠⚠ **AND I QUOTED IT** — the corpus count in the START HERE box and in a report to the user both came from this tool. ✅ **REPAIRED: `built` is now derived from `results-php/gate/ph*.json`, a directory with no record is reported as `⏳ IN PROGRESS` and NOT counted, and a record with no directory is reported as `⛔ ORPHAN RECORD`.** ⭐ **Four §H negatives added INSIDE the tool** — N1 in-progress excluded (⭐ **and it prints `VACUOUS TODAY` rather than passing silently when no row is half-built**, F10's lesson), N2 every built row has a record, N3 `ph00` never counted, N4 no orphan records. ✅ **Now reads `built 9 · IN PROGRESS 1 · remaining 31 · T5 OWES 1`.** ⓘ Free — `.tasks-php/*.py` is in no digest. ⭐⭐ **THE CLASS: a checker can agree with the truth for a long time because the STATE THAT WOULD SEPARATE THEM HAS NEVER OCCURRED.** F49's shape (*a check that could not report its own blindness*), and the third measurement tool in this programme to be wrong in a way only a new kind of input could reveal |
+| 115 | ⚠⚠ **A CONTROL THAT CANNOT RUN ON ITS OWN SHIPPED FILE — AND THE GUARD MATCHES A *COMMENT*. *"A COMMENT IS NOT CODE"*, FOURTH INSTANCE** | `TASK_PHP_053` §2.5, **reproduced by the manager**. `patterns-php/ph56-fetchmode-arith/controls/rlimit_bisect.sh` refuses its own row: *"insertion matched 2x, want 1 -- verus.rs has been respelled and this script is measuring the wrong file"*. ⛔ **Its guard greps `verifier::rlimit`, and `verus.rs`'s own COMMENT about the rlimit matches**, so the count is 2 where the guard wants 1. ⚠⚠ **`ph55`'s copy is WORSE — two comments.** ⭐⭐ **FOURTH INSTANCE OF *A CHECK THAT READS PROSE AND CALLS IT CODE***: `spelling_matches`'s original lesson, `width.py`'s guard firing on the comment documenting its own defect, `contract_audit.py`'s `labels`-as-a-noun, and now this. ▶ **REPAIR: the guard must count occurrences in CODE — strip comments before matching, or match on the attribute's syntactic position.** ⓘ **`controls/*` is in `source_sha256`, so it is a RE-GATE per row and no re-measure** — batch with each row's next task. ⛔ **AND IT PRODUCED A WRONG PUBLISHED NUMBER**: F112's *"the floor bisects to 2"* came from this script; the floor is **3** |
+| 116 | ⛔ **`check.py::req-mut` DELETES PRECONDITIONS ONE AT A TIME, SO IT CANNOT SEE A JOINTLY-NECESSARY PAIR** | `TASK_PHP_053` §2.4, at `harness/check.py:6718`. **Two preconditions can each be individually removable and jointly necessary**, and a one-at-a-time stage reports both as *"NOT load-bearing"* and invites deleting both. ✅ **It does NOT bite `ph56`** — that row's **shipped** file verifies without both, which the reviewer checked rather than assumed. ⚠⚠ **A `harness/` finding: REPORTED, NOT EDITED** — `harness/check.py` is hashed into all 33 PAT gate records, so a repair is a 33-pattern re-gate (the same price as item 105's option (a)). ▶ **If item 105 is ever answered (a), BATCH THIS WITH IT** — one re-gate, two repairs. ⓘ Until then it is a caveat on any *"not load-bearing"* verdict: **it means *not individually* load-bearing** |
+| 117 | ⚠⚠ **THE ONE LOAD-BEARING UNCERTAINTY LEFT FROM `_050`: `ph53`'s A1 `unsafe→verus` IS EXACTLY `−14.000`, AND `14 = 2 × 7`** | `TASK_PHP_050` §10 #2, triaged as load-bearing by `TASK_PHP_053` §1.6 and **still open**. ⛔ **F96's headline `−1.253 %` rests on it.** ⚠ **The sweep tool measures the whole-program slope, NOT `kernel_exclusive_ir`, so it cannot test an A1 figure** — no tool here does. ⭐ **Counter-evidence that stands**: `_050`'s PAT census found **0 of 288**, and `_053` §1.4 makes an alignment explanation *less* likely for an A1 figure rather than more, since the axes demonstrably differ. ▶ **Route: a dedicated task that sweeps `kernel_exclusive_ir`, OR an explicit decision to accept the PAT census and say so once.** ⓘ **Of `_050`'s seven uncertainties this is the only one still owed**; #1 closed (the wrong way, F113), #3/#4/#7 are neither cheap-and-important nor load-bearing, #5 is handled by scoping, and #6 is *"one `verus_run.py` invocation — a paragraph, not a task"* |

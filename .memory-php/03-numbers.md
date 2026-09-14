@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F112** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F113** live in `RECAP_PHP.md`
 > (⚠ this said *F1–F41* for **forty-nine** findings, then *F1–F90* for **eleven** more — `PROTOCOL.md` rule 13, **and it has now rotted THREE TIMES.** ✅ **`.tasks-php/boxcheck.py` CHECKS THIS LINE against the actual highest finding as of 2026-09-13, so it is the last time.**
 > **Count it yourself: `grep -c '^### F' RECAP_PHP.md`.**)
 > ⭐ **And the statistic decision — which column every row publishes in — is
@@ -224,9 +224,12 @@
   clang cells (`14` to protect their *difference*) — **but `ph53/small.bin`
   publishes `c-gcc → c-gcc-h` at `+2.80 Ir/call` with a measured range of `0.00`
   and it is perfectly sound**, so the floor would refuse a good figure.
-  ⭐⭐ **AND THE STEP IS NOT A CONSTANT: measured corpus-wide it takes FOUR
-  distinct values — `0.00`, `0.02`, `7.00` and `34.49` — and the largest is NOT
-  a multiple of the `7 Ir` constant.** ▶ **A constant floor is too strict and too
+  ⭐⭐ **AND THE STEP IS NOT A CONSTANT: measured corpus-wide ON THE `argv[1]`
+  AXIS it takes FOUR distinct values — `0.00`, `0.02`, `7.00` and `34.49` — and
+  the largest is NOT a multiple of the `7 Ir` constant.** ⚠⚠ **NAME THE AXIS:
+  `34.49` is an `argv[1]` value and the SAME CELL reads `20.08` on `argv[0]` and
+  `0.00` on `envp`** (`TASK_PHP_053` §1.4). **The sentence is true only with the
+  axis in it.** ▶ **A constant floor is too strict and too
   loose at once, which is why the rule is a sweep and not a number.**
   ⭐ **And a floor sees MAGNITUDE where only a sweep sees PHASE**: `ph45`'s
   `unsafe → verus` is `+106.25` — above any floor anyone would set — yet carries
@@ -239,14 +242,28 @@
   ⓘ **Scope: all ten rows, both inputs, `-O3 isolated`, `probe_iters [100, 200]`,
   5 120 callgrind runs. Says nothing about `-O0` or `whole`.**
 
-  ⚠⚠ **THE ONE UNPROVEN LINK, DECLARED BY THE REVIEWER RATHER THAN FOUND LATER:
-  the sweep perturbs `argv`, while the bimodality the GATE observes is across
-  `envp`.** The evidence they are the same knob is strong but **indirect** —
-  both shift the same stack block, the step size and the 32/16 period match, and
-  `repo_path_bytes` (an `argv`-side quantity) moves the gate's own figures.
-  ⛔ **It was not proven.** ▶ **So the rule is sound as an `argv`-side
-  publication test; whether an `envp`-side change can put a `0.00`-step pair into
-  a different state is OPEN.** ⓘ Cheap to close: sweep `envp` the same way.
+  ⛔⛔ **MEASURED `TASK_PHP_053` §1, AND THE VERDICTS STAND WHILE THE GROUND
+  THEY WERE GIVEN IS REFUTED — SO READ THE GROUND, NOT THE OLD STORY.**
+  The rule was defended here as *"`argv` and `envp` are the same knob"*.
+  **They are not.** `ph07`'s `verus` cell steps **`34.49` under `argv[1]`,
+  `20.08` under `argv[0]` and `0.00` under `envp`** (flat over **96** consecutive
+  bytes), with a dead instrument, the added variable, a longer period and the
+  *"the program reads `argv[1]`"* reading all ruled out. ▶ ⭐⭐ **THE STEP IS A
+  PROPERTY OF THE `(cell, axis)` PAIR, NOT OF A CELL.** The mechanism is
+  **unexplained and the reviewer said so.**
+
+  ✅ **WHAT SURVIVES, AND IT SURVIVES BY MEASUREMENT RATHER THAN BY ARGUMENT:
+  12 `0.00`-`argv` cells were swept on `envp` AND on `argv[0]` — 24 cell-sweeps,
+  NO COUNTEREXAMPLE — so `ph64`'s clearance is CONFIRMED ON THREE AXES**, and the
+  magnitude-floor refutation gets *stronger*, because the `34.49` outlier that
+  broke the floor is **axis-specific** as well as non-constant.
+
+  ⚠⚠ **SO AN `argv[1]` SWEEP READING `0.00` IS A *NECESSARY* CONDITION,
+  CORROBORATED ON 12 CELLS AND 2 FURTHER AXES, AND NOT A PROVED *SUFFICIENT*
+  ONE.** ⭐⭐ **And the right way to say that is one this project has already
+  written, about this exact quantity**: `harness/check.py::_env_block`'s caution
+  that **three equal fields mean *this record cannot tell the two draws apart*,
+  not *the two draws are the same*.** ▶ **§B5 did not inherit it. It does now.**
 
 - ⚠⚠ **REPORT TWO VERDICTS PER PAIR, NEVER ONE — *magnitude resolvable?* and
   *sign stable?*** A single verdict throws away a usable result to avoid quoting
