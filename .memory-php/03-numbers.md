@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F109** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F110** live in `RECAP_PHP.md`
 > (⚠ this said *F1–F41* for **forty-nine** findings, then *F1–F90* for **eleven** more — `PROTOCOL.md` rule 13, **and it has now rotted THREE TIMES.** ✅ **`.tasks-php/boxcheck.py` CHECKS THIS LINE against the actual highest finding as of 2026-09-13, so it is the last time.**
 > **Count it yourself: `grep -c '^### F' RECAP_PHP.md`.**)
 > ⭐ **And the statistic decision — which column every row publishes in — is
@@ -51,6 +51,15 @@
   `|Δ|`) and *does the callee work diverge* (**a sign flip ENTAILS callee
   divergence, so the variable does not vary**). **Details and scope —
   two rows, nine cells — in `02-ladder.md`.** (F91 narrowed, item 78 answered.)
+  ⭐⭐ **AND THE SHARPEST EVIDENCE FOR *"the DIFFERENCE, not the share"* ARRIVED
+  ON ROW 9: `ph55`'s C cells sit at `inside_share` 74–83 % — the corpus's FIRST
+  HIGH-SHARE CELLS WHERE A1 STILL READS `0.000 %`.** Both C kernels compile to a
+  **byte-identical `kernel` symbol** under both compilers (`asm.py` `exact`) and
+  **one of the two binaries SEGVs**, because the defect lives in an uninlinable
+  callee. ⛔ **So a high `inside_share` is NOT a certificate.** ⓘ **This is an
+  INSTANCE of the rule above, not a new rule** — `TASK_PHP_050` §4.1 refuted
+  landing it as one, on the ground that the layer already said it and a second
+  statement of one rule is how the weaker gets cited. (F109, narrowed.)
 
 - ⚠⚠⚠ **A ROW'S SPREAD OVER RESPELLINGS IS A FACT ABOUT THAT ROW'S VARIANTS, NOT
   ABOUT THE STATISTIC.** `ph45`'s A1 spread over nine searched variants is
@@ -196,3 +205,67 @@
   one as a call). ⚠⚠ **The other SEVEN rows have no C-cell profiles and are
   UNTESTED.** ▶ **New requirement on item 62: family C must be built for BOTH C
   cells per row**, or it re-adjudicates 8 flips and leaves 20 untouched.
+
+---
+
+## Landed 2026-09-14 from `TASK_PHP_050` — **when a family-B figure may be published**
+
+- ⛔⛔⛔ **A FAMILY-B DIFFERENCE MAY BE PUBLISHED IFF THE TWO CELLS IT SPANS HAVE
+  A MEASURED STEP OF `0.00 Ir/call` OVER A FULL 32-RESIDUE `argv` PAD SWEEP, OR
+  THE DIFFERENCE EXCEEDS THAT STEP BY THE SWEEP'S STABLE RATIO.** The lever is
+  the **stack alignment of the probe argv**, it is **bistable with period 32 and
+  window 16**, and it **survives into family B by construction** because every
+  family-B figure is a difference of two cells from one record.
+  ⓘ Sweep: `.tasks-php/php50_align_sweep.py`, **no build, no gate, no
+  re-measure** — minutes per row on already-built binaries.
+
+  ⛔ **A MAGNITUDE FLOOR WAS CONSIDERED AND IS REFUTED BY MEASUREMENT, NOT
+  DECLINED ON TASTE.** A floor would have to be ≥ `7 Ir/call` to protect `ph55`'s
+  clang cells (`14` to protect their *difference*) — **but `ph53/small.bin`
+  publishes `c-gcc → c-gcc-h` at `+2.80 Ir/call` with a measured range of `0.00`
+  and it is perfectly sound**, so the floor would refuse a good figure.
+  ⭐⭐ **AND THE STEP IS NOT A CONSTANT: measured corpus-wide it takes FOUR
+  distinct values — `0.00`, `0.02`, `7.00` and `34.49` — and the largest is NOT
+  a multiple of the `7 Ir` constant.** ▶ **A constant floor is too strict and too
+  loose at once, which is why the rule is a sweep and not a number.**
+  ⭐ **And a floor sees MAGNITUDE where only a sweep sees PHASE**: `ph45`'s
+  `unsafe → verus` is `+106.25` — above any floor anyone would set — yet carries
+  a `14.00` range because its two cells have **different phases**.
+
+  ✅ **STATE OF THE CORPUS WHEN THE RULE LANDED: `4` of `180` family-B
+  differences flagged, on `ph55` and `ph07` only, and NO PUBLISHED FAMILY-B
+  NUMBER IS WRONG** — the one row that both publishes family B and owns an
+  exposed cell is `ph55`, which already refuses to quote it.
+  ⓘ **Scope: all ten rows, both inputs, `-O3 isolated`, `probe_iters [100, 200]`,
+  5 120 callgrind runs. Says nothing about `-O0` or `whole`.**
+
+  ⚠⚠ **THE ONE UNPROVEN LINK, DECLARED BY THE REVIEWER RATHER THAN FOUND LATER:
+  the sweep perturbs `argv`, while the bimodality the GATE observes is across
+  `envp`.** The evidence they are the same knob is strong but **indirect** —
+  both shift the same stack block, the step size and the 32/16 period match, and
+  `repo_path_bytes` (an `argv`-side quantity) moves the gate's own figures.
+  ⛔ **It was not proven.** ▶ **So the rule is sound as an `argv`-side
+  publication test; whether an `envp`-side change can put a `0.00`-step pair into
+  a different state is OPEN.** ⓘ Cheap to close: sweep `envp` the same way.
+
+- ⚠⚠ **REPORT TWO VERDICTS PER PAIR, NEVER ONE — *magnitude resolvable?* and
+  *sign stable?*** A single verdict throws away a usable result to avoid quoting
+  an unusable one: one `ph55` pair is `+216 k` or `+76 k` Ir depending which side
+  of the step it lands on, **both positive**, so the magnitude is unquotable and
+  the sign is sound. (`ph55/controls/argv_align.py`, cloned in the sweep.)
+
+- ⛔ **NEVER PUBLISH A FAMILY-B FIGURE FOR AN `unsafe → verus` (R4/R5) PAIR ON A
+  ROW WHOSE KERNEL ALLOCATES.** `ph64`'s B1 for that pair is **`+193.36` on
+  `small` and `−28.77` on `large`** while A1 is **`−0.510` on both** — **B
+  disagrees with A in SIGN and FLIPS between inputs.** `check.py`'s own operative
+  rule already says it (*"for a cross-RUNG comparison use `kernel_exclusive_ir`"*).
+  ✅ Nothing shipped violates this; it is a guard-rail for the next row.
+
+- ⚠⚠ **A FAMILY-B COMPARISON *ACROSS ROWS* IS OUT OF THE RECORDS' OWN STATED
+  DOMAIN.** `marginal_ir_env.domain` says *"comparable ONLY against a record with
+  the same `envp_stack_bytes`"* — and that field takes **four distinct values
+  across the ten records (`3685`, `3695`, `3697`, `3698`), spanning 13 bytes
+  inside a 16-wide window.** ✅ **No published figure is affected** (every one is
+  a difference of two cells from ONE record, exactly the case the domain permits)
+  — **this is a constraint on a comparison nobody has made yet, recorded before
+  someone makes it.** ⭐ `ph55`, the one alignment-exposed C row, is the outlier.

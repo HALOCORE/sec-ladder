@@ -999,6 +999,42 @@ through. **The rule exists because of the census, not because of that row.**
 row's citations with that row's next re-gate. **What this rule binds is the NEXT
 row**, and `citecheck.py` is what makes that enforceable rather than remembered.
 
+### B5. ⛔⛔ WHEN A **FAMILY-B** FIGURE MAY BE PUBLISHED — the sweep, not a floor
+
+**Family B (`marginal_ir_per_call`) differences are exposed to the stack
+alignment of the probe `argv`.** The lever is **bistable with period 32 and
+window 16**, and it **survives into family B by construction**, because every
+family-B figure a row publishes is a difference of two cells from one record.
+
+> ▶ **RULE: a family-B difference may be published IFF the two cells it spans
+> have a measured step of `0.00 Ir/call` over a full 32-residue pad sweep, or the
+> difference exceeds that step by the sweep's stable ratio.**
+> ⓘ `.tasks-php/php50_align_sweep.py` — **no build, no gate, no re-measure**;
+> minutes per row on already-built binaries.
+
+⛔ **A MAGNITUDE FLOOR IS REFUTED BY MEASUREMENT, NOT DECLINED ON TASTE.** It
+would have to be ≥ `7 Ir/call` to protect `ph55`'s clang cells — but
+`ph53/small.bin` publishes `c-gcc → c-gcc-h` at **`+2.80 Ir/call`, range
+`0.00`**, perfectly soundly. ⭐⭐ **And the step is NOT a constant: measured
+corpus-wide it takes FOUR values — `0.00`, `0.02`, `7.00`, `34.49` — and the
+largest is not a multiple of the `7 Ir` constant.** A floor is **too strict and
+too loose at once**; only a sweep sees **phase**.
+
+⚠⚠ **REPORT TWO VERDICTS PER PAIR, NEVER ONE — *magnitude resolvable?* and
+*sign stable?*** One `ph55` pair is `+216 k` or `+76 k` Ir depending which side
+of the step it lands on, **both positive**: the magnitude is unquotable and the
+sign is sound. **A single verdict discards the usable half.**
+
+⛔ **AND NEVER PUBLISH A FAMILY-B FIGURE FOR AN `unsafe → verus` PAIR ON A ROW
+WHOSE KERNEL ALLOCATES** — `ph64`'s is `+193.36` / `−28.77` while A1 is
+`−0.510` on both, i.e. **B disagrees with A in sign and flips between inputs.**
+
+✅ **State when this landed: `4` of `180` corpus differences flagged, on `ph55`
+and `ph07` only, and no published family-B number was wrong.** (`TASK_PHP_050`;
+`RECAP_PHP.md` item 112, F110.)
+
+---
+
 ### F6a. ⭐ A `c/*` COMMENT MAY **POINT** AT AN ARGUMENT; IT MAY NOT **STATE** THAT ARGUMENT'S VERDICT
 
 **`c/*` is in the MEASUREMENT digest, so a comment inside a C kernel is frozen at
