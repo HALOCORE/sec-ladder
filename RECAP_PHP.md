@@ -47,12 +47,12 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 9 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL · ph45
         (T1) + ph53+ph52 (T3) + ph55 (T5) TYPE. 7 of 20 fam. 31 owed.
-NEXT    NOTHING RUNNING. ⛔ _051 STOPPED MID-ROW: ph56 IS **NOT BUILT**, 5 OF 6
+NEXT    ⏳ _052 RUNNING (ENGINEER, ALONE): FINISHES ROW 10. _051 STOPPED MID-ROW
         ▶ (1) ⛔⛔ ITEM 105 NEEDS A USER DECISION, NOW (a) OR
         (c) -- MY RECOMMENDED (b) DOES NOT EXIST (F107). (a)=edit check.py, a
         33-PATTERN RE-GATE, BUYS PUBLISHING THE SMALLER TCB; (c)=leave it, what
         gate.py's OWN HEADER PRESCRIBES. ⭐ I PROCEED UNDER (c), THE REVERSIBLE
-        RUNGS EXIST, NO spec.md/verus.rs. ▶ (2) _052 FINISHES IT. 9 built, 31 owed.
+        CLEANLY: 5 OF 6 RUNGS AGREE, NO spec.md/verus.rs. 9 built, 31 owed.
 ⚠ NEW   F109 ⭐⭐ ROW 9: TWO BLOBS ONE BYTE APART. THE Option CAUGHT THE NULL, NOT
         THE WRONG PC -- SAFE RUST RETURNS C's WRONG ANSWER BIT FOR BIT, SANITIZERS
         SILENT. UNSAFE RUST IS STRICTLY WORSE THAN C THERE. VERUS REFUSES fn PTRS.
