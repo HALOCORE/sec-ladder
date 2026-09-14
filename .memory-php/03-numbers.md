@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F107** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F108** live in `RECAP_PHP.md`
 > (⚠ this said *F1–F41* for **forty-nine** findings, then *F1–F90* for **eleven** more — `PROTOCOL.md` rule 13, **and it has now rotted THREE TIMES.** ✅ **`.tasks-php/boxcheck.py` CHECKS THIS LINE against the actual highest finding as of 2026-09-13, so it is the last time.**
 > **Count it yourself: `grep -c '^### F' RECAP_PHP.md`.**)
 > ⭐ **And the statistic decision — which column every row publishes in — is
@@ -138,3 +138,61 @@
   that makes the defect reproducible at all — **`inside_share` is not independent of
   the extraction's fidelity choices**, so it is a measurement and never a constant.
   (`TASK_PHP_045` §4 + §6.2, manager-verified from `results-php/ph52-…json`.)
+
+---
+
+## Landed 2026-09-13 from `TASK_PHP_049` — **the fourth thing a cross-language figure owes**
+
+- ⛔⛔⛔ **A CROSS-LANGUAGE FIGURE MUST NAME **WHICH C COMPILER**, AND SHOULD CARRY
+  **BOTH** C COLUMNS — AND THIS RULE ALREADY EXISTED IN THE PAT LAYER SINCE
+  `TASK_001`. `.memory-php/` NEVER INHERITED IT, AND THAT OMISSION PUT TWO
+  SIGN-CHANGING CLAIMS INTO THE AUTHORITATIVE LAYER.**
+
+  > `.memory/02-bench-rules.md`, **"Honesty rules"**:
+  > *"Never report a C-vs-Rust number **without saying which C compiler**, and
+  > whether a same-backend (clang) column exists."* · *"**Never report a perf
+  > number from an `O0` row.**"*
+  >
+  > `.memory/01-ladder.md:2534, :2572`: clang *"is the same-backend baseline and
+  > is **mandatory for any C-vs-Rust claim**; gcc is the *'what a distro ships'*
+  > baseline."* · *"**Always report a clang column.** A gcc-only C baseline
+  > overstates C's dynamic cost here by **43 %**."*
+
+  ▶ ⭐ **SO THE FOUR THINGS EVERY PERCENTAGE OWES BECOME FIVE: the STATISTIC ·
+  the INPUT · the OPT/MODE level · the BASE it is against · and IF THAT BASE IS A
+  C CELL, WHICH COMPILER — with both columns, or an explicit statement that only
+  one was measured.** ⛔ **One column is not a number with error bars on it; it
+  is a DIFFERENT SIGN.**
+
+  ⚠⚠ **AND *"quote a rung against a rung, never against 'C'"* — `ph03`'s own
+  row-1 note 4 — IS INSUFFICIENT AND SHOULD BE RETIRED IN FAVOUR OF THE PAT
+  WORDING, NOT KEPT BESIDE IT.** It constrains the **Rust** side, which was never
+  the ambiguous one, and is satisfied by *"C vs `safe_naive`"* because *"C"* reads
+  as a rung name. **Two rules of different strength on one question is how the
+  weaker one gets cited.**
+
+  ⭐⭐ **THE MEASURED SCALE, so nobody treats this as pedantry:** across 8 php
+  rows, A1, `small.bin`, `O3/isolated`, clang against gcc on **identical
+  extracted C**, the gap runs **−1.86 % to −29.96 %**. **10 of 128 A1
+  cross-language cell-pairs change SIGN under the swap** — **15.6 % at
+  `O3/isolated`, 0 % at `O0`** — across four of eight rows. ⓘ The PAT pilot
+  measured the same effect at **+42.9 %** in the other direction, so this is a
+  **rediscovery**, not a discovery.
+
+  ⛔⛔ **AND IT CUTS THE OTHER WAY TOO, WHICH IS WHY IT IS A LABELLING RULE AND
+  NOT A PREFERENCE FOR CLANG:** splitting F85's **29 cross-language sign flips**
+  by baseline gives **21 `c-clang` against 8 `c-gcc`** — and above a 1-pp floor on
+  both columns, **17 clang to 0 gcc**; **20 of the 28 family-C survivors are
+  clang-baseline.** ▶ **So the A-vs-whole-program disagreement is, if anything, a
+  `clang` property.** (F108; item 111 **UPHELD-NARROWED, headline REFUTED**.)
+
+- ⚠⚠ **AND `TASK_PHP_049` SETTLED THE ATTRIBUTION CONFOUND ON THE ONE ROW THAT
+  HAD THE EVIDENCE, WITHOUT BUILDING FAMILY C.** The objection was that A1 is
+  symbol-scoped, so differing inlining could move work across the `kernel`
+  boundary without changing the work done. ⛔ **Refuted on `ph29`: the gcc→clang
+  gap is `−28.09 %` (A1), `−27.01 %` (family C), `−26.74 %` (W1)** — **W1 is
+  immune to symbol boundaries and still sees it**, which also **refutes the
+  cold-helper alternative** (a compiler inlining a cold helper while keeping a hot
+  one as a call). ⚠⚠ **The other SEVEN rows have no C-cell profiles and are
+  UNTESTED.** ▶ **New requirement on item 62: family C must be built for BOTH C
+  cells per row**, or it re-adjudicates 8 flips and leaves 20 untouched.

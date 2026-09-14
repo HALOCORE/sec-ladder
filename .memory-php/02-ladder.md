@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F107** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F108** live in `RECAP_PHP.md`
 > ⭐ **and the statistic decision is `.tasks-php/STATISTICS_001.md`, committed**
 > (⚠ this said *F1–F41* for seven findings, then *F1–F48* for forty-two
 > more, then *F1–F90* for eleven more — `PROTOCOL.md` rule 13, **and it
@@ -147,9 +147,40 @@
 `ph03`, `Ir(kernel)`, `small.bin`, `O3 / isolated` — ⚠ **within-row ratios only**
 (`03-numbers.md` forbids any comparison with a `pNN` figure):
 
-| `safe_naive` | `safe_tuned` | `unsafe` | `verus` | `c-gcc-h` (real 2004 fix) |
-|---:|---:|---:|---:|---:|
-| **+26.8 %** | **+3.7 %** | **−7.6 %** | **−7.6 %** | **−0.4 %** |
+> ⛔⛔⛔ **THIS TABLE SHIPPED WITHOUT NAMING ITS BASELINE FOR A DAY, AND TWO OF
+> ITS FOUR RUST CELLS CHANGE SIGN WHEN THE BASELINE CHANGES** (`TASK_PHP_049`
+> §2.3). **Repaired 2026-09-13 by adding the `c-clang` column, which
+> `.memory/01-ladder.md` has called MANDATORY for any C-vs-Rust claim since
+> `TASK_001` and which this layer never inherited.** ⚠⚠ **The bullet two below
+> warned that *"`c-clang` beats `c-gcc` by 15.4 %, larger than every safety
+> effect on this row"* — so the file warned about the effect and then published
+> the table the effect reverses.**
+
+**Re-derived `TASK_PHP_049` §2.3 from `results-php/ph03-uudecode-bound.json`,
+A1, `O3/isolated`, *"rung dearer than the named C baseline by"* — ⚠ all eight
+cells from ONE source, rather than splicing a clang row onto the older gcc row:**
+
+| input | baseline | `safe_naive` | `safe_tuned` | `unsafe` | `verus` |
+|---|---|---:|---:|---:|---:|
+| `small.bin` | `c-gcc` *("what a distro ships")* | +27.06 % | +3.78 % | ⛔ **−7.49 %** | ⛔ **−7.49 %** |
+| `small.bin` | ⭐ **`c-clang`** *(**the SAME-BACKEND baseline**)* | +49.95 % | +22.48 % | ⛔ **+9.17 %** | ⛔ **+9.17 %** |
+| `large.bin` | `c-gcc` | +29.71 % | +5.78 % | ⛔ **−5.70 %** | ⛔ **−5.70 %** |
+| `large.bin` | ⭐ **`c-clang`** | +52.35 % | +24.25 % | ⛔ **+10.76 %** | ⛔ **+10.76 %** |
+
+⛔⛔ **SO *"unsafe Rust is 7.6 % FASTER than C"* IS A `gcc` STATEMENT. Against
+the same-backend baseline the SAME CELLS ARE ~9–11 % SLOWER, on BOTH inputs, at
+5.7–10.8 pp.** ▶ **Quote both columns, or say explicitly that only one was
+measured** — one column is not a number with error bars, **it is a different
+sign.** ⓘ The `c-gcc-h` cell (**−0.4 %**, the real 2004 fix) is a **C-vs-C**
+comparison and is unaffected. ⚠ The figures previously published here
+(`+26.8 / +3.7 / −7.6 / −7.6`) differ from the re-derivation in the second
+decimal; **the re-derivation governs, and both are the same story.**
+
+⭐⭐⭐ **AND `ph03`'s OWN `NOTES.md:692-697` ALREADY SAID SO** — *"Unsafe Rust
+beats gcc C on this kernel and loses to clang C, and the clang column is why that
+must be stated as two numbers."* ▶ **The ROW got it right and the AUTHORITATIVE
+LAYER dropped the column.** ⚠⚠ **That is the `SYNTHESIS.md`-beats-`RECAP_PAT.md`
+pattern `CLAUDE.md` records, one level deeper: here the row beats `.memory-php/`.**
 
 - **Tuning recovers 86.4 % of the naive-safe gap**, so *"safe Rust costs 27 %"*
   and *"safe Rust is nearly free"* are **the same pattern written two ways.**
@@ -618,11 +649,20 @@
   > numbers move) — **a correction landed as a new paragraph instead of applied
   > to the sentence it corrects, so this file stated both numbers at once and
   > THIS is the layer that outranks
-  > `RECAP_PHP.md`.** A says C is
-  > **+33 %** dearer than naive safe Rust; **B, C and W1 all say ~1 % CHEAPER**,
-  > agreeing to ~2 pp. **That is the difference between *"safe Rust is a third
-  > cheaper than C here"* and *"they are the same"* — this programme's central
-  > claim.** ⚠ `ph07` and `ph03` are **B-only** so far (item 64).
+  > `RECAP_PHP.md`.** ⛔⛔⛔ **REPAIRED 2026-09-13 (`TASK_PHP_049` §1.3): EVERY
+  > NUMBER IN THE NEXT SENTENCE IS AGAINST `c-gcc`, AND THIS UNIT NEVER SAID SO
+  > — the strings `c-gcc` and `c-clang` appeared NOWHERE in its 182 lines, in the
+  > layer that outranks everything.** On **`ph29/large`, A1, `O3/isolated`**:
+  > **A says `c-gcc` is +33.01 % dearer than naive safe Rust; B, C and W1 all say
+  > ~1 % CHEAPER**, agreeing to ~2 pp. ⚠⚠ **AND THE SAME CELL AGAINST `c-clang`
+  > IS NOT ~1 % ANYTHING: A `−4.36 %`, C `−27.78 %`, W1 `−27.61 %`.** ▶ ⛔ **SO
+  > *"A disagrees with three other statistics"* IS A `c-gcc` STATEMENT, AND THE
+  > ~2 pp AGREEMENT AMONG B/C/W1 IS TOO.** ⭐ **The disagreement is REAL and the
+  > swap does not rescue A** — against `c-clang` it shrinks from 34.07 to 23.42 pp
+  > and **gains a sign flip on `small.bin` that gcc did not have.** **That is the
+  > difference between *"safe Rust is a third cheaper than C here"* and *"they are
+  > the same"* — this programme's central claim, and it owes its baseline in the
+  > same breath, every time.** ⚠ `ph07` and `ph03` are **B-only** so far (item 64).
   > ⭐ **It generalises open item 54 rather than repeating it: it is not one row.**
   >
   > ⚠ **Four corrections to the manager's own published work this round:** F74's
