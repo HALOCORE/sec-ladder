@@ -1,0 +1,23 @@
+From 1e708a5aeb30711f8b7b2a811377a13f2b23a8c9 Mon Sep 17 00:00:00 2001
+From: Marcus Boerger <helly@php.net>
+Date: Sun, 29 Aug 2004 13:28:03 +0000
+Subject: [PATCH] Bugfix #29882 isset crashes on arrays
+
+---
+ Zend/zend_compile.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Zend/zend_compile.c b/Zend/zend_compile.c
+index 862ba578f2b1..1911912003a8 100644
+--- a/Zend/zend_compile.c
++++ b/Zend/zend_compile.c
+@@ -763,6 +763,9 @@ void zend_do_end_variable_parse(int type, int arg_offset TSRMLS_DC)
+ 				opline->opcode += 3;
+ 				break;
+ 			case BP_VAR_IS:
++				if (opline->opcode == ZEND_FETCH_DIM_W && opline->op2.op_type == IS_UNUSED) {
++					zend_error(E_COMPILE_ERROR, "Cannot use [] for reading");
++				}
+ 				opline->opcode += 6; /* 3+3 */
+ 				break;
+ 			case BP_VAR_FUNC_ARG:

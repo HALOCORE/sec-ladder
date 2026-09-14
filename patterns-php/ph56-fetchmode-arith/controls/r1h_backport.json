@@ -1,0 +1,65 @@
+{
+  "control": "r1h_backport",
+  "derived_from_sha256": {
+    "patterns/ph56-fetchmode-arith/c/kernel.c": "a141bf3b4435d7cfacefe10f4ef73820ab05ccaccf568434c735b50193439edc",
+    "patterns/ph56-fetchmode-arith/c/kernel_hardened.c": "1288ef112024ca9a10ed8bb1cb106e09d3dcf247873e9b7f496ce01250cd1d98",
+    "patterns/ph56-fetchmode-arith/controls/1e708a5aeb30.patch": "9e86b04f294c451670a238b803f7331610098b5e4f58174d7a5454f74b98d5f2"
+  },
+  "evidence": {
+    "applied": {
+      "added": [
+        "if (opline->opcode == ZEND_FETCH_DIM_W && opline->op2.op_type == IS_UNUSED) {",
+        "zend_error(E_COMPILE_ERROR, \"Cannot use [] for reading\");",
+        "}"
+      ],
+      "bytes_moved": true,
+      "message": "Checking patch Zend/zend_compile.c... Hunk #1 succeeded at 761 (offset -2 lines). Applied patch Zend/zend_compile.c cleanly."
+    },
+    "kernel_delta": {
+      "added": [
+        "if (opline->opcode == PH56_FETCH_DIM_W",
+        "&& opline->op2_type == PH56_IS_UNUSED) {",
+        "ex->bailout = 1u;",
+        "return 0;",
+        "}"
+      ],
+      "guards_on_opcode_and_op2_type": true,
+      "r1_arm": [
+        "opline->opcode += 6; /* 3+3 */                     /* :764 */"
+      ],
+      "r1h_arm": [
+        "if (opline->opcode == PH56_FETCH_DIM_W",
+        "&& opline->op2_type == PH56_IS_UNUSED) {",
+        "ex->bailout = 1u;",
+        "return 0;",
+        "}",
+        "opline->opcode += 6; /* 3+3 */                     /* :764 */"
+      ]
+    },
+    "legs": {
+      "applied_at": 761,
+      "applied_offset": -2,
+      "case_bp_var_is_count": 1,
+      "case_bp_var_is_line": 763,
+      "existing_guards": 2,
+      "first_context_line": "opline->opcode += 3;",
+      "first_context_line_at_5_0_0": 761,
+      "hunk_context_names_fn": true,
+      "hunk_header_old_start": 763
+    },
+    "patch_sha256": "9e86b04f294c451670a238b803f7331610098b5e4f58174d7a5454f74b98d5f2",
+    "pristine": true,
+    "trap": {
+      "bytes_moved": false,
+      "check_rc": 0,
+      "path_is_gitignored": true
+    }
+  },
+  "fix_commit": "1e708a5aeb30711f8b7b2a811377a13f2b23a8c9",
+  "pin": {
+    "note": "re-runs `git apply` against the pinned tarball and re-derives the R1 -> R1h delta",
+    "regenerate": "python3 controls/r1h_backport.py"
+  },
+  "problems": [],
+  "row": "ph56-fetchmode-arith"
+}

@@ -1,0 +1,139 @@
+{
+  "control": "census",
+  "derived_from_sha256": {
+    "patterns/ph56-fetchmode-arith/c/kernel.c": "a141bf3b4435d7cfacefe10f4ef73820ab05ccaccf568434c735b50193439edc",
+    "patterns/ph56-fetchmode-arith/c/kernel_hardened.c": "1288ef112024ca9a10ed8bb1cb106e09d3dcf247873e9b7f496ce01250cd1d98",
+    "patterns/ph56-fetchmode-arith/model.py": "ffddd505d620b24e6c9f13a1882f5a2c73940ae52cca277fe474a132a77bac04"
+  },
+  "evidence": {
+    "cli": "/home/apt/repos_common/php-in-safe-rust/.trash/temp-20260805-0920/build-5.0.0/php-5.0.0/sapi/cli/php",
+    "guards": {
+      "BP_VAR_FUNC_ARG": {
+        "delta": "+= 9",
+        "guard": false,
+        "present": true
+      },
+      "BP_VAR_IS": {
+        "delta": "+= 6",
+        "guard": false,
+        "present": true
+      },
+      "BP_VAR_R": {
+        "delta": "-= 3",
+        "guard": true,
+        "present": true
+      },
+      "BP_VAR_RW": {
+        "delta": "+= 3",
+        "guard": false,
+        "present": true
+      },
+      "BP_VAR_UNSET": {
+        "delta": "+= 12",
+        "guard": true,
+        "present": true
+      },
+      "BP_VAR_W": {
+        "delta": null,
+        "guard": false,
+        "present": true
+      }
+    },
+    "ladder": {
+      "BP_VAR_FUNC_ARG": {
+        "null_operand": false,
+        "r1": 10675820307550588145,
+        "r1h": 10675820307550588145,
+        "r1h_moves_it": false
+      },
+      "BP_VAR_IS": {
+        "null_operand": true,
+        "r1": null,
+        "r1h": 12931740930296957986,
+        "r1h_moves_it": true
+      },
+      "BP_VAR_IS (chained)": {
+        "null_operand": false,
+        "r1": 3222507138983799653,
+        "r1h": 12931740930296957986,
+        "r1h_moves_it": true
+      },
+      "BP_VAR_R": {
+        "null_operand": false,
+        "r1": 12931740930296957986,
+        "r1h": 12931740930296957986,
+        "r1h_moves_it": false
+      },
+      "BP_VAR_RW": {
+        "null_operand": false,
+        "r1": 16030725390636040805,
+        "r1h": 16030725390636040805,
+        "r1h_moves_it": false
+      },
+      "BP_VAR_UNSET": {
+        "null_operand": false,
+        "r1": 12931740930296957986,
+        "r1h": 12931740930296957986,
+        "r1h_moves_it": false
+      },
+      "BP_VAR_W": {
+        "null_operand": false,
+        "r1": 9484805895323991327,
+        "r1h": 9484805895323991327,
+        "r1h_moves_it": false
+      }
+    },
+    "parse_problems": [],
+    "php": {
+      "BP_VAR_FUNC_ARG": {
+        "fatal": false,
+        "out": "4",
+        "rc": 0,
+        "segv": false
+      },
+      "BP_VAR_IS": {
+        "fatal": false,
+        "out": "",
+        "rc": -11,
+        "segv": true
+      },
+      "BP_VAR_R": {
+        "fatal": true,
+        "out": "Fatal error: Cannot use [] for reading in Command line code on line 1",
+        "rc": 255,
+        "segv": false
+      },
+      "BP_VAR_R (via a DECLARED callee)": {
+        "fatal": true,
+        "out": "Fatal error: Cannot use [] for reading in Command line code on line 1",
+        "rc": 255,
+        "segv": false
+      },
+      "BP_VAR_RW": {
+        "fatal": false,
+        "out": "4",
+        "rc": 0,
+        "segv": false
+      },
+      "BP_VAR_UNSET": {
+        "fatal": true,
+        "out": "Fatal error: Cannot use [] for unsetting in Command line code on line 1",
+        "rc": 255,
+        "segv": false
+      },
+      "BP_VAR_W": {
+        "fatal": false,
+        "out": "4",
+        "rc": 0,
+        "segv": false
+      }
+    }
+  },
+  "pin": {
+    "note": "re-parses the pinned tarball's switch, re-drives the six arms through model.py, and re-runs the six PHP snippets on a pristine-sourced 5.0.0 CLI",
+    "regenerate": "python3 controls/census.py"
+  },
+  "problems": [],
+  "question": "six arms, two guards -- why did 1e708a5aeb30 fix only BP_VAR_IS?",
+  "row": "ph56-fetchmode-arith"
+}

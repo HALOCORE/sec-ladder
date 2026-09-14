@@ -81,9 +81,33 @@ if not rowB:
     die('no `**phNN ·` blocks found in Part B')
 
 # --- built rows ------------------------------------------------------------
-built = sorted(re.match(r'.*/(ph\d+)', d).group(1)
+# ⛔⛔ FIXED 2026-09-14 (RECAP_PHP.md item 114).  This used to glob
+# `patterns-php/ph*/` -- i.e. it counted a DIRECTORY, not a built row -- and it
+# agreed with the truth for NINE ROWS only because no row had ever existed in a
+# half-built state: every previous row went from nothing to fully gated inside
+# one task.  `TASK_PHP_051` stopped mid-row with `ph56`'s C and Rust rungs on
+# disk and no `spec.md`, no `verus.rs` and no gate record, and this tool
+# immediately reported `built 10`.
+#
+# ⭐ The right definition was already written down in `RECAP_PHP.md`'s own STATE
+# cell -- *"count it: `ls results-php/gate/ | grep -av ph00 | wc -l`"* -- so the
+# repo knew it and this file used a different one.  A ROW IS BUILT WHEN IT HAS A
+# GATE RECORD.
+GATE_DIR = 'results-php/gate'
+built = sorted(m.group(1)
+               for f in glob.glob(os.path.join(GATE_DIR, 'ph*.json'))
+               for m in [re.match(r'.*/(ph\d+)', f)]
+               if m and 'smoke' not in f)
+
+# ⭐ A directory with no gate record is IN PROGRESS, and saying so is the whole
+# point: it is neither "built" (it has no verdict) nor absent (work exists).
+_dirs = sorted(m.group(1)
                for d in glob.glob('patterns-php/ph*/')
-               if re.match(r'.*/(ph\d+)', d) and 'smoke' not in d)
+               for m in [re.match(r'.*/(ph\d+)', d)]
+               if m and 'smoke' not in d)
+in_progress = [r for r in _dirs if r not in built]
+orphan_records = [r for r in built if r not in _dirs]
+
 fam_of = {r: f for f, rs in famrows.items() for r in rs}
 
 # --- report ----------------------------------------------------------------
@@ -100,6 +124,12 @@ if dupA: print(f'  ⚠ duplicated in Part A: {dupA}')
 
 print(f'\n  families         {len(famrows)}')
 print(f'  built rows       {len(built)}  {built}')
+if in_progress:
+    print(f'  ⏳ IN PROGRESS    {len(in_progress)}  {in_progress}'
+          f'   <- a row DIRECTORY with NO gate record. NOT counted as built.')
+if orphan_records:
+    print(f'  ⛔ ORPHAN RECORD  {len(orphan_records)}  {orphan_records}'
+          f'   <- a gate record whose row directory is GONE. Investigate.')
 
 print('\n--- Part A section headers: declared vs counted ---')
 tot_dec = tot_cnt = 0
@@ -167,6 +197,54 @@ else:
         print(f'  ⚠ {r}: Part A files it under "{sa}", Part B under {f} ({fb})')
     print(f'  {len(misfiled)} row(s) filed under different axes in the two parts')
 
+# --- §H negatives, INSIDE the tool, on every invocation ---------------------
+# PROTOCOL_PHP.md §H: a validator change lands with its must-fire negatives or it
+# does not land.  These pin the item-114 repair: `built` must mean "has a gate
+# record", never "has a directory".
+print('\n--- §H negatives ---')
+_neg = []
+
+# N1 MUST-FIRE: a directory with no gate record is IN PROGRESS, not built.
+#    Live reach: `ph56` today.  If this list is ever empty the arm is vacuous
+#    and says so, rather than passing silently (F10).
+if in_progress:
+    ok = all(r not in built for r in in_progress)
+    print(f'  N1 MUST-FIRE      in-progress rows excluded from `built`: '
+          f'{in_progress} -> {"OK" if ok else "FAIL"}')
+    if not ok:
+        _neg.append('N1: an in-progress row is being counted as built')
+else:
+    print('  N1 MUST-FIRE      ⓘ VACUOUS TODAY -- no row is half-built. '
+          'The arm cannot fire; it is not passing.')
+
+# N2 MUST-FIRE: every `built` row really has a gate record on disk.
+_missing = [r for r in built
+            if not glob.glob(os.path.join(GATE_DIR, r + '*.json'))]
+print(f'  N2 MUST-FIRE      every built row has a gate record: '
+      f'{len(_missing)} missing -> {"OK" if not _missing else "FAIL"}')
+if _missing:
+    _neg.append(f'N2: `built` contains rows with no gate record: {_missing}')
+
+# N3 MUST-NOT-FIRE: ph00-smoke is a relocated PAT calibration kernel with no PHP
+#    provenance.  It has a gate record and must never be counted.
+print(f'  N3 MUST-NOT-FIRE  ph00 excluded: '
+      f'{"OK" if not any(r.startswith("ph00") for r in built) else "FAIL"}')
+if any(r.startswith('ph00') for r in built):
+    _neg.append('N3: ph00-smoke is being counted as a corpus row')
+
+# N4 MUST-FIRE: the directory glob and the record glob must not have silently
+#    become the same set for the wrong reason -- if a row directory vanished
+#    while its record survived, that is a deletion nobody announced.
+print(f'  N4 MUST-FIRE      no orphan gate records: '
+      f'{len(orphan_records)} -> {"OK" if not orphan_records else "FAIL"}')
+if orphan_records:
+    _neg.append(f'N4: gate record(s) with no row directory: {orphan_records}')
+
+if _neg:
+    print(f'\n⛔ {len(_neg)} NEGATIVE(S) FAILED:')
+    for n in _neg:
+        print('   -', n)
+
 bad = (len(rowA) != len(rowB)) or onlyA or onlyB or dupA \
-      or (tot_dec != len(rowA)) or misfiled
+      or (tot_dec != len(rowA)) or misfiled or _neg
 sys.exit(1 if bad else 0)
