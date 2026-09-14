@@ -251,6 +251,11 @@
   *"the program reads `argv[1]`"* reading all ruled out. ▶ ⭐⭐ **THE STEP IS A
   PROPERTY OF THE `(cell, axis)` PAIR, NOT OF A CELL.** The mechanism is
   **unexplained and the reviewer said so.**
+  ⚠⚠⚠ **SCOPE, AND QUOTE IT WITH THE CLAIM: ONE ROW DISAGREES AND THREE AGREE.**
+  `ph55`'s clang cells agree; **`ph45`'s four Rust cells agree TO THE DIGIT on
+  every median, range and verdict string**; the 12 clean cells read `0.00` on
+  every axis. ⭐ **The refutation stands because ONE counterexample breaks an
+  `iff` and this rule is an `iff`** — **not because the axes generally differ.**
 
   ✅ **WHAT SURVIVES, AND IT SURVIVES BY MEASUREMENT RATHER THAN BY ARGUMENT:
   12 `0.00`-`argv` cells were swept on `envp` AND on `argv[0]` — 24 cell-sweeps,

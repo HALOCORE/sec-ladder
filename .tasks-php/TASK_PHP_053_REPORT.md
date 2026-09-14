@@ -80,17 +80,28 @@ and a common offset is exactly what adding `PH53PAD` to the environment is. **On
 The pair verdict is identical on both axes: `c-clang → c-clang-h`, median `0.00`,
 range `14.00`, **NOT RESOLVABLE / SIGN-UNSTABLE**.
 
-`ph45-htmlent-cache-int` / `large.bin` is a **second** positive control and agrees:
-all four Rust cells step **`7.00`** under `envp` with **unequal phases** —
-`unsafe` flips up at pad **5** and back down at pad **21** (**a 16-wide window,
-`[5,20]`**), `verus` at pad **7**, `safe_naive`/`safe_tuned` at pad **13** —
-which is exactly the shape `_050` measured for that row on `argv` (*"`7.00` on
-four **Rust** cells, **UNEQUAL PHASES**"*). ⭐ **The `7.00` step, the 32 period
-and the 16-wide window all reproduce on the `envp` axis on a second row.**
-⭐ `verus` also completed a full 16-wide window (`[7,22]`, flipping back at pad
-**23**), so **two** of the four cells have a closed window on this axis.
-(`.temp/php53/ph45.log`; **STILL RUNNING when this report was written — past pad
-24 of 32**; that log is the live record. See §11.)
+⭐⭐ **`ph45-htmlent-cache-int` / `large.bin` IS A SECOND POSITIVE CONTROL, AND IT
+IS NOT MERELY "CONSISTENT" — THE TWO AXES ARE INDISTINGUISHABLE ON IT.**
+32 `envp` residues, four Rust cells, `O3 isolated`
+(`.temp/php53/envp_ph45.json`) against `_050`'s 32-residue `argv` sweep of the
+same row (`.temp/php50/sw_ph45.json`):
+
+| | `argv[1]` (`_050`) | **`envp`** (here) |
+|---|---|---|
+| step per cell | `safe_naive` `safe_tuned` `unsafe` `verus` all **`7.00`** | **identical** |
+| `safe_naive → safe_tuned` | median `−93062.50`, range `0.00`, RESOLVABLE / SIGN-STABLE | **identical** |
+| `safe_tuned → unsafe` | median `+13130.86`, range **`14.00`**, RESOLVABLE / SIGN-STABLE | **identical** |
+| `unsafe → verus` | median `+794.86`, range **`14.00`**, RESOLVABLE / SIGN-STABLE | **identical** |
+
+▶ **Every median, every range and every verdict string agrees to the digit**,
+including `_050`'s own headline for this row — *"`7.00` on four **Rust** cells,
+**UNEQUAL PHASES**, so two of its differences carry a `14.00` range"*: **exactly
+two do, and they are the same two.** The windows are 16 wide and the period is 32
+on this axis as well (`unsafe` `[5,20]`, `verus` `[7,22]`).
+
+⭐ **So on `ph55` and on `ph45` the two axes are the same lever, measured rather
+than argued. The refutation in §1.4 rests on ONE row against these two — and
+that is stated as a scope limit in §7.**
 
 ### 1.3 ⛔⛔⛔ THE DECISIVE TEST — **`ph64` DOES NOT STEP UNDER `envp`**
 
@@ -185,7 +196,7 @@ full 32-residue **`argv`** pad sweep. The layer entry defends that with:
 |---|---|
 | ✅ **the rule's verdicts** | **not refuted.** 12 `0.00`-`argv` cells swept on `envp`; none moved. `ph64`'s clearance is **confirmed on two further axes.** |
 | ✅ **the magnitude-floor refutation** | untouched and still right — `ph07` now makes it *stronger*, because the `34.49` outlier that broke the floor is **axis-specific** as well as non-constant. |
-| ⛔ **"they are the same knob"** | **REFUTED.** True on `ph55` (both cells, `+6` phase, same step) and on `ph45`; **false on `ph07`**, where one axis reads `34.49` and another reads `0.00`. |
+| ⛔ **"they are the same knob"** | **REFUTED as a general claim.** ✅ **Exactly** true on `ph55` (both cells, same `7.00`, constant `+6` phase) and on `ph45` (**every median, range and verdict identical**); ⛔ **false on `ph07`**, where one axis reads `34.49` and another reads `0.00`. ⚠ **2 rows agree, 1 disagrees — and one counterexample is enough to break an "iff", which is what §B5 is.** |
 | ⛔ **"the measured step" as a property of a CELL** | **REFUTED.** It is a property of the **(cell, axis)** pair: `ph07/verus` = `{argv1: 34.49, argv0: 20.08, envp: 0.00}`. |
 | ⚠ **sufficiency** | **STILL OPEN, and now for a REASON rather than for want of a measurement.** Since the axes demonstrably differ, an `argv[1]` sweep reading `0.00` is a **necessary** condition, corroborated on 12 cells and 2 further axes, and **not a proved sufficient one.** |
 
@@ -681,6 +692,16 @@ survives and the story does not.**
 
 ## §7 ⭐ WHAT I AM UNSURE OF
 
+0. ⚠⚠⚠ **THE "NOT THE SAME KNOB" REFUTATION RESTS ON ONE ROW.** Of the four
+   cell-groups I swept on two or more axes, **three agree** — `ph55`'s clang
+   cells (same `7.00`, constant `+6` phase), `ph45`'s four Rust cells (**every
+   median, range and verdict identical to the digit**) and the 12 clean cells
+   (`0.00` everywhere) — **and one, `ph07`'s `verus`, disagrees completely.**
+   ⭐ One counterexample is enough to break an `iff`, and §B5 is an `iff`, so the
+   refutation stands as stated. ⛔ **But if `ph07` turned out to be an artefact I
+   failed to find, §B5's ground would be fine and this round's headline would
+   collapse to "confirmed on three axes".** I attacked `ph07` four ways (§1.4)
+   and it survived all four. **It is one row.**
 1. ⚠⚠ **I CANNOT EXPLAIN `ph07`'s AXIS ASYMMETRY.** `argv[0]` moves it, `argv[1]`
    moves it more, `envp` does not move it at all over 96 consecutive bytes. I
    ruled out a dead instrument, the extra variable, a longer period and the
@@ -780,14 +801,11 @@ family-B `unsafe → verus` figure on an allocating row, and `ph64` is that row.
 
 ⭐ **All four subjects were reached.** What is incomplete, named:
 
-* ⚠ **`ph45`'s `envp` sweep was STILL RUNNING at the close of this round** —
-  past pad **24 of 32** (`.temp/php53/ph45.log`, `large.bin`, four Rust cells,
-  `-O3 isolated`). All four had already stepped **`7.00`** with unequal phases,
-  and **two** (`unsafe` `[5,20]`, `verus` `[7,22]`) had closed a full 16-wide
-  window — which is what it was there to show. ⛔ **But each step is a LOWER
-  BOUND until the sweep finishes, and `envp_ph45.json` is not written.** It is a
-  **second** positive control; **no conclusion in §1 depends on it**, and
-  `ph55` (§1.2) is the control that carries §1.
+* ✅ **`ph45`'s `envp` sweep COMPLETED** after the first draft of this report, all
+  32 pads, and `envp_ph45.json` is written. It turned out **stronger** than the
+  draft claimed: the `envp` axis reproduces `_050`'s `argv` axis **to the digit
+  on every median, every range and every verdict string** (§1.2). Nothing in this
+  report now rests on a partial sweep.
 * ✅ **`ph55`'s Rust cells on the `argv[0]` axis COMPLETED** after the first draft
   of this report: all four cells step `0.00` over 32 residues, `unsafe → verus`
   median `+1.14`, range `0.00`. §1.3's tally includes it.

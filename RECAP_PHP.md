@@ -58,12 +58,12 @@ NEXT    NOTHING RUNNING. _053 CLOSED 3 OF 4. ▶ (1) ⛔⛔ ITEM 105 NEEDS A
         (cell,axis) PAIR. ✅ §B5's VERDICTS SURVIVE -- 24 CELL-SWEEPS, NO
         COUNTEREXAMPLE, ph64 FLAT ON ALL THREE. F112 ⭐ ROW 10: R4->R5 = 0.000
         Ir/call; CROSS-LANG SIGN FLIPS BETWEEN THE 2 C COMPILERS, ROW PUBLISHES BOTH.
-⚠ WRONG 4TH ROUND RUNNING WHERE THE CONCLUSION LIVES AND ITS REASON DIES. 115:
-        A CONTROL'S GUARD MATCHED A COMMENT (4th). 116: req-mut IS ONE-AT-A-TIME.
+⚠ WRONG 118 ⛔ I COMMITTED A DRAFT: "completed" MEANS STOPPED, NOT FINISHED, AND
+        F113 SHIPPED WITHOUT ITS SCOPE (1 ROW vs 3). DIFF THE REPORT BEFORE COMMIT.
 ⚠ TRAPS `grep -a` ALWAYS; a line-grep MISSES A WRAPPED PHRASE. APPENDING A
         CORRECTION LEAVES THE OLD NUMBER (73,x4). NAME THE FILE EVERY FIELD CAME
         FROM (84). ⚠ .web/ CONCURRENT: NEVER `git add -A`.
-READ    RULE-9 block · .memory-php/ · F1-F113 · items 1-117 · _047 §1.7 · _049 §1.3+§4.2
+READ    RULE-9 block · .memory-php/ · F1-F113 · items 1-118 · _047 §1.7 · _049 §1.3+§4.2
         · PROTOCOL_PHP §B1a+§F6+§F6a+§H · STATISTICS_001 · CLAUDE.md r6.
 ```
 
@@ -1668,6 +1668,18 @@ WRITING rule: never backtick a span containing a character literal.**
 >
 > `ph07`'s `verus` cell steps **`34.49` under `argv[1]`, `20.08` under
 > `argv[0]`, `0.00` under `envp`** — flat over **96 consecutive bytes**.
+>
+> ⚠⚠⚠ **AND THE SCOPE, WHICH THE MANAGER LANDED WITHOUT AND THE REVIEWER ADDED:
+> THE REFUTATION RESTS ON *ONE ROW AGAINST THREE THAT AGREE*.** `ph55`'s clang
+> cells agree (same `7.00`, constant `+6` phase); ⭐⭐ **`ph45`'s four Rust cells
+> agree to the DIGIT — every median, every range and every verdict string
+> identical across the two axes**, including `_050`'s own headline that exactly
+> two of its differences carry a `14.00` range (**the same two**); and the 12
+> clean cells read `0.00` everywhere. ▶ ⭐ **The refutation still STANDS AS
+> STATED, because one counterexample breaks an `iff` and §B5 is an `iff`** —
+> **but if `ph07` were an artefact nobody found, §B5's ground would be fine and
+> this round's headline would collapse to *"confirmed on three axes"*.**
+> ✅ **`ph07` was attacked four ways and survived all four. It is one row.**
 > ✅ **Four rival explanations ruled out by measurement**: a dead instrument
 > (`ph55` stepped `7.00` under `envp` in the same session, same period and
 > window, constant `+6` phase on **both** cells), the added variable (the `argv`
@@ -6560,3 +6572,4 @@ the wrong one.
 | 115 | ⚠⚠ **A CONTROL THAT CANNOT RUN ON ITS OWN SHIPPED FILE — AND THE GUARD MATCHES A *COMMENT*. *"A COMMENT IS NOT CODE"*, FOURTH INSTANCE** | `TASK_PHP_053` §2.5, **reproduced by the manager**. `patterns-php/ph56-fetchmode-arith/controls/rlimit_bisect.sh` refuses its own row: *"insertion matched 2x, want 1 -- verus.rs has been respelled and this script is measuring the wrong file"*. ⛔ **Its guard greps `verifier::rlimit`, and `verus.rs`'s own COMMENT about the rlimit matches**, so the count is 2 where the guard wants 1. ⚠⚠ **`ph55`'s copy is WORSE — two comments.** ⭐⭐ **FOURTH INSTANCE OF *A CHECK THAT READS PROSE AND CALLS IT CODE***: `spelling_matches`'s original lesson, `width.py`'s guard firing on the comment documenting its own defect, `contract_audit.py`'s `labels`-as-a-noun, and now this. ▶ **REPAIR: the guard must count occurrences in CODE — strip comments before matching, or match on the attribute's syntactic position.** ⓘ **`controls/*` is in `source_sha256`, so it is a RE-GATE per row and no re-measure** — batch with each row's next task. ⛔ **AND IT PRODUCED A WRONG PUBLISHED NUMBER**: F112's *"the floor bisects to 2"* came from this script; the floor is **3** |
 | 116 | ⛔ **`check.py::req-mut` DELETES PRECONDITIONS ONE AT A TIME, SO IT CANNOT SEE A JOINTLY-NECESSARY PAIR** | `TASK_PHP_053` §2.4, at `harness/check.py:6718`. **Two preconditions can each be individually removable and jointly necessary**, and a one-at-a-time stage reports both as *"NOT load-bearing"* and invites deleting both. ✅ **It does NOT bite `ph56`** — that row's **shipped** file verifies without both, which the reviewer checked rather than assumed. ⚠⚠ **A `harness/` finding: REPORTED, NOT EDITED** — `harness/check.py` is hashed into all 33 PAT gate records, so a repair is a 33-pattern re-gate (the same price as item 105's option (a)). ▶ **If item 105 is ever answered (a), BATCH THIS WITH IT** — one re-gate, two repairs. ⓘ Until then it is a caveat on any *"not load-bearing"* verdict: **it means *not individually* load-bearing** |
 | 117 | ⚠⚠ **THE ONE LOAD-BEARING UNCERTAINTY LEFT FROM `_050`: `ph53`'s A1 `unsafe→verus` IS EXACTLY `−14.000`, AND `14 = 2 × 7`** | `TASK_PHP_050` §10 #2, triaged as load-bearing by `TASK_PHP_053` §1.6 and **still open**. ⛔ **F96's headline `−1.253 %` rests on it.** ⚠ **The sweep tool measures the whole-program slope, NOT `kernel_exclusive_ir`, so it cannot test an A1 figure** — no tool here does. ⭐ **Counter-evidence that stands**: `_050`'s PAT census found **0 of 288**, and `_053` §1.4 makes an alignment explanation *less* likely for an A1 figure rather than more, since the axes demonstrably differ. ▶ **Route: a dedicated task that sweeps `kernel_exclusive_ir`, OR an explicit decision to accept the PAT census and say so once.** ⓘ **Of `_050`'s seven uncertainties this is the only one still owed**; #1 closed (the wrong way, F113), #3/#4/#7 are neither cheap-and-important nor load-bearing, #5 is handled by scoping, and #6 is *"one `verus_run.py` invocation — a paragraph, not a task"* |
+| 118 | ⛔⛔ **A `task-notification` MEANS *STOPPED*, NOT *FINISHED* — AND I COMMITTED A DRAFT REPORT BECAUSE OF IT** | Manager, this round. `TASK_PHP_053` notified `status=completed`; I verified the artefacts, landed the findings and committed `e0d4975`. **The agent then resumed and added 38 insertions** — the completed `ph45` `envp` sweep and, more importantly, **a scope caveat that the round's headline refutation rests on ONE ROW against THREE that agree.** ⛔⛔ **So I published F113's *"`argv` and `envp` are NOT the same knob"* as a flat general claim while the evidence was `1` disagreeing against `3` agreeing** — ⭐⭐ **which is the exact defect this programme has corrected four rounds running, committed by me IN THE COMMIT THAT LANDED THE ROUND ABOUT IT.** ✅ **Repaired in RECAP and in `.memory-php/03-numbers.md`; the refutation still stands, because one counterexample breaks an `iff` and §B5 is an `iff` — but the SCOPE now travels with the claim.** ▶▶ **THE RULE: `status=completed` is the harness saying the agent STOPPED. It may resume. ⭐ Before committing a subagent's report, DIFF IT AGAINST WHAT YOU READ** — `git diff --stat` on the report file costs one command and would have caught this. ⚠ **And rule 11's widened form already forbade it**: *do not COMMIT a file the subagent WRITES.* **I read `completed` as "the subagent is gone" when the notification's own text says it fires each time the agent stops and may fire again.** ⓘ **No research consequence beyond the scope clause** — every number in the draft survived into the final report unchanged |
