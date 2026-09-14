@@ -47,12 +47,12 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 10 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL · ph45
         (T1)+ph53+ph52 (T3)+ph55+ph56 (T5) TYPE. 7 of 20 fam. 30 owed.
-NEXT    NOTHING RUNNING. ROW 10 BUILT+GATED; T5 AT 2. ▶ (1) ⛔⛔ ITEM 105 NEEDS A
+NEXT    ⏳ _053 RUNNING (REVIEWER): 4 UNREVIEWED. ▶ (1) ⛔⛔ ITEM 105 NEEDS A
         USER DECISION, NOW (a) OR (c) -- MY RECOMMENDED (b) DOES NOT EXIST (F107).
         (a)=edit check.py, a 33-PATTERN RE-GATE, BUYS PUBLISHING THE SMALLER TCB;
         (c)=leave it, what gate.py's OWN HEADER PRESCRIBES. ⭐ I PROCEED UNDER (c).
-        ▶ (2) REVIEW F96+F110+F111+F112 (4 UNREVIEWED). ▶ (3) ROW 11: A NEW
-        FAMILY (13 UNENTERED) -- SCREEN IT FIRST, ph55/ph56 SHOW WHY. 30 owed.
+        ▶ (2) AFTER _053: ROW 11, A NEW FAMILY (13 UNENTERED) -- SCREEN IT
+        FIRST; ph55/ph56 BOTH SHOW WHY. 30 owed, 10 built, 7 of 20 families.
 ⚠ NEW   F112 ⭐⭐⭐ ROW 10: R4->R5 COSTS EXACTLY 0.000 Ir/call ON BOTH INPUTS, AND
         THE ROW HAD TO BUY IT (one modulus spelling across all 4 Rust rungs;
         ph55 shipped two and paid +0.071%). ⛔ THE CROSS-LANGUAGE SIGN FLIPS
