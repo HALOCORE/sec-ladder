@@ -1,0 +1,34 @@
+From 4f68f3774c34948ac651344d73c9d9e0a08801e6 Mon Sep 17 00:00:00 2001
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon, 30 Aug 2004 08:57:40 +0000
+Subject: [PATCH] fix crash #29893 -- HAND BACKPORTED TO php-5.0.0
+
+The upstream commit is against 2004-08-30 HEAD and does not apply to 5.0.0:
+by fix time the error exit had gained an inner block and a
+`FREE_OP_VAR_PTR(free_op1);` that :1765-1770 does not have, so `git apply`
+refuses it with `error: while searching for: ... FREE_OP_VAR_PTR(free_op1);`.
+
+THE THREE LINES ARE UNCHANGED. Only the context is 5.0.0's. Diff this against
+4f68f3774c34.patch: the `+` lines are identical, character for character.
+
+`patterns-php/ph55-opdata-stride/controls/r1h_backport.py` applies THIS patch
+to the pristine tarball on every run and asserts the bytes move -- which is the
+POSITIVE control that makes its "the upstream patch does NOT apply" verdict
+worth anything.
+---
+ Zend/zend_execute.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Zend/zend_execute.c b/Zend/zend_execute.c
+--- a/Zend/zend_execute.c
++++ b/Zend/zend_execute.c
+@@ -1765,6 +1765,9 @@ static inline int zend_binary_assign_op_helper(int (*binary_op)(zval *result, zv
+ 	if (*var_ptr == EG(error_zval_ptr)) {
+ 		EX_T(opline->result.u.var).var.ptr_ptr = &EG(uninitialized_zval_ptr);
+ 		SELECTIVE_PZVAL_LOCK(*EX_T(opline->result.u.var).var.ptr_ptr, &opline->result);
+ 		AI_USE_PTR(EX_T(opline->result.u.var).var);
++		if (increment_opline) {
++			INC_OPCODE();
++		}
+ 		NEXT_OPCODE();
+ 	}

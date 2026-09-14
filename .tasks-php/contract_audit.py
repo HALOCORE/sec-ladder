@@ -144,6 +144,31 @@ ADJUDICATED = {
     "ph29-recvfrom-alloc/kernel_hardened.c:23": (
         "FALSE-POSITIVE", "\"the manager's independently cached copy\" -- "
                           "`independently` qualifies a CACHE, not a corroboration."),
+    # ---- row 9 (ph55), adjudicated 2026-09-14 when the ratchet fired on it ----
+    "ph55-opdata-stride/kernel_hardened.c:9": (
+        "REAL", "\u26d4\u26d4 states ANOTHER TOOL'S VERDICT verbatim -- "
+                "\"`preimage_screen.py`'s own verdict is `CANDIDATE` and is NOT one "
+                "of them\" -- which is F98's shape exactly.  \u2b50 AND IT IS HERE "
+                "BECAUSE TASK_PHP_048 \u00a72.3 TOLD THE ENGINEER TO RECORD THAT THE "
+                "SCREEN IS WEAK RATHER THAN QUOTE IT AS CONFIRMATION.  The "
+                "INSTRUCTION WAS RIGHT AND THE PLACEMENT WAS WRONG: that belongs in "
+                "NOTES.md (gate-only, one re-gate) and not in c/* (MEASUREMENT "
+                "digest, 32 cells).  \u26d4 NOT REPAIRED -- repairing it costs the "
+                "re-measure item 98 exists to avoid; recorded as known, exactly as "
+                "ph53's was."),
+    "ph55-opdata-stride/kernel.c:473": (
+        "FALSE-POSITIVE", "\"../NOTES.md \u00a74 proves it\" -- POINTER class; it "
+                "says WHERE the argument lives.  The classifier fired on the strong "
+                "verb `proves`, not on a stated verdict.  \u26a0 It is the strongest "
+                "verb the pointer class should carry; `shows`/`says` are safer."),
+    "ph55-opdata-stride/kernel_hardened.c:496": (
+        "FALSE-POSITIVE", "the same sentence as kernel.c:473 -- kernel_hardened.c "
+                "is c/kernel.c plus the three-line backport, so its comments are "
+                "duplicated by construction.  \u2b50 EVERY ph* row will therefore "
+                "double-count c/kernel.c comments; that is structural, not a defect."),
+    "ph55-opdata-stride/kernel_hardened.c:326": (
+        "FALSE-POSITIVE", "\"../NOTES.md \u00a75 shows why `git apply` refuses it\" -- "
+                "POINTER class, same as kernel.c:473."),
     "(SHARED)/emalloc_shim.h:640": (
         "FALSE-POSITIVE", "\"order-independent per field\" -- `independent` inside "
                           "a COMPOUND ADJECTIVE describing the tally's mixing "

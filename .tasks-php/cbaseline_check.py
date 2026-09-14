@@ -138,9 +138,67 @@ BASE = re.compile(r'c-(?:gcc|clang)(?:-h)?')
 # 59 -> 61 -> 63: the +4 are all FALSE and all in text written to REPAIR the
 # defect this file detects; the -2 are real repairs (ph03's row-1 table and the
 # 182-line central-claim unit now name their baselines).
-RATCHET = 63
-
-
+# ------------------------------------------------------------------ engineer,
+# 2026-09-14, TASK_PHP_048 (ph55-opdata-stride).  Three new hits, all in the new
+# row's NOTES.md, ALL FALSE.  Adjudicated BY HAND; the regex was NOT widened.
+#
+#  FALSE patterns-php/ph55-.../NOTES.md:388  ⭐ A THIRD CLASS, AND IT IS NEW:
+#                                       **A SHARE IS NOT A CROSS-LANGUAGE
+#                                       FIGURE.**  The magnitudes in this unit
+#                                       are `inside_share` -- `A1 / W1` WITHIN
+#                                       one cell -- so *"the C cells are
+#                                       74-83 %"* names no baseline because
+#                                       there is no baseline to name: it is not
+#                                       a ratio of one rung against another.
+#                                       The four cells it is about are tabulated
+#                                       BY NAME (`c-gcc`, `c-gcc-h`, `c-clang`,
+#                                       `c-clang-h`) in the unit immediately
+#                                       above, which unit boundaries hide.
+#  FALSE patterns-php/ph55-.../NOTES.md:395  the same class one paragraph on:
+#                                       *"17-26 % of a C cell's instructions are
+#                                       in callees"* is a share of that cell's
+#                                       OWN total.
+#  FALSE patterns-php/ph55-.../NOTES.md:903  ⚠ THE UNIT-SIZE CLASS THIS FILE
+#                                       ALREADY DOCUMENTS, in its sharpest form
+#                                       yet.  The unit is the whole of §13 -- a
+#                                       15-item numbered list with no blank
+#                                       lines -- so item 5's `74-83 %` (a SHARE
+#                                       again) marries item 1's *"876 vs 872
+#                                       instructions"*, which is an R4-vs-R5
+#                                       comparison with no C in it at all.
+#
+# ⭐ THE SHARE CLASS IS WORTH A REVIEWER'S DECISION, and it is NOT the same as
+# the bare-`gcc`/`clang` class above.  `inside_share` became a published,
+# per-cell quantity at `TASK_PHP_043`, and a per-cell share expressed as a
+# percentage will trip `MAG` in every row that publishes one -- ph52 and ph53
+# already do.  ▶ A reviewer should decide whether `MAG` should exclude a unit
+# whose only magnitudes are shares; if so, add a negative pinning BOTH a real
+# cross-language ratio and a share, and expect the census to fall.
+# ⛔ I did not do it, for this file's own standing reason: widening the checker
+# to make my own text pass is the anti-pattern it exists to resist.
+#
+# 63 -> 66: the +3 are all FALSE and all in one new row's NOTES.md.
+# ------------------------------------------------------------------ manager,
+# 2026-09-14, LANDING TASK_PHP_048 (row 9).  66 -> 69, all three adjudicated:
+#
+#  FALSE RECAP_PHP.md START HERE box   the 20-line navigation box.  It is
+#                                      LENGTH-CAPPED and structurally cannot
+#                                      carry full labels; every figure in it is
+#                                      a POINTER to a finding that carries its
+#                                      own.  A box that had to label every
+#                                      number would not fit in 20 lines.
+#  FALSE RECAP_PHP.md RULE-9 block     a findings-status TABLE.  Its "+9.17 %"
+#                                      etc. are quoted verdicts that name their
+#                                      baseline at the finding, not here.
+#  FALSE RECAP_PHP.md F109 A1-blind    says "under both compilers" and
+#                                      "on every C cell", and the 74-83 % is a
+#                                      RANGE SPANNING BOTH -- baseline-complete
+#                                      by construction, in the bare spelling.
+#
+# ⚠ The bare-spelling class is now SEVEN instances.  Still not widening `BASE`;
+# see the 2026-09-13 note above.  The case for widening it is now strong enough
+# that a reviewer should settle it rather than let it keep growing.
+RATCHET = 69
 def units(path):
     with open(path, encoding='utf-8', errors='replace') as fh:
         txt = fh.read()

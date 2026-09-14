@@ -1,0 +1,23 @@
+From 4f68f3774c34948ac651344d73c9d9e0a08801e6 Mon Sep 17 00:00:00 2001
+From: Stanislav Malyshev <stas@php.net>
+Date: Mon, 30 Aug 2004 08:57:40 +0000
+Subject: [PATCH] fix crash #29893
+
+---
+ Zend/zend_execute.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Zend/zend_execute.c b/Zend/zend_execute.c
+index 228c2d355da0..ed6247d4c4af 100644
+--- a/Zend/zend_execute.c
++++ b/Zend/zend_execute.c
+@@ -1942,6 +1942,9 @@ static inline int zend_binary_assign_op_helper(int (*binary_op)(zval *result, zv
+ 			AI_USE_PTR(EX_T(opline->result.u.var).var);
+ 		}
+ 		FREE_OP_VAR_PTR(free_op1);
++		if (increment_opline) {
++			INC_OPCODE();
++		}
+ 		NEXT_OPCODE();
+ 	}
+ 	

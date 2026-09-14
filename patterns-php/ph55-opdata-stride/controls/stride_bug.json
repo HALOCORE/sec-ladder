@@ -1,0 +1,128 @@
+{
+  "adversarial": {
+    "c-R1/adversarial-nullcall.bin": {
+      "class": "SIGNAL-11",
+      "exit": -11,
+      "signal": 11,
+      "stderr": "",
+      "stdout": ""
+    },
+    "c-R1/adversarial-opdatalive.bin": {
+      "class": "ANSWERED",
+      "exit": 0,
+      "signal": null,
+      "stderr": "",
+      "stdout": "17484701542569762048"
+    },
+    "fnptr_dispatch-bug/adversarial-nullcall.bin": {
+      "class": "PANIC",
+      "exit": 101,
+      "signal": null,
+      "stderr": "thread 'main' (2953777) panicked at /home/apt/repos_common/sec-ladder/.temp/php55-stride/c/fnptr_dispatch-bug.rs:345:19: called `Option::unw",
+      "stdout": ""
+    },
+    "fnptr_dispatch-bug/adversarial-opdatalive.bin": {
+      "class": "ANSWERED",
+      "exit": 0,
+      "signal": null,
+      "stderr": "",
+      "stdout": "17484701542569762048"
+    },
+    "safe_naive-bug/adversarial-nullcall.bin": {
+      "class": "PANIC",
+      "exit": 101,
+      "signal": null,
+      "stderr": "thread 'main' (2953774) panicked at /home/apt/repos_common/sec-ladder/.temp/php55-stride/safe_naive-bug.rs:237:37: called `Option::unwrap()`",
+      "stdout": ""
+    },
+    "safe_naive-bug/adversarial-opdatalive.bin": {
+      "class": "ANSWERED",
+      "exit": 0,
+      "signal": null,
+      "stderr": "",
+      "stdout": "17484701542569762048"
+    },
+    "safe_tuned-bug/adversarial-nullcall.bin": {
+      "class": "PANIC",
+      "exit": 101,
+      "signal": null,
+      "stderr": "thread 'main' (2953775) panicked at /home/apt/repos_common/sec-ladder/.temp/php55-stride/safe_tuned-bug.rs:217:31: called `Option::unwrap()`",
+      "stdout": ""
+    },
+    "safe_tuned-bug/adversarial-opdatalive.bin": {
+      "class": "ANSWERED",
+      "exit": 0,
+      "signal": null,
+      "stderr": "",
+      "stdout": "17484701542569762048"
+    },
+    "unsafe-bug/adversarial-nullcall.bin": {
+      "class": "ANSWERED",
+      "exit": 0,
+      "signal": null,
+      "stderr": "",
+      "stdout": "11370550710093900800"
+    },
+    "unsafe-bug/adversarial-opdatalive.bin": {
+      "class": "ANSWERED",
+      "exit": 0,
+      "signal": null,
+      "stderr": "",
+      "stdout": "17484701542569762048"
+    }
+  },
+  "benign": {
+    "large.bin": [
+      {
+        "class": "ANSWERED",
+        "exit": 0,
+        "signal": null,
+        "stderr": "",
+        "stdout": "1700852360492175006"
+      },
+      {
+        "class": "ANSWERED",
+        "exit": 0,
+        "signal": null,
+        "stderr": "",
+        "stdout": "1700852360492175006"
+      }
+    ],
+    "small.bin": [
+      {
+        "class": "ANSWERED",
+        "exit": 0,
+        "signal": null,
+        "stderr": "",
+        "stdout": "13727189135177570731"
+      },
+      {
+        "class": "ANSWERED",
+        "exit": 0,
+        "signal": null,
+        "stderr": "",
+        "stdout": "13727189135177570731"
+      }
+    ]
+  },
+  "derived_from_sha256": {
+    "patterns/ph55-opdata-stride/c/kernel.c": "025a4fb1712ce311c407622f68d54c794f820a9778bdf1956819315a40250433",
+    "patterns/ph55-opdata-stride/c/kernel_hardened.c": "bcf9a63d37da2e359b2f606b9c2e075c7a87c41132b8a539916aa28a848aff36",
+    "patterns/ph55-opdata-stride/c/main.c": "b56cd4a2273e0b802609e9d63c6ae6d746d90ebef4c128736c3da6f5d1413777",
+    "patterns/ph55-opdata-stride/controls/fnptr_dispatch.rs": "af485ccf5a938a84959c52d6df4a82df13eb31cb11321301e87b5f985b9d6c4a",
+    "patterns/ph55-opdata-stride/controls/stride_bug.py": "fd940c50bddbd7f9ae0b12618cb36f2c5865bbf949a26f21f0a0f1ef72d1c358",
+    "patterns/ph55-opdata-stride/inputs/gen.py": "1056bde2f389d39b38b7e906d39e29136aca6f46873a043a5e75d39e96d928da",
+    "patterns/ph55-opdata-stride/safe_naive.rs": "6b2235b919436d271611a2284f56bc01c6d8386f246c69f5a83e6bb608aa1d2d",
+    "patterns/ph55-opdata-stride/safe_tuned.rs": "0bc8e977f702d3818046dd5c42916973cf8a9916010048217cebbd0debc40deb",
+    "patterns/ph55-opdata-stride/unsafe.rs": "64ee887400d0ee25ae75f1ab65452b238b01191938f8c05c4dc7968785e3e8e8"
+  },
+  "pin": {
+    "note": "the two C kernels and the driver (the shipped R1/R1h pair), the three Rust rungs this file MUTATES plus the fnptr control it also mutates, inputs/gen.py (the corpus every row is run over) and this script. It does NOT pin verus.rs: R5's exec code is unsafe.rs's and this file mutates the latter.",
+    "regenerate": "python3 patterns-php/ph55-opdata-stride/controls/stride_bug.py"
+  },
+  "problems": [],
+  "r1h_reference": {
+    "adversarial-nullcall.bin": "15498615717350492160",
+    "adversarial-opdatalive.bin": "15498615717350492160"
+  }
+}

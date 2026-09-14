@@ -1,0 +1,263 @@
+{
+  "derived_from_sha256": {
+    "patterns/ph55-opdata-stride/controls/spellings.py": "5ca3fe00ffeadb01c3ce8c292dfc6451f25706a2c0996531695f8fc6148faf6b",
+    "patterns/ph55-opdata-stride/inputs/gen.py": "1056bde2f389d39b38b7e906d39e29136aca6f46873a043a5e75d39e96d928da",
+    "patterns/ph55-opdata-stride/safe_tuned.rs": "0bc8e977f702d3818046dd5c42916973cf8a9916010048217cebbd0debc40deb",
+    "patterns/ph55-opdata-stride/spec.md": "bbc125064be24b13cc05959c1f8d1cad48a695b097646060940c329b6b7bf06b",
+    "patterns/ph55-opdata-stride/unsafe.rs": "64ee887400d0ee25ae75f1ab65452b238b01191938f8c05c4dc7968785e3e8e8",
+    "patterns/ph55-opdata-stride/verus.rs": "7b8dc911a0d87a917b9006a30655b5660adac58c2fbe42c837355c8f5d3d46f0"
+  },
+  "identity_measured": {
+    "O0": "differ",
+    "O3": "differ"
+  },
+  "identity_pinned": {
+    "O0": "differ",
+    "O3": "differ"
+  },
+  "pin": {
+    "note": "the two rung sources the variants are derived from, verus.rs (the R4 admissibility half), spec.md (the declaration the audit runs against AND the `identity` pin the admissibility rule reads), inputs/gen.py and this script.",
+    "regenerate": "python3 patterns-php/ph55-opdata-stride/controls/spellings.py --verus"
+  },
+  "problems": [],
+  "rows": {
+    "R3/SHIPPED": {
+      "A1": {
+        "large.bin": 4997.31035,
+        "small.bin": 1547.31045
+      },
+      "W1": {
+        "large.bin": 5115.59105,
+        "small.bin": 1664.9927
+      },
+      "build_error": "",
+      "built": true,
+      "checksum_mismatch": null,
+      "forbidden_hits": [],
+      "in_contract": true,
+      "name": "SHIPPED",
+      "required_absent": [
+        "required[2] `hunwrap(o.handler)`"
+      ],
+      "rs": "/home/apt/repos_common/sec-ladder/patterns-php/ph55-opdata-stride/safe_tuned.rs",
+      "rung_candidate": false,
+      "side": "R3",
+      "unsafe_tokens": 0,
+      "verus_rs": null,
+      "why": "safe_tuned.rs"
+    },
+    "R3/r3_nobind": {
+      "A1": {
+        "large.bin": 4859.52225,
+        "small.bin": 1519.1719
+      },
+      "W1": {
+        "large.bin": 4984.8046,
+        "small.bin": 1643.8558
+      },
+      "build_error": "",
+      "built": true,
+      "checksum_mismatch": null,
+      "forbidden_hits": [],
+      "in_contract": true,
+      "name": "r3_nobind",
+      "required_absent": [
+        "required[2] `hunwrap(o.handler)`"
+      ],
+      "rs": "/home/apt/repos_common/sec-ladder/.temp/php55sp/r3_nobind.rs",
+      "rung_candidate": false,
+      "side": "R3",
+      "unsafe_tokens": 0,
+      "verus_rs": null,
+      "why": "LEVER 1 REVERTED: re-index `ops[pc]` per field, as R2 does. This is the lever about the row -- a dispatch loop reads its current instruction four or five times."
+    },
+    "R3/r3_noodbind": {
+      "A1": {
+        "large.bin": 4997.31035,
+        "small.bin": 1547.31045
+      },
+      "W1": {
+        "large.bin": 5122.5878,
+        "small.bin": 1671.98945
+      },
+      "build_error": "",
+      "built": true,
+      "checksum_mismatch": null,
+      "forbidden_hits": [],
+      "in_contract": true,
+      "name": "r3_noodbind",
+      "required_absent": [
+        "required[2] `hunwrap(o.handler)`"
+      ],
+      "rs": "/home/apt/repos_common/sec-ladder/.temp/php55sp/r3_noodbind.rs",
+      "rung_candidate": false,
+      "side": "R3",
+      "unsafe_tokens": 0,
+      "verus_rs": null,
+      "why": "LEVER 2 REVERTED: re-index `ops[pc + 1]` per field in the two two-word arms."
+    },
+    "R3/r3_noslice": {
+      "A1": {
+        "large.bin": 5916.31035,
+        "small.bin": 1794.31045
+      },
+      "W1": {
+        "large.bin": 6041.59655,
+        "small.bin": 1918.9982
+      },
+      "build_error": "",
+      "built": true,
+      "checksum_mismatch": null,
+      "forbidden_hits": [],
+      "in_contract": true,
+      "name": "r3_noslice",
+      "required_absent": [
+        "required[2] `hunwrap(o.handler)`"
+      ],
+      "rs": "/home/apt/repos_common/sec-ladder/.temp/php55sp/r3_noslice.rs",
+      "rung_candidate": false,
+      "side": "R3",
+      "unsafe_tokens": 0,
+      "verus_rs": null,
+      "why": "LEVER 3 REVERTED: eight independent index expressions in the decoder instead of one slice bind."
+    },
+    "R4/SHIPPED": {
+      "A1": {
+        "large.bin": 4619.72535,
+        "small.bin": 1462.70265
+      },
+      "W1": {
+        "large.bin": 4738.00085,
+        "small.bin": 1580.3797
+      },
+      "build_error": "",
+      "built": true,
+      "checksum_mismatch": null,
+      "forbidden_hits": [],
+      "in_contract": true,
+      "name": "SHIPPED",
+      "required_absent": [
+        "required[2] `.handler.unwrap()`"
+      ],
+      "rs": "/home/apt/repos_common/sec-ladder/patterns-php/ph55-opdata-stride/unsafe.rs",
+      "rung_candidate": false,
+      "side": "R4",
+      "unsafe_tokens": 8,
+      "verus_rs": null,
+      "why": "unsafe.rs"
+    },
+    "R4/r4_safe_all": {
+      "A1": {
+        "large.bin": 5916.31035,
+        "small.bin": 1794.31045
+      },
+      "W1": {
+        "large.bin": 6041.5852,
+        "small.bin": 1918.98685
+      },
+      "build_error": "",
+      "built": true,
+      "checksum_mismatch": null,
+      "forbidden_hits": [],
+      "in_contract": true,
+      "name": "r4_safe_all",
+      "required_absent": [
+        "required[2] `.handler.unwrap()`"
+      ],
+      "rs": "/home/apt/repos_common/sec-ladder/.temp/php55sp/r4_safe_all.rs",
+      "rung_candidate": false,
+      "side": "R4",
+      "twin_errors": 0,
+      "twin_unsupported": false,
+      "twin_verified": 61,
+      "unsafe_tokens": 0,
+      "verus_rs": "/home/apt/repos_common/sec-ladder/.temp/php55sp/r4_safe_all_verus.rs",
+      "why": "the DEGENERATE ENDPOINT -- every unchecked operation removed, i.e. R3 with a proof attached. \u26d4 NOT A RUNG CANDIDATE: an R4 with no `unsafe` is an R3."
+    },
+    "R4/r4_safe_hunwrap": {
+      "A1": {
+        "large.bin": 4789.08175,
+        "small.bin": 1494.82025
+      },
+      "W1": {
+        "large.bin": 4914.3595,
+        "small.bin": 1619.49955
+      },
+      "build_error": "",
+      "built": true,
+      "checksum_mismatch": null,
+      "forbidden_hits": [],
+      "in_contract": true,
+      "name": "r4_safe_hunwrap",
+      "required_absent": [
+        "required[2] `.handler.unwrap()`"
+      ],
+      "rs": "/home/apt/repos_common/sec-ladder/.temp/php55sp/r4_safe_hunwrap.rs",
+      "rung_candidate": true,
+      "side": "R4",
+      "twin_errors": 0,
+      "twin_unsupported": false,
+      "twin_verified": 54,
+      "unsafe_tokens": 7,
+      "verus_rs": "/home/apt/repos_common/sec-ladder/.temp/php55sp/r4_safe_hunwrap_verus.rs",
+      "why": "\u2b50 ONLY the handler `unwrap` is checked; every index stays unchecked. This prices THE ROW'S OWN `unsafe` and nothing else."
+    },
+    "R4/r4_safe_ops": {
+      "A1": {
+        "large.bin": 4826.5261,
+        "small.bin": 1506.8717
+      },
+      "W1": {
+        "large.bin": 4951.799,
+        "small.bin": 1631.54615
+      },
+      "build_error": "",
+      "built": true,
+      "checksum_mismatch": null,
+      "forbidden_hits": [],
+      "in_contract": true,
+      "name": "r4_safe_ops",
+      "required_absent": [
+        "required[2] `.handler.unwrap()`"
+      ],
+      "rs": "/home/apt/repos_common/sec-ladder/.temp/php55sp/r4_safe_ops.rs",
+      "rung_candidate": true,
+      "side": "R4",
+      "twin_errors": 0,
+      "twin_unsupported": false,
+      "twin_verified": 55,
+      "unsafe_tokens": 6,
+      "verus_rs": "/home/apt/repos_common/sec-ladder/.temp/php55sp/r4_safe_ops_verus.rs",
+      "why": "the op_array accessors are checked: trusted surface 8 -> 6."
+    },
+    "R4/r4_safe_slots": {
+      "A1": {
+        "large.bin": 4658.6817,
+        "small.bin": 1467.7524
+      },
+      "W1": {
+        "large.bin": 4783.95655,
+        "small.bin": 1592.4288
+      },
+      "build_error": "",
+      "built": true,
+      "checksum_mismatch": null,
+      "forbidden_hits": [],
+      "in_contract": true,
+      "name": "r4_safe_slots",
+      "required_absent": [
+        "required[2] `.handler.unwrap()`"
+      ],
+      "rs": "/home/apt/repos_common/sec-ladder/.temp/php55sp/r4_safe_slots.rs",
+      "rung_candidate": true,
+      "side": "R4",
+      "twin_errors": 0,
+      "twin_unsupported": false,
+      "twin_verified": 57,
+      "unsafe_tokens": 4,
+      "verus_rs": "/home/apt/repos_common/sec-ladder/.temp/php55sp/r4_safe_slots_verus.rs",
+      "why": "the zval-store accessors are checked: trusted surface 8 -> 4."
+    }
+  },
+  "verus_ran": true
+}

@@ -1,0 +1,35 @@
+{
+  "backport_applied": true,
+  "backport_message": "-v /home/apt/repos_common/sec-ladder/patterns-php/ph55-opdata-stride/controls/4f68f3774c34-backport-5.0.0.patch -> the bytes moved",
+  "derived_from_sha256": {
+    "patterns/ph55-opdata-stride/controls/4f68f3774c34-backport-5.0.0.patch": "a93124bdcb0020d457933b24c68eca367745e3c261c19fb377e2103544cb9c08",
+    "patterns/ph55-opdata-stride/controls/4f68f3774c34.patch": "0d89f52985505ff77ba249a90954c32e41b6373f495a6e889b938addf8087056",
+    "patterns/ph55-opdata-stride/controls/r1h_backport.py": "957a9c92bf4ed3d92629008fcfa3d9d2ff5b777899bb24b22e35e60cdfa0b607"
+  },
+  "git_apply_applied": false,
+  "git_apply_message": "Checking patch Zend/zend_execute.c... error: while searching for: AI_USE_PTR(EX_T(opline->result.u.var).var); } FREE_OP_VAR_PTR(free_op1); NEXT_OPCODE(); } error: patch failed: Zend/zend_execute.c:194 | Checking patch Zend/zend_execute.c... error: while searching for: AI_USE_PTR(EX_T(opline->result.u.var).var); } FREE_OP_VAR_PTR(free_op1); NEXT_OPCODE(); } error: patch failed: Zend/zend_execute.c:",
+  "gitignore_trap": {
+    "bytes_moved": false,
+    "check_rc": 0,
+    "path_is_gitignored": true
+  },
+  "legs": {
+    "leg1_hunk_context": "static inline int zend_binary_assign_op_helper(int (*binary_op)(zval *result, zv",
+    "leg2_all_inside_span": true,
+    "leg2_increment_opline_lines": [
+      1728,
+      1749,
+      1792
+    ],
+    "leg3_normal_guard_present": true,
+    "next_opcode_occurrences": 117,
+    "patch_deletions": 0,
+    "patch_insertions": 3
+  },
+  "pin": {
+    "note": "the upstream patch, the hand backport that is its positive control, and this script. \u26a0 The TARBALL is not pinned here because it is pinned BY SHA256 INSIDE the script and re-checked on every run, which is stronger.",
+    "regenerate": "python3 patterns-php/ph55-opdata-stride/controls/r1h_backport.py"
+  },
+  "problems": [],
+  "tarball_sha256": "5783e0c0ba94f165633a565fe73a83e59cf17b6880ef95fa8f936dc6301d6919"
+}

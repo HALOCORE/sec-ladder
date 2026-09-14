@@ -1,0 +1,160 @@
+{
+  "claims": {
+    "c-clang->c-clang-h": "NOT RESOLVABLE/SIGN-UNSTABLE",
+    "c-clang-h->safe_tuned": "RESOLVABLE/SIGN-STABLE",
+    "c-clang-h->unsafe": "RESOLVABLE/SIGN-STABLE",
+    "c-gcc->c-gcc-h": "RESOLVABLE/SIGN-STABLE",
+    "c-gcc-h->safe_tuned": "RESOLVABLE/SIGN-STABLE",
+    "c-gcc-h->unsafe": "RESOLVABLE/SIGN-STABLE",
+    "safe_naive->safe_tuned": "RESOLVABLE/SIGN-STABLE",
+    "safe_tuned->unsafe": "RESOLVABLE/SIGN-STABLE",
+    "unsafe->verus": "RESOLVABLE/SIGN-STABLE"
+  },
+  "derived_from_sha256": {
+    "patterns/ph55-opdata-stride/c/kernel.c": "025a4fb1712ce311c407622f68d54c794f820a9778bdf1956819315a40250433",
+    "patterns/ph55-opdata-stride/c/kernel_hardened.c": "bcf9a63d37da2e359b2f606b9c2e075c7a87c41132b8a539916aa28a848aff36",
+    "patterns/ph55-opdata-stride/c/main.c": "b56cd4a2273e0b802609e9d63c6ae6d746d90ebef4c128736c3da6f5d1413777",
+    "patterns/ph55-opdata-stride/controls/argv_align.py": "5df1417488c27a522170de82468d8675dbc723e5fe66ba44290f51da43622c3c",
+    "patterns/ph55-opdata-stride/inputs/gen.py": "1056bde2f389d39b38b7e906d39e29136aca6f46873a043a5e75d39e96d928da",
+    "patterns/ph55-opdata-stride/safe_naive.rs": "6b2235b919436d271611a2284f56bc01c6d8386f246c69f5a83e6bb608aa1d2d",
+    "patterns/ph55-opdata-stride/safe_tuned.rs": "0bc8e977f702d3818046dd5c42916973cf8a9916010048217cebbd0debc40deb",
+    "patterns/ph55-opdata-stride/unsafe.rs": "64ee887400d0ee25ae75f1ab65452b238b01191938f8c05c4dc7968785e3e8e8",
+    "patterns/ph55-opdata-stride/verus.rs": "7b8dc911a0d87a917b9006a30655b5660adac58c2fbe42c837355c8f5d3d46f0"
+  },
+  "input": "large.bin",
+  "path_lengths": [
+    61,
+    63,
+    65,
+    67,
+    69,
+    71
+  ],
+  "pin": {
+    "note": "the same set statistic.py pins, because the sweep is over the same eight cells. The CLAIMS table inside this script is what ../NOTES.md 8b-2 publishes, so a change to either shows up here.",
+    "regenerate": "python3 patterns-php/ph55-opdata-stride/controls/argv_align.py --input small.bin"
+  },
+  "problems": [],
+  "stability": {
+    "c-clang->c-clang-h": [
+      -14,
+      140079,
+      "NOT RESOLVABLE",
+      "SIGN-UNSTABLE"
+    ],
+    "c-clang-h->safe_tuned": [
+      7415558,
+      139983,
+      "RESOLVABLE",
+      "SIGN-STABLE"
+    ],
+    "c-clang-h->unsafe": [
+      -2736255,
+      140023,
+      "RESOLVABLE",
+      "SIGN-STABLE"
+    ],
+    "c-gcc->c-gcc-h": [
+      -1317011,
+      28,
+      "RESOLVABLE",
+      "SIGN-STABLE"
+    ],
+    "c-gcc-h->safe_tuned": [
+      5468253,
+      141,
+      "RESOLVABLE",
+      "SIGN-STABLE"
+    ],
+    "c-gcc-h->unsafe": [
+      -4683554,
+      113,
+      "RESOLVABLE",
+      "SIGN-STABLE"
+    ],
+    "safe_naive->safe_tuned": [
+      -18259805,
+      0,
+      "RESOLVABLE",
+      "SIGN-STABLE"
+    ],
+    "safe_tuned->unsafe": [
+      -10151824,
+      51,
+      "RESOLVABLE",
+      "SIGN-STABLE"
+    ],
+    "unsafe->verus": [
+      90487,
+      69,
+      "RESOLVABLE",
+      "SIGN-STABLE"
+    ]
+  },
+  "sweep": {
+    "c-clang": [
+      98916479,
+      98916493,
+      98916479,
+      98916493,
+      98776428,
+      98776442
+    ],
+    "c-clang-h": [
+      98916493,
+      98916479,
+      98776442,
+      98776428,
+      98776442,
+      98776428
+    ],
+    "c-gcc": [
+      102040837,
+      102040823,
+      102040837,
+      102040823,
+      102040786,
+      102040772
+    ],
+    "c-gcc-h": [
+      100723798,
+      100723812,
+      100723798,
+      100723812,
+      100723747,
+      100723761
+    ],
+    "safe_naive": [
+      124451884,
+      124451887,
+      124451816,
+      124451757,
+      124451805,
+      124451797
+    ],
+    "safe_tuned": [
+      106192079,
+      106192082,
+      106192011,
+      106191952,
+      106192000,
+      106191992
+    ],
+    "unsafe": [
+      96040255,
+      96040258,
+      96040187,
+      96040179,
+      96040227,
+      96040168
+    ],
+    "verus": [
+      96130732,
+      96130749,
+      96130664,
+      96130670,
+      96130649,
+      96130655
+    ]
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "derived_from_sha256": {
+    "patterns/ph55-opdata-stride/controls/fnptr.rs": "ac6fb62cfdd7bfdb4b9e5ac0905fbd7c7b91d45ac4efcfa1a663e5f4eb34b49f",
+    "patterns/ph55-opdata-stride/controls/negatives.py": "b8a8b99a6fd5a95c68cc6f67b437036926ab7f3fafedef35e5a45cc8857403e6",
+    "patterns/ph55-opdata-stride/verus.rs": "7b8dc911a0d87a917b9006a30655b5660adac58c2fbe42c837355c8f5d3d46f0"
+  },
+  "fnptr": {
+    "errors": null,
+    "rc": 1,
+    "text": "error: The verifier does not yet support the following Rust feature: function pointer types\n  --> /home/apt/repos_common/sec-ladder/patterns-php/ph55-opdata-stride/controls/fnptr.rs:69:13\n   |\n69 | fn dispatch(t: &[Option<H>; 4], i: usize, x: u64) -> (r: u64)\n   |             ^^^^^^^^^^^^^^^^^^\n\nerror: aborting due to 1 previous error\n\n",
+    "verified": null
+  },
+  "mutants": {
+    "nofixup": {
+      "errors": 1,
+      "rc": 1,
+      "text": "ported; rerun with a higher value for --multiple-errors to find other potential errors in this function\n   --> /home/apt/repos_common/sec-ladder/.temp/php55neg/nofixup.rs:855:1\n    |\n855 | pub fn kernel(buf: &[u8], off: usize, len: usize) -> (r: u64)\n    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nerror: assertion failed\n   --> /home/apt/repos_common/sec-ladder/.temp/php55neg/nofixup.rs:921:12\n    |\n921 |     assert(ops@ == emitted(dec, nops as int, 0));\n    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed\n\nerror: assertion failed\n   --> /home/apt/repos_common/sec-ladder/.temp/php55neg/nofixup.rs:922:12\n    |\n922 |     assert(ok_from(ops@, nops as int, 0));\n    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed\n\nnote: recommendation not met\n   --> /home/apt/repos_common/sec-ladder/.temp/php55neg/nofixup.rs:933:67\n    |\n933 |                 0 <= j < i ==> #[trigger] ops@[j] == with_handler(em[j]),\n    |                                                                   ^^^^^\n    |\n   --> vstd/seq.rs:972:12\n    |\n    = note: recommendation not met\n\nnote: recommendation not met\n   --> /home/apt/repos_common/sec-ladder/.temp/php55neg/nofixup.rs:934:71\n    |\n934 |             forall|j: int| i <= j < MAX_OPS ==> #[trigger] ops@[j] == em[j],\n    |                                                                       ^^^^^\n    |\n   --> vstd/seq.rs:972:12\n    |\n    = note: recommendation not met\n\nerror: aborting due to 2 previous errors\n\n",
+      "verified": 52
+    },
+    "noprecond": {
+      "errors": 1,
+      "rc": 1,
+      "text": "verification results:: 52 verified, 1 errors\nerror: assertion failed\n   --> /home/apt/repos_common/sec-ladder/.temp/php55neg/noprecond.rs:870:12\n    |\n870 |     assert(2 <= nops <= MAX_OPS);\n    |            ^^^^^^^^^^^^^^^^^^^^ assertion failed\n\nnote: recommendation not met\n   --> /home/apt/repos_common/sec-ladder/.temp/php55neg/noprecond.rs:932:67\n    |\n932 |                 0 <= j < i ==> #[trigger] ops@[j] == with_handler(em[j]),\n    |                                                                   ^^^^^\n    |\n   --> vstd/seq.rs:972:12\n    |\n    = note: recommendation not met\n\nnote: recommendation not met\n   --> /home/apt/repos_common/sec-ladder/.temp/php55neg/noprecond.rs:933:71\n    |\n933 |             forall|j: int| i <= j < MAX_OPS ==> #[trigger] ops@[j] == em[j],\n    |                                                                       ^^^^^\n    |\n   --> vstd/seq.rs:972:12\n    |\n    = note: recommendation not met\n\nerror: aborting due to 1 previous error\n\n",
+      "verified": 52
+    },
+    "nostride": {
+      "errors": 1,
+      "rc": 1,
+      "text": "verification results:: 52 verified, 1 errors\nnote: recommendation not met\n   --> /home/apt/repos_common/sec-ladder/.temp/php55neg/nostride.rs:932:67\n    |\n932 |                 0 <= j < i ==> #[trigger] ops@[j] == with_handler(em[j]),\n    |                                                                   ^^^^^\n    |\n   --> vstd/seq.rs:972:12\n    |\n    = note: recommendation not met\n\nnote: recommendation not met\n   --> /home/apt/repos_common/sec-ladder/.temp/php55neg/nostride.rs:933:71\n    |\n933 |             forall|j: int| i <= j < MAX_OPS ==> #[trigger] ops@[j] == em[j],\n    |                                                                       ^^^^^\n    |\n   --> vstd/seq.rs:972:12\n    |\n    = note: recommendation not met\n\nerror: assertion failed\n    --> /home/apt/repos_common/sec-ladder/.temp/php55neg/nostride.rs:1134:16\n     |\n1134 |         assert(cur2 == step(ops@, cur));\n     |                ^^^^^^^^^^^^^^^^^^^^^^^ assertion failed\n\nerror: aborting due to 1 previous error\n\n",
+      "verified": 52
+    },
+    "notail": {
+      "errors": 1,
+      "rc": 1,
+      "text": "verification results:: 52 verified, 1 errors\nerror: assertion failed\n   --> /home/apt/repos_common/sec-ladder/.temp/php55neg/notail.rs:911:12\n    |\n911 |     assert(ops@ =~= decoded(win@, nops as int));\n    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ assertion failed\n\nnote: recommendation not met\n   --> /home/apt/repos_common/sec-ladder/.temp/php55neg/notail.rs:928:67\n    |\n928 |                 0 <= j < i ==> #[trigger] ops@[j] == with_handler(em[j]),\n    |                                                                   ^^^^^\n    |\n   --> vstd/seq.rs:972:12\n    |\n    = note: recommendation not met\n\nnote: recommendation not met\n   --> /home/apt/repos_common/sec-ladder/.temp/php55neg/notail.rs:929:71\n    |\n929 |             forall|j: int| i <= j < MAX_OPS ==> #[trigger] ops@[j] == em[j],\n    |                                                                       ^^^^^\n    |\n   --> vstd/seq.rs:972:12\n    |\n    = note: recommendation not met\n\nerror: aborting due to 1 previous error\n\n",
+      "verified": 52
+    }
+  },
+  "pin": {
+    "note": "verus.rs (every mutant is a substitution ON it, and the hit counts are asserted), controls/fnptr.rs (the must-fire type-level negative) and this script. NOT inputs/: no mutant is RUN, only verified.",
+    "regenerate": "python3 patterns-php/ph55-opdata-stride/controls/negatives.py"
+  },
+  "problems": []
+}

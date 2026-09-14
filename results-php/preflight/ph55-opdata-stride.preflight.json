@@ -1,0 +1,1583 @@
+{
+  "row": "ph55-opdata-stride",
+  "runs": [
+    {
+      "row": "ph55-opdata-stride",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph55-opdata-stride: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph55-opdata-stride: Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_opcode.c are in the manifest (04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 9959ecae7fda)",
+        "  ph55-opdata-stride: OK  Zend/zend_execute.c:1724-1796  2407 bytes  sha256 9bce864972fdf5d7  tier=modelled",
+        "  ph55-opdata-stride: OK+1 Zend/zend_execute.c:1313-1338  597 bytes  sha256 db683b0f6b210280  -- THE TWO MACROS AND THE TABLE. `NEXT_OPCODE()` is `CHECK_SYMBOL_TABLES(",
+        "  ph55-opdata-stride: OK+2 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- \u26d4 THE DISPATCH LOOP, AND IT IS THE HALF WITHOUT WHICH THE STRIDE ERROR",
+        "  ph55-opdata-stride: OK+3 Zend/zend_execute.c:2198-2226  990 bytes  sha256 5200ef0a9cb8b3ce  -- \u2b50 THE CLEAN SIBLING, LIFTED ON PURPOSE. `zend_assign_dim_handler` is S",
+        "  ph55-opdata-stride: OK+4 Zend/zend_execute.c:4426-4427  110 bytes  sha256 23b3b6e1e4c39621  -- \u2b50 TWO LINES, AND THE SECOND IS THE HARM. `zend_opcode_handlers[ZEND_AS",
+        "  ph55-opdata-stride: OK+5 Zend/zend_opcode.c:341-366  750 bytes  sha256 2e82e7e63352f083  -- `pass_two`'s walk, and the line that makes the NULL REACHABLE FROM A P",
+        "  ph55-opdata-stride: per-span overlap: span0 16% (7/45), span1 30% (3/10), span2 14% (1/7), span3 12% (2/17), span4 0% (0/2), span5 15% (3/20)  -- the UNION is what is reported below, and it is what 6 cited spans oblige the row to",
+        "  ph55-opdata-stride: kernel overlap 14% (13/93 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph55-opdata-stride: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph55-opdata-stride: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH55_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1072,
+          "prefix_words": 1072,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "build",
+      "gate_argv": [
+        "--tool",
+        "build",
+        "ph55-opdata-stride",
+        "--all"
+      ],
+      "tool_argv": [
+        "ph55-opdata-stride",
+        "--all"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph55-opdata-stride",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph55-opdata-stride: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph55-opdata-stride: Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_opcode.c are in the manifest (04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 9959ecae7fda)",
+        "  ph55-opdata-stride: OK  Zend/zend_execute.c:1724-1796  2407 bytes  sha256 9bce864972fdf5d7  tier=modelled",
+        "  ph55-opdata-stride: OK+1 Zend/zend_execute.c:1313-1338  597 bytes  sha256 db683b0f6b210280  -- THE TWO MACROS AND THE TABLE. `NEXT_OPCODE()` is `CHECK_SYMBOL_TABLES(",
+        "  ph55-opdata-stride: OK+2 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- \u26d4 THE DISPATCH LOOP, AND IT IS THE HALF WITHOUT WHICH THE STRIDE ERROR",
+        "  ph55-opdata-stride: OK+3 Zend/zend_execute.c:2198-2226  990 bytes  sha256 5200ef0a9cb8b3ce  -- \u2b50 THE CLEAN SIBLING, LIFTED ON PURPOSE. `zend_assign_dim_handler` is S",
+        "  ph55-opdata-stride: OK+4 Zend/zend_execute.c:4426-4427  110 bytes  sha256 23b3b6e1e4c39621  -- \u2b50 TWO LINES, AND THE SECOND IS THE HARM. `zend_opcode_handlers[ZEND_AS",
+        "  ph55-opdata-stride: OK+5 Zend/zend_opcode.c:341-366  750 bytes  sha256 2e82e7e63352f083  -- `pass_two`'s walk, and the line that makes the NULL REACHABLE FROM A P",
+        "  ph55-opdata-stride: per-span overlap: span0 16% (7/45), span1 30% (3/10), span2 14% (1/7), span3 12% (2/17), span4 0% (0/2), span5 15% (3/20)  -- the UNION is what is reported below, and it is what 6 cited spans oblige the row to",
+        "  ph55-opdata-stride: kernel overlap 14% (13/93 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph55-opdata-stride: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph55-opdata-stride: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH55_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1072,
+          "prefix_words": 1072,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "ph55-opdata-stride"
+      ],
+      "tool_argv": [
+        "ph55-opdata-stride"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph55-opdata-stride",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph55-opdata-stride: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph55-opdata-stride: Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_opcode.c are in the manifest (04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 9959ecae7fda)",
+        "  ph55-opdata-stride: OK  Zend/zend_execute.c:1724-1796  2407 bytes  sha256 9bce864972fdf5d7  tier=modelled",
+        "  ph55-opdata-stride: OK+1 Zend/zend_execute.c:1313-1338  597 bytes  sha256 db683b0f6b210280  -- THE TWO MACROS AND THE TABLE. `NEXT_OPCODE()` is `CHECK_SYMBOL_TABLES(",
+        "  ph55-opdata-stride: OK+2 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- \u26d4 THE DISPATCH LOOP, AND IT IS THE HALF WITHOUT WHICH THE STRIDE ERROR",
+        "  ph55-opdata-stride: OK+3 Zend/zend_execute.c:2198-2226  990 bytes  sha256 5200ef0a9cb8b3ce  -- \u2b50 THE CLEAN SIBLING, LIFTED ON PURPOSE. `zend_assign_dim_handler` is S",
+        "  ph55-opdata-stride: OK+4 Zend/zend_execute.c:4426-4427  110 bytes  sha256 23b3b6e1e4c39621  -- \u2b50 TWO LINES, AND THE SECOND IS THE HARM. `zend_opcode_handlers[ZEND_AS",
+        "  ph55-opdata-stride: OK+5 Zend/zend_opcode.c:341-366  750 bytes  sha256 2e82e7e63352f083  -- `pass_two`'s walk, and the line that makes the NULL REACHABLE FROM A P",
+        "  ph55-opdata-stride: per-span overlap: span0 16% (7/45), span1 30% (3/10), span2 14% (1/7), span3 12% (2/17), span4 0% (0/2), span5 15% (3/20)  -- the UNION is what is reported below, and it is what 6 cited spans oblige the row to",
+        "  ph55-opdata-stride: kernel overlap 14% (13/93 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph55-opdata-stride: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph55-opdata-stride: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH55_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1072,
+          "prefix_words": 1072,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "report",
+      "gate_argv": [
+        "--tool",
+        "report",
+        "ph55-opdata-stride"
+      ],
+      "tool_argv": [
+        "ph55-opdata-stride"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph55-opdata-stride",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph55-opdata-stride: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph55-opdata-stride: Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_opcode.c are in the manifest (04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 9959ecae7fda)",
+        "  ph55-opdata-stride: OK  Zend/zend_execute.c:1724-1796  2407 bytes  sha256 9bce864972fdf5d7  tier=modelled",
+        "  ph55-opdata-stride: OK+1 Zend/zend_execute.c:1313-1338  597 bytes  sha256 db683b0f6b210280  -- THE TWO MACROS AND THE TABLE. `NEXT_OPCODE()` is `CHECK_SYMBOL_TABLES(",
+        "  ph55-opdata-stride: OK+2 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- \u26d4 THE DISPATCH LOOP, AND IT IS THE HALF WITHOUT WHICH THE STRIDE ERROR",
+        "  ph55-opdata-stride: OK+3 Zend/zend_execute.c:2198-2226  990 bytes  sha256 5200ef0a9cb8b3ce  -- \u2b50 THE CLEAN SIBLING, LIFTED ON PURPOSE. `zend_assign_dim_handler` is S",
+        "  ph55-opdata-stride: OK+4 Zend/zend_execute.c:4426-4427  110 bytes  sha256 23b3b6e1e4c39621  -- \u2b50 TWO LINES, AND THE SECOND IS THE HARM. `zend_opcode_handlers[ZEND_AS",
+        "  ph55-opdata-stride: OK+5 Zend/zend_opcode.c:341-366  750 bytes  sha256 2e82e7e63352f083  -- `pass_two`'s walk, and the line that makes the NULL REACHABLE FROM A P",
+        "  ph55-opdata-stride: per-span overlap: span0 16% (7/45), span1 30% (3/10), span2 14% (1/7), span3 12% (2/17), span4 0% (0/2), span5 15% (3/20)  -- the UNION is what is reported below, and it is what 6 cited spans oblige the row to",
+        "  ph55-opdata-stride: kernel overlap 14% (13/93 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph55-opdata-stride: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph55-opdata-stride: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH55_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1072,
+          "prefix_words": 1072,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph55-opdata-stride"
+      ],
+      "tool_argv": [
+        "ph55-opdata-stride"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 1
+    },
+    {
+      "row": "ph55-opdata-stride",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph55-opdata-stride: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph55-opdata-stride: Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_opcode.c are in the manifest (04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 9959ecae7fda)",
+        "  ph55-opdata-stride: OK  Zend/zend_execute.c:1724-1796  2407 bytes  sha256 9bce864972fdf5d7  tier=modelled",
+        "  ph55-opdata-stride: OK+1 Zend/zend_execute.c:1313-1338  597 bytes  sha256 db683b0f6b210280  -- THE TWO MACROS AND THE TABLE. `NEXT_OPCODE()` is `CHECK_SYMBOL_TABLES(",
+        "  ph55-opdata-stride: OK+2 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- \u26d4 THE DISPATCH LOOP, AND IT IS THE HALF WITHOUT WHICH THE STRIDE ERROR",
+        "  ph55-opdata-stride: OK+3 Zend/zend_execute.c:2198-2226  990 bytes  sha256 5200ef0a9cb8b3ce  -- \u2b50 THE CLEAN SIBLING, LIFTED ON PURPOSE. `zend_assign_dim_handler` is S",
+        "  ph55-opdata-stride: OK+4 Zend/zend_execute.c:4426-4427  110 bytes  sha256 23b3b6e1e4c39621  -- \u2b50 TWO LINES, AND THE SECOND IS THE HARM. `zend_opcode_handlers[ZEND_AS",
+        "  ph55-opdata-stride: OK+5 Zend/zend_opcode.c:341-366  750 bytes  sha256 2e82e7e63352f083  -- `pass_two`'s walk, and the line that makes the NULL REACHABLE FROM A P",
+        "  ph55-opdata-stride: per-span overlap: span0 16% (7/45), span1 30% (3/10), span2 14% (1/7), span3 12% (2/17), span4 0% (0/2), span5 15% (3/20)  -- the UNION is what is reported below, and it is what 6 cited spans oblige the row to",
+        "  ph55-opdata-stride: kernel overlap 14% (13/93 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph55-opdata-stride: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph55-opdata-stride: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH55_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1086,
+          "prefix_words": 1086,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "report",
+      "gate_argv": [
+        "--tool",
+        "report",
+        "ph55-opdata-stride"
+      ],
+      "tool_argv": [
+        "ph55-opdata-stride"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph55-opdata-stride",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph55-opdata-stride: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph55-opdata-stride: Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_opcode.c are in the manifest (04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 9959ecae7fda)",
+        "  ph55-opdata-stride: OK  Zend/zend_execute.c:1724-1796  2407 bytes  sha256 9bce864972fdf5d7  tier=modelled",
+        "  ph55-opdata-stride: OK+1 Zend/zend_execute.c:1313-1338  597 bytes  sha256 db683b0f6b210280  -- THE TWO MACROS AND THE TABLE. `NEXT_OPCODE()` is `CHECK_SYMBOL_TABLES(",
+        "  ph55-opdata-stride: OK+2 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- \u26d4 THE DISPATCH LOOP, AND IT IS THE HALF WITHOUT WHICH THE STRIDE ERROR",
+        "  ph55-opdata-stride: OK+3 Zend/zend_execute.c:2198-2226  990 bytes  sha256 5200ef0a9cb8b3ce  -- \u2b50 THE CLEAN SIBLING, LIFTED ON PURPOSE. `zend_assign_dim_handler` is S",
+        "  ph55-opdata-stride: OK+4 Zend/zend_execute.c:4426-4427  110 bytes  sha256 23b3b6e1e4c39621  -- \u2b50 TWO LINES, AND THE SECOND IS THE HARM. `zend_opcode_handlers[ZEND_AS",
+        "  ph55-opdata-stride: OK+5 Zend/zend_opcode.c:341-366  750 bytes  sha256 2e82e7e63352f083  -- `pass_two`'s walk, and the line that makes the NULL REACHABLE FROM A P",
+        "  ph55-opdata-stride: per-span overlap: span0 16% (7/45), span1 30% (3/10), span2 14% (1/7), span3 12% (2/17), span4 0% (0/2), span5 15% (3/20)  -- the UNION is what is reported below, and it is what 6 cited spans oblige the row to",
+        "  ph55-opdata-stride: kernel overlap 14% (13/93 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph55-opdata-stride: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph55-opdata-stride: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH55_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1086,
+          "prefix_words": 1086,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph55-opdata-stride"
+      ],
+      "tool_argv": [
+        "ph55-opdata-stride"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 1
+    },
+    {
+      "row": "ph55-opdata-stride",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph55-opdata-stride: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph55-opdata-stride: Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_opcode.c are in the manifest (04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 9959ecae7fda)",
+        "  ph55-opdata-stride: OK  Zend/zend_execute.c:1724-1796  2407 bytes  sha256 9bce864972fdf5d7  tier=modelled",
+        "  ph55-opdata-stride: OK+1 Zend/zend_execute.c:1313-1338  597 bytes  sha256 db683b0f6b210280  -- THE TWO MACROS AND THE TABLE. `NEXT_OPCODE()` is `CHECK_SYMBOL_TABLES(",
+        "  ph55-opdata-stride: OK+2 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- \u26d4 THE DISPATCH LOOP, AND IT IS THE HALF WITHOUT WHICH THE STRIDE ERROR",
+        "  ph55-opdata-stride: OK+3 Zend/zend_execute.c:2198-2226  990 bytes  sha256 5200ef0a9cb8b3ce  -- \u2b50 THE CLEAN SIBLING, LIFTED ON PURPOSE. `zend_assign_dim_handler` is S",
+        "  ph55-opdata-stride: OK+4 Zend/zend_execute.c:4426-4427  110 bytes  sha256 23b3b6e1e4c39621  -- \u2b50 TWO LINES, AND THE SECOND IS THE HARM. `zend_opcode_handlers[ZEND_AS",
+        "  ph55-opdata-stride: OK+5 Zend/zend_opcode.c:341-366  750 bytes  sha256 2e82e7e63352f083  -- `pass_two`'s walk, and the line that makes the NULL REACHABLE FROM A P",
+        "  ph55-opdata-stride: per-span overlap: span0 16% (7/45), span1 30% (3/10), span2 14% (1/7), span3 12% (2/17), span4 0% (0/2), span5 15% (3/20)  -- the UNION is what is reported below, and it is what 6 cited spans oblige the row to",
+        "  ph55-opdata-stride: kernel overlap 14% (13/93 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph55-opdata-stride: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph55-opdata-stride: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH55_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1086,
+          "prefix_words": 1086,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph55-opdata-stride"
+      ],
+      "tool_argv": [
+        "ph55-opdata-stride"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph55-opdata-stride",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph55-opdata-stride: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph55-opdata-stride: Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_opcode.c are in the manifest (04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 9959ecae7fda)",
+        "  ph55-opdata-stride: OK  Zend/zend_execute.c:1724-1796  2407 bytes  sha256 9bce864972fdf5d7  tier=modelled",
+        "  ph55-opdata-stride: OK+1 Zend/zend_execute.c:1313-1338  597 bytes  sha256 db683b0f6b210280  -- THE TWO MACROS AND THE TABLE. `NEXT_OPCODE()` is `CHECK_SYMBOL_TABLES(",
+        "  ph55-opdata-stride: OK+2 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- \u26d4 THE DISPATCH LOOP, AND IT IS THE HALF WITHOUT WHICH THE STRIDE ERROR",
+        "  ph55-opdata-stride: OK+3 Zend/zend_execute.c:2198-2226  990 bytes  sha256 5200ef0a9cb8b3ce  -- \u2b50 THE CLEAN SIBLING, LIFTED ON PURPOSE. `zend_assign_dim_handler` is S",
+        "  ph55-opdata-stride: OK+4 Zend/zend_execute.c:4426-4427  110 bytes  sha256 23b3b6e1e4c39621  -- \u2b50 TWO LINES, AND THE SECOND IS THE HARM. `zend_opcode_handlers[ZEND_AS",
+        "  ph55-opdata-stride: OK+5 Zend/zend_opcode.c:341-366  750 bytes  sha256 2e82e7e63352f083  -- `pass_two`'s walk, and the line that makes the NULL REACHABLE FROM A P",
+        "  ph55-opdata-stride: per-span overlap: span0 16% (7/45), span1 30% (3/10), span2 14% (1/7), span3 12% (2/17), span4 0% (0/2), span5 15% (3/20)  -- the UNION is what is reported below, and it is what 6 cited spans oblige the row to",
+        "  ph55-opdata-stride: kernel overlap 14% (13/93 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph55-opdata-stride: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph55-opdata-stride: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH55_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "build",
+      "gate_argv": [
+        "--tool",
+        "build",
+        "ph55-opdata-stride",
+        "--all"
+      ],
+      "tool_argv": [
+        "ph55-opdata-stride",
+        "--all"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph55-opdata-stride",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph55-opdata-stride: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph55-opdata-stride: Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_opcode.c are in the manifest (04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 9959ecae7fda)",
+        "  ph55-opdata-stride: OK  Zend/zend_execute.c:1724-1796  2407 bytes  sha256 9bce864972fdf5d7  tier=modelled",
+        "  ph55-opdata-stride: OK+1 Zend/zend_execute.c:1313-1338  597 bytes  sha256 db683b0f6b210280  -- THE TWO MACROS AND THE TABLE. `NEXT_OPCODE()` is `CHECK_SYMBOL_TABLES(",
+        "  ph55-opdata-stride: OK+2 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- \u26d4 THE DISPATCH LOOP, AND IT IS THE HALF WITHOUT WHICH THE STRIDE ERROR",
+        "  ph55-opdata-stride: OK+3 Zend/zend_execute.c:2198-2226  990 bytes  sha256 5200ef0a9cb8b3ce  -- \u2b50 THE CLEAN SIBLING, LIFTED ON PURPOSE. `zend_assign_dim_handler` is S",
+        "  ph55-opdata-stride: OK+4 Zend/zend_execute.c:4426-4427  110 bytes  sha256 23b3b6e1e4c39621  -- \u2b50 TWO LINES, AND THE SECOND IS THE HARM. `zend_opcode_handlers[ZEND_AS",
+        "  ph55-opdata-stride: OK+5 Zend/zend_opcode.c:341-366  750 bytes  sha256 2e82e7e63352f083  -- `pass_two`'s walk, and the line that makes the NULL REACHABLE FROM A P",
+        "  ph55-opdata-stride: per-span overlap: span0 16% (7/45), span1 30% (3/10), span2 14% (1/7), span3 12% (2/17), span4 0% (0/2), span5 15% (3/20)  -- the UNION is what is reported below, and it is what 6 cited spans oblige the row to",
+        "  ph55-opdata-stride: kernel overlap 14% (13/93 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph55-opdata-stride: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph55-opdata-stride: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH55_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "ph55-opdata-stride"
+      ],
+      "tool_argv": [
+        "ph55-opdata-stride"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph55-opdata-stride",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph55-opdata-stride: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph55-opdata-stride: Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_opcode.c are in the manifest (04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 9959ecae7fda)",
+        "  ph55-opdata-stride: OK  Zend/zend_execute.c:1724-1796  2407 bytes  sha256 9bce864972fdf5d7  tier=modelled",
+        "  ph55-opdata-stride: OK+1 Zend/zend_execute.c:1313-1338  597 bytes  sha256 db683b0f6b210280  -- THE TWO MACROS AND THE TABLE. `NEXT_OPCODE()` is `CHECK_SYMBOL_TABLES(",
+        "  ph55-opdata-stride: OK+2 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- \u26d4 THE DISPATCH LOOP, AND IT IS THE HALF WITHOUT WHICH THE STRIDE ERROR",
+        "  ph55-opdata-stride: OK+3 Zend/zend_execute.c:2198-2226  990 bytes  sha256 5200ef0a9cb8b3ce  -- \u2b50 THE CLEAN SIBLING, LIFTED ON PURPOSE. `zend_assign_dim_handler` is S",
+        "  ph55-opdata-stride: OK+4 Zend/zend_execute.c:4426-4427  110 bytes  sha256 23b3b6e1e4c39621  -- \u2b50 TWO LINES, AND THE SECOND IS THE HARM. `zend_opcode_handlers[ZEND_AS",
+        "  ph55-opdata-stride: OK+5 Zend/zend_opcode.c:341-366  750 bytes  sha256 2e82e7e63352f083  -- `pass_two`'s walk, and the line that makes the NULL REACHABLE FROM A P",
+        "  ph55-opdata-stride: per-span overlap: span0 16% (7/45), span1 30% (3/10), span2 14% (1/7), span3 12% (2/17), span4 0% (0/2), span5 15% (3/20)  -- the UNION is what is reported below, and it is what 6 cited spans oblige the row to",
+        "  ph55-opdata-stride: kernel overlap 14% (13/93 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph55-opdata-stride: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph55-opdata-stride: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH55_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph55-opdata-stride"
+      ],
+      "tool_argv": [
+        "ph55-opdata-stride"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 1
+    },
+    {
+      "row": "ph55-opdata-stride",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph55-opdata-stride: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph55-opdata-stride: Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_opcode.c are in the manifest (04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 9959ecae7fda)",
+        "  ph55-opdata-stride: OK  Zend/zend_execute.c:1724-1796  2407 bytes  sha256 9bce864972fdf5d7  tier=modelled",
+        "  ph55-opdata-stride: OK+1 Zend/zend_execute.c:1313-1338  597 bytes  sha256 db683b0f6b210280  -- THE TWO MACROS AND THE TABLE. `NEXT_OPCODE()` is `CHECK_SYMBOL_TABLES(",
+        "  ph55-opdata-stride: OK+2 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- \u26d4 THE DISPATCH LOOP, AND IT IS THE HALF WITHOUT WHICH THE STRIDE ERROR",
+        "  ph55-opdata-stride: OK+3 Zend/zend_execute.c:2198-2226  990 bytes  sha256 5200ef0a9cb8b3ce  -- \u2b50 THE CLEAN SIBLING, LIFTED ON PURPOSE. `zend_assign_dim_handler` is S",
+        "  ph55-opdata-stride: OK+4 Zend/zend_execute.c:4426-4427  110 bytes  sha256 23b3b6e1e4c39621  -- \u2b50 TWO LINES, AND THE SECOND IS THE HARM. `zend_opcode_handlers[ZEND_AS",
+        "  ph55-opdata-stride: OK+5 Zend/zend_opcode.c:341-366  750 bytes  sha256 2e82e7e63352f083  -- `pass_two`'s walk, and the line that makes the NULL REACHABLE FROM A P",
+        "  ph55-opdata-stride: per-span overlap: span0 16% (7/45), span1 30% (3/10), span2 14% (1/7), span3 12% (2/17), span4 0% (0/2), span5 15% (3/20)  -- the UNION is what is reported below, and it is what 6 cited spans oblige the row to",
+        "  ph55-opdata-stride: kernel overlap 14% (13/93 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph55-opdata-stride: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph55-opdata-stride: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH55_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "report",
+      "gate_argv": [
+        "--tool",
+        "report",
+        "ph55-opdata-stride"
+      ],
+      "tool_argv": [
+        "ph55-opdata-stride"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph55-opdata-stride",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph55-opdata-stride: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph55-opdata-stride: Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_opcode.c are in the manifest (04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 9959ecae7fda)",
+        "  ph55-opdata-stride: OK  Zend/zend_execute.c:1724-1796  2407 bytes  sha256 9bce864972fdf5d7  tier=modelled",
+        "  ph55-opdata-stride: OK+1 Zend/zend_execute.c:1313-1338  597 bytes  sha256 db683b0f6b210280  -- THE TWO MACROS AND THE TABLE. `NEXT_OPCODE()` is `CHECK_SYMBOL_TABLES(",
+        "  ph55-opdata-stride: OK+2 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- \u26d4 THE DISPATCH LOOP, AND IT IS THE HALF WITHOUT WHICH THE STRIDE ERROR",
+        "  ph55-opdata-stride: OK+3 Zend/zend_execute.c:2198-2226  990 bytes  sha256 5200ef0a9cb8b3ce  -- \u2b50 THE CLEAN SIBLING, LIFTED ON PURPOSE. `zend_assign_dim_handler` is S",
+        "  ph55-opdata-stride: OK+4 Zend/zend_execute.c:4426-4427  110 bytes  sha256 23b3b6e1e4c39621  -- \u2b50 TWO LINES, AND THE SECOND IS THE HARM. `zend_opcode_handlers[ZEND_AS",
+        "  ph55-opdata-stride: OK+5 Zend/zend_opcode.c:341-366  750 bytes  sha256 2e82e7e63352f083  -- `pass_two`'s walk, and the line that makes the NULL REACHABLE FROM A P",
+        "  ph55-opdata-stride: per-span overlap: span0 16% (7/45), span1 30% (3/10), span2 14% (1/7), span3 12% (2/17), span4 0% (0/2), span5 15% (3/20)  -- the UNION is what is reported below, and it is what 6 cited spans oblige the row to",
+        "  ph55-opdata-stride: kernel overlap 14% (13/93 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph55-opdata-stride: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph55-opdata-stride: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH55_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph55-opdata-stride"
+      ],
+      "tool_argv": [
+        "ph55-opdata-stride"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    }
+  ]
+}

@@ -1,0 +1,178 @@
+{
+  "claims": {
+    "c-clang->c-clang-h": "NOT RESOLVABLE/SIGN-UNSTABLE",
+    "c-clang-h->safe_tuned": "NOT RESOLVABLE/SIGN-STABLE",
+    "c-clang-h->unsafe": "RESOLVABLE/SIGN-STABLE",
+    "c-gcc->c-gcc-h": "RESOLVABLE/SIGN-STABLE",
+    "c-gcc-h->safe_tuned": "RESOLVABLE/SIGN-STABLE",
+    "c-gcc-h->unsafe": "RESOLVABLE/SIGN-STABLE",
+    "safe_naive->safe_tuned": "RESOLVABLE/SIGN-STABLE",
+    "safe_tuned->unsafe": "RESOLVABLE/SIGN-STABLE",
+    "unsafe->verus": "RESOLVABLE/SIGN-STABLE"
+  },
+  "derived_from_sha256": {
+    "patterns/ph55-opdata-stride/c/kernel.c": "025a4fb1712ce311c407622f68d54c794f820a9778bdf1956819315a40250433",
+    "patterns/ph55-opdata-stride/c/kernel_hardened.c": "bcf9a63d37da2e359b2f606b9c2e075c7a87c41132b8a539916aa28a848aff36",
+    "patterns/ph55-opdata-stride/c/main.c": "b56cd4a2273e0b802609e9d63c6ae6d746d90ebef4c128736c3da6f5d1413777",
+    "patterns/ph55-opdata-stride/controls/argv_align.py": "5df1417488c27a522170de82468d8675dbc723e5fe66ba44290f51da43622c3c",
+    "patterns/ph55-opdata-stride/inputs/gen.py": "1056bde2f389d39b38b7e906d39e29136aca6f46873a043a5e75d39e96d928da",
+    "patterns/ph55-opdata-stride/safe_naive.rs": "6b2235b919436d271611a2284f56bc01c6d8386f246c69f5a83e6bb608aa1d2d",
+    "patterns/ph55-opdata-stride/safe_tuned.rs": "0bc8e977f702d3818046dd5c42916973cf8a9916010048217cebbd0debc40deb",
+    "patterns/ph55-opdata-stride/unsafe.rs": "64ee887400d0ee25ae75f1ab65452b238b01191938f8c05c4dc7968785e3e8e8",
+    "patterns/ph55-opdata-stride/verus.rs": "7b8dc911a0d87a917b9006a30655b5660adac58c2fbe42c837355c8f5d3d46f0"
+  },
+  "input": "small.bin",
+  "path_lengths": [
+    61,
+    63,
+    65,
+    67,
+    69,
+    71,
+    73,
+    75
+  ],
+  "pin": {
+    "note": "the same set statistic.py pins, because the sweep is over the same eight cells. The CLAIMS table inside this script is what ../NOTES.md 8b-2 publishes, so a change to either shows up here.",
+    "regenerate": "python3 patterns-php/ph55-opdata-stride/controls/argv_align.py --input small.bin"
+  },
+  "problems": [],
+  "stability": {
+    "c-clang->c-clang-h": [
+      -14,
+      140079,
+      "NOT RESOLVABLE",
+      "SIGN-UNSTABLE"
+    ],
+    "c-clang-h->safe_tuned": [
+      216199,
+      140050,
+      "NOT RESOLVABLE",
+      "SIGN-STABLE"
+    ],
+    "c-clang-h->unsafe": [
+      -2156070,
+      140023,
+      "RESOLVABLE",
+      "SIGN-STABLE"
+    ],
+    "c-gcc->c-gcc-h": [
+      -395654,
+      28,
+      "RESOLVABLE",
+      "SIGN-STABLE"
+    ],
+    "c-gcc-h->safe_tuned": [
+      -2347354,
+      163,
+      "RESOLVABLE",
+      "SIGN-STABLE"
+    ],
+    "c-gcc-h->unsafe": [
+      -4719633,
+      113,
+      "RESOLVABLE",
+      "SIGN-STABLE"
+    ],
+    "safe_naive->safe_tuned": [
+      -5092796,
+      0,
+      "RESOLVABLE",
+      "SIGN-STABLE"
+    ],
+    "safe_tuned->unsafe": [
+      -2372280,
+      83,
+      "RESOLVABLE",
+      "SIGN-STABLE"
+    ],
+    "unsafe->verus": [
+      22570,
+      69,
+      "RESOLVABLE",
+      "SIGN-STABLE"
+    ]
+  },
+  "sweep": {
+    "c-clang": [
+      35183893,
+      35183907,
+      35183893,
+      35183907,
+      35043842,
+      35043856,
+      35043842,
+      35043856
+    ],
+    "c-clang-h": [
+      35183907,
+      35183893,
+      35043856,
+      35043842,
+      35043856,
+      35043842,
+      35043856,
+      35043842
+    ],
+    "c-gcc": [
+      38003153,
+      38003139,
+      38003153,
+      38003139,
+      38003102,
+      38003088,
+      38003102,
+      38003088
+    ],
+    "c-gcc-h": [
+      37607471,
+      37607485,
+      37607471,
+      37607485,
+      37607420,
+      37607434,
+      37607420,
+      37607434
+    ],
+    "safe_naive": [
+      40352924,
+      40352927,
+      40352856,
+      40352797,
+      40352845,
+      40352837,
+      40352885,
+      40352909
+    ],
+    "safe_tuned": [
+      35260128,
+      35260131,
+      35260060,
+      35260001,
+      35260049,
+      35260041,
+      35260089,
+      35260113
+    ],
+    "unsafe": [
+      32887848,
+      32887851,
+      32887780,
+      32887772,
+      32887820,
+      32887761,
+      32887809,
+      32887801
+    ],
+    "verus": [
+      32910408,
+      32910425,
+      32910340,
+      32910346,
+      32910325,
+      32910331,
+      32910369,
+      32910375
+    ]
+  }
+}

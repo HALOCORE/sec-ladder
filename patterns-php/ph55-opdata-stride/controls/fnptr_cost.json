@@ -1,0 +1,93 @@
+{
+  "checksums": {
+    "fn_pointer": {
+      "adversarial-benignerr.bin": [
+        0,
+        "7327411121395268096"
+      ],
+      "adversarial-nowin.bin": [
+        0,
+        "0"
+      ],
+      "adversarial-nullcall.bin": [
+        0,
+        "15498615717350492160"
+      ],
+      "adversarial-opdatalive.bin": [
+        0,
+        "15498615717350492160"
+      ],
+      "adversarial-shortlen.bin": [
+        5,
+        ""
+      ],
+      "large.bin": [
+        0,
+        "1700852360492175006"
+      ],
+      "small.bin": [
+        0,
+        "13727189135177570731"
+      ]
+    },
+    "tag_match": {
+      "adversarial-benignerr.bin": [
+        0,
+        "7327411121395268096"
+      ],
+      "adversarial-nowin.bin": [
+        0,
+        "0"
+      ],
+      "adversarial-nullcall.bin": [
+        0,
+        "15498615717350492160"
+      ],
+      "adversarial-opdatalive.bin": [
+        0,
+        "15498615717350492160"
+      ],
+      "adversarial-shortlen.bin": [
+        5,
+        ""
+      ],
+      "large.bin": [
+        0,
+        "1700852360492175006"
+      ],
+      "small.bin": [
+        0,
+        "13727189135177570731"
+      ]
+    }
+  },
+  "derived_from_sha256": {
+    "patterns/ph55-opdata-stride/controls/fnptr_cost.py": "35ae6d8a0978a4aedd86d212d7e2d2f130e042b28b1a21b5eaaf20c616846878",
+    "patterns/ph55-opdata-stride/controls/fnptr_dispatch.rs": "af485ccf5a938a84959c52d6df4a82df13eb31cb11321301e87b5f985b9d6c4a",
+    "patterns/ph55-opdata-stride/inputs/gen.py": "1056bde2f389d39b38b7e906d39e29136aca6f46873a043a5e75d39e96d928da",
+    "patterns/ph55-opdata-stride/safe_naive.rs": "6b2235b919436d271611a2284f56bc01c6d8386f246c69f5a83e6bb608aa1d2d"
+  },
+  "pin": {
+    "note": "the two sides of the pair and the corpus. NOT the other rungs: this file compares safe_naive.rs against controls/fnptr_dispatch.rs and nothing else.",
+    "regenerate": "python3 patterns-php/ph55-opdata-stride/controls/fnptr_cost.py"
+  },
+  "problems": [],
+  "rows": {
+    "fn_pointer/large.bin": {
+      "A1": 4853.2642,
+      "W1": 6636.28145
+    },
+    "fn_pointer/small.bin": {
+      "A1": 1527.6918,
+      "W1": 2163.0494
+    },
+    "tag_match/large.bin": {
+      "A1": 5778.52225,
+      "W1": 5903.8082
+    },
+    "tag_match/small.bin": {
+      "A1": 1766.1719,
+      "W1": 1890.8594
+    }
+  }
+}

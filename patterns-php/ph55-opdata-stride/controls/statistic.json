@@ -1,0 +1,135 @@
+{
+  "derived_from_sha256": {
+    "patterns/ph55-opdata-stride/c/kernel.c": "025a4fb1712ce311c407622f68d54c794f820a9778bdf1956819315a40250433",
+    "patterns/ph55-opdata-stride/c/kernel_hardened.c": "bcf9a63d37da2e359b2f606b9c2e075c7a87c41132b8a539916aa28a848aff36",
+    "patterns/ph55-opdata-stride/c/main.c": "b56cd4a2273e0b802609e9d63c6ae6d746d90ebef4c128736c3da6f5d1413777",
+    "patterns/ph55-opdata-stride/controls/statistic.py": "3cf482044b44d2db51e4f80a59a38b333e129eea7dfdc6e981de04ce625acb57",
+    "patterns/ph55-opdata-stride/inputs/gen.py": "1056bde2f389d39b38b7e906d39e29136aca6f46873a043a5e75d39e96d928da",
+    "patterns/ph55-opdata-stride/safe_naive.rs": "6b2235b919436d271611a2284f56bc01c6d8386f246c69f5a83e6bb608aa1d2d",
+    "patterns/ph55-opdata-stride/safe_tuned.rs": "0bc8e977f702d3818046dd5c42916973cf8a9916010048217cebbd0debc40deb",
+    "patterns/ph55-opdata-stride/unsafe.rs": "64ee887400d0ee25ae75f1ab65452b238b01191938f8c05c4dc7968785e3e8e8",
+    "patterns/ph55-opdata-stride/verus.rs": "7b8dc911a0d87a917b9006a30655b5660adac58c2fbe42c837355c8f5d3d46f0"
+  },
+  "pin": {
+    "note": "every source that reaches one of the eight measured cells, plus inputs/gen.py and this script. It does NOT pin the BINARIES under .temp/php-scratch/: those are gitignored and re-derivable, and the pin is on what produces them.",
+    "regenerate": "python3 patterns-php/ph55-opdata-stride/controls/statistic.py --repeats 3"
+  },
+  "problems": [],
+  "repeats": 1,
+  "rows": {
+    "c-clang-h/large.bin": {
+      "A1": 3678.38165,
+      "W1": 4945.8235,
+      "error": null,
+      "inside_share": 0.7437349209893964
+    },
+    "c-clang-h/small.bin": {
+      "A1": 1340.5866,
+      "W1": 1759.1942,
+      "error": null,
+      "inside_share": 0.7620458275726466
+    },
+    "c-clang/large.bin": {
+      "A1": 3678.38165,
+      "W1": 4938.8221,
+      "error": null,
+      "inside_share": 0.7447892585562051
+    },
+    "c-clang/small.bin": {
+      "A1": 1340.5866,
+      "W1": 1752.1928,
+      "error": null,
+      "inside_share": 0.7650908050757884
+    },
+    "c-gcc-h/large.bin": {
+      "A1": 3774.0946,
+      "W1": 5036.18805,
+      "error": null,
+      "inside_share": 0.7493950905983345
+    },
+    "c-gcc-h/small.bin": {
+      "A1": 1553.3484,
+      "W1": 1880.3717,
+      "error": null,
+      "inside_share": 0.8260858212235379
+    },
+    "c-gcc/large.bin": {
+      "A1": 3774.0946,
+      "W1": 5102.0393,
+      "error": null,
+      "inside_share": 0.7397227614456047
+    },
+    "c-gcc/small.bin": {
+      "A1": 1553.3484,
+      "W1": 1900.1551,
+      "error": null,
+      "inside_share": 0.8174850568777254
+    },
+    "safe_naive/large.bin": {
+      "A1": 6154.52225,
+      "W1": 6222.59215,
+      "error": null,
+      "inside_share": 0.9890608450049229
+    },
+    "safe_naive/small.bin": {
+      "A1": 1950.1719,
+      "W1": 2017.64255,
+      "error": null,
+      "inside_share": 0.9665596614226836
+    },
+    "safe_tuned/large.bin": {
+      "A1": 5241.31035,
+      "W1": 5309.6019,
+      "error": null,
+      "inside_share": 0.9871381035177044
+    },
+    "safe_tuned/small.bin": {
+      "A1": 1695.31045,
+      "W1": 1763.00275,
+      "error": null,
+      "inside_share": 0.9616039736750269
+    },
+    "unsafe/large.bin": {
+      "A1": 4733.72535,
+      "W1": 4802.0109,
+      "error": null,
+      "inside_share": 0.9857798011245664
+    },
+    "unsafe/small.bin": {
+      "A1": 1576.70265,
+      "W1": 1644.38895,
+      "error": null,
+      "inside_share": 0.958838023084502
+    },
+    "verus/large.bin": {
+      "A1": 4738.2484,
+      "W1": 4806.53385,
+      "error": null,
+      "inside_share": 0.9857932031415945
+    },
+    "verus/small.bin": {
+      "A1": 1577.82985,
+      "W1": 1645.51605,
+      "error": null,
+      "inside_share": 0.9588662778463936
+    }
+  },
+  "w1_spread": {
+    "c-clang-h/large.bin": 0.0,
+    "c-clang-h/small.bin": 0.0,
+    "c-clang/large.bin": 0.0,
+    "c-clang/small.bin": 0.0,
+    "c-gcc-h/large.bin": 0.0,
+    "c-gcc-h/small.bin": 0.0,
+    "c-gcc/large.bin": 0.0,
+    "c-gcc/small.bin": 0.0,
+    "safe_naive/large.bin": 0.0,
+    "safe_naive/small.bin": 0.0,
+    "safe_tuned/large.bin": 0.0,
+    "safe_tuned/small.bin": 0.0,
+    "unsafe/large.bin": 0.0,
+    "unsafe/small.bin": 0.0,
+    "verus/large.bin": 0.0,
+    "verus/small.bin": 0.0
+  }
+}
