@@ -4,11 +4,18 @@
 Mechanism family **T5** — *the emitted program is not the one the executor
 implements* — and this row is T5's **second** member, beside `ph55`.
 
-> ## ⛔⛔⛔ THIS ROW IS **INCOMPLETE**. READ `NOTES.md` §10 BEFORE TOUCHING IT.
-> **Five of six rungs are built, validated and cross-agreeing. `verus.rs` (R5)
-> does not exist, `spec.md` does not exist, and the row HAS NOT BEEN GATED.**
-> `NOTES.md` §10 is the exact stopping point and the exact next steps.
-> Everything that IS here has been differentially tested and is described below.
+> ## ⭐ ALL SIX RUNGS ARE BUILT AND THE ROW IS GATED.
+> `NOTES.md` §11 is the proof, §12 is the statistic, and §10 is the history —
+> the row was built over **two** tasks and `TASK_PHP_051` stopped cleanly with
+> five rungs and no `spec.md`.
+>
+> ⭐⭐ **THE R5 OBLIGATION IS `operand_present`**: *for every `j < nops`, an
+> opline whose opcode is `ZEND_ISSET_ISEMPTY_DIM_OBJ` carries an op2 that is
+> `IS_CONST` or `IS_VAR`, never `IS_UNUSED`.* It is the compile pass's loop
+> invariant, it is what discharges `zunwrap`'s `requires t.is_some()`, and it is
+> exactly what `case BP_VAR_IS:` breaks at 5.0.0. **Delete `1e708a5aeb30`'s
+> three lines and `verus.rs` stops verifying** — measured,
+> `controls/negatives.py --emit r1`.
 
 ---
 
@@ -80,27 +87,54 @@ safe_tuned.rs           R3   three bounds checks removed, still zero `unsafe`
 unsafe.rs               R4   ten trusted accessors; the tenth is `zunwrap`
                              — `Option::unwrap_unchecked` on the OPERAND, which
                              is the check whose absence is CRASH-041
-verus.rs                R5   ⛔ NOT WRITTEN — see NOTES.md §10
+verus.rs                R5   R4's exec text unchanged + the proof. 66 verified /
+                             0 errors, 76 under `--cfg slb_twin`, NO rlimit
+spec.md                      the contract, and the pins the gate enforces
 model.py                     THREE independent implementations + a 156-window
                              synthetic sweep
 inputs/gen.py                the corpus, with its reachability ASSERTIONS
 controls/r1h_backport.py     re-runs `git apply`; reproduces the gitignore trap
 controls/census.py           the six-arm census, re-derived three ways
+controls/negatives.py        the mutants that must FAIL to verify — including
+                             `r1`, which deletes 1e708a5aeb30
+controls/spellings.py        every backticked pin in spec.md × every rung.
+                             ⚠ THE CONTRACT AUDIT ONLY — unlike ph55's file of
+                             the same name this is NOT a respelling search; see
+                             NOTES.md §13.1 for what that costs the row
+controls/statistic.py        `inside_share` per cell, and both C columns
+controls/rlimit_bisect.sh    what rlimit the proof needs. The answer is 2
 ```
+
+⭐ **R4 and R5 are ONE EXEC TEXT on this row**, which `ph55` could not manage:
+that row shipped `(x as usize) % NVAR` in `unsafe.rs` and
+`(x % (NVAR as u64)) as usize` in `verus.rs`, because Verus will not assume a
+`u64`→`usize` cast is lossless. Here **all four Rust rungs** write the second
+spelling, so no gradient is polluted by a representation change.
+`spec.md`'s `provenance.divergences` itemises it.
 
 ## Reproducing
 
 ```sh
 python3 patterns-php/ph56-fetchmode-arith/inputs/gen.py
-python3 patterns-php/ph56-fetchmode-arith/controls/census.py
 python3 patterns-php/ph56-fetchmode-arith/controls/census.py --selftest
-python3 patterns-php/ph56-fetchmode-arith/controls/r1h_backport.py
 python3 patterns-php/ph56-fetchmode-arith/controls/r1h_backport.py --selftest
+python3 patterns-php/ph56-fetchmode-arith/controls/spellings.py --audit-only
+python3 patterns-php/ph56-fetchmode-arith/controls/negatives.py --selftest
+sh      patterns-php/ph56-fetchmode-arith/controls/rlimit_bisect.sh
+
+# the gate — SIX commands, PROTOCOL_PHP.md §E, and never `harness/check.py`
+python3 harness-php/gate.py --tool build   ph56-fetchmode-arith --all
+python3 harness-php/gate.py --tool measure ph56-fetchmode-arith
+python3 harness-php/gate.py --tool report  ph56-fetchmode-arith
+python3 harness-php/gate.py                ph56-fetchmode-arith   # FAILS on tables
+python3 harness-php/gate.py --tool report  ph56-fetchmode-arith
+python3 harness-php/gate.py                ph56-fetchmode-arith   # green
 ```
 
-⛔ **Do NOT run `harness-php/gate.py` on this row yet** — it has no `spec.md`,
-so the gate cannot read a contract and `provenance.py` has nothing to validate.
-The preflight is green with the row present (measured); the gate is not.
+⛔ **Never run `harness/check.py` directly on this row.** The shim lengthens
+every repo-relative path by exactly 15 bytes against an alignment window that is
+16 wide, so a direct run measures a different alignment state — it is not only a
+provenance convention (`PROTOCOL_PHP.md` §E, `TASK_PHP_050` §2.4).
 
 `NOTES.md` is the measurement record and the argument. `../CATALOGUE.md` has the
 row's catalogue entry — ⚠ **whose `⚠ risk` note is WRONG in both halves**, and

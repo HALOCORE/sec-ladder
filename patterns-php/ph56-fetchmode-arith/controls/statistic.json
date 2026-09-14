@@ -1,0 +1,238 @@
+{
+  "cross": {
+    "safe_naive/large.bin": {
+      "A1_vs_clang": 39.89056368466733,
+      "A1_vs_gcc": 41.171887390284425,
+      "W1_vs_clang": 38.05725974950037,
+      "W1_vs_gcc": 21.787299650175633
+    },
+    "safe_naive/small.bin": {
+      "A1_vs_clang": 40.716316804913276,
+      "A1_vs_gcc": 28.23241801262731,
+      "W1_vs_clang": 35.10284802956817,
+      "W1_vs_gcc": 16.343945091026
+    },
+    "safe_tuned/large.bin": {
+      "A1_vs_clang": 13.811642841636004,
+      "A1_vs_gcc": 14.854097401165372,
+      "W1_vs_clang": 12.519529578698082,
+      "W1_vs_gcc": -0.7408252911720048
+    },
+    "safe_tuned/small.bin": {
+      "A1_vs_clang": 19.604859412477907,
+      "A1_vs_gcc": 8.993901181947873,
+      "W1_vs_clang": 15.318252064632324,
+      "W1_vs_gcc": -0.6935783969234343
+    },
+    "unsafe/large.bin": {
+      "A1_vs_clang": 4.9182742149279814,
+      "A1_vs_gcc": 5.879270213250327,
+      "W1_vs_clang": 3.810734567182619,
+      "W1_vs_gcc": -8.423294359324192
+    },
+    "unsafe/small.bin": {
+      "A1_vs_clang": 14.03934083041448,
+      "A1_vs_gcc": 3.9221374982690556,
+      "W1_vs_clang": 10.102572690715737,
+      "W1_vs_gcc": -5.1850656123413
+    },
+    "verus/large.bin": {
+      "A1_vs_clang": 4.9182742149279814,
+      "A1_vs_gcc": 5.879270213250327,
+      "W1_vs_clang": 3.8107262804707416,
+      "W1_vs_gcc": -8.423301669452353
+    },
+    "verus/small.bin": {
+      "A1_vs_clang": 14.03934083041448,
+      "A1_vs_gcc": 3.9221374982690556,
+      "W1_vs_clang": 10.102547516877806,
+      "W1_vs_gcc": -5.185087290815595
+    }
+  },
+  "derived_from_sha256": {
+    "patterns/ph56-fetchmode-arith/c/kernel.c": "a141bf3b4435d7cfacefe10f4ef73820ab05ccaccf568434c735b50193439edc",
+    "patterns/ph56-fetchmode-arith/c/kernel_hardened.c": "1288ef112024ca9a10ed8bb1cb106e09d3dcf247873e9b7f496ce01250cd1d98",
+    "patterns/ph56-fetchmode-arith/c/main.c": "9d87deb3129c616ca44588f8e178df48cc77b50a11e1bdba3e5a45e6c03cbcf9",
+    "patterns/ph56-fetchmode-arith/controls/statistic.py": "53a8f705aad505d908bd2a5bc1804c95055c09974a6fada67053bbd5e1bb8763",
+    "patterns/ph56-fetchmode-arith/inputs/large.bin": "da8db7cf0dba21370d0403c813ac8ea7e8d87ae11a9dd744983c1ca96c8de74e",
+    "patterns/ph56-fetchmode-arith/inputs/small.bin": "d5c7a6b4f6ce23762074c580ae498815e11fcbc54bfae497f5e8d70248ece2b2",
+    "patterns/ph56-fetchmode-arith/safe_naive.rs": "7feb44f81eda35eaac78e5fc078c2320564d455a704f739ec99f63f12c7aa1f5",
+    "patterns/ph56-fetchmode-arith/safe_tuned.rs": "6a35ebd956457d19ff94828073ce09e6bd7a8e67b9a7e31002f09332606c16b7",
+    "patterns/ph56-fetchmode-arith/unsafe.rs": "d8b4836e7f08c5c3573eee8c9304b4a5a293e25fc3ebe0ed2d86711082bca49c",
+    "patterns/ph56-fetchmode-arith/verus.rs": "bcf92ed5443e7388962aba1dbe7b5df879917ce562c9a8f0d8fa547a09aa4dfb"
+  },
+  "ladder": {
+    "safe_naive->safe_tuned/large.bin": {
+      "dA1": -2465.4107999999997,
+      "pctA1": -18.642373120903862
+    },
+    "safe_naive->safe_tuned/small.bin": {
+      "dA1": -628.7309,
+      "pctA1": -15.00284961388233
+    },
+    "safe_tuned->unsafe/large.bin": {
+      "dA1": -840.7482500000006,
+      "pctA1": -7.814111460531996
+    },
+    "safe_tuned->unsafe/small.bin": {
+      "dA1": -165.7494999999999,
+      "pctA1": -4.653254566246161
+    },
+    "unsafe->verus/large.bin": {
+      "dA1": 0.0,
+      "pctA1": 0.0
+    },
+    "unsafe->verus/small.bin": {
+      "dA1": 0.0,
+      "pctA1": 0.0
+    }
+  },
+  "pin": {
+    "note": "every rung SOURCE (the binaries are rebuilt from them), c/main.c (the driver loop is inside W1), the two probe inputs, and this script. NOT spec.md and NOT NOTES.md: no number here is derived from either.",
+    "regenerate": "python3 harness-php/gate.py --tool build ph56-fetchmode-arith --all && python3 patterns-php/ph56-fetchmode-arith/controls/statistic.py"
+  },
+  "problems": [],
+  "r1h": {
+    "c-clang->c-clang-h/large.bin": {
+      "dA1": 68.04440000000068,
+      "dW1": 68.04509999999937,
+      "pctA1": 0.7249865153929534,
+      "pctW1": 0.7098408976039383
+    },
+    "c-clang->c-clang-h/small.bin": {
+      "dA1": 17.376800000000003,
+      "dW1": 17.377500000000055,
+      "pctA1": 0.58690071632805,
+      "pctW1": 0.5498295552109099
+    },
+    "c-gcc->c-gcc-h/large.bin": {
+      "dA1": 99.42530000000079,
+      "dW1": 99.42270000000099,
+      "pctA1": 1.0727315052799355,
+      "pctW1": 0.9168200737089766
+    },
+    "c-gcc->c-gcc-h/small.bin": {
+      "dA1": 24.421949999999924,
+      "dW1": 24.419350000000122,
+      "pctA1": 0.7529128881827711,
+      "pctW1": 0.6661256865597484
+    }
+  },
+  "repeats": 1,
+  "rows": {
+    "c-clang-h/large.bin": {
+      "A1": 9453.65345,
+      "W1": 9654.0101,
+      "error": null,
+      "inside_share": 0.9792462771506734
+    },
+    "c-clang-h/small.bin": {
+      "A1": 2978.15015,
+      "W1": 3177.9024,
+      "error": null,
+      "inside_share": 0.9371433653846638
+    },
+    "c-clang/large.bin": {
+      "A1": 9385.60905,
+      "W1": 9585.965,
+      "error": null,
+      "inside_share": 0.9790990317615389
+    },
+    "c-clang/small.bin": {
+      "A1": 2960.77335,
+      "W1": 3160.5249,
+      "error": null,
+      "inside_share": 0.9367979825123353
+    },
+    "c-gcc-h/large.bin": {
+      "A1": 9367.8489,
+      "W1": 10943.7206,
+      "error": null,
+      "inside_share": 0.8560021991058507
+    },
+    "c-gcc-h/small.bin": {
+      "A1": 3268.08405,
+      "W1": 3690.2966,
+      "error": null,
+      "inside_share": 0.8855884510746372
+    },
+    "c-gcc/large.bin": {
+      "A1": 9268.4236,
+      "W1": 10844.2979,
+      "error": null,
+      "inside_share": 0.8546817586042154
+    },
+    "c-gcc/small.bin": {
+      "A1": 3243.6621,
+      "W1": 3665.87725,
+      "error": null,
+      "inside_share": 0.8848256171152484
+    },
+    "safe_naive/large.bin": {
+      "A1": 13224.7691,
+      "W1": 13328.0618,
+      "error": null,
+      "inside_share": 0.9922499834146927
+    },
+    "safe_naive/small.bin": {
+      "A1": 4190.7432,
+      "W1": 4293.43665,
+      "error": null,
+      "inside_share": 0.9760812937579969
+    },
+    "safe_tuned/large.bin": {
+      "A1": 10759.3583,
+      "W1": 10862.64675,
+      "error": null,
+      "inside_share": 0.9904914103922232
+    },
+    "safe_tuned/small.bin": {
+      "A1": 3562.0123,
+      "W1": 3664.7015,
+      "error": null,
+      "inside_share": 0.9719788364754947
+    },
+    "unsafe/large.bin": {
+      "A1": 9918.61005,
+      "W1": 10021.8988,
+      "error": null,
+      "inside_share": 0.9896936945721304
+    },
+    "unsafe/small.bin": {
+      "A1": 3396.2628,
+      "W1": 3498.9523,
+      "error": null,
+      "inside_share": 0.9706513575506588
+    },
+    "verus/large.bin": {
+      "A1": 9918.61005,
+      "W1": 10021.898,
+      "error": null,
+      "inside_share": 0.9896937735746263
+    },
+    "verus/small.bin": {
+      "A1": 3396.2628,
+      "W1": 3498.9515,
+      "error": null,
+      "inside_share": 0.97065157948031
+    }
+  },
+  "spreads": {
+    "c-clang-h/large.bin": 0.0,
+    "c-clang-h/small.bin": 0.0,
+    "c-clang/large.bin": 0.0,
+    "c-clang/small.bin": 0.0,
+    "c-gcc-h/large.bin": 0.0,
+    "c-gcc-h/small.bin": 0.0,
+    "c-gcc/large.bin": 0.0,
+    "c-gcc/small.bin": 0.0,
+    "safe_naive/large.bin": 0.0,
+    "safe_naive/small.bin": 0.0,
+    "safe_tuned/large.bin": 0.0,
+    "safe_tuned/small.bin": 0.0,
+    "unsafe/large.bin": 0.0,
+    "unsafe/small.bin": 0.0,
+    "verus/large.bin": 0.0,
+    "verus/small.bin": 0.0
+  }
+}

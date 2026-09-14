@@ -1,0 +1,841 @@
+{
+  "row": "ph56-fetchmode-arith",
+  "runs": [
+    {
+      "row": "ph56-fetchmode-arith",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph56-fetchmode-arith: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph56-fetchmode-arith: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph56-fetchmode-arith: Zend/zend_compile.c, Zend/zend_compile.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_compile.h, Zend/zend_execute.c are in the manifest (ac6ef970d6e2, ac6ef970d6e2, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 5ef70294c416, 04eb85da37e7)",
+        "  ph56-fetchmode-arith: OK  Zend/zend_compile.c:736-780  1200 bytes  sha256 53df75a816666219  tier=modelled",
+        "  ph56-fetchmode-arith: OK+1 Zend/zend_compile.c:3215-3240  670 bytes  sha256 977998d164ec4cdb  -- \u2b50\u2b50 THE SECOND REWRITE, AND WITHOUT IT THIS ROW NAMES THE WRONG HARM. `",
+        "  ph56-fetchmode-arith: OK+2 Zend/zend_execute.c:88-125  1171 bytes  sha256 3a89539031793801  -- \u26d4 `_get_zval_ptr`, AND ITS `case IS_UNUSED:` IS AN EXPLICIT `*should_f",
+        "  ph56-fetchmode-arith: OK+3 Zend/zend_execute.c:3958-4000  1174 bytes  sha256 33d08e0f038f4185  -- \u26d4\u26d4 THE FAULTING FRAME. `zend_isset_isempty_dim_prop_obj_handler` reads",
+        "  ph56-fetchmode-arith: OK+4 Zend/zend_execute.c:896-975  2372 bytes  sha256 4ac45e000a6f994b  -- \u2b50 THE APPEND ARM, AND IT IS NOT THE DEFECT. `:935-943` is what `$a[] =",
+        "  ph56-fetchmode-arith: OK+5 Zend/zend_compile.h:636-656  653 bytes  sha256 1ac60fb0c2f79468  -- \u2b50 THE LAYOUT THE ARITHMETIC WALKS, IN UPSTREAM'S OWN WORDS AND WITH UP",
+        "  ph56-fetchmode-arith: OK+6 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- `execute()`'s dispatch loop. It is pinned because this row's executor ",
+        "  ph56-fetchmode-arith: per-span overlap: span0 23% (7/30), span1 13% (2/15), span2 7% (2/27), span3 21% (6/29), span4 9% (4/46), span5 n/a, span6 0% (0/7)  -- the UNION is what is reported below, and it is what 7 cited spans oblige the row to",
+        "  ph56-fetchmode-arith: kernel overlap 10% (14/143 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph56-fetchmode-arith: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph56-fetchmode-arith: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH56_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph56-fetchmode-arith": {
+          "row_specific_words": 1586,
+          "prefix_words": 1586,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "--preflight",
+        "ph56-fetchmode-arith"
+      ],
+      "tool_argv": [
+        "ph56-fetchmode-arith"
+      ],
+      "verdict": "preflight only"
+    },
+    {
+      "row": "ph56-fetchmode-arith",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph56-fetchmode-arith: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph56-fetchmode-arith: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph56-fetchmode-arith: Zend/zend_compile.c, Zend/zend_compile.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_compile.h, Zend/zend_execute.c are in the manifest (ac6ef970d6e2, ac6ef970d6e2, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 5ef70294c416, 04eb85da37e7)",
+        "  ph56-fetchmode-arith: OK  Zend/zend_compile.c:736-780  1200 bytes  sha256 53df75a816666219  tier=modelled",
+        "  ph56-fetchmode-arith: OK+1 Zend/zend_compile.c:3215-3240  670 bytes  sha256 977998d164ec4cdb  -- \u2b50\u2b50 THE SECOND REWRITE, AND WITHOUT IT THIS ROW NAMES THE WRONG HARM. `",
+        "  ph56-fetchmode-arith: OK+2 Zend/zend_execute.c:88-125  1171 bytes  sha256 3a89539031793801  -- \u26d4 `_get_zval_ptr`, AND ITS `case IS_UNUSED:` IS AN EXPLICIT `*should_f",
+        "  ph56-fetchmode-arith: OK+3 Zend/zend_execute.c:3958-4000  1174 bytes  sha256 33d08e0f038f4185  -- \u26d4\u26d4 THE FAULTING FRAME. `zend_isset_isempty_dim_prop_obj_handler` reads",
+        "  ph56-fetchmode-arith: OK+4 Zend/zend_execute.c:896-975  2372 bytes  sha256 4ac45e000a6f994b  -- \u2b50 THE APPEND ARM, AND IT IS NOT THE DEFECT. `:935-943` is what `$a[] =",
+        "  ph56-fetchmode-arith: OK+5 Zend/zend_compile.h:636-656  653 bytes  sha256 1ac60fb0c2f79468  -- \u2b50 THE LAYOUT THE ARITHMETIC WALKS, IN UPSTREAM'S OWN WORDS AND WITH UP",
+        "  ph56-fetchmode-arith: OK+6 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- `execute()`'s dispatch loop. It is pinned because this row's executor ",
+        "  ph56-fetchmode-arith: per-span overlap: span0 23% (7/30), span1 13% (2/15), span2 7% (2/27), span3 21% (6/29), span4 9% (4/46), span5 n/a, span6 0% (0/7)  -- the UNION is what is reported below, and it is what 7 cited spans oblige the row to",
+        "  ph56-fetchmode-arith: kernel overlap 10% (14/143 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph56-fetchmode-arith: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph56-fetchmode-arith: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH56_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph56-fetchmode-arith": {
+          "row_specific_words": 1586,
+          "prefix_words": 1586,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "build",
+      "gate_argv": [
+        "--tool",
+        "build",
+        "ph56-fetchmode-arith",
+        "--all"
+      ],
+      "tool_argv": [
+        "ph56-fetchmode-arith",
+        "--all"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph56-fetchmode-arith",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph56-fetchmode-arith: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph56-fetchmode-arith: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph56-fetchmode-arith: Zend/zend_compile.c, Zend/zend_compile.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_compile.h, Zend/zend_execute.c are in the manifest (ac6ef970d6e2, ac6ef970d6e2, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 5ef70294c416, 04eb85da37e7)",
+        "  ph56-fetchmode-arith: OK  Zend/zend_compile.c:736-780  1200 bytes  sha256 53df75a816666219  tier=modelled",
+        "  ph56-fetchmode-arith: OK+1 Zend/zend_compile.c:3215-3240  670 bytes  sha256 977998d164ec4cdb  -- \u2b50\u2b50 THE SECOND REWRITE, AND WITHOUT IT THIS ROW NAMES THE WRONG HARM. `",
+        "  ph56-fetchmode-arith: OK+2 Zend/zend_execute.c:88-125  1171 bytes  sha256 3a89539031793801  -- \u26d4 `_get_zval_ptr`, AND ITS `case IS_UNUSED:` IS AN EXPLICIT `*should_f",
+        "  ph56-fetchmode-arith: OK+3 Zend/zend_execute.c:3958-4000  1174 bytes  sha256 33d08e0f038f4185  -- \u26d4\u26d4 THE FAULTING FRAME. `zend_isset_isempty_dim_prop_obj_handler` reads",
+        "  ph56-fetchmode-arith: OK+4 Zend/zend_execute.c:896-975  2372 bytes  sha256 4ac45e000a6f994b  -- \u2b50 THE APPEND ARM, AND IT IS NOT THE DEFECT. `:935-943` is what `$a[] =",
+        "  ph56-fetchmode-arith: OK+5 Zend/zend_compile.h:636-656  653 bytes  sha256 1ac60fb0c2f79468  -- \u2b50 THE LAYOUT THE ARITHMETIC WALKS, IN UPSTREAM'S OWN WORDS AND WITH UP",
+        "  ph56-fetchmode-arith: OK+6 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- `execute()`'s dispatch loop. It is pinned because this row's executor ",
+        "  ph56-fetchmode-arith: per-span overlap: span0 23% (7/30), span1 13% (2/15), span2 7% (2/27), span3 21% (6/29), span4 9% (4/46), span5 n/a, span6 0% (0/7)  -- the UNION is what is reported below, and it is what 7 cited spans oblige the row to",
+        "  ph56-fetchmode-arith: kernel overlap 10% (14/143 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph56-fetchmode-arith: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph56-fetchmode-arith: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH56_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph56-fetchmode-arith": {
+          "row_specific_words": 1586,
+          "prefix_words": 1586,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "ph56-fetchmode-arith"
+      ],
+      "tool_argv": [
+        "ph56-fetchmode-arith"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph56-fetchmode-arith",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph56-fetchmode-arith: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph56-fetchmode-arith: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph56-fetchmode-arith: Zend/zend_compile.c, Zend/zend_compile.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_compile.h, Zend/zend_execute.c are in the manifest (ac6ef970d6e2, ac6ef970d6e2, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 5ef70294c416, 04eb85da37e7)",
+        "  ph56-fetchmode-arith: OK  Zend/zend_compile.c:736-780  1200 bytes  sha256 53df75a816666219  tier=modelled",
+        "  ph56-fetchmode-arith: OK+1 Zend/zend_compile.c:3215-3240  670 bytes  sha256 977998d164ec4cdb  -- \u2b50\u2b50 THE SECOND REWRITE, AND WITHOUT IT THIS ROW NAMES THE WRONG HARM. `",
+        "  ph56-fetchmode-arith: OK+2 Zend/zend_execute.c:88-125  1171 bytes  sha256 3a89539031793801  -- \u26d4 `_get_zval_ptr`, AND ITS `case IS_UNUSED:` IS AN EXPLICIT `*should_f",
+        "  ph56-fetchmode-arith: OK+3 Zend/zend_execute.c:3958-4000  1174 bytes  sha256 33d08e0f038f4185  -- \u26d4\u26d4 THE FAULTING FRAME. `zend_isset_isempty_dim_prop_obj_handler` reads",
+        "  ph56-fetchmode-arith: OK+4 Zend/zend_execute.c:896-975  2372 bytes  sha256 4ac45e000a6f994b  -- \u2b50 THE APPEND ARM, AND IT IS NOT THE DEFECT. `:935-943` is what `$a[] =",
+        "  ph56-fetchmode-arith: OK+5 Zend/zend_compile.h:636-656  653 bytes  sha256 1ac60fb0c2f79468  -- \u2b50 THE LAYOUT THE ARITHMETIC WALKS, IN UPSTREAM'S OWN WORDS AND WITH UP",
+        "  ph56-fetchmode-arith: OK+6 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- `execute()`'s dispatch loop. It is pinned because this row's executor ",
+        "  ph56-fetchmode-arith: per-span overlap: span0 23% (7/30), span1 13% (2/15), span2 7% (2/27), span3 21% (6/29), span4 9% (4/46), span5 n/a, span6 0% (0/7)  -- the UNION is what is reported below, and it is what 7 cited spans oblige the row to",
+        "  ph56-fetchmode-arith: kernel overlap 10% (14/143 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph56-fetchmode-arith: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph56-fetchmode-arith: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH56_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph56-fetchmode-arith": {
+          "row_specific_words": 1586,
+          "prefix_words": 1586,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "report",
+      "gate_argv": [
+        "--tool",
+        "report",
+        "ph56-fetchmode-arith"
+      ],
+      "tool_argv": [
+        "ph56-fetchmode-arith"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph56-fetchmode-arith",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph56-fetchmode-arith: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph56-fetchmode-arith: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph56-fetchmode-arith: Zend/zend_compile.c, Zend/zend_compile.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_compile.h, Zend/zend_execute.c are in the manifest (ac6ef970d6e2, ac6ef970d6e2, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 5ef70294c416, 04eb85da37e7)",
+        "  ph56-fetchmode-arith: OK  Zend/zend_compile.c:736-780  1200 bytes  sha256 53df75a816666219  tier=modelled",
+        "  ph56-fetchmode-arith: OK+1 Zend/zend_compile.c:3215-3240  670 bytes  sha256 977998d164ec4cdb  -- \u2b50\u2b50 THE SECOND REWRITE, AND WITHOUT IT THIS ROW NAMES THE WRONG HARM. `",
+        "  ph56-fetchmode-arith: OK+2 Zend/zend_execute.c:88-125  1171 bytes  sha256 3a89539031793801  -- \u26d4 `_get_zval_ptr`, AND ITS `case IS_UNUSED:` IS AN EXPLICIT `*should_f",
+        "  ph56-fetchmode-arith: OK+3 Zend/zend_execute.c:3958-4000  1174 bytes  sha256 33d08e0f038f4185  -- \u26d4\u26d4 THE FAULTING FRAME. `zend_isset_isempty_dim_prop_obj_handler` reads",
+        "  ph56-fetchmode-arith: OK+4 Zend/zend_execute.c:896-975  2372 bytes  sha256 4ac45e000a6f994b  -- \u2b50 THE APPEND ARM, AND IT IS NOT THE DEFECT. `:935-943` is what `$a[] =",
+        "  ph56-fetchmode-arith: OK+5 Zend/zend_compile.h:636-656  653 bytes  sha256 1ac60fb0c2f79468  -- \u2b50 THE LAYOUT THE ARITHMETIC WALKS, IN UPSTREAM'S OWN WORDS AND WITH UP",
+        "  ph56-fetchmode-arith: OK+6 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- `execute()`'s dispatch loop. It is pinned because this row's executor ",
+        "  ph56-fetchmode-arith: per-span overlap: span0 23% (7/30), span1 13% (2/15), span2 7% (2/27), span3 21% (6/29), span4 9% (4/46), span5 n/a, span6 0% (0/7)  -- the UNION is what is reported below, and it is what 7 cited spans oblige the row to",
+        "  ph56-fetchmode-arith: kernel overlap 10% (14/143 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph56-fetchmode-arith: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph56-fetchmode-arith: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH56_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph56-fetchmode-arith": {
+          "row_specific_words": 1586,
+          "prefix_words": 1586,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph56-fetchmode-arith"
+      ],
+      "tool_argv": [
+        "ph56-fetchmode-arith"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 1
+    },
+    {
+      "row": "ph56-fetchmode-arith",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph56-fetchmode-arith: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph56-fetchmode-arith: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph56-fetchmode-arith: Zend/zend_compile.c, Zend/zend_compile.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_execute.c, Zend/zend_compile.h, Zend/zend_execute.c are in the manifest (ac6ef970d6e2, ac6ef970d6e2, 04eb85da37e7, 04eb85da37e7, 04eb85da37e7, 5ef70294c416, 04eb85da37e7)",
+        "  ph56-fetchmode-arith: OK  Zend/zend_compile.c:736-780  1200 bytes  sha256 53df75a816666219  tier=modelled",
+        "  ph56-fetchmode-arith: OK+1 Zend/zend_compile.c:3215-3240  670 bytes  sha256 977998d164ec4cdb  -- \u2b50\u2b50 THE SECOND REWRITE, AND WITHOUT IT THIS ROW NAMES THE WRONG HARM. `",
+        "  ph56-fetchmode-arith: OK+2 Zend/zend_execute.c:88-125  1171 bytes  sha256 3a89539031793801  -- \u26d4 `_get_zval_ptr`, AND ITS `case IS_UNUSED:` IS AN EXPLICIT `*should_f",
+        "  ph56-fetchmode-arith: OK+3 Zend/zend_execute.c:3958-4000  1174 bytes  sha256 33d08e0f038f4185  -- \u26d4\u26d4 THE FAULTING FRAME. `zend_isset_isempty_dim_prop_obj_handler` reads",
+        "  ph56-fetchmode-arith: OK+4 Zend/zend_execute.c:896-975  2372 bytes  sha256 4ac45e000a6f994b  -- \u2b50 THE APPEND ARM, AND IT IS NOT THE DEFECT. `:935-943` is what `$a[] =",
+        "  ph56-fetchmode-arith: OK+5 Zend/zend_compile.h:636-656  653 bytes  sha256 1ac60fb0c2f79468  -- \u2b50 THE LAYOUT THE ARITHMETIC WALKS, IN UPSTREAM'S OWN WORDS AND WITH UP",
+        "  ph56-fetchmode-arith: OK+6 Zend/zend_execute.c:1383-1396  290 bytes  sha256 a18c98a900b0f3ca  -- `execute()`'s dispatch loop. It is pinned because this row's executor ",
+        "  ph56-fetchmode-arith: per-span overlap: span0 23% (7/30), span1 13% (2/15), span2 7% (2/27), span3 21% (6/29), span4 9% (4/46), span5 n/a, span6 0% (0/7)  -- the UNION is what is reported below, and it is what 7 cited spans oblige the row to",
+        "  ph56-fetchmode-arith: kernel overlap 10% (14/143 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  (tier=modelled: reported, no expectation)",
+        "  ph56-fetchmode-arith: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph56-fetchmode-arith: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH56_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph56-fetchmode-arith": {
+          "row_specific_words": 1586,
+          "prefix_words": 1586,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph56-fetchmode-arith"
+      ],
+      "tool_argv": [
+        "ph56-fetchmode-arith"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    }
+  ]
+}

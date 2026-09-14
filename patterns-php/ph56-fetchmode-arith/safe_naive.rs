@@ -242,7 +242,7 @@ fn fetch_dimension_address(
     }
     if slots[b].ty == IS_ARRAY {
         // :930
-        let a = (slots[b].lval as usize) % NVAR;
+        let a = (slots[b].lval % (NVAR as u64)) as usize;
         if op2_type == T_UNUSED {
             // :935 -- THE APPEND
             let n = anext[a];
@@ -440,14 +440,14 @@ pub fn kernel(buf: &[u8], off: usize, len: usize) -> u64 {
                 let mut result: u64 = 0;
                 if slots[c].ty == IS_ARRAY {
                     // :3967
-                    let a = (slots[c].lval as usize) % NVAR;
+                    let a = (slots[c].lval % (NVAR as u64)) as usize;
                     // ⛔⛔⛔ :3973 -- `switch (offset->type)`. In C `offset` is
                     // NULL whenever op2 is IS_UNUSED and this is a read of
                     // address 0x14. In safe Rust the Option cannot be opened
                     // without this call, so the SAME wrong program panics.
                     let off = offset.unwrap();
                     if slots[off].ty == IS_LONG {
-                        let idx = (slots[off].lval as usize) % DIM;
+                        let idx = (slots[off].lval % (DIM as u64)) as usize;
                         let s = ARR_BASE + a * DIM + idx;
                         if idx < anext[a] as usize {
                             isset = 1;

@@ -1,0 +1,54 @@
+{
+  "derived_from_sha256": {
+    "patterns/ph56-fetchmode-arith/controls/negatives.py": "1b400ced1086926cc7d47b6a08faec43fc5804ae733e0b8c8bcac5a36880ffcd",
+    "patterns/ph56-fetchmode-arith/verus.rs": "bcf92ed5443e7388962aba1dbe7b5df879917ce562c9a8f0d8fa547a09aa4dfb"
+  },
+  "expect_verifies": [],
+  "mutants": {
+    "nobuf": {
+      "errors": 1,
+      "rc": 1,
+      "text": " + len];\n     |                       ^^^^^^^^^^^^^^^^^^^\n\nerror: possible arithmetic underflow/overflow\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/nobuf.rs:1219:32\n     |\n1219 |     let win: &[u8] = &buf[off..off + len];\n     |                                ^^^^^^^^^\n\nnote: recommendation not met\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/nobuf.rs:1221:21\n     |\n1221 |     assert(win@ =~= buf@.subrange(off as int, off + len));\n     |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n     |\n    --> vstd/seq.rs:1030:12\n     |\n     = note: recommendation not met\n\nnote: recommendation not met\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/nobuf.rs:1408:83\n     |\n1408 |                     0 <= j < first || n2 <= j < MAX_OPS ==> #[trigger] ops@[j] == pre[j],\n     |                                                                                   ^^^^^^\n     |\n    --> vstd/seq.rs:972:12\n     |\n     = note: recommendation not met\n\nnote: recommendation not met\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/nobuf.rs:1410:73\n     |\n1410 |                     first <= j < k ==> #[trigger] ops@[j] == s_parse_op(pre[j], mode),\n     |                                                                         ^^^^^^\n     |\n    --> vstd/seq.rs:972:12\n     |\n     = note: recommendation not met\n\nnote: recommendation not met\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/nobuf.rs:1411:62\n     |\n1411 |                 forall|j: int| first <= j < k ==> s_parse_ok(#[trigger] pre[j], mode),\n     |                                                              ^^^^^^^^^^^^^^^^^\n     |\n    --> vstd/seq.rs:972:12\n     |\n     = note: recommendation not met\n\nnote: recommendation not met\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/nobuf.rs:1412:70\n     |\n1412 |                 forall|j: int| k <= j < n2 ==> #[trigger] ops@[j] == pre[j],\n     |                                                                      ^^^^^^\n     |\n    --> vstd/seq.rs:972:12\n     |\n     = note: recommendation not met\n\nnote: recommendation not met\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/nobuf.rs:1423:83\n     |\n1423 |                     0 <= j < first || n2 <= j < MAX_OPS ==> #[trigger] ops@[j] == pre[j]),\n     |                                                                                   ^^^^^^\n     |\n    --> vstd/seq.rs:972:12\n     |\n     = note: recommendation not met\n\nerror: aborting due to 2 previous errors\n\n",
+      "verified": 65
+    },
+    "nocap": {
+      "errors": 1,
+      "rc": 1,
+      "text": "verification results:: 65 verified, 1 errors\nerror: while loop: Resource limit (rlimit) exceeded; consider rerunning with --profile for more details\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/nocap.rs:1291:5\n     |\n1291 |     while i < nstmt\n     |     ^^^^^^^^^^^^^^^\n\nerror: aborting due to 1 previous error\n\n",
+      "verified": 65
+    },
+    "noclamp": {
+      "errors": 1,
+      "rc": 1,
+      "text": "verification results:: 65 verified, 1 errors\nerror: assertion failed\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/noclamp.rs:1223:12\n     |\n1223 |       assert(nstmt as int == (if len as int / 8 > MAX_STMT as int {\n     |  ____________^\n1224 | |         MAX_STMT as int\n1225 | |     } else {\n1226 | |         len as int / 8\n1227 | |     }));\n     | |______^ assertion failed\n\nnote: recommendation not met\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/noclamp.rs:1405:83\n     |\n1405 |                     0 <= j < first || n2 <= j < MAX_OPS ==> #[trigger] ops@[j] == pre[j],\n     |                                                                                   ^^^^^^\n     |\n    --> vstd/seq.rs:972:12\n     |\n     = note: recommendation not met\n\nnote: recommendation not met\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/noclamp.rs:1407:73\n     |\n1407 |                     first <= j < k ==> #[trigger] ops@[j] == s_parse_op(pre[j], mode),\n     |                                                                         ^^^^^^\n     |\n    --> vstd/seq.rs:972:12\n     |\n     = note: recommendation not met\n\nnote: recommendation not met\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/noclamp.rs:1408:62\n     |\n1408 |                 forall|j: int| first <= j < k ==> s_parse_ok(#[trigger] pre[j], mode),\n     |                                                              ^^^^^^^^^^^^^^^^^\n     |\n    --> vstd/seq.rs:972:12\n     |\n     = note: recommendation not met\n\nerror: aborting due to 1 previous error\n\n",
+      "verified": 65
+    },
+    "noinv": {
+      "errors": 1,
+      "rc": 1,
+      "text": "verification results:: 65 verified, 1 errors\nnote: while loop: not all errors may have been reported; rerun with a higher value for --multiple-errors to find other potential errors in this function\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/noinv.rs:1522:9\n     |\n1522 |         while pc < nops\n     |         ^^^^^^^^^^^^^^^\n\nnote: recommendation not met\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/noinv.rs:1408:83\n     |\n1408 |                     0 <= j < first || n2 <= j < MAX_OPS ==> #[trigger] ops@[j] == pre[j],\n     |                                                                                   ^^^^^^\n     |\n    --> vstd/seq.rs:972:12\n     |\n     = note: recommendation not met\n\nnote: recommendation not met\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/noinv.rs:1410:73\n     |\n1410 |                     first <= j < k ==> #[trigger] ops@[j] == s_parse_op(pre[j], mode),\n     |                                                                         ^^^^^^\n     |\n    --> vstd/seq.rs:972:12\n     |\n     = note: recommendation not met\n\nnote: recommendation not met\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/noinv.rs:1411:62\n     |\n1411 |                 forall|j: int| first <= j < k ==> s_parse_ok(#[trigger] pre[j], mode),\n     |                                                              ^^^^^^^^^^^^^^^^^\n     |\n    --> vstd/seq.rs:972:12\n     |\n     = note: recommendation not met\n\nerror: precondition not satisfied\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/noinv.rs:1596:31\n     |\n 940 |         t.is_some(),\n     |         ----------- failed precondition\n...\n1596 |                     let off = zunwrap(offset);\n     |                               ^^^^^^^^^^^^^^^\n\nerror: precondition not satisfied\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/noinv.rs:1597:34\n     |\n 790 |         i < NSLOT,\n     |         --------- failed precondition\n...\n1597 |                     let oz: Zv = sget(&slots, off);\n     |                                  ^^^^^^^^^^^^^^^^^\n\nerror: aborting due to 2 previous errors\n\n",
+      "verified": 65
+    },
+    "r1": {
+      "errors": 1,
+      "rc": 1,
+      "text": "verification results:: 65 verified, 1 errors\nnote: recommendation not met\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/r1.rs:1407:83\n     |\n1407 |                     0 <= j < first || n2 <= j < MAX_OPS ==> #[trigger] ops@[j] == pre[j],\n     |                                                                                   ^^^^^^\n     |\n    --> vstd/seq.rs:972:12\n     |\n     = note: recommendation not met\n\nnote: recommendation not met\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/r1.rs:1409:73\n     |\n1409 |                     first <= j < k ==> #[trigger] ops@[j] == s_parse_op(pre[j], mode),\n     |                                                                         ^^^^^^\n     |\n    --> vstd/seq.rs:972:12\n     |\n     = note: recommendation not met\n\nnote: recommendation not met\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/r1.rs:1410:62\n     |\n1410 |                 forall|j: int| first <= j < k ==> s_parse_ok(#[trigger] pre[j], mode),\n     |                                                              ^^^^^^^^^^^^^^^^^\n     |\n    --> vstd/seq.rs:972:12\n     |\n     = note: recommendation not met\n\nerror: assertion failed\n    --> /home/apt/repos_common/sec-ladder/.temp/php56neg/r1.rs:1479:98\n     |\n1479 |               0 <= j < nops as int && (#[trigger] ops@[j]).opcode == ISSET_ISEMPTY_DIM_OBJ implies (\n     |  __________________________________________________________________________________________________^\n1480 | |         ops@[j].op2_type == T_CONST || ops@[j].op2_type == T_VAR) by {\n     | |_________________________________________________________________^ assertion failed\n\nerror: aborting due to 1 previous error\n\n",
+      "verified": 65
+    }
+  },
+  "pin": {
+    "note": "verus.rs (every mutant is a substitution ON it, and the hit counts are asserted) and this script. NOT inputs/: no mutant is RUN, only verified.",
+    "regenerate": "python3 patterns-php/ph56-fetchmode-arith/controls/negatives.py"
+  },
+  "pristine": {
+    "plain": [
+      66,
+      0
+    ],
+    "twin": [
+      76,
+      0
+    ]
+  },
+  "problems": []
+}

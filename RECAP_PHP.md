@@ -45,25 +45,25 @@ between them read `CLAUDE.md`'s top table.
 ## ▶ START HERE — the next action, in ≤ 20 lines
 
 ```
-STATE   ⭐ ROWS BUILT 9 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL · ph45
-        (T1) + ph53+ph52 (T3) + ph55 (T5) TYPE. 7 of 20 fam. 31 owed.
-NEXT    ⏳ _052 RUNNING (ENGINEER, ALONE): FINISHES ROW 10. _051 STOPPED MID-ROW
-        ▶ (1) ⛔⛔ ITEM 105 NEEDS A USER DECISION, NOW (a) OR
-        (c) -- MY RECOMMENDED (b) DOES NOT EXIST (F107). (a)=edit check.py, a
-        33-PATTERN RE-GATE, BUYS PUBLISHING THE SMALLER TCB; (c)=leave it, what
-        gate.py's OWN HEADER PRESCRIBES. ⭐ I PROCEED UNDER (c), THE REVERSIBLE
-        CLEANLY: 5 OF 6 RUNGS AGREE, NO spec.md/verus.rs. 9 built, 31 owed.
-⚠ NEW   F109 ⭐⭐ ROW 9: TWO BLOBS ONE BYTE APART. THE Option CAUGHT THE NULL, NOT
-        THE WRONG PC -- SAFE RUST RETURNS C's WRONG ANSWER BIT FOR BIT, SANITIZERS
-        SILENT. UNSAFE RUST IS STRICTLY WORSE THAN C THERE. VERUS REFUSES fn PTRS.
-        F110 ⭐ 112 SWEPT: ph64 CLEAN (step 0.00), BUT ph45/ph07/ph29 EXPOSED AND
-        ph07 STEPS 34.49 -- 4 of 180 FLAGGED, NO PUBLISHED NUMBER WRONG. 99 CLOSED.
+STATE   ⭐ ROWS BUILT 10 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL · ph45
+        (T1)+ph53+ph52 (T3)+ph55+ph56 (T5) TYPE. 7 of 20 fam. 30 owed.
+NEXT    NOTHING RUNNING. ROW 10 BUILT+GATED; T5 AT 2. ▶ (1) ⛔⛔ ITEM 105 NEEDS A
+        USER DECISION, NOW (a) OR (c) -- MY RECOMMENDED (b) DOES NOT EXIST (F107).
+        (a)=edit check.py, a 33-PATTERN RE-GATE, BUYS PUBLISHING THE SMALLER TCB;
+        (c)=leave it, what gate.py's OWN HEADER PRESCRIBES. ⭐ I PROCEED UNDER (c).
+        ▶ (2) REVIEW F96+F110+F111+F112 (4 UNREVIEWED). ▶ (3) ROW 11: A NEW
+        FAMILY (13 UNENTERED) -- SCREEN IT FIRST, ph55/ph56 SHOW WHY. 30 owed.
+⚠ NEW   F112 ⭐⭐⭐ ROW 10: R4->R5 COSTS EXACTLY 0.000 Ir/call ON BOTH INPUTS, AND
+        THE ROW HAD TO BUY IT (one modulus spelling across all 4 Rust rungs;
+        ph55 shipped two and paid +0.071%). ⛔ THE CROSS-LANGUAGE SIGN FLIPS
+        BETWEEN THE TWO C COMPILERS INSIDE W1 (-8.423% vs c-gcc-h, +3.811% vs
+        c-clang-h) AND THE ROW PUBLISHES BOTH -- F108 WORKING ON THE NEXT ROW.
 ⚠ WRONG MY ph64 DEFENCE: "TWO COMPILERS AND TWO INPUTS" -- THE TWO-INPUT HALF IS
         NOT EVIDENCE (SAME-LENGTH PROBE NAMES). RIGHT ANSWER, WORTHLESS REASON.
 ⚠ TRAPS `grep -a` ALWAYS; a line-grep MISSES A WRAPPED PHRASE. APPENDING A
         CORRECTION LEAVES THE OLD NUMBER (73,x4). NAME THE FILE EVERY FIELD CAME
         FROM (84). ⚠ .web/ CONCURRENT: NEVER `git add -A`.
-READ    RULE-9 block · .memory-php/ · F1-F111 · items 1-114 · _047 §1.7 · _049 §1.3+§4.2
+READ    RULE-9 block · .memory-php/ · F1-F112 · items 1-114 · _047 §1.7 · _049 §1.3+§4.2
         · PROTOCOL_PHP §B1a+§F6+§F6a+§H · STATISTICS_001 · CLAUDE.md r6.
 ```
 
@@ -138,6 +138,7 @@ READ    RULE-9 block · .memory-php/ · F1-F111 · items 1-114 · _047 §1.7 · 
 > | ⭐ **F110** | ⛔ **UNREVIEWED** | `_050`'s own sweep. ⚠ **Its publication rule DID land**, because it is a measurement over the whole corpus rather than a manager reading — **but its `argv`-vs-`envp` gap is declared IN the layer entry** |
 > | **F96** | ⛔ **UNREVIEWED** | **third round running, and said plainly.** `ph55` does not supply the missing second method — it is a `T5` row, not the *"third `T3`-ish"* row the task supposed |
 > | ⭐ **F111** | ⛔ **UNREVIEWED** | `_051`, an ENGINEER task that **stopped mid-row**. ⛔ **Nothing from it is in the layer**, and its row is **not built**. ⚠ It refuted BOTH the catalogue AND the manager on the same question, so it is exactly the shape law 12 describes |
+> | ⭐ **F112** | ⛔ **UNREVIEWED** | `_052`, row 10 finished and gated. ⛔ **Nothing from it is in the layer.** ⭐ **Two things it would change once reviewed: (1) *“the proof is free”* is a claim about how the ladder was WRITTEN — `ph56` made `R4→R5` exactly `0.000` by normalising one spelling across all four Rust rungs, where `ph55` paid `+0.071 %` for shipping two; (2) an `rlimit` ERROR IS A SYMPTOM, NOT A SIZE — the overrun was a wrong loop invariant, and raising the limit would have shipped it.** ⓘ Both are `n = 2` with `ph55` |
 >
 > ⛔ **SEVEN THINGS `_050` §8.1 FORBIDS THE LAYER**, and they are enumerated in
 > its report. ▶ **Read that list before adding anything from `F109`, `F110`,
@@ -145,7 +146,7 @@ READ    RULE-9 block · .memory-php/ · F1-F111 · items 1-114 · _047 §1.7 · 
 >
 > ⭐⭐ **F109 WAS HELD BACK BECAUSE THE LAST TIME A ROW LANDED I PUT ITS MATERIAL
 > IN THE LAYER UNMARKED. HOLDING IT BACK WAS RIGHT: the refinement turned out to
-> be a rule the layer already carried.** ▶ **Next review scope: `F96 · F110 · F111`.**
+> be a rule the layer already carried.** ▶ **Next review scope: `F96 · F110 · F111 · F112` — FOUR open, and `F110`–`F112` are three consecutive ENGINEER tasks.**
 >
 > ⭐⭐⭐ **THE ROUND'S OWN HEADLINE: OF THE SIX FINDINGS IT VERDICTED, ONE WAS
 > REFUTED OUTRIGHT, ONE LOST ITS HEADLINE CLAUSE, THREE WERE NARROWED AND ONE WAS
@@ -1650,6 +1651,79 @@ which pins `kernel.c:247` and `hardened:175`, one line each.
 The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
+
+### F112 — ⭐⭐⭐ **ROW 10 IS BUILT — T5 CLOSED AT 2 — AND `R4 → R5` COSTS *EXACTLY NOTHING*, WHICH THE ROW HAD TO *BUY*
+
+`TASK_PHP_052`, 508 lines. ⚠ **UNREVIEWED** (rule 9). ✅ **Manager-verified from
+`results-php/gate/ph56-fetchmode-arith.json` and SAYING WHICH**: `verdict PASS`,
+`failures []`, `complete_run true`, `contract_sha256 e76ae727f70b`,
+`blocked_rows null`, `advisories null`, `identity` **`norel`** as pinned.
+**Brackets `66/0` unmoved and `20/0 → 22/0`, the `+2` being exactly this row's
+two records — re-run by me.** ⭐ `quota.py`: **10 built, 30 owed, T5 at 2.**
+
+> ### ⭐⭐⭐ `R4 → R5` = **`0.000 Ir/call`, `0.000 %`, ON BOTH INPUTS** — AND IT WAS NOT FREE, IT WAS BOUGHT
+>
+> `identity` pins **`norel`**, and family B reads **`0.00` across all 32 pad
+> residues**. ⛔ **But `ph55` shipped `+0.071 %` on the same step**, and the
+> difference is a *representation* choice: **Verus models `usize` as 32 **or**
+> 64 bits and will not assume a `u64 → usize` cast is lossless**, so R5 must take
+> the modulus **before** the cast. `ph55` resolved that by shipping **two
+> spellings** — `(x as usize) % NVAR` in `unsafe.rs`, `(x % (NVAR as u64)) as
+> usize` in `verus.rs`. ⭐⭐ **`ph56` NORMALISED ALL FOUR RUST RUNGS ONTO THE
+> SECOND SPELLING** (nine expressions, three files), **so R4 and R5 are one exec
+> text and the R2→R3 / R3→R4 gradients carry no representation change.**
+> ▶ **THE RESULT: *"the proof is free"* is a claim about how the ladder was
+> WRITTEN, not only about Verus** — and this row is the first to make it exactly
+> zero by construction rather than approximately zero by luck.
+
+> ### ⛔⛔ AND THE CROSS-LANGUAGE **SIGN FLIPS BETWEEN THE TWO C COMPILERS INSIDE ONE STATISTIC**
+>
+> **R4/R5 against the R1h C cells, W1, `O3/isolated`, `large.bin`:**
+> **`−8.423 %` against `c-gcc-h`** and **`+3.811 %` against `c-clang-h`.**
+> ⭐⭐⭐ **AND THE ROW PUBLISHES BOTH COLUMNS AND BOTH SIGNS RATHER THAN PICKING
+> THE FLATTERING ONE** — **F108's rule working on the FIRST ROW BUILT AFTER IT
+> LANDED**, which is the strongest evidence that rule could have.
+> ⓘ `inside_share` predicts it: gcc keeps **11–15 %** of per-call work outside
+> the `kernel` symbol against Rust's **0.8–2.9 %**, a gap of `0.085–0.137`
+> against `STATISTICS_001.md` §1's `0.02` threshold. ⭐ Exactly one pair set is
+> narrow (Rust vs `c-clang-h` on `large.bin`, `0.0104–0.0130`), and
+> `controls/statistic.py` **checks the wide and narrow halves in OPPOSITE
+> directions so neither claim can rot silently.**
+
+⭐⭐ **THE GATE DELETED TWO OF THREE PRECONDITIONS THIS ROW COPIED FROM `ph55`.**
+`req-mut` reported `16 <= len` and `len <= 8 * MAX_STMT` **NOT load-bearing**,
+and both are gone. ▶ **`ph56` ESTABLISHES IN CODE WHAT `ph55` ASSUMES IN A
+SIGNATURE** — the `nstmt` clamp and the `nops` break — and the `noclamp`/`nocap`
+mutants measure that nothing else does. ⚠ **The lesson is about CLONING A
+SIBLING'S SIGNATURE: a precondition that is not load-bearing narrows the
+admissible call sites for nothing, and READING WOULD NOT HAVE CAUGHT IT.**
+
+⛔ **THE MUTATION TEST IS THE ARGUMENT, AND ALL FIVE MUTANTS FAIL.** The one that
+matters: **`r1` deletes `1e708a5aeb30`'s three lines and the file STOPS
+VERIFYING — at the `assert forall` that re-establishes `operand_present`.**
+✅ `pristine` re-verifies the shipped file at **66/0** (and **76/0** twin) on
+every run, **so a broken toolchain cannot read as a clean sweep.**
+
+⭐ **AND AN `rlimit` ERROR IS A SYMPTOM, NOT A SIZE.** The floor bisects to
+**2** — ⭐ **the same as `ph55`, so `n = 2` about the proof SHAPE** — and the
+first draft's overrun was **a wrong loop invariant**: two clauses that cannot
+hold at a `break` were declared `invariant` instead of `invariant_except_break`,
+so Z3 spent the budget failing to prove them. ⛔⛔ **The obvious repair — raise
+the limit — would have shipped a WRONG INVARIANT under a 20× budget.**
+
+**PREDICTIONS: 1 ✅ UPHELD** — stage 5c-twin clean, **10/10 twins, none justified
+away**, so F97's narrowing survives a second row. **2 ⚠ UPHELD ON MECHANISM** —
+the guard costs **1.06–1.55 Ir per emitted statement, FLAT across a 4× change in
+statement count** — ⭐ **and the report states explicitly that its percentage is a
+loose UPPER BOUND on PHP's, not PHP's**, because this kernel compiles-and-runs in
+one loop. **3 ✅ HONOURED** — no endpoint prediction was made, which was the
+position.
+
+⚠ **LARGEST DECLARED GAP: the `R3 → R4` step is NOT decomposed** — `zunwrap`
+against the nine index accessors is unmeasured, because this row's
+`controls/spellings.py` is the contract audit only and not `ph55`'s respelling
+search. ⭐ **An endpoint search is a separate task on every row; this is that
+task's brief.**
 
 ### F111 — ⭐⭐⭐ `ph56`'s HARM IS **MEASURED** AND IT REFUTES THE CATALOGUE **AND** THE MANAGER — AND THE SIBLING CENSUS COMES BACK **NON-EMPTY** FOR THE FIRST TIME
 

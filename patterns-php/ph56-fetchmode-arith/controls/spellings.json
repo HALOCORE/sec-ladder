@@ -1,0 +1,646 @@
+{
+  "absent": [],
+  "derived_from_sha256": {
+    "patterns/ph56-fetchmode-arith/c/kernel.c": "a141bf3b4435d7cfacefe10f4ef73820ab05ccaccf568434c735b50193439edc",
+    "patterns/ph56-fetchmode-arith/c/kernel_hardened.c": "1288ef112024ca9a10ed8bb1cb106e09d3dcf247873e9b7f496ce01250cd1d98",
+    "patterns/ph56-fetchmode-arith/controls/spellings.py": "d09640a557624eb676165744e79c6a575d918c2ca59921b4459665cf99c8ace1",
+    "patterns/ph56-fetchmode-arith/safe_naive.rs": "7feb44f81eda35eaac78e5fc078c2320564d455a704f739ec99f63f12c7aa1f5",
+    "patterns/ph56-fetchmode-arith/safe_tuned.rs": "6a35ebd956457d19ff94828073ce09e6bd7a8e67b9a7e31002f09332606c16b7",
+    "patterns/ph56-fetchmode-arith/spec.md": "8a3d37c15a3794c9f71c998df82be8dddc6cdbf692c3eabd15c84d13dd032dcf",
+    "patterns/ph56-fetchmode-arith/unsafe.rs": "d8b4836e7f08c5c3573eee8c9304b4a5a293e25fc3ebe0ed2d86711082bca49c",
+    "patterns/ph56-fetchmode-arith/verus.rs": "bcf92ed5443e7388962aba1dbe7b5df879917ce562c9a8f0d8fa547a09aa4dfb"
+  },
+  "n_obligations": 78,
+  "pin": {
+    "note": "spec.md (the pins) and all six rungs (the text matched against them), plus this script. NOT inputs/ and NOT NOTES.md: no number here is derived from either.",
+    "regenerate": "python3 patterns-php/ph56-fetchmode-arith/controls/spellings.py"
+  },
+  "present": [],
+  "problems": [],
+  "rows": [
+    {
+      "hit": true,
+      "index": 0,
+      "key": "required",
+      "lang": "c",
+      "rung": "c/kernel.c",
+      "spelling": "opline->opcode += 6"
+    },
+    {
+      "hit": true,
+      "index": 0,
+      "key": "required",
+      "lang": "c",
+      "rung": "c/kernel_hardened.c",
+      "spelling": "opline->opcode += 6"
+    },
+    {
+      "hit": true,
+      "index": 0,
+      "key": "required",
+      "lang": "rust",
+      "rung": "safe_naive.rs",
+      "spelling": "o.opcode.wrapping_add(6)"
+    },
+    {
+      "hit": true,
+      "index": 0,
+      "key": "required",
+      "lang": "rust",
+      "rung": "safe_tuned.rs",
+      "spelling": "o.opcode.wrapping_add(6)"
+    },
+    {
+      "hit": true,
+      "index": 0,
+      "key": "required",
+      "lang": "rust",
+      "rung": "unsafe.rs",
+      "spelling": "o.opcode.wrapping_add(6)"
+    },
+    {
+      "hit": true,
+      "index": 0,
+      "key": "required",
+      "lang": "rust",
+      "rung": "verus.rs",
+      "spelling": "o.opcode.wrapping_add(6)"
+    },
+    {
+      "hit": true,
+      "index": 0,
+      "key": "required",
+      "lang": "rust",
+      "rung": "safe_naive.rs",
+      "spelling": "wrapping_"
+    },
+    {
+      "hit": true,
+      "index": 0,
+      "key": "required",
+      "lang": "rust",
+      "rung": "safe_tuned.rs",
+      "spelling": "wrapping_"
+    },
+    {
+      "hit": true,
+      "index": 0,
+      "key": "required",
+      "lang": "rust",
+      "rung": "unsafe.rs",
+      "spelling": "wrapping_"
+    },
+    {
+      "hit": true,
+      "index": 0,
+      "key": "required",
+      "lang": "rust",
+      "rung": "verus.rs",
+      "spelling": "wrapping_"
+    },
+    {
+      "hit": true,
+      "index": 1,
+      "key": "required",
+      "lang": "c",
+      "rung": "c/kernel.c",
+      "spelling": "case PH56_IS_UNUSED:"
+    },
+    {
+      "hit": true,
+      "index": 1,
+      "key": "required",
+      "lang": "c",
+      "rung": "c/kernel_hardened.c",
+      "spelling": "case PH56_IS_UNUSED:"
+    },
+    {
+      "hit": true,
+      "index": 1,
+      "key": "required",
+      "lang": "c",
+      "rung": "c/kernel.c",
+      "spelling": "return NULL;"
+    },
+    {
+      "hit": true,
+      "index": 1,
+      "key": "required",
+      "lang": "c",
+      "rung": "c/kernel_hardened.c",
+      "spelling": "return NULL;"
+    },
+    {
+      "hit": true,
+      "index": 1,
+      "key": "required",
+      "lang": "rust",
+      "rung": "safe_naive.rs",
+      "spelling": "Option<usize>"
+    },
+    {
+      "hit": true,
+      "index": 1,
+      "key": "required",
+      "lang": "rust",
+      "rung": "safe_tuned.rs",
+      "spelling": "Option<usize>"
+    },
+    {
+      "hit": true,
+      "index": 1,
+      "key": "required",
+      "lang": "rust",
+      "rung": "unsafe.rs",
+      "spelling": "Option<usize>"
+    },
+    {
+      "hit": true,
+      "index": 1,
+      "key": "required",
+      "lang": "rust",
+      "rung": "verus.rs",
+      "spelling": "Option<usize>"
+    },
+    {
+      "hit": true,
+      "index": 2,
+      "key": "required",
+      "lang": "c",
+      "rung": "c/kernel.c",
+      "spelling": "switch (offset->type)"
+    },
+    {
+      "hit": true,
+      "index": 2,
+      "key": "required",
+      "lang": "c",
+      "rung": "c/kernel_hardened.c",
+      "spelling": "switch (offset->type)"
+    },
+    {
+      "hit": true,
+      "index": 2,
+      "key": "required",
+      "lang": "c",
+      "rung": "c/kernel.c",
+      "spelling": "get_zval_ptr"
+    },
+    {
+      "hit": true,
+      "index": 2,
+      "key": "required",
+      "lang": "c",
+      "rung": "c/kernel_hardened.c",
+      "spelling": "get_zval_ptr"
+    },
+    {
+      "hit": true,
+      "index": 3,
+      "key": "required",
+      "lang": "c",
+      "rung": "c/kernel.c",
+      "spelling": "last_op->opcode = PH56_ISSET_ISEMPTY_DIM_OBJ;"
+    },
+    {
+      "hit": true,
+      "index": 3,
+      "key": "required",
+      "lang": "c",
+      "rung": "c/kernel_hardened.c",
+      "spelling": "last_op->opcode = PH56_ISSET_ISEMPTY_DIM_OBJ;"
+    },
+    {
+      "hit": true,
+      "index": 3,
+      "key": "required",
+      "lang": "rust",
+      "rung": "safe_naive.rs",
+      "spelling": "o.opcode = ISSET_ISEMPTY_DIM_OBJ;"
+    },
+    {
+      "hit": true,
+      "index": 3,
+      "key": "required",
+      "lang": "rust",
+      "rung": "safe_tuned.rs",
+      "spelling": "o.opcode = ISSET_ISEMPTY_DIM_OBJ;"
+    },
+    {
+      "hit": true,
+      "index": 3,
+      "key": "required",
+      "lang": "rust",
+      "rung": "unsafe.rs",
+      "spelling": "o.opcode = ISSET_ISEMPTY_DIM_OBJ;"
+    },
+    {
+      "hit": true,
+      "index": 3,
+      "key": "required",
+      "lang": "rust",
+      "rung": "verus.rs",
+      "spelling": "o.opcode = ISSET_ISEMPTY_DIM_OBJ;"
+    },
+    {
+      "hit": true,
+      "index": 4,
+      "key": "required",
+      "lang": "c",
+      "rung": "c/kernel.c",
+      "spelling": "ex->slots[PH56_UNINIT].refcount++"
+    },
+    {
+      "hit": true,
+      "index": 4,
+      "key": "required",
+      "lang": "c",
+      "rung": "c/kernel_hardened.c",
+      "spelling": "ex->slots[PH56_UNINIT].refcount++"
+    },
+    {
+      "hit": true,
+      "index": 4,
+      "key": "required",
+      "lang": "rust",
+      "rung": "safe_naive.rs",
+      "spelling": "UNINIT as usize"
+    },
+    {
+      "hit": true,
+      "index": 4,
+      "key": "required",
+      "lang": "rust",
+      "rung": "safe_tuned.rs",
+      "spelling": "UNINIT as usize"
+    },
+    {
+      "hit": true,
+      "index": 4,
+      "key": "required",
+      "lang": "rust",
+      "rung": "unsafe.rs",
+      "spelling": "UNINIT as usize"
+    },
+    {
+      "hit": true,
+      "index": 4,
+      "key": "required",
+      "lang": "rust",
+      "rung": "verus.rs",
+      "spelling": "UNINIT as usize"
+    },
+    {
+      "hit": true,
+      "index": 4,
+      "key": "required",
+      "lang": "rust",
+      "rung": "safe_naive.rs",
+      "spelling": "wrapping_add(1)"
+    },
+    {
+      "hit": true,
+      "index": 4,
+      "key": "required",
+      "lang": "rust",
+      "rung": "safe_tuned.rs",
+      "spelling": "wrapping_add(1)"
+    },
+    {
+      "hit": true,
+      "index": 4,
+      "key": "required",
+      "lang": "rust",
+      "rung": "unsafe.rs",
+      "spelling": "wrapping_add(1)"
+    },
+    {
+      "hit": true,
+      "index": 4,
+      "key": "required",
+      "lang": "rust",
+      "rung": "verus.rs",
+      "spelling": "wrapping_add(1)"
+    },
+    {
+      "hit": true,
+      "index": 4,
+      "key": "required",
+      "lang": "rust",
+      "rung": "safe_naive.rs",
+      "spelling": "wrapping_sub(1)"
+    },
+    {
+      "hit": true,
+      "index": 4,
+      "key": "required",
+      "lang": "rust",
+      "rung": "safe_tuned.rs",
+      "spelling": "wrapping_sub(1)"
+    },
+    {
+      "hit": true,
+      "index": 4,
+      "key": "required",
+      "lang": "rust",
+      "rung": "unsafe.rs",
+      "spelling": "wrapping_sub(1)"
+    },
+    {
+      "hit": true,
+      "index": 4,
+      "key": "required",
+      "lang": "rust",
+      "rung": "verus.rs",
+      "spelling": "wrapping_sub(1)"
+    },
+    {
+      "hit": false,
+      "index": 0,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "c/kernel.c",
+      "spelling": "offset != NULL"
+    },
+    {
+      "hit": false,
+      "index": 0,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "c/kernel_hardened.c",
+      "spelling": "offset != NULL"
+    },
+    {
+      "hit": false,
+      "index": 0,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "safe_naive.rs",
+      "spelling": "offset != NULL"
+    },
+    {
+      "hit": false,
+      "index": 0,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "safe_tuned.rs",
+      "spelling": "offset != NULL"
+    },
+    {
+      "hit": false,
+      "index": 0,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "unsafe.rs",
+      "spelling": "offset != NULL"
+    },
+    {
+      "hit": false,
+      "index": 0,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "verus.rs",
+      "spelling": "offset != NULL"
+    },
+    {
+      "hit": false,
+      "index": 0,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "c/kernel.c",
+      "spelling": "offset.is_none()"
+    },
+    {
+      "hit": false,
+      "index": 0,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "c/kernel_hardened.c",
+      "spelling": "offset.is_none()"
+    },
+    {
+      "hit": false,
+      "index": 0,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "safe_naive.rs",
+      "spelling": "offset.is_none()"
+    },
+    {
+      "hit": false,
+      "index": 0,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "safe_tuned.rs",
+      "spelling": "offset.is_none()"
+    },
+    {
+      "hit": false,
+      "index": 0,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "unsafe.rs",
+      "spelling": "offset.is_none()"
+    },
+    {
+      "hit": false,
+      "index": 0,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "verus.rs",
+      "spelling": "offset.is_none()"
+    },
+    {
+      "hit": false,
+      "index": 1,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "c/kernel.c",
+      "spelling": "unwrap_or"
+    },
+    {
+      "hit": false,
+      "index": 1,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "c/kernel_hardened.c",
+      "spelling": "unwrap_or"
+    },
+    {
+      "hit": false,
+      "index": 1,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "safe_naive.rs",
+      "spelling": "unwrap_or"
+    },
+    {
+      "hit": false,
+      "index": 1,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "safe_tuned.rs",
+      "spelling": "unwrap_or"
+    },
+    {
+      "hit": false,
+      "index": 1,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "unsafe.rs",
+      "spelling": "unwrap_or"
+    },
+    {
+      "hit": false,
+      "index": 1,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "verus.rs",
+      "spelling": "unwrap_or"
+    },
+    {
+      "hit": false,
+      "index": 1,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "c/kernel.c",
+      "spelling": "case PH56_IS_UNUSED: return &"
+    },
+    {
+      "hit": false,
+      "index": 1,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "c/kernel_hardened.c",
+      "spelling": "case PH56_IS_UNUSED: return &"
+    },
+    {
+      "hit": false,
+      "index": 1,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "safe_naive.rs",
+      "spelling": "case PH56_IS_UNUSED: return &"
+    },
+    {
+      "hit": false,
+      "index": 1,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "safe_tuned.rs",
+      "spelling": "case PH56_IS_UNUSED: return &"
+    },
+    {
+      "hit": false,
+      "index": 1,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "unsafe.rs",
+      "spelling": "case PH56_IS_UNUSED: return &"
+    },
+    {
+      "hit": false,
+      "index": 1,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "verus.rs",
+      "spelling": "case PH56_IS_UNUSED: return &"
+    },
+    {
+      "hit": false,
+      "index": 2,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "c/kernel.c",
+      "spelling": "opline->op2_type != PH56_IS_UNUSED"
+    },
+    {
+      "hit": false,
+      "index": 2,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "c/kernel_hardened.c",
+      "spelling": "opline->op2_type != PH56_IS_UNUSED"
+    },
+    {
+      "hit": false,
+      "index": 2,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "safe_naive.rs",
+      "spelling": "opline->op2_type != PH56_IS_UNUSED"
+    },
+    {
+      "hit": false,
+      "index": 2,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "safe_tuned.rs",
+      "spelling": "opline->op2_type != PH56_IS_UNUSED"
+    },
+    {
+      "hit": false,
+      "index": 2,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "unsafe.rs",
+      "spelling": "opline->op2_type != PH56_IS_UNUSED"
+    },
+    {
+      "hit": false,
+      "index": 2,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "verus.rs",
+      "spelling": "opline->op2_type != PH56_IS_UNUSED"
+    },
+    {
+      "hit": false,
+      "index": 2,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "c/kernel.c",
+      "spelling": "o.op2_type != T_UNUSED"
+    },
+    {
+      "hit": false,
+      "index": 2,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "c/kernel_hardened.c",
+      "spelling": "o.op2_type != T_UNUSED"
+    },
+    {
+      "hit": false,
+      "index": 2,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "safe_naive.rs",
+      "spelling": "o.op2_type != T_UNUSED"
+    },
+    {
+      "hit": false,
+      "index": 2,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "safe_tuned.rs",
+      "spelling": "o.op2_type != T_UNUSED"
+    },
+    {
+      "hit": false,
+      "index": 2,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "unsafe.rs",
+      "spelling": "o.op2_type != T_UNUSED"
+    },
+    {
+      "hit": false,
+      "index": 2,
+      "key": "forbidden",
+      "lang": null,
+      "rung": "verus.rs",
+      "spelling": "o.op2_type != T_UNUSED"
+    }
+  ]
+}

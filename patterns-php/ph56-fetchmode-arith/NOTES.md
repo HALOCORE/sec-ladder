@@ -3,8 +3,10 @@
 Measurements and arguments for `ph56-fetchmode-arith`. `README.md` is the
 reader's entry point; this file is the record.
 
-⛔ **THE ROW IS INCOMPLETE — §10 IS THE STOPPING POINT.** Read it before
-planning any work here.
+⭐ **THE ROW IS COMPLETE AND GATED.** §11 is the proof, §12 is the statistic.
+§10 is the HISTORY and not a warning: the row was built over **two** tasks, and
+`TASK_PHP_051` stopped cleanly at five rungs with no `spec.md` rather than
+guessing at the sixth.
 
 ---
 
@@ -447,17 +449,33 @@ All five built rungs agree on every input (§6). The rungs differ as follows:
   `requires t.is_some()` is discharged by the *compiler pass*, and that
   precondition **is CRASH-041 written as a proof obligation**.
 
-⚠ **No instruction counts, no `Ir`, no percentages are published here**, because
-no measurement record exists — §10.
+* **R4 → R5** adds the proof and **changes not one character of the exec text**
+  (§11). The numbers are in §12c.
+
+⭐⭐ **AND THE R3 → R4 LEVER IS ONE SPELLING OF ONE EXPRESSION.** `safe_naive.rs`
+and `safe_tuned.rs` write a **checked** `unwrap` on the operand; `unsafe.rs` and
+`verus.rs` write the unchecked one through `zunwrap`. `spec.md`'s
+`idiom.required[2]` declares that per rung and backticks nothing on the Rust
+side, because a pin there would name a spelling half the Rust rungs cannot
+carry.
 
 ---
 
-## §10 ⛔⛔⛔ THE STOPPING POINT — what is done, what is not, and what to do next
+## §10 ⓘ THE ROW'S HISTORY — it was built over two tasks, and the stop was the right call
 
-`TASK_PHP_051` says: *"If your depth runs out, STOP and say exactly where."*
-This is exactly where.
+`TASK_PHP_051` built five of six rungs, established the harm end to end, ran the
+sibling census and the R1h backport, and then **stopped** — `verus.rs` and
+`spec.md` did not exist and nothing had been built, measured or gated. It wrote
+down the obligation, the resume order and the blast radius, and published **no**
+`Ir`, **no** percentage and **no** statistic rather than half of one.
+`TASK_PHP_052` resumed from that note and did §11 and §12.
 
-### DONE, and validated
+⭐ **That cost the programme one task and cost it nothing else.** The five rungs
+were differentially validated before the stop and none of them moved afterwards
+except for one normalisation the proof forced, itemised in §11.3 and in
+`spec.md`'s `provenance.divergences`.
+
+### What was already true at the stop, and is still true
 
 | | evidence |
 |---|---|
@@ -474,46 +492,591 @@ This is exactly where.
 | `controls/` | both controls green, both selftests green |
 | the preflight with this row present | `gate.py --preflight` → **rc 0** |
 
-### NOT DONE
+### What `TASK_PHP_052` added
 
-1. ⛔ **`verus.rs` (R5) does not exist.** The proof obligation is written down —
-   §9, and `unsafe.rs::zunwrap`'s doc comment — but no Verus source was
-   attempted. **This is the long pole.** The property to prove is:
+| | evidence |
+|---|---|
+| `verus.rs` (R5) | §11. **66 verified / 0 errors**, **76 under `--cfg slb_twin`**, no `#[verifier::rlimit]` |
+| `spec.md` | the contract, the seven pinned spans, the tier declaration and the 56 `verus.items` pins |
+| the gate | the six-command sequence, `PROTOCOL_PHP.md` §E |
+| the statistic | §12 — the `inside_share` matrix per cell, both C columns on every cross-language figure, and §B5's sweep |
+| `controls/negatives.py` | the mutants that must FAIL to verify, including `r1` |
+| `controls/spellings.py` | every backticked pin in `spec.md` against every rung |
+| `controls/statistic.py`, `controls/rlimit_bisect.sh` | §12 and §11.4 |
 
-   > for every `j < nops`, `ops[j].opcode == ISSET_ISEMPTY_DIM_OBJ` implies
-   > `ops[j].op2_type != T_UNUSED`
+---
 
-   established as a loop invariant of the compile pass (which needs the
-   `BP_VAR_IS` guard, i.e. R1h) and consumed at `zunwrap`'s call site. It is the
-   direct analogue of `ph55`'s `ok_from`, and like `ok_from` it is a property the
-   **emitter** establishes and the **executor** relies on without testing.
-2. ⛔ **`spec.md` does not exist**, so the row has no contract, no `provenance`
-   block, no `idiom`, no `identity` and no `collapse`. `provenance.py` has
-   nothing to validate and the gate cannot read a `contract_sha256`.
-3. ⛔ **The row has never been built, measured, reported or gated.** No `Ir`, no
-   `inside_share`, no statistic choice, no family-B figure, no alignment sweep.
-4. ⛔ `controls/` has no `spellings.py`, no `negatives.py`, no `statistic.py`,
-   no `argv_align.py`.
+## §11 ⭐⭐⭐ THE PROOF — `operand_present`, and it is `ph55`'s `ok_from` one file over
 
-### ⚠ Consequently, these `TASK_PHP_051` deliverables are **UNMET**
+### 11.1 What is proved
 
-* **#2** — the row is not built at five rungs and not gated; no verdict to quote.
-* **#5** — no `inside_share` matrix, no statistic, no C columns, no §B5 sweep.
-* **#6 prediction 2** (*stage 5c-twin passes cleanly*) — **UNTESTED**. Nothing
-  was put through Verus, so nothing is known. It is not refuted; it is unasked.
-* **#6 prediction 3** — upheld on the mechanism, **UNTESTED on the number**; §8.
+```
+requires  off + len <= buf@.len(),  16 <= len,  len <= 8 * MAX_STMT
+ensures   r == ph56_fold(buf@, off as int, len as int)
+```
 
-### The order to resume in
+A **value** postcondition over the whole machine, not a memory-safety-only
+retreat. `ph56_fold` is PHP 5.0.0's compiler-plus-executor with `1e708a5aeb30`
+applied, spelled as recursive spec functions — `c_stmt`, `parsed`, `compiled`,
+`s_fetch`, `e_step`, `e_run`, `fold_slots`, `fold_anext` — and `model.py`'s
+**second** implementation, `ph56_run`, re-derives the same `u64` from a
+different decomposition. A kernel that returned `0` unconditionally would
+satisfy every bounds obligation in the file; it is the `ensures` that stops the
+proof being vacuous, and `main`'s
+`assert(r == ph56_fold(buf@, (k * stride) as int, stride as int))` is what
+*consumes* it.
 
-1. Write `verus.rs` from `unsafe.rs` — the exec text must stay one text
-   (`identity` pins R4 == R5). Start with the compile-pass invariant.
-2. Write `spec.md`, deriving `requires`/`ensures` from `verus.rs`. `ensures`
-   should name `ph56_run`, which `model.py` already exports as `helpers`.
-3. The six-command sequence (`PROTOCOL_PHP.md` §E). ⚠ Expect the first gate to
-   FAIL on tables; that is the `gate → report → gate` chain, not a defect.
-4. Then, and only then, the statistic, the `inside_share` matrix and
-   `.tasks-php/php50_align_sweep.py`.
+### 11.2 ⭐⭐⭐ The obligation, and where it comes from
 
-⚠ **Nothing in this row is load-bearing for any other row.** It is untracked,
-it is in no digest, and `gate.py --preflight` is green with it present
-(measured). Deleting it costs only the work.
+> `operand_present(ops, n)` — *for every `j < n`, an opline whose opcode is
+> `ZEND_ISSET_ISEMPTY_DIM_OBJ` carries an op2 that is `IS_CONST` or `IS_VAR`,
+> and never `IS_UNUSED`.*
+
+It is the **loop invariant of the compile pass**, it is what discharges
+`zunwrap`'s `requires t.is_some()`, and **it is exactly the invariant
+`case BP_VAR_IS:` breaks at 5.0.0.** Three facts carry the per-statement step,
+and the middle one is the upstream fix:
+
+1. `ZEND_ISSET_ISEMPTY_DIM_OBJ` is reachable only through
+   `zend_do_isset_or_isempty`'s `ZEND_FETCH_DIM_IS` arm (`:3229`), and
+   `ZEND_FETCH_DIM_IS` is `ZEND_FETCH_DIM_W + 6` and nothing else — that is the
+   six-groups-of-three layout doing the work;
+2. `case BP_VAR_IS:` **refuses** `ZEND_FETCH_DIM_W` with an `IS_UNUSED` op2.
+   At 5.0.0 it does not, and this is the assert that fails;
+3. `zend_do_isset_or_isempty` rewrites the **last** opline only, so a chain's
+   leading `[]` opline is judged by (2) as well.
+
+⭐⭐ **It is ESTABLISHED BY THE EMITTER and CONSUMED BY THE EXECUTOR WITHOUT
+TESTING**, which is `ph55`'s `ok_from` with the layers swapped. See §11.5.
+
+⚠ **Note what it is NOT: it is not *every opcode has a handler*.** Every opcode
+this compiler emits HAS one. What is missing is the **operand** — §7, and it is
+why this row needs no `Option<u8>` substitution and never meets Verus's
+function-pointer-type refusal.
+
+### 11.3 ⚠ THE ONE THING THE PROOF CHANGED IN THE OTHER RUNGS, and it is declared
+
+Verus models `usize` as 32 **or** 64 bits and will not assume a `u64` cast to
+`usize` is lossless, so R5 must take the modulus **before** the cast. `ph55`
+resolved that by shipping `(x as usize) % NVAR` in `unsafe.rs` and
+`(x % (NVAR as u64)) as usize` in `verus.rs` — two texts, on a row whose
+`identity` pin says one.
+
+▶ **This row normalised ALL FOUR Rust rungs onto the second spelling** (three
+expressions per file, nine in total), so:
+
+* R4 and R5 are **one exec text**, character-identical apart from the `verus!`
+  block, the spec and proof items and the ghost clauses;
+* the R2→R3 and R3→R4 gradients are **not** polluted by a representation change
+  that has nothing to do with either lever.
+
+The two expressions denote the same value on any 64-bit target and compile to
+the same mask. C keeps the cast-first form, because C has nothing to prove.
+Itemised in `spec.md`'s `provenance.divergences`, and demonstrated
+behaviour-preserving by the gate's own stage-3 cross-rung checksum on every
+input.
+
+### 11.4 ⭐⭐ THE RLIMIT IS **2**, AND THE DEFAULT IS 10
+
+`controls/rlimit_bisect.sh`, bisected on this box rather than guessed:
+
+| rlimit | plain | `--cfg slb_twin` |
+|---:|---|---|
+| 1 | 65 verified / **1 error** | 75 / **1 error** |
+| 2 | **66 / 0** | **76 / 0** |
+| 3, 5, 8, 10, 20, 30, 40, 60, 100, 200 | 66 / 0 | 76 / 0 |
+| *(no attribute — what ships)* | 66 / 0 | 76 / 0 |
+
+⭐ **`ph55` bisected to the same `2`** on a proof of the same shape. That makes
+it an `n = 2` result about the SHAPE and not a fact about one row: every
+obligation in both files is one unfolding of a recursive definition whose shape
+the exec code mirrors, so Z3 never searches. ⚠ Compare `ph16`, whose obligation
+is a single index bound with no loop in it and which ships
+`#[verifier::rlimit(30)]` because its twin build FAILED at 8.
+
+⚠⚠ **AND THE FIRST DRAFT OF `verus.rs` DID EXCEED THE DEFAULT.** The cause was a
+**wrong loop invariant**, not proof size: two clauses that cannot hold at a
+`break` were declared `invariant` instead of `invariant_except_break`, Z3 spent
+the budget failing to prove them, and the diagnostic was
+`Resource limit (rlimit) exceeded`. ▶ **An rlimit error is a symptom, not a
+size** — and the obvious repair, raise the number, would have shipped a proof
+with a wrong invariant and a 20× budget.
+
+### 11.5 ⭐⭐⭐ THE `ph55` PAIRING'S R5 HALF — the family is now `n = 2` on the PROOF too
+
+§3 pairs the two rows on the **defect** and the **fix**. This is the third axis
+and neither row has it alone:
+
+| | `ph55` | `ph56` |
+|---|---|---|
+| the obligation | `ok_from` — *starting at `p` and striding by each instruction's own width, every word the PC lands on is an INSTRUCTION word* | `operand_present` — *every opline that reads op2 was emitted with op2 present* |
+| what it is about | the **program counter** | the **operand contract** |
+| who establishes it | the **emitter** (`emit_from`) | the **emitter** (the compile pass's loop invariant) |
+| who consumes it | the **executor**, untested, at `zend_execute.c:1391` | the **executor**, untested, at `zend_execute.c:3973` |
+| what it discharges | `hunwrap`'s `requires t.is_some()` | `zunwrap`'s `requires t.is_some()` |
+| trusted items | 8 (+8 twins) | 10 (+10 twins) |
+| rlimit needed | **2** | **2** |
+| Verus's obstacle | ⛔ **function pointer types unsupported** — a TYPE-LEVEL refusal no `external_body` wrapper fixes; forced `Option<u8>` + `match` on all four Rust rungs | **none** |
+| the must-fire negative | `--emit nofixup` deletes the emitter pass | `--emit r1` deletes `1e708a5aeb30`'s three lines |
+
+> ⭐⭐ **THE SENTENCE, and it completes §3's:** *in both rows the obligation is a
+> property the EMITTER establishes and the EXECUTOR relies on WITHOUT TESTING,
+> both are loop invariants of the emitting pass, both discharge exactly one
+> `unwrap_unchecked` precondition, and both proofs need an rlimit of 2 against a
+> default of 10.* **One family, one fix shape, one proof shape, two harms.**
+
+### 11.6 ⭐ THE MUTANTS, AND `r1` FAILS ON THE ROW'S OWN ASSERT
+
+`controls/negatives.py`. Four mutants, and the row declares in advance which
+must fail:
+
+| mutant | what it removes | must | measured |
+|---|---|---|---|
+| `r1` | ⭐⭐⭐ `1e708a5aeb30`'s three lines — from `s_parse_ok` and from the exec arm together | **FAIL** | **65 verified / 1 error**, and the error is the `assert forall` that re-establishes `operand_present` — the diagnostic names `ISSET_ISEMPTY_DIM_OBJ` |
+| `noinv` | `operand_present` from the **executor** loop's invariant | **FAIL** | see `controls/negatives.json` |
+| `nocap` | the `nops + 1 + chain > MAX_OPS` break | **FAIL** | 65 / 1 |
+| `noclamp` | the `if nstmt > MAX_STMT { nstmt = MAX_STMT; }` clamp | **FAIL** | 65 / 1 |
+| `nobuf` | `off + len <= buf@.len()` — the kernel's **only** precondition | **FAIL** | 65 / 1 |
+
+⭐ **The `r1` mutant is the whole R5 argument in one command.** It is not enough
+that the file verifies; what makes the proof *about CRASH-041* is that deleting
+the 2004 patch makes it stop verifying, **at the obligation and not somewhere
+else** — which `negative_problems` arm 3 checks by reading the diagnostic rather
+than the exit code.
+
+⚠ `pristine` re-verifies the **shipped** file plain and twin on every run and
+fails if either moves off 66/0 or 76/0. Without it, a run in which Verus was
+broken for every input would report five mutants failing and look like a pass.
+Measured: `66 / 0` plain and `76 / 0` twin, with all five mutants at `65 / 1`.
+
+### 11.7 ⭐⭐ THE PRECONDITION COUNT WENT 3 → 1, AND THE GATE DID IT
+
+The first draft of `verus.rs` carried `ph55`'s three preconditions, copied
+across:
+
+```
+requires  off + len <= buf@.len(),  16 <= len,  len <= 8 * MAX_STMT
+```
+
+⛔ **The gate's own `req-mut` stage deleted each one from the verified item and
+re-ran Verus.** Two of the three came back `66 verified, 0 errors` — i.e. the
+body never used the assumption and no call site ever had to discharge it:
+
+```
+[req-mut] verus.rs kernel requires[1] is NOT load-bearing   (16 <= len)
+[req-mut] verus.rs kernel requires[2] is NOT load-bearing   (len <= 8 * MAX_STMT)
+```
+
+Both were **deleted**, and the shipped kernel has exactly one `requires`.
+
+▶ **Why the two rows differ, and it is not about the proof.** `ph55`'s decoder
+writes `nops - 2` and its op_array has no capacity test, so `16 <= len` and
+`len <= 8 * MAX_OPS` are the only things keeping those expressions defined.
+`ph56` **establishes** both facts in the code instead: `nstmt` is clamped to
+`MAX_STMT` two lines after it is computed, and the statement loop breaks on
+`nops + 1 + chain > MAX_OPS`. ⭐ Those are exactly the two things
+`controls/negatives.py`'s `noclamp` and `nocap` delete, and **both mutants
+fail** — so the row does not merely assert that the code establishes the
+bounds, it measures that nothing else does.
+
+⚠⚠ **AND THE LESSON IS ABOUT COPYING A SIBLING'S SIGNATURE.** A precondition
+that is not load-bearing is not harmless: it is a claim about the caller that
+the callee does not need, it narrows the admissible call sites for nothing, and
+it is exactly the decoration `.memory/04-verus.md` warns a `requires` can become.
+It was caught by a stage that exists for that purpose and would not have been
+caught by reading.
+
+⭐ **AND THE DELETION COST ZERO BYTES, MEASURED RATHER THAN ASSERTED.** A ghost
+clause erases before codegen, so removing two of them should change no machine
+code — but *should* is an argument. The four `verus` binaries were `md5sum`'d
+before and after, and rebuilt from the edited source through
+`harness-php/gate.py --tool build`:
+
+```
+verus-O3-isolated   ecf9521fdebbe03cc91fc034b076f83a   before and after
+verus-O0-isolated   33d6eeb18628d24e5a36de9f60fc4eef   before and after
+```
+
+▶ **Byte-identical.** So every figure in §12 that was taken before the edit is a
+figure about the shipped binary. ⚠ The MEASUREMENT RECORD still had to be
+retaken, because it pins `verus.rs`'s **source** hash and not the binary's —
+`harness-php/gate.py --tool measure --check-stale` reported `STALE
+results/ph56-fetchmode-arith.json patterns/ph56-fetchmode-arith/verus.rs`, which
+is the digest doing exactly its job on a change that moved no byte it measures.
+
+### 11.8 SLB-TRUSTED-ARGUMENT — the per-item arguments the gate requires
+
+Ten trusted items, ten arguments. Each answers the three things no stage of the
+gate can judge: **(a)** is the twin's body the right checked stand-in for the
+unchecked operation; **(b)** is the `ensures` COMPLETE with respect to every
+unchecked operation the body performs; **(c)** does each clause mean the same
+thing in the shipped configuration as in the twin's.
+
+#### SLB-TRUSTED-ARGUMENT verus.rs bget
+
+**(a)** The unchecked operation is `*v.get_unchecked(i)` on a `&[u8]`; the twin
+is `v[i]`, the same read with the bounds check Rust would have emitted. There is
+no third thing `get_unchecked` does. **(b)** The body performs exactly one
+memory operation and it is a read at `i`; `r == v@[i as int]` names the value of
+that read, and there is no post-state to constrain because `v` is a shared
+reference and the function returns by value. A body that also read `i + 1` would
+still satisfy this contract — `TASK_009_REVIEW`'s x4 — and the defence is Miri,
+which this row requires, plus a body three tokens long quoted verbatim beside
+the twin. **(c)** `i < v@.len()` and `r == v@[i as int]` mention only the
+parameter, the slice view and the return value; `slb_twin` is on the twin's own
+`#[cfg]` and nowhere else, so nothing in either clause can differ between the
+two configurations.
+
+#### SLB-TRUSTED-ARGUMENT verus.rs oget
+
+**(a)** `*a.get_unchecked(i)` on a `&[Op; MAX_OPS]` against the twin's `a[i]`:
+the same read, checked. `Op` is `Copy`, so both return by value and neither can
+alias. **(b)** One read, at `i`, returned; `r == a@[i as int]` is the whole of
+it, and there is no post-state — `a` is shared. **(c)** The clauses name `i`,
+`MAX_OPS` and `a@`; `MAX_OPS` is a `pub const usize` outside any `#[cfg]`, so it
+is the same 128 in both configurations. ⚠ **The `requires` is `i < MAX_OPS` and
+NOT `i < a@.len()`**, deliberately: the length is in the TYPE, so
+`a@.len() == MAX_OPS` holds of every `a` this signature admits and a
+length-shaped `requires` would be saying nothing. That is the difference from
+`bget`, whose slice length is a run-time fact.
+
+#### SLB-TRUSTED-ARGUMENT verus.rs oset
+
+**(a)** `*a.get_unchecked_mut(i) = x` against the twin's `a[i] = x`: the same
+store, checked. **(b)** ⭐ This is the completeness case that matters. The body
+performs exactly one store, and the `ensures` names the **whole post-state** —
+`final(a)@ == old(a)@.update(i as int, x)` — so a body that also clobbered
+`a[i + 1]`, or stored something other than `x`, or stored at some other index,
+could not satisfy its own postcondition. A weaker `ensures` naming only
+`final(a)@[i] == x` would have admitted all three, and this row does not write
+one. **(c)** `i`, `MAX_OPS`, `x`, `old(a)@`, `final(a)@` — none is
+`#[cfg]`-dependent. ⚠ `x: Op` is a **pure value** and correctly has no
+precondition: every inhabitant of `Op` is a legal store into a slot that
+`[ZERO_OP; MAX_OPS]` has already initialised.
+
+#### SLB-TRUSTED-ARGUMENT verus.rs sget
+
+**(a)** `*a.get_unchecked(i)` on a `&[Zv; NSLOT]` against `a[i]`: the same read,
+checked; `Zv` is `Copy`. **(b)** One read, at `i`, returned by value;
+`r == a@[i as int]` is the whole of it and there is no post-state. **(c)** `i`,
+`NSLOT` (a `pub const usize` = 42, outside any `#[cfg]`) and `a@`. ⭐ `Zv` is
+ONE record where `ph55` used two parallel arrays for the same zval store, so
+this row has one get/set pair for the store where `ph55` has two — a trusted
+surface two items narrower for the same job, and `spec.md`'s
+`unsafe_justifications` records the trade rather than hiding it.
+
+#### SLB-TRUSTED-ARGUMENT verus.rs sset
+
+**(a)** `*a.get_unchecked_mut(i) = x` against `a[i] = x`. **(b)** One store, and
+the `ensures` is the whole post-state `old(a)@.update(i as int, x)`, so a body
+that clobbered a neighbour could not satisfy it. `x: Zv` is a pure value and
+needs no precondition — every inhabitant of `Zv` is a legal store into an
+already-initialised slot, and `[ZERO_ZV; NSLOT]` initialises all 42 before the
+first call site. ⚠ The array is `[Zv; 42]` and not `[Op; 128]`: a reviewer
+checking that the bound matches the array is checking a different pair here than
+in `oset`. **(c)** `i`, `NSLOT`, `x`, `old(a)@`, `final(a)@`; none is
+`#[cfg]`-dependent.
+
+#### SLB-TRUSTED-ARGUMENT verus.rs tget
+
+**(a)** `*a.get_unchecked(i)` on a `&[u16; MAX_STMT]` against `a[i]`. **(b)** One
+read at `i`, returned; `r == a@[i as int]`, no post-state. **(c)** `i`,
+`MAX_STMT` (= 64) and `a@`. ⚠ **The bound is `MAX_STMT`, not `NSLOT` and not
+`MAX_OPS`** — `EX(Ts)` has one slot per STATEMENT — and this file has THREE
+different array bounds in play, which is the thing a reviewer of this section
+has to keep apart. `tmp_of`'s `% MAX_STMT` is what establishes it at every call
+site.
+
+#### SLB-TRUSTED-ARGUMENT verus.rs tset
+
+**(a)** `*a.get_unchecked_mut(i) = x` against `a[i] = x`. **(b)** One store; the
+`ensures` is the whole post-state. `x: u16` is a pure value. **(c)** `i`,
+`MAX_STMT`, `x`, `old(a)@`, `final(a)@`; none is `#[cfg]`-dependent.
+
+#### SLB-TRUSTED-ARGUMENT verus.rs nget
+
+**(a)** `*a.get_unchecked(i)` on a `&[u16; NVAR]` against `a[i]`. **(b)** One
+read at `i`, returned; `r == a@[i as int]`, no post-state. **(c)** `i`, `NVAR`
+(= 8) and `a@`. ⚠ This is the NARROWEST of the four bounds and the one
+established from a value the INPUT controls: `a` comes from
+`cz.lval % (NVAR as u64)`, where `cz.lval` is whatever the decoded record put
+in the container slot. The modulus is what makes it sound, and it is in the exec
+text of all four Rust rungs identically.
+
+#### SLB-TRUSTED-ARGUMENT verus.rs nset
+
+**(a)** `*a.get_unchecked_mut(i) = x` against `a[i] = x`. **(b)** One store; the
+`ensures` is the whole post-state `old(a)@.update(i as int, x)`. `x: u16` is a
+pure value. **(c)** `i`, `NVAR`, `x`, `old(a)@`, `final(a)@`; none is
+`#[cfg]`-dependent.
+
+#### SLB-TRUSTED-ARGUMENT verus.rs zunwrap
+
+⭐⭐⭐ **THE ROW'S OWN TRUSTED ITEM, AND THE ONLY ONE OF THE TEN THAT IS NOT AN
+INDEX.**
+
+**(a)** The unchecked operation is `t.unwrap_unchecked()` on an
+`Option<usize>`; the twin is `t.unwrap()`, which is the same projection with the
+`None` test Rust would have emitted. ⚠ **Neither TESTS the operand** — `unwrap`
+panics, it does not take a different path — so the twin is the right stand-in
+for what C does at `zend_execute.c:3973`, which is to assume and read.
+**(b)** The body performs exactly one operation and it is the projection;
+`r == t.unwrap()` names its result and there is no post-state, because `t` is
+taken by value and `usize` is `Copy`. There is no second parameter to leave
+unconstrained — the shape this stage exists to catch cannot arise here, because
+the ONLY thing that can make `t.unwrap_unchecked()` undefined is `t` itself.
+**(c)** `t.is_some()` and `r == t.unwrap()` name only the parameter and the
+return value; `Option<usize>` is `core`'s and carries no `#[cfg]`.
+
+⚠ **What makes this entry worth reading is where the precondition comes from.**
+Not from arithmetic and not from the caller's convenience: from the COMPILER.
+`operand_present` is the compile pass's loop invariant, it holds only because
+`case BP_VAR_IS:` refuses an append dim, and that refusal is `1e708a5aeb30`.
+`controls/negatives.py --emit r1` deletes the three lines and the mutant must
+FAIL — measured, `65 verified / 1 error`, and the error is the `assert forall`
+that re-establishes `operand_present`.
+
+---
+
+## §12 ⭐⭐⭐ THE STATISTIC — and on this row **the cross-language sign depends on which one you pick**
+
+⛔ **Everything in this section is `O3`, and every percentage names five things:
+STATISTIC · INPUT · OPT/MODE · BASE · and, where the base is a C cell, WHICH
+COMPILER — with BOTH C columns.** No `O0` figure is quoted as a performance
+result and none is measured into this section. Produced by
+`controls/statistic.py` (`statistic.json`), with the family-B half from
+`.tasks-php/php50_align_sweep.py` (§12d).
+
+ⓘ **The two shapes**: `small.bin` is a 128-byte window = **16 statement
+records**; `large.bin` is 512 bytes = **64**. Both at 20 000 driver iterations.
+
+### 12a ⭐⭐ `inside_share` PER CELL, BEFORE ANY STATISTIC IS CHOSEN
+
+`inside_share` = A1 / W1 = (the `kernel` symbol's exclusive Ir) / (the whole
+program's Ir), per call, O3/isolated.
+
+| cell | `small.bin` | `large.bin` |
+|---|---:|---:|
+| `c-gcc` (R1) | **0.8848** | **0.8547** |
+| `c-gcc-h` (R1h) | **0.8856** | **0.8560** |
+| `c-clang` (R1) | 0.9368 | 0.9791 |
+| `c-clang-h` (R1h) | 0.9371 | 0.9792 |
+| `safe_naive` (R2) | 0.9761 | 0.9922 |
+| `safe_tuned` (R3) | 0.9720 | 0.9905 |
+| `unsafe` (R4) | 0.9707 | 0.9897 |
+| `verus` (R5) | 0.9707 | 0.9897 |
+
+⚠⚠ **READ THE GCC ROW.** gcc keeps **11.4 % of the per-call work on `small.bin`
+and 14.5 % on `large.bin` OUTSIDE the `kernel` symbol** — in callees it chose
+not to inline — where the four Rust cells keep 0.8–2.9 % outside. The gap
+between `c-gcc-h` and the Rust cells is **0.085 to 0.137**, far past
+`STATISTICS_001.md` §1's `0.02` threshold.
+
+⭐ **Exactly one pair set is NARROW**: the Rust cells against `c-clang-h` **on
+`large.bin`**, where the gap is **0.0104 to 0.0130**. `controls/statistic.py`
+pins that set in `DECLARED_NARROW` and checks the two halves in OPPOSITE
+directions (arms 7 and 8), so neither the wide claim nor the narrow one can rot
+silently.
+
+⛔⛔ **AND A HIGH SHARE IS STILL NOT A CERTIFICATE.** `ph55`'s two C cells —
+`c-gcc` and `c-clang` — sit at 74–83 % and A1 reads `0.000 %` on that row's own
+defect site anyway (base there: the R1 cell of the same compiler), because
+what matters is not how much of the cell A1 sees but whether **THE DIFFERENCE**
+lands inside it. §12b is this row's answer to that question and it is the
+opposite of `ph55`'s.
+
+### 12b ⭐⭐⭐ A1 **SEES** THIS ROW'S FIX, WHERE IT WAS BLIND TO `ph55`'s
+
+R1 → R1h, both families, **both compilers**. Base is the R1 cell of the SAME
+compiler; statistic named per column; O3/isolated.
+
+| input | pair | **A1** Ir/call | **A1 %** | **W1** Ir/call | **W1 %** |
+|---|---|---:|---:|---:|---:|
+| `small.bin` | `c-gcc` → `c-gcc-h` | **+24.422** | **+0.753 %** | +24.419 | +0.666 % |
+| `small.bin` | `c-clang` → `c-clang-h` | **+17.377** | **+0.587 %** | +17.378 | +0.550 % |
+| `large.bin` | `c-gcc` → `c-gcc-h` | **+99.425** | **+1.073 %** | +99.423 | +0.917 % |
+| `large.bin` | `c-clang` → `c-clang-h` | **+68.044** | **+0.725 %** | +68.045 | +0.710 % |
+
+⭐ **Non-zero on all four, in both families**, where `ph55` measures *exactly*
+`0.000 %` in A1 on both of its C cells, `c-gcc` and `c-clang`, against the same
+R1-cell base. ▶ **The difference between the two rows
+is not the defect: it is whether the path from the kernel symbol to the fix goes
+through a function pointer.** `ph55`'s three lines live in a handler reached
+through `opline->handler`, which cannot be inlined; `ph56`'s live in
+`ph56_do_end_variable_parse`, a `static` called from an ordinary loop, which
+both compilers inline into `kernel` at O3.
+
+### 12c ⭐⭐ PREDICTION 2, MEASURED: THE GUARD RUNS ONCE PER EMITTED OPLINE
+
+The task predicts *"the R1h costs ~nothing at run time — the guard is in the
+COMPILER, so it runs once per emitted opline, not per execution"*. Dividing
+§12b's A1 deltas by the statement count:
+
+| compiler | `small.bin` (16 stmts) | `large.bin` (64 stmts) |
+|---|---:|---:|
+| gcc | **1.526** Ir per emitted statement | **1.554** |
+| clang | **1.086** | **1.063** |
+
+⭐ **The per-statement cost is flat across a 4× change in statement count** —
+1.53 vs 1.55 for gcc, 1.09 vs 1.06 for clang. That is the mechanism confirmed by
+the number: the guard is paid **once per opline the compiler emits**, not once
+per execution of anything.
+
+⚠⚠ **AND THE PERCENTAGE IS NOT PHP's.** §8 states it and it is restated here
+because this is where the number appears: `kernel()` **compiles and then
+executes on every call**, where PHP compiles once per script and executes many
+times. **`+0.753 %` / `+0.587 %` (A1, O3/isolated, base = the R1 cell of the
+same compiler) is a LOOSE UPPER BOUND on PHP's cost of `1e708a5aeb30` and may
+not be quoted as PHP's cost of it.** What may be quoted is the per-opline figure
+above, because that quantity is the same in both harnesses.
+
+### 12d ⛔⛔ THE CROSS-LANGUAGE COLUMN — and it changes SIGN between the families
+
+Statistic named per column; input named per row; O3/isolated; bases
+`c-gcc-h` and `c-clang-h` (the R1h cells, so the C side is the fixed program the
+Rust rungs implement).
+
+| rust cell | input | **A1** vs `c-gcc-h` | **A1** vs `c-clang-h` | **W1** vs `c-gcc-h` | **W1** vs `c-clang-h` |
+|---|---|---:|---:|---:|---:|
+| `safe_naive` (R2) | `small.bin` | +28.232 % | +40.716 % | +16.344 % | +35.103 % |
+| `safe_tuned` (R3) | `small.bin` | +8.994 % | +19.605 % | **−0.694 %** | +15.318 % |
+| `unsafe` (R4) | `small.bin` | +3.922 % | +14.039 % | **−5.185 %** | +10.103 % |
+| `verus` (R5) | `small.bin` | +3.922 % | +14.039 % | **−5.185 %** | +10.103 % |
+| `safe_naive` (R2) | `large.bin` | +41.172 % | +39.891 % | +21.787 % | +38.057 % |
+| `safe_tuned` (R3) | `large.bin` | +14.854 % | +13.812 % | **−0.741 %** | +12.520 % |
+| `unsafe` (R4) | `large.bin` | +5.879 % | +4.918 % | **−8.423 %** | +3.811 % |
+| `verus` (R5) | `large.bin` | +5.879 % | +4.918 % | **−8.423 %** | +3.811 % |
+
+> ### ⛔⛔⛔ THE SIGN FLIPS BETWEEN THE TWO FAMILIES, AGAINST GCC, ON SIX OF THE
+> EIGHT ROWS. R4 against `c-gcc-h` on `large.bin` is **+5.879 % in A1** and
+> **−8.423 % in W1** — *the same pair of binaries, the same input, the same
+> optimisation level, dearer or cheaper depending on the statistic*. Against
+> `c-clang-h` the sign is stable positive in both families.
+
+⭐ **`inside_share` predicts it exactly**, which is the point of publishing §12a
+first: `c-gcc` and `c-gcc-h` hide 11–15 % of their per-call work in callees A1
+does not sum, so A1 compares 88 % of the `c-gcc-h` program against 97–99 % of
+the Rust one. **The
+difference does not land inside the symbol on the gcc cells**, so per
+`STATISTICS_001.md` §1 the gcc column may NOT be quoted in A1 and **W1 is the
+statistic for it**. The clang column on `large.bin` is the one pair set where
+the shares are within `0.02` and A1 IS admissible.
+
+▶ **What this row therefore publishes as its cross-language figure**, and it
+names all five things: ⭐ **R4/R5 against the R1h C cells, W1, O3/isolated,
+`large.bin`: −8.423 % against `c-gcc-h` and +3.811 % against `c-clang-h`.**
+Two C columns, two signs, and the row says so rather than picking the flattering
+one — **F108 in a single line.**
+
+### 12e THE LADDER, AND R5 COSTS **EXACTLY** R4
+
+A1, O3/isolated, base named per column.
+
+| step | `small.bin` | `large.bin` |
+|---|---:|---:|
+| R2 → R3 (`safe_naive` → `safe_tuned`) | −628.731 Ir/call, **−15.003 %** | −2465.411 Ir/call, **−18.642 %** |
+| R3 → R4 (`safe_tuned` → `unsafe`) | −165.749 Ir/call, **−4.653 %** | −840.748 Ir/call, **−7.814 %** |
+| R4 → R5 (`unsafe` → `verus`) | **0.000 Ir/call, 0.000 %** | **0.000 Ir/call, 0.000 %** |
+
+⭐⭐⭐ **R4 → R5 IS EXACTLY ZERO ON BOTH INPUTS AND IN BOTH FAMILIES** (§12f has
+the family-B half). `ph55` paid **+0.071 %** on the same pair. The reason is
+§11.3: this row's R4 and R5 are **one exec text**, so the compiler emits the same
+instruction sequence and the binaries differ only in relocation bytes
+(`md5_fn_norel` and `md5_norm` identical at both O0 and O3 isolated — measured,
+and `spec.md`'s `identity` pins `norel` on the strength of it).
+
+⭐ **The R3 → R4 step is this row's own `unsafe`.** Nine of the ten trusted
+accessors are ordinary unchecked indexing; the tenth, `zunwrap`, is the check
+whose absence is CRASH-041. **−4.653 % / −7.814 % (A1, O3/isolated, base = R3)
+is what the whole trusted surface buys**, and the row does NOT attribute it to
+`zunwrap` alone — nothing here decomposes it, and `ph55`'s
+`controls/spellings.py` is the shape that would (that search is **NOT** done on
+this row; §13).
+
+### 12f ⛔ FAMILY B, THROUGH `PROTOCOL_PHP.md` §B5's SWEEP — two verdicts per pair
+
+`.tasks-php/php50_align_sweep.py --row ph56-fetchmode-arith --pads 32`, a full
+32-residue argv pad sweep, O3/isolated, `dcalls=100`.
+
+**Measured step per cell**: `c-clang` **7.0** Ir/call, `c-clang-h` **7.0**, and
+**0.0** for `c-gcc`, `c-gcc-h`, `safe_naive`, `safe_tuned`, `unsafe`, `verus`.
+ⓘ Corpus-wide the step takes `0.00`, `0.02`, `7.00` and `34.49`; this row draws
+two of those four, in the same record.
+
+| input | pair | median Ir/call | range | \|d\|/step | magnitude | sign |
+|---|---|---:|---:|---:|---|---|
+| `small.bin` | `c-clang` → `c-clang-h` | +17.53 | 14.00 | 1.25 | ⛔ **NOT RESOLVABLE** | ✅ SIGN-STABLE |
+| `small.bin` | `c-gcc` → `c-gcc-h` | +24.41 | 0.00 | n/a | ✅ RESOLVABLE | ✅ SIGN-STABLE |
+| `small.bin` | `c-gcc-h` → `safe_tuned` | −31.99 | 0.00 | n/a | ✅ RESOLVABLE | ✅ SIGN-STABLE |
+| `small.bin` | `c-gcc-h` → `unsafe` | −197.87 | 0.00 | n/a | ✅ RESOLVABLE | ✅ SIGN-STABLE |
+| `small.bin` | `c-clang-h` → `safe_tuned` | +486.00 | 7.00 | 69.43 | ✅ RESOLVABLE | ✅ SIGN-STABLE |
+| `small.bin` | `c-clang-h` → `unsafe` | +320.12 | 7.00 | 45.73 | ✅ RESOLVABLE | ✅ SIGN-STABLE |
+| `small.bin` | `safe_naive` → `safe_tuned` | −628.60 | 0.00 | n/a | ✅ RESOLVABLE | ✅ SIGN-STABLE |
+| `small.bin` | `safe_tuned` → `unsafe` | −165.88 | 0.00 | n/a | ✅ RESOLVABLE | ✅ SIGN-STABLE |
+| `small.bin` | `unsafe` → `verus` | **0.00** | 0.00 | n/a | ✅ RESOLVABLE | ✅ SIGN-ZERO |
+| `large.bin` | `c-clang` → `c-clang-h` | +70.76 | 14.00 | 5.05 | ✅ RESOLVABLE | ✅ SIGN-STABLE |
+| `large.bin` | `c-gcc` → `c-gcc-h` | +101.61 | 0.00 | n/a | ✅ RESOLVABLE | ✅ SIGN-STABLE |
+| `large.bin` | `c-gcc-h` → `safe_tuned` | −74.96 | 0.00 | n/a | ✅ RESOLVABLE | ✅ SIGN-STABLE |
+| `large.bin` | `c-gcc-h` → `unsafe` | −917.45 | 0.00 | n/a | ✅ RESOLVABLE | ✅ SIGN-STABLE |
+| `large.bin` | `c-clang-h` → `safe_tuned` | +1209.31 | 7.00 | 172.76 | ✅ RESOLVABLE | ✅ SIGN-STABLE |
+| `large.bin` | `c-clang-h` → `unsafe` | +366.82 | 7.00 | 52.40 | ✅ RESOLVABLE | ✅ SIGN-STABLE |
+| `large.bin` | `safe_naive` → `safe_tuned` | −2463.50 | 0.00 | n/a | ✅ RESOLVABLE | ✅ SIGN-STABLE |
+| `large.bin` | `safe_tuned` → `unsafe` | −842.49 | 0.00 | n/a | ✅ RESOLVABLE | ✅ SIGN-STABLE |
+| `large.bin` | `unsafe` → `verus` | **0.00** | 0.00 | n/a | ✅ RESOLVABLE | ✅ SIGN-ZERO |
+
+⛔ **ONE PAIR IS NOT PUBLISHABLE AS A MAGNITUDE**: `c-clang` → `c-clang-h` on
+`small.bin` is `+17.53` with a range of `14.00` over the pad sweep, i.e.
+`|d|/step = 1.25`. **Its SIGN is sound and its SIZE is not**, and this row does
+not quote `+17.53 Ir/call` as a family-B figure. The A1 figure for that pair
+(`+17.377 Ir/call`, §12b) is a different statistic taken on the `kernel` symbol
+and is not subject to it.
+
+⭐ **Everything else clears.** In particular the three figures this row leans on
+— `safe_tuned` → `unsafe` (−165.88 / −842.49), `unsafe` → `verus` (0.00 / 0.00)
+and `c-gcc-h` → `unsafe` (−197.87 / −917.45) — all have **range 0.00 across all
+32 residues**, so their magnitudes are resolvable and their signs stable.
+
+⭐⭐ **AND THE TWO FAMILIES AGREE ON THE R3 → R4 STEP TO WITHIN 0.2 Ir**:
+A1 gives −165.749 / −840.748 and family B gives −165.88 / −842.49. The price of
+this row's own `unsafe` is the one figure that does not depend on which
+statistic you pick.
+
+### 12g ⚠ The family-B cross-language sign flips between the two COMPILERS too
+
+Family B, O3/isolated, medians from §12f: against `c-gcc-h` the R3 and R4 cells
+are **cheaper** (−31.99 / −197.87 on `small.bin`, −74.96 / −917.45 on
+`large.bin`); against `c-clang-h` they are **dearer** (+486.00 / +320.12 and
++1209.31 / +366.82). ▶ **So on this row the cross-language sign depends on the
+STATISTIC *and* on the C COMPILER, independently.** A single C column would have
+been a different answer, not a noisier one.
+
+---
+
+## §13 ⭐ WHAT THIS ROW DOES **NOT** HAVE
+
+Stated so nobody infers it from the presence of the other controls.
+
+1. ⛔ **No in-contract RESPELLING SEARCH.** `ph55` ships
+   `controls/spellings.py` as a search — it reverts each R3 lever one at a time
+   and reduces the R4 trusted surface one class at a time, and prices each in
+   Ir. **This row's file of the same name is the CONTRACT AUDIT only** (every
+   backticked pin × every rung), and says so in its own docstring. ▶ **So the
+   R2 → R3 and R3 → R4 numbers in §12e are the SHIPPED cells and nothing else:
+   no in-contract spread on either side, and no decomposition of the R3 → R4
+   step into `zunwrap` versus the nine index accessors.** That is the row's
+   largest gap and it is a separate task's work.
+2. ⛔ **No `controls/argv_align.py`.** The family-B alignment question is
+   answered by the corpus-wide `.tasks-php/php50_align_sweep.py` (§12f) rather
+   than by a per-row control.
+3. ⛔ **No endpoint search.** `spec.md` pins R3 and R4 by IDIOM, chosen before
+   measurement, which is what makes `R3ship − R4ship` a bound rather than a
+   difference of two minima. `ph45` and `ph52` both reversed their ordering
+   under search and `ph55` refuted its endpoint prediction in both halves with
+   the signs exactly swapped — so **no prediction about this row's endpoints is
+   made here**, and none should be read into §12e.
+4. ⚠ **The R1h was not verified against a rebuilt PHP.** §8.1 of
+   `TASK_PHP_051`'s report asked for it: rebuild 5.0.0 with `1e708a5aeb30`
+   applied and re-run the six census snippets. That the fix also kills
+   `isset($a[][0])` is an inference from the source plus a measurement in the
+   kernel, and it is **not** confirmed on the real interpreter. It is still the
+   cheapest remaining check on this row.
