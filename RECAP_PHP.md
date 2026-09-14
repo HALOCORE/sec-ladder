@@ -47,12 +47,12 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 8 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL ·
         ph45 (T1) + ph53+ph52 (T3, CLOSED). 6 of 20 fam. .memory-php/ AUTHORITATIVE.
-NEXT    NOTHING RUNNING. _049 LANDED: MY ITEM 111 HEADLINE REFUTED, BUT IT FOUND
-        A BIGGER DEFECT. ▶ (1) ⛔⛔ ITEM 105 NEEDS A USER DECISION, NOW (a) OR
+NEXT    ⏳ _048 RUNNING (ENGINEER, ALONE): ROW 9 `ph55`, T5, THE 7TH FAMILY.
+        ▶ (1) ⛔⛔ ITEM 105 NEEDS A USER DECISION, NOW (a) OR
         (c) -- MY RECOMMENDED (b) DOES NOT EXIST (F107). (a)=edit check.py, a
         33-PATTERN RE-GATE, BUYS PUBLISHING THE SMALLER TCB; (c)=leave it, what
         gate.py's OWN HEADER PRESCRIBES. ⭐ I PROCEED UNDER (c), THE REVERSIBLE
-        DEFAULT. ▶ (2) DISPATCH _048: ROW 9 `ph55`. 32 owed, ~99-122 tasks.
+        DEFAULT. ▶ (2) AFTER _048: ROW 10 = `ph56` (T5, NEARLY FREE). 32 owed.
 ⚠ NEW   F108 ⛔⛔ TWO PUBLISHED CLAIMS IN .memory-php/ CHANGE SIGN WITH THE C
         COMPILER -- ph03's ROW-1 TABLE: "unsafe is 7.6% FASTER than C" IS +9.17%
         SLOWER vs c-clang, AND ph03's OWN NOTES ALREADY SAID SO. ⭐ ROOT CAUSE IS

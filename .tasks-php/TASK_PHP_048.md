@@ -269,10 +269,45 @@ on its Rust cells, so **the same row needed W1 for one column and A1 for the
 other.** `ph45` is 9.5 % → W1; `ph53` is 89.5 % → A1.
 
 ▶ **Measure `inside_share` per cell BEFORE choosing, publish the matrix, and
-publish BOTH statistics labelled.** ⛔ **Never publish a percentage without
-saying WHICH INPUT and WHICH STATISTIC.** ⚠ **Do not quote a W1 figure to more
+publish BOTH statistics labelled.** ⚠ **Do not quote a W1 figure to more
 than 2 dp** — item 99: W1 moves ±14–28 Ir across regenerations while every A1
 figure is bit-identical.
+
+> ### ⛔⛔⛔ AND A **FIFTH** THING EVERY PERCENTAGE OWES, NEW ON 2026-09-13 (F108) — **THIS IS WHY `_049` RAN BEFORE THIS TASK**
+>
+> **A cross-language figure must name the STATISTIC · the INPUT · the OPT/MODE
+> level · the BASE it is against · and ⭐ IF THAT BASE IS A C CELL, WHICH
+> COMPILER — with BOTH C columns, or an explicit statement that only one was
+> measured.**
+>
+> ⛔⛔ **THIS IS NOT PEDANTRY: TWO PUBLISHED CLAIMS IN THE AUTHORITATIVE LAYER
+> CHANGED SIGN UNDER `c-gcc` → `c-clang`.** `ph03`'s row-1 headline table said
+> *"unsafe and verus are **7.6 % FASTER** than C"*; against `c-clang` the same
+> cells are **`+9.17 %` SLOWER**, on both inputs. **Across 8 rows the gcc↔clang
+> gap on identical extracted C runs `−1.86 %` to `−29.96 %`, and 10 of 128 A1
+> cross-language cell-pairs CHANGE SIGN** — **15.6 % at `O3/isolated`, `0 %` at
+> `O0`.** ⛔ **One C column is not a number with error bars. It is a different
+> sign.**
+>
+> ⭐ **The rule has been in `.memory/02-bench-rules.md` and `.memory/01-ladder.md`
+> since `TASK_001`** (*"never report a C-vs-Rust number without saying which C
+> compiler"*, *"always report a clang column"*, clang being *"the same-backend
+> baseline and MANDATORY for any C-vs-Rust claim"*) — **`.memory-php/` simply
+> never inherited it. It is inherited now, in `03-numbers.md`.**
+>
+> ⚠⚠ **ALSO FROM THAT RULE, AND IT BINDS THIS TASK DIRECTLY: *"NEVER REPORT A
+> PERF NUMBER FROM AN `O0` ROW."*** ⛔ **The manager broke it two days ago inside
+> the item that rediscovered it. Do not quote `O0` as a performance result** —
+> `O0` is for identity, blindness and inlining-sensitivity arguments only.
+>
+> ▶ ✅ **Run `.tasks-php/cbaseline_check.py --ratchet` before you finish.** It is
+> a **tripwire, not a defect count** (over-reports by design), and its `RATCHET`
+> is hand-adjudicated. ⛔ **If it fires on your text, ADJUDICATE THE NEW HITS BY
+> HAND in its table — DO NOT widen the regex to make your prose pass.** ⓘ Known
+> checker defect, flagged and deliberately unfixed: `BASE` recognises the four
+> hyphenated **cell** spellings (`c-gcc`, `c-clang`, `c-gcc-h`, `c-clang-h`) and
+> **not** bare `gcc`/`clang` in prose, so correctly-labelled prose can still
+> score as a hit. **Five such false positives are already filed; add yours.**
 
 ⓘ **The manager's guess, offered as a guess:** the whole mechanism is inside the
 dispatch loop, so `inside_share` should be **high on every cell** and A1 should
@@ -362,6 +397,10 @@ failure.**
    of what safe Rust does in each.**
 3. **`inside_share` measured PER CELL and published as a matrix, before the
    statistic is chosen**; both statistics published, labelled.
+3a. ⭐⭐ **EVERY CROSS-LANGUAGE FIGURE CARRIES BOTH C COLUMNS** (`c-gcc` AND
+   `c-clang`), or says explicitly that only one was measured — §2.7's fifth
+   requirement, and **`cbaseline_check.py --ratchet` run before you finish.**
+   ⛔ **No `O0` figure quoted as a performance result.**
 4. **Item 95 recorded as CLOSED** in `NOTES.md`, with §2.2's reasoning and the
    note that the exception path is deliberately out of the kernel.
 5. **The two §2.8 predictions scored, either way.**
