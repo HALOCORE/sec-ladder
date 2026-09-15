@@ -223,3 +223,34 @@ names which findings these are and what a review round owes.
     plain `malloc`, so ASan's `0xbe` is a **runtime option default**
     (`ASAN_OPTIONS=malloc_fill_byte=0` gives zeros), not a compile-time property.
     (Item 96.)
+
+16. ⭐⭐⭐ **AN ARM MAY ASSERT AN EFFECT'S *DIRECTION* ONLY TO DEFEND A
+    **PUBLISHED** FINDING, AND ONLY IF IT PRINTS THE MEASURED MARGIN BESIDE THE
+    FLOOR — AND IT NEEDS A RETIREMENT CONDITION.** A check that asserts the
+    direction of something still being **estimated** can only report a changed
+    conclusion **as a tool failure**, which is the data being blamed for the
+    hypothesis. Three instances are on file: `task_cost.py`'s **`N11`** (the
+    first-in-family premium, refuted in sign at `n = 8` after standing on
+    `n = 1`), **`N13`** (refuted the day it was written), and **`N5`** (whose
+    `not rising` enforced the flat-trend conclusion **that its own file
+    produces**). ✅ The model to copy is `width.py` `N4`/`N3b` and `php_null.py`
+    `N8`/`N9`/`N7b`: they re-assert a **published** result so the tool speaks
+    when it stops reproducing, **and firing is the point.**
+
+    ⛔⛔ **THE SPLIT IS NOT A PROPERTY OF THE ARM. It is a property of the arm's
+    RELATION TO A FINDING'S CURRENT STATUS — AND THAT STATUS CHANGES WITHOUT THE
+    ARM CHANGING.** `N11` was a textbook defending arm right up to the moment
+    the premium was refuted, at which point it became a textbook offending one,
+    **with no edit to it.** ▶ **So the margin clause is the whole mechanism, not
+    a nicety: an arm that prints its margin turns a refutation into a VISIBLY
+    SHRINKING NUMBER instead of a hard failure, which is the transition handled
+    safely.** ⭐ ***An arm that asserts a published direction without printing
+    the margin is an offending arm that has not been caught yet.***
+    ▶ **And every such arm needs a written RETIREMENT CONDITION: a registered
+    prediction with no expiry becomes a pin.**
+
+    ⚠ **Scope, stated because the first wording was withdrawn for being too
+    broad**: *"an arm must not assert a sign"* would have damaged **five correct
+    arms**. ⚠ The sweep behind this covered **four** checkers, 59 arms; **five
+    more are unswept** and speak a different arm dialect. (`RECAP_PHP.md` F126,
+    F128, item 130; narrowed and landed at `TASK_PHP_059` §4.)
