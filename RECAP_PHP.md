@@ -47,23 +47,24 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 11 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL · ph45
         (T1)+ph53+ph52 (T3)+ph55+ph56 (T5)+ph97 (T6) TYPE. 8 of 20 fam. 26 owed
-        to a floor of 37 (item 121). BACKLOG 3 -- F127, F128, F129. NOTHING RUNS.
-NEXT    ▶ (1) ⭐⭐⭐ F129 FORCES A LABEL EVERYWHERE: NAME THE **TWO** SHARES IN
-        .memory-php/03-numbers.md, AND NEVER QUOTE ph29's +33% WITHOUT c-clang's
-        **-4.36%**. ▶ (2) REPAIR N5 (item 130) + SWEEP THE 6 UNSWEPT CHECKERS.
-        ▶ (3) ITEM 129 "UNSURE OF" CENSUS -- ~289 ITEMS, **NOT** A ONE-TASK JOB;
-        ITS SCOPE IS MEASURED IN THE ITEM. ▶ (4) ITEM 132: PIN F74's (i), FREE.
+        to floor 37 (item 121). ⛔ BACKLOG **4** (F127-F130), BIGGEST SINCE _057.
+NEXT    ▶ (1) ⭐⭐⭐ A **REVIEW ROUND**, SCOPE F129+F130 FIRST: F129 REDEFINES WHAT
+        EVERY `inside_share` FIGURE MEANS AND ITS NUMBERS ARE **MANAGER-VERIFIED,
+        NOT REVIEWED** -- law 12 is sharpest here. ▶ (2) ITEM 129 "UNSURE OF"
+        CENSUS -- ~289 ITEMS, **NOT** A ONE-TASK JOB; SCOPE MEASURED IN THE ITEM.
+        ▶ (3) ITEM 132 PIN F74's (i), FREE. ▶ (4) ITEM 134 `BASE`'s SPELLING.
         ▶ (5) ROW 12 = ph96. ▶ (6) ⛔⛔ ITEM 105 IS THE USER'S DECISION, NOT MINE.
-⚠ NEW   F129 ⭐⭐⭐ **TWO QUANTITIES WEAR THE NAME `inside_share`** AND NO DOC SAID
-        SO (0.8045 vs 0.8933 same cell; F74's EXCEEDS 1.0 ON 15/360 CELLS). AND
-        THE +33% **FLIPS SIGN BETWEEN THE TWO C COMPILERS** -- F108's OWN DEFECT.
-⚠ WRONG MY P5 SAID THE COMPARABILITY BAR WAS UNWRITTEN. **IT IS WRITTEN, IN
-        .memory-php/ -- THE LAYER THAT OUTRANKS ME**, AND I DID NOT GREP IT. I
-        ALSO PRICED ITEM 127 BEFORE MEASURING IT. BOTH ARE RULE 14, BY ME.
+⚠ NEW   F129 **TWO QUANTITIES WEAR THE NAME `inside_share`** (0.8045 vs 0.8933
+        SAME CELL; F74's EXCEEDS 1.0 ON 15/360). F130 ⭐⭐⭐ **A RATCHET NOTHING
+        EVER INVOKED** -- GATED ON A FLAG NO CALLER PASSED; IT HAD ALREADY DRIFTED.
+⚠ WRONG **I OVER-CLAIMED IN F129 AND CORRECTED IT MYSELF**: c-clang's -4.36% IS
+        **NOT NEW** -- _049 FILED IT 09-13 IN .memory-php/ AND IN ITEM 111. THE
+        REAL DEFECT IS THAT THE HEADLINE CELL NEVER INHERITED IT. ALSO: MY P5
+        SAID THE BAR WAS UNWRITTEN -- IT IS, IN THE LAYER THAT OUTRANKS ME.
 ⚠ TRAPS AN ARM MAY ASSERT A DIRECTION ONLY IF IT DEFENDS A **PUBLISHED** FINDING,
         AND THEN MUST PRINT THE MARGIN. `grep -a`; EVENT NOT STATE; DESCRIBE A
         PATH, DON'T SPELL IT (x7); NEVER `git add -A`; NOTIFIED != FINISHED.
-READ    RULE-9 · .memory-php/ · F1-F129 · items 1-133 · _058 + ADJUDICATION_003/004.
+READ    RULE-9 · .memory-php/ · F1-F130 · items 1-134 · _058 + ADJUDICATION_003/004.
 ```
 
 ---
@@ -170,6 +171,7 @@ READ    RULE-9 · .memory-php/ · F1-F129 · items 1-133 · _058 + ADJUDICATION_
 > | **F125** | ⚠ **UPHELD-NARROWED / REASON REFUTED** | ⛔⛔ **both clauses of its disclaimer are false** — see **F127**, which is the bigger finding it produced |
 > | ⭐ **F127** | ⛔ **UNREVIEWED** — `_057`'s own round | ⛔ **NOTHING.** ⚠ **It is a reviewer finding, so law 12 cuts the other way** — but item 127 is an ENGINEER task and will test it directly, and it is dispatched as `_058` |
 > | **F128** | ⚠ **UPHELD-NARROWED BY ITS OWN SWEEP, SAME DAY** | ✅ The `N13` defect is real and repaired; ⭐ **a THIRD instance found (`N5`)**. ⛔⛔ **But its RULE as worded is WITHDRAWN — too broad: five correct arms assert a direction legitimately.** Replaced by the Kind-A/Kind-B rule, item 130. ⚠ **Still a manager self-finding, and the sweep was the manager's too** |
+> | ⭐⭐⭐ **F130** | ⛔ **UNREVIEWED** — manager self-finding | ⛔ **NOTHING.** ✅ The un-run ratchet is measured against a worktree and the bare run is **demonstrated failing**; the eight adjudications are written out. ⚠ **What a reviewer owes it: are the eight really benign, and does `BASE` now need widening after all?** — the standing note refused that **seven** times, and the eighth instance cuts the other way |
 > | ⭐⭐⭐ **F129** | ⛔ **UNREVIEWED** — `_058`'s own round | ⛔ **NOTHING**, and it is the **highest-stakes unreviewed finding in the programme**: it changes what every `inside_share` figure MEANS and withdraws the label from the most-cited number. ✅ **Every load-bearing number in it was re-derived by the manager from the committed records with independent code** — the two shares, the exactly-15 over-1.0 cells, the `+33.01 %` and `c-clang`'s `−4.36 %`. ⚠ **That is verification, NOT review**: nobody has yet asked whether the CONCLUSIONS follow |
 >
 > #### ⭐⭐⭐ `F96`, PER GROUP — **SEVEN groups, not the four I wrote** (`_055` §1.1)
@@ -510,8 +512,14 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > marginal_ir_per_call`, the only shipped control computes `A1 / callgrind
 > whole-run total`, they read 0.8045 and 0.8933 on the same cell, and F74's
 > exceeds 1.0 on 15 of 360 corpus cells. AND the programme's most-cited
-> number — `ph29`'s `+33 %` — reads `−4.36 %` on `c-clang`: it FLIPS SIGN
-> between the two C columns, which is the exact defect `F108` exists to stop**
+> number — `ph29`'s `+33 %` — is INADMISSIBLE on the row's own written bar
+> (Δshare 0.2355 against `≤ 0.02`), not merely unlabelled** ·
+> **F130 ⭐⭐⭐ a RATCHET THAT NOTHING EVER INVOKED — `cbaseline_check.py`'s
+> enforcement was gated on a `--ratchet` flag no caller passed, and measured
+> at `1cc2c0e` the corpus already stood at 70 hits against a baseline of 69,
+> un-run and unnoticed. The bare run now enforces. Eight new hits adjudicated
+> by hand, all benign, and one of them is the line that obeys the rule BEST —
+> flagged because it writes `gcc-C` where the regex wants `c-gcc`**
 >
 > ⚠⚠ **This index stopped at F59 while F60–F65 existed, and then AT F101 WHILE
 > F113 EXISTED — twelve behind, caught by a pre-handoff audit 2026-09-14.**
@@ -1815,6 +1823,57 @@ The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
 
+### F130 — ⭐⭐⭐ **A RATCHET THAT NOTHING EVER INVOKED. `cbaseline_check.py`'s ENFORCEMENT WAS GATED ON A FLAG NO CALLER PASSED, AND THE CORPUS HAD ALREADY DRIFTED PAST IT**
+
+⚠ **Manager, 2026-09-15, found while sweeping item 130. UNREVIEWED.**
+
+`cbaseline_check.py` is `F108`'s enforcer: *every cross-language percentage must
+name which C compiler*. Its hit count is a **ratchet** — the house pattern, and
+the one `.tasks-php/README.md` calls *"the ratchet"* in terms: **adjudicate every
+hit BY HAND with a reason; never tune the regex.**
+
+⛔⛔⛔ **Its enforcement sat behind `if '--ratchet' in argv`, and NOTHING PASSED
+IT.** `checkers.py` files the tool with `argv=[]` and a `--selftest` arm; the
+sweep runs both; **neither enforces.** ⭐ **Measured against a worktree at
+`1cc2c0e`, before this session touched anything: 70 hits against a ratchet of
+69.** The corpus had already gone past its adjudicated baseline and **no run
+anywhere would have said so.**
+
+> ⭐⭐ **A RATCHET YOU MUST OPT INTO IS NOT A RATCHET.** ▶ The **bare** run now
+> enforces; `--ratchet` survives as an accepted no-op for old callers.
+> ✅ **Demonstrated failing**: with the baseline lowered by one, the bare run
+> returns `1` and prints `RATCHET FAIL: 77 hits > 76`.
+
+⛔⛔ **AND THE REGISTRY ENTRY'S OWN CAUTION NAMED THE WRONG FLAG.** It read
+*"a bare run REPORTS and does not check — the sweep must run the flag arm too"*,
+and **the flag arm it means is `--selftest`**, which tests the arms, not the
+ratchet. ⭐ **The entry was right that something was un-run and wrong about
+what.** ⓘ It also carried `RATCHET=69` as a literal — **item 73's class, in a
+registry entry about a ratchet.** The count is now stated nowhere but in the
+tool.
+
+#### ✅ THE EIGHT NEW HITS, ADJUDICATED BY HAND — **ALL BENIGN, AND TWO INFORMATIVE**
+
+All eight are `_058`'s new `inside_share` sections (`ph03` +3, `ph16` +2, `ph29`
++2, `ph97` +1; `RECAP_PHP.md` went 35 → 34, so eight arrived and one left). Five
+are share LEVELS or ranges rather than cross-language magnitudes, an `R1`-vs-`R1h`
+line (C against C, same compiler), and a markdown table header. The two that
+matter:
+
+* ⭐ **`ph29` NOTES 1145 quotes the defective `RECAP` sentence IN ORDER TO
+  CRITICISE IT** — a quotation of a defect scoring as the defect. **Item 115's
+  class — *a check that reads prose and calls it code* — seventh instance.**
+* ⭐⭐ **`ph29` NOTES 1157 names BOTH columns and is flagged anyway**, because it
+  writes them `gcc-C` / `clang-C` while `BASE` matches only `c-gcc` / `c-clang`.
+  ⛔ **The checker flags the one line in the corpus that obeys its rule BEST,
+  because of a spelling.** `F10`: *a grep has a spelling.* **Eighth
+  bare-spelling instance — and the first that cuts in this direction**, which is
+  the case the standing note *"still not widening `BASE`"* never considered.
+
+⛔ **ONE of the 70 hits at `1cc2c0e` was ALREADY unadjudicated and is NOT
+attributed** — it predates this session and I did not chase it. **Said rather
+than smoothed over: the ratchet is honest again from 77, not retrospectively.**
+
 ### F129 — ⭐⭐⭐ **TWO DIFFERENT QUANTITIES ARE CALLED `inside_share`, NO DOCUMENT SAID SO, AND THE PROGRAMME'S MOST-CITED NUMBER FLIPS SIGN BETWEEN THE TWO C COMPILERS**
 
 `TASK_PHP_058`, the engineer task item 127 dispatched. ⚠ **UNREVIEWED.** Four
@@ -1862,10 +1921,29 @@ from `results-php/ph29-recvfrom-alloc.json` and the gate record**:
 
 ⛔⛔⛔ **The published sentence is `c-gcc`'s. The other C column says C is
 CHEAPER, and the whole-program statistic says C is cheaper on BOTH.** ⚠ The input
-moves it too (`small.bin`: `+39.92 %`). ⭐ **`F108`'s five things exist precisely
-to stop this, and the programme's single most-cited number was carrying the
-defect `F108` was written about.** ⓘ **The `+33.01 %` is not false** — it
+moves it too (`small.bin`: `+39.92 %`). ⓘ **The `+33.01 %` is not false** — it
 reproduces to the digit. **It was never labelled.**
+
+> ⛔⛔ **CORRECTED BY THE MANAGER THE SAME DAY, BEFORE ANY REVIEWER SAW IT — AND
+> THE CORRECTION MAKES THE FINDING SHARPER, NOT WEAKER.** This section first
+> presented `c-clang`'s `−4.36 %` as a DISCOVERY. **It is not new.** `TASK_PHP_049`
+> measured it on **2026-09-13** and filed it in **`.memory-php/02-ladder.md`** —
+> which states the swap in full (*"A `−4.36 %`, C `−27.78 %`, W1 `−27.61 %`"*)
+> and says in terms that *"A disagrees with three other statistics"* **is a
+> `c-gcc` statement** — and in **this file's own item 111**.
+>
+> ⭐⭐⭐ **SO THE DEFECT WAS NEVER THAT THE SIGN FLIP WAS UNKNOWN. IT IS THAT A
+> CORRECTION LANDED IN THE AUTHORITATIVE LAYER *AND* IN THIS FILE'S ITEMS TABLE,
+> AND THE HEADLINE CELL EVERYONE ACTUALLY READS NEVER INHERITED IT** — for two
+> days, in the same document, one section apart. ⚠ **That is open item 73's class
+> running BACKWARDS**: the item warns that a correction can reach `RECAP_PHP.md`
+> and not `.memory-php/`; here the layer was right and the SUMMARY was stale.
+> ⛔ **And a summary is what gets quoted.**
+>
+> ⓘ **`CLAUDE.md` names this exact shape on the PAT side** — *"`RECAP_PAT.md`
+> twice carried a figure the synthesis had corrected."* **Third instance, first
+> on the php side.** ▶ **What `F129` genuinely adds here is the ADMISSIBILITY
+> verdict (§3), not the clang number.**
 
 #### ✅ (3) `ph29`'s DISCLAIMER IS RIGHT, AND IS ABOUT A DIFFERENT PAIR THAN THE HEADLINE
 
@@ -7527,7 +7605,7 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 ## Open items — carried, not closed
 
 ⚠ **THE NUMBERS HAVE GAPS AND THAT IS CORRECT — DO NOT "REPAIR" THEM.**
-**129 rows present, numbered 1 → 133, with 45–47 and 106 ABSENT** and a
+**130 rows present, numbered 1 → 134, with 45–47 and 106 ABSENT** and a
 growing set retired IN PLACE as `~~N~~`; no number is ever reused.
 ⚠ **Verified 2026-09-15 by the check below**, not by trusting this line — the
 count, the maximum and the gap set are all re-derived, and this sentence exists
@@ -7726,3 +7804,4 @@ the wrong one.
 | 131 | ⚠ **`N12` CANNOT READ THE ARM DIALECT THREE NEW TOOLS SPEAK, SO IT COULD NOT TELL IF THEY WENT SILENT** | **F129**/`_058`. `N12` derives every *"&lt;n&gt; arms"* claim from what a checker PRINTS, matching `PASS`/`FAIL`/`OK` beside an `N&lt;digits&gt;` name. ⛔ **`controls/inside_share.py`, `php58_mutate_arms.py` and `php58_record_share.py` all print `ok &lt;n&gt; &lt;name&gt;` — lowercase, numeric, no `N`** — so `N12` scores them **0 arms** while they run 7, 6 and 7. ⓘ **It fired correctly in form**: it refused a registry entry of mine claiming 7. ▶ **The count was REMOVED from the `why` rather than the regex widened** (the registry's own rule, and *"the fix is no number, not a better one"*). ⛔ **The residual is real: `N12`'s silent-checker guard does not cover these three.** ▶ **Normalising the dialect would cost FOUR RE-GATES** (`inside_share.py` is hashed into four rows' `source_sha256`), which is why it is an item and not a same-day fix |
 | 132 | ⭐⭐ **`F74`'s CONDITION (i) HAS NO THRESHOLD, AND AT ELEVEN ROWS IT IS NOW CHEAP TO PIN** | **F129**/`_058` §9.4. `.memory-php/02-ladder.md`: the bar is **(i)** `min(inside_share)` HIGH **and (ii)** `|Δinside_share| ≤ 0.02`, and *"the threshold in (i) is **not tuned and six rows cannot pin it**"* — `>0.3`, `>0.5`, `>0.6` all give 0 flips. ⭐ **There are ELEVEN rows now and 360 evaluable cells.** ▶ **The sweep reads committed records and builds nothing** — `.tasks-php/php58_record_share.py --pairs`. ⚠⚠ **Do it in `F74`'s spelling, not the control's — they are different quantities (F129), and pinning the threshold of the wrong one would be worse than leaving it open** |
 | 133 | ⛔⛔ **`F74`'s SHARE EXCEEDS `1.0` ON 15 OF 360 CELLS, AND A SHARE OF THE WHOLE CANNOT** | **F129**/`_058`. ✅ **Manager-reproduced independently: exactly 15**, largest `ph07` `c-gcc`/`large` at **`1.0353`**, concentrated in `ph07` and `ph16` at `O3/isolated`. ⚠ **The proposed mechanism — numerator over `n_iters` calls, denominator a SLOPE at `collapse.probe_iters` — is consistent with the arithmetic and was NOT isolated**; it could equally be a start-of-run transient (`F93`'s shape). ⛔ **Do not quote the mechanism as measured; the engineer said so unprompted.** ▶ **The cheap discriminator: recompute the marginal at `n_iters` on one offending cell.** ⭐⭐ **THE STAKES: this quantity DECIDES WHICH STATISTIC MAY PUBLISH (`F74`'s two-condition bar), and it is out of range on 4 % of the corpus.** <br><br>⭐⭐ **THE SHARPEST SINGLE DATUM, manager-verified**: `ph16` `c-gcc`/`isolated`/`small.bin` — **the same row, cell and input** — reads **`0.0418` at `O0`** and **`1.0241` at `O3`**. `A1` is `476.48` vs a marginal of `11401.39` at `O0`, and `3683.26` vs `3596.61` at `O3`. ▶ **A 24× swing, from *A1 sees almost nothing* to *A1 sees more than the whole*, moved by the optimisation level alone.** ⛔ **I am deliberately NOT proposing a mechanism** — that is this item's whole point, and the engineer declined to as well |
+| 134 | ⚠⚠ **`cbaseline_check.py` ENFORCES FOUR-FIFTHS OF THE RULE IT EXISTS FOR: ONE C COLUMN PASSES IT** | **F129**/item 130's sweep. `.memory-php/03-numbers.md` states the fifth thing as *"WHICH COMPILER — **with both columns, or an explicit statement that only one was measured.** ⛔ One column is not a number with error bars on it; it is a DIFFERENT SIGN."* ⛔ **But `scores()` is `MAG and XLANG and not BASE`, where `BASE` matches `c-gcc` OR `c-clang`** — so a sentence naming EITHER is deemed labelled. ⭐⭐ **And its `N2` arm, the exemplar it holds up as *"a correctly labelled claim"*, is `` `ph29/large`, `c-gcc` vs `safe_naive`: A says C is +33.01 % DEARER `` — ONE column, of the very pair whose columns have OPPOSITE SIGNS.** ⓘ **The enforcer's model of compliance is itself one item short of the rule.** <br><br>✅ **SCOPE MEASURED BEFORE OPENING THIS, and it is small: of the scanned corpus, 5 lines name BOTH C columns and 2 name exactly one** — and ⭐ **on inspection BOTH of those two are FINE**: `.memory-php/02-ladder.md` gives the `c-clang` swap in full two lines later, and the `RECAP_PHP.md` hit sits inside `F108`'s own discussion. ⛔ **So there is NO live violation — the finding is that nothing would have caught one**, plus the artefact that a **line-based** scan cannot see a claim whose two columns are one sentence apart. ▶ **The repair is cheap and is NOT a corpus job**: make `BASE` demand both spellings (or an explicit *"only one measured"*), re-adjudicate the handful of hits BY HAND, and fix the `N2` exemplar. ⚠ **It WILL move the `RATCHET` count — that is the point of a ratchet, and every new hit is adjudicated, never regex-tuned** |

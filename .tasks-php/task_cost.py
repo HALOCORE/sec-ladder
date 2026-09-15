@@ -589,23 +589,73 @@ def selftest():
           f"{pub:.2f}: {[round(w, 2) for w in worsts]}")
 
     # N5 ⚠ E2. A "flat, not rising" claim needs a series with real variation --
-    #    if every row cost the same the claim would be unfalsifiable, and if the
-    #    series WERE monotone rising the claim is simply false.
+    #    if every row cost the same the claim would be unfalsifiable.
+    #
+    # ⛔⛔ THIS ARM ASSERTED A DIRECTION TOO, AND IT IS THE **THIRD** IN THIS FILE
+    #    (`N11`/F126, `N13`/F128, this). It read
+    #        check("N5", not rising and max(ser) - min(ser) > 1.0, ...)
+    #    -- and the two conjuncts are DIFFERENT IN KIND, which is the defect:
+    #      * `max - min > 1.0` is a VARIATION FLOOR. Legitimate: without spread
+    #        the trend claim is unfalsifiable and the arm should say so.
+    #      * `not rising` is a DIRECTION ASSERTION. If rows 12-14 happened to
+    #        cost 3, 4 and 5 tasks the series becomes monotone rising, N5 FIRES,
+    #        and the ledger is reported as BROKEN when the truth is that the
+    #        published trend claim needs restating.
+    #
+    # ⛔⛔ AND THIS FILE IS WHAT **PRODUCES** THE TREND CLAIM. An arm inside it
+    #    that enforces the claim's conclusion cannot notice the conclusion has
+    #    changed -- it can only report the change as a tool failure. RECAP_PHP.md
+    #    publishes "flat if anything FALLING" from this very series, so the arm
+    #    and the claim would go stale TOGETHER, silently: the one configuration
+    #    in which nothing catches it.
+    #
+    # ⭐ THE RULE THE ITEM-130 SWEEP EARNED, and it is narrower than F128's first
+    #    wording (which would have damaged five correct arms): an arm MAY assert
+    #    a direction when the direction is a PUBLISHED FINDING it exists to
+    #    defend -- and then it must PRINT THE MEASURED MARGIN beside the floor,
+    #    so the margin is visible shrinking (`width.py` N4/N3b are the model).
+    #    It must NOT assert a direction still being ESTIMATED.
     ser = [per[r] for r in ROWS]
     rising = all(ser[i] <= ser[i + 1] for i in range(len(ser) - 1))
-    check("N5", not rising and max(ser) - min(ser) > 1.0,
-          f"the per-row series is NOT monotone rising and has real spread: "
+    check("N5", max(ser) - min(ser) > 1.0,
+          f"the per-row series has real spread ({max(ser) - min(ser):.2f} > 1.0), "
+          f"so a flat-vs-rising claim about it is falsifiable at all: "
           f"{[round(v, 2) for v in ser]}")
+    print(f"  ⓘ  N5b REPORT (no verdict): the series is "
+          f"{'MONOTONE RISING' if rising else 'not monotone rising'}. ⛔ The "
+          f"direction is NOT asserted -- if it ever turns, that is a RESULT to "
+          f"restate the published trend from, not a failure of this file.")
 
     # N6 ⚠⚠ E3 — THE F52 CONTROL. If the dearest row were one of the RECENT ones
     #    the flat-trend reading would be luck. It must be `ph07`, the one row
     #    that was rebuilt, and that is a claim about a specific row that can
     #    come out wrong.
+    #
+    # ⚠⚠ RETIREMENT CONDITION, ADDED 2026-09-15 (item 130's sweep). This arm is
+    #    a REGISTERED PREDICTION, not an invariant: E3 named `ph07` BEFORE the
+    #    run, and that is exactly what makes it evidence. ⛔ But a prediction
+    #    with no expiry becomes a PIN -- the day a genuinely hard row honestly
+    #    costs more than `ph07`'s 5.50, this arm fires on CORRECT data, which is
+    #    the `N11`/`N13`/`N5` failure mode arriving by a slower road.
+    # ▶ RETIRE IT, do not "fix" it, when EITHER holds:
+    #      (a) a row other than `ph07` is dearest AND its task list has been
+    #          read by hand and found legitimate -- then the E3 control has
+    #          SERVED ITS PURPOSE and the finding is that the trend reading
+    #          needs restating; or
+    #      (b) `ph07` stops being the only REBUILT row, which is the entire
+    #          reason it was predicted dearest.
+    #    In both cases the replacement is an `ⓘ` REPORT of the dearest row and
+    #    its margin -- never a re-pin to whichever row happens to lead.
+    # ⓘ The margin is PRINTED so it is visible shrinking: that is the property
+    #    `width.py`'s N4/N3b have and the three broken arms did not.
     dear = max(ROWS, key=lambda r: per[r])
+    runner = max((r for r in ROWS if r != dear), key=lambda r: per[r])
     check("N6", dear == "ph07",
-          f"the dearest row is `{dear}` at {per[dear]:.2f} — E3 named `ph07` "
-          f"(the only REBUILT row) before running; if it were a recent row the "
-          f"flat trend would be luck")
+          f"the dearest row is `{dear}` at {per[dear]:.2f}, ahead of `{runner}` "
+          f"at {per[runner]:.2f} (margin {per[dear] - per[runner]:+.2f}) — E3 "
+          f"named `ph07` (the only REBUILT row) before running; if it were a "
+          f"recent row the flat trend would be luck. ⚠ REGISTERED PREDICTION, "
+          f"NOT AN INVARIANT — see the retirement condition above")
 
     # N7 ⚠⚠ THE TWO QUANTITIES MUST MATERIALLY DIFFER, or this file has nothing
     #    to say. ⛔ ITS FIRST VERSION PINNED `total/rows ~ 6.5` AS A LITERAL --

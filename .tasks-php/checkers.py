@@ -184,11 +184,19 @@ REGISTRY = {
     "cbaseline_check.py": dict(
         kind="checker", argv=[], expect=0, negatives="flag", st_expect=0,
         why="F108: every cross-language percentage must name WHICH C COMPILER. "
-            "10 arms, RATCHET=69 hand-adjudicated hits. ⛔ A bare run REPORTS "
-            "and does not check -- the sweep must run the flag arm too. "
-            "⛔⛔ This entry said `9 arms` until N12 measured it: N8b was never "
-            "counted, and the arms printed NOTHING on pass, so the claim was "
-            "uncheckable as well as wrong. Both repaired 2026-09-15."),
+            "10 arms over a hand-adjudicated hit ratchet. ⛔⛔ THIS ENTRY SAID "
+            "`A bare run REPORTS and does not check -- the sweep must run the "
+            "flag arm too`, AND THE FLAG IT MEANT WAS THE WRONG ONE: the ratchet "
+            "was gated on `--ratchet`, which NOTHING passed -- not this registry, "
+            "not the sweep. Measured at `1cc2c0e`: the corpus already stood at 70 "
+            "hits against a ratchet of 69, un-run and unnoticed. ⭐ A ratchet you "
+            "must opt into is not a ratchet: the BARE run now enforces, so "
+            "`argv=[]` is the enforcing arm and no new argv is filed. ⛔ The "
+            "count is NOT repeated here -- it was `RATCHET=69` and went stale "
+            "the moment the ratchet was raised, which is item 73's class in a "
+            "registry entry ABOUT a ratchet. ⛔⛔ This entry also said `9 arms` "
+            "until N12 measured it: N8b was never counted, and the arms printed "
+            "NOTHING on pass, so the claim was uncheckable as well as wrong."),
     "preimage_screen.py": dict(
         kind="checker", argv=[], expect=0, negatives="flag", st_expect=0,
         why="F64/F68/F95: the R1h pre-image screen and its FOUR outcomes, of "
