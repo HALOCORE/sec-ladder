@@ -1339,7 +1339,19 @@ whether **the DIFFERENCE** lands inside the symbol, not the level. ▶ Applied t
 this row under `F74`'s two-condition rule (`.memory-php/02-ladder.md`;
 (ii) `|Δinside_share| ≤ 0.02`), at `O3/isolated`, both inputs:
 
-| pair | `small.bin` Δshare | `large.bin` Δshare | rule (ii) |
+> ⛔⛔ **READ THE QUANTITY, AND READ WHAT *"PASS"* MEANS — BOTH WERE CORRECTED
+> AT `TASK_PHP_059`.** The Δ column below is **`F74`'s** share
+> ((`kernel_exclusive_ir`/`n_iters`) / `marginal_ir_per_call`), **not** the `W`
+> one this row's `controls/inside_share.py` computes; two quantities wear the
+> name and they differ by **8.9 pp on `ph29`** and **0.01 pp on `ph45`**
+> (`F129`). ⛔ **And *"PASS"* IS NOT *"LICENSED"*: `F74`'s two conditions are
+> NOT A GATE** — `.memory-php/02-ladder.md` says *"NO FUNCTION OF THE SHARES CAN
+> CERTIFY A AT ANY THRESHOLD"*, and `_059` measured the conjunction **admitting**
+> `ph55` `c-gcc` vs `c-gcc-h` where A1 reads `+0.0000 %` against 66.14 `Ir`/call.
+> ▶ **Read a PASS as *"A1 and the whole-program column are in the regime where
+> they are expected to AGREE"*, never as permission to publish one alone.**
+
+| pair | `small.bin` Δshare (**`F74`'s**) | `large.bin` Δshare (**`F74`'s**) | rule (ii) |
 |---|---:|---:|---|
 | §8b's headline, `c-gcc` vs `c-gcc-h` | 0.0001 | 0.0000 | **PASS** |
 | `c-clang` vs `c-clang-h` | 0.0001 | 0.0000 | **PASS** |
@@ -1356,6 +1368,26 @@ columns and both inputs** — so an `A1` C-vs-Rust figure from this row needs th
 same qualification `ph29` §15 gives its own.
 ⚠⚠ **AND THE NULL PAIR FAILING ON `small.bin` IS A FACT ABOUT THE RULE, NOT
 ABOUT THE ROW:** `unsafe` vs `verus` is the one comparison whose true A1
-difference is **known to be exactly 0**, and (ii) refuses it — because the
-+3.64 % sits in the denominator. **Reported, not repaired: whether F74's rule
-should exempt an `identity`-pinned pair is the manager's to rule on.**
+difference is **known to be exactly 0**, and (ii) rejects it — because the
++3.64 % sits in the denominator. ~~**Reported, not repaired: whether F74's rule
+should exempt an `identity`-pinned pair is the manager's to rule on.**~~
+
+> ✅✅ **RULED AT `TASK_PHP_059`, AND THIS PARAGRAPH WAS RIGHT ABOUT SOMETHING
+> BIGGER THAN IT CLAIMED. NO EXEMPTION IS NEEDED, BECAUSE THE RULE WAS NEVER A
+> GATE.** A condition that rejects a pair whose true A1 difference is *known to
+> be exactly zero* is not a filter that needs an escape hatch — **it is a filter
+> being read as something it is not.** ⭐ The two conditions describe **when A1
+> and the whole-program column are expected to agree**; they never licensed or
+> forbade a publication, and `.memory-php/02-ladder.md` has said so all along
+> (*"NO FUNCTION OF THE SHARES CAN CERTIFY A AT ANY THRESHOLD"*).
+>
+> ⛔⛔⛔ **AND THE MANAGER OWES THIS PARAGRAPH AN APOLOGY IT CANNOT READ.** It was
+> written here, addressed to the manager, and **routed to him for a ruling** —
+> and he did not rule. He then published, in `F129`, that a `ph29` comparison was
+> ***"INADMISSIBLE on the row's own written bar"***, which is exactly the
+> gate-reading this paragraph is a counterexample to. ⭐⭐ **`TASK_PHP_059`
+> refuted that with a `ph55` pair; THIS ROW HAD AN INDEPENDENT COUNTEREXAMPLE ON
+> FILE FIRST, AND IT WAS SITTING IN THE MANAGER'S OWN INBOX.**
+> ▶ **A question routed to the manager and never answered is not neutral — it
+> becomes a claim he is free to contradict without noticing.** (`F123`'s law:
+> an engineer's own uncertainty may be DEFERRED but not DOWNGRADED.)

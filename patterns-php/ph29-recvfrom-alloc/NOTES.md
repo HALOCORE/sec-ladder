@@ -1168,7 +1168,12 @@ written definition of *"comparable callee share"* in this repository:
 explicitly **not tuned**, six rows cannot pin it — **and (ii) `|Δinside_share|
 ≤ 0.02`.** Applied to this row at `O3/isolated`:
 
-| pair | `small.bin` Δshare | `large.bin` Δshare | rule (ii) |
+> ⛔⛔ **READ THE QUANTITY, AND READ WHAT *"PASS"* MEANS — BOTH CORRECTED AT
+> `TASK_PHP_059`.** The Δ column is **`F74`'s** share, **not** the `W` one this
+> row's `controls/inside_share.py` computes; on THIS ROW the two differ by
+> **8.9 pp** (`F129`). ⛔ **And the two conditions are NOT A GATE** — see §15f.
+
+| pair | `small.bin` Δshare (**`F74`'s**) | `large.bin` Δshare (**`F74`'s**) | rule (ii) |
 |---|---:|---:|---|
 | `safe_tuned` vs `unsafe` (the `fixed-R4 bound`) | 0.0103 | 0.0139 | **PASS** |
 | `unsafe` vs `verus` (the null) | 0.0036 | 0.0000 | **PASS** |
@@ -1188,5 +1193,46 @@ statistic cannot resolve this pair"*, it is exactly the evidence
 cross-language**. Bare, it is a C-vs-Rust headline this row disclaims.
 ⚠⚠ **One half of the bar is a number and the other half is not**: nobody has
 pinned *"HIGH"*, and `safe_naive` at `0.6911` sits above `>0.3`, `>0.5` and
-`>0.6` and below every share on `ph03` and `ph16`. **That residue is the
-manager's to rule on, and this section does not invent a threshold.**
+`>0.6` and below every share on `ph03` and `ph16`. ~~**That residue is the
+manager's to rule on, and this section does not invent a threshold.**~~
+
+### §15f ⛔⛔⛔ THE RULING THIS SECTION ASKED FOR — **AND IT WITHDRAWS THIS SECTION'S OWN STRONGEST SENTENCE**
+
+**`TASK_PHP_059`, the eighth review round.** Two things above are now corrected
+**in place**, because both were routed to the manager and he answered them the
+wrong way first.
+
+**(1) THE TWO CONDITIONS ARE NOT A GATE, SO *"REFUSES"* AND *"MAY NOT BE"* ARE
+WITHDRAWN.** This section says the rule *"refuses"* the C-vs-Rust pair and that
+*"what it may not be is a claim about C against Rust"*. ⛔ **`F129` then hardened
+that into *"INADMISSIBLE on the row's own written bar"*, and `_059` refuted it.**
+Four documents say the quantity never gates — `.tasks-php/STATISTICS_001.md`,
+`.memory-php/02-ladder.md` (*"NO FUNCTION OF THE SHARES CAN CERTIFY A AT ANY
+THRESHOLD"*), `.memory-php/03-numbers.md`'s `F109`, and the `RECAP_PHP.md` cell
+that carried the claim. ⭐ **And two measured counterexamples exist**: `ph55`
+`c-gcc` vs `c-gcc-h`, where the conjunction **ADMITS** a pair on which A1 reads
+`+0.0000 %` against **66.14 `Ir`/call**; and **`ph03`'s null pair**, whose true
+A1 difference is **known to be exactly 0** and which (ii) **rejects**.
+▶ ***A condition that rejects a known-zero pair and admits a known-blind one is
+not a gate.***
+
+✅ **WHAT SURVIVES IS THIS SECTION'S CONCLUSION, ON A BETTER GROUND.** The
+docstring's disclaimer is **upheld and must not be narrowed** — but it stands on
+**`F108`**, not on `F74`: the published sentence names **one C compiler of a pair
+whose columns have opposite signs** (`c-gcc` `+33.01 %`, `c-clang` `−4.36 %`).
+▶ **The honest reading of the table above: on the cross-language pairs the two
+cells' shares differ by more than `0.02`, so A1 and the whole-program column are
+in the regime where they are EXPECTED TO DISAGREE — which is a reason to publish
+BOTH columns, labelled, and NOT a reason to withhold either.**
+
+**(2) THE THRESHOLD RESIDUE IS RULED: *DO NOT FIT IT*.** Item 132 is **CLOSED**.
+Swept over **eleven rows and 360 cells** in `F74`'s spelling
+(`.tasks-php/php59_share.py sweep`): condition (i) is **VACUOUS on the
+cross-language column at every `t` in `[0.00, 0.90]`** — all 17 pairs that pass
+(ii) sit at min-share **≥ 0.9019**, and ⛔ **six of them above `1.0`.**
+Same-language it *is* load-bearing, **but the population that would pin it is
+`ph45` alone, `n = 1`.** ⭐ ***A threshold fitted on one row's pathology is not a
+threshold.*** ⚠ **This section was right to refuse to invent one**; eleven rows
+still cannot pin it, and the reason is now specific rather than *"not enough
+rows"*. ⓘ The *"six rows cannot pin it"* wording above is therefore **superseded,
+not merely stale** — the answer is no longer a matter of row count.

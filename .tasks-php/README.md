@@ -112,10 +112,21 @@ silently and this README went on describing it.
 ▶ **It is recorded as lapsed rather than deleted, and NOT revived**, because the
 thing it was a proxy for is now measured directly and far better: the **RULE-9
 table in `RECAP_PHP.md`** verdicts every finding, and the programme's standing
-record — *SEVEN consecutive review rounds refuted manager or engineer claims; in
+record — *EVERY review round so far has refuted manager or engineer claims; in
 `_053` not one finding survived as written, in `_055` three of four conclusions
-survived while ZERO of four REASONS did, and in `_057` only THREE of sixteen
-entries had both conclusion and reason upheld* — is a stronger rigour signal
-than a counter nobody incremented. ⚠ **Count it from `RECAP_PHP.md`'s RULE-9
+survived while ZERO of four REASONS did, in `_057` only THREE of sixteen
+entries had both conclusion and reason upheld, and in `_059` FIVE manager claims
+fell including both load-bearing halves of the finding the round was convened
+for* — is a stronger rigour signal than a counter nobody incremented.
+
+> ⛔⛔ **THIS SENTENCE SAID *"SEVEN consecutive review rounds"* AND IT WENT STALE
+> THE MOMENT `_059` LANDED — WHICH IS THE SECOND PRE-COMPACT AUDIT IN A ROW TO
+> MEET IT.** ⭐⭐ **The first audit CHECKED this line and CLEARED it**, correctly:
+> `_058` was a build task, so seven was right that day. ▶ ***A line an audit
+> cleared is not a line that stays true — clearing it recorded that it was
+> accurate then, not that it is self-maintaining.*** ⛔ **The count is now gone
+> rather than corrected**, because the run of rounds is the point and the
+> integer never was: `RECAP_PHP.md`'s RULE-9 table carries the per-round
+> verdicts and is the only place that should be counted. ⚠ **Count it from `RECAP_PHP.md`'s RULE-9
 table, which is the index; this sentence is a summary and will go stale.** ⚠ **A lapsed convention left described
 as live is worse than no convention**: it makes a reader think the signal exists.
