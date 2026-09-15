@@ -221,6 +221,21 @@ criterion 2 was argued; re-running them is a separate, cheap task and is open
 item 120's residue. **Nor does it move the admission bar** — `CLAUDE.md` rule 6
 is unchanged, and *"the reproducer did not fault"* is **not** a kill.
 
+> ⛔⛔ **THIS LIST OF FOUR IS UNDER REVIEW AND IS KNOWN TO BE INCOMPLETE BY AT
+> LEAST ONE. DO NOT READ IT AS SETTLED.** A fifth obligation — ***re-run the
+> trigger against the R1h POST-IMAGE build***, which would make the upstream
+> fix's efficacy measurable on real PHP — was dropped when this section was
+> written, **on the false premise that PHP 5.0.0 cannot be rebuilt on this box.**
+> It can: `php-in-safe-rust` ships a tracked, idempotent build script that needs
+> no sudo, and four 5.0.0 builds with four different recorded `cflags` already
+> exist here. **`RECAP_PHP.md` F123 and open item 126.**
+>
+> ⚠ **It is NOT simply owed, and that is why it is not written in yet.**
+> **Requiring it makes every row pay for a full PHP compile, and this section's
+> whole merit is being cheap enough that nobody skips it.** ▶ **`TASK_PHP_057`
+> §1.2 asks a reviewer to rule REQUIRED vs PERMITTED, with a measured cost.**
+> ⛔ **Until it does, a row that does not do it is COMPLIANT.**
+
 ✅ **First row to satisfy this clause: `ph97`** (`TASK_PHP_056`) —
 `mb_get_info()` with zero arguments → `SIG11 si_code=1 si_addr=(nil)`, exit
 `139`, while `mb_get_info("internal_encoding")` returns `ISO-8859-1` on the same
@@ -584,10 +599,29 @@ and that the rule it replaced arrived the same way. **Give this to the next
 reviewer whose task touches R1h. If the reasoning below is wrong, it is one
 subsection and it comes back out.**
 
-**R1h is the `fix_commit` of the id whose `c_file_line` the row's kernel
-EXTRACTS.** Singular. A kernel extracts **one** site (`PLAN_PHP.md` §3
-criterion 3 — flat blob in, `u64` out); that site is one id's `c_file_line`;
-that id has one `fix_commit`.
+**R1h is the upstream commit that REPAIRS THE CITED SITE** — the site the row's
+kernel EXTRACTS. Singular. A kernel extracts **one** site (`PLAN_PHP.md` §3
+criterion 3 — flat blob in, `u64` out); that site is one id's `c_file_line`.
+
+⛔⛔ **AND THE `fix_commit` COLUMN IS *EVIDENCE* FOR WHICH COMMIT THAT IS, NOT A
+DEFINITION OF IT.** This clause read *"R1h **is** the `fix_commit` of the id
+whose `c_file_line` the row's kernel extracts … that id has one `fix_commit`"* —
+a **lookup**, and the programme has measured that lookup wrong **twice**:
+**F38** (*"the `fix_commit` was a COLUMN IN THE CORPUS INDEX, and it is not
+always THE fix"* — 3 of 5 hand-checked commits were **later** fixes) and **F118**
+(**six rows**, from three independent `TASK_PHP_054` agents). ▶ **A build task
+verifies the binding against the BYTES before relying on it**, which every row
+since `ph55` has in fact done. **`ADJUDICATION_004` §2, open item 119.**
+
+⭐ **This also makes `preimage_screen.py`'s silence readable.** It has four
+outcomes and **only `NOT-THE-REPAIR` is a proof**; `CANDIDATE` and the two
+`INAPPLICABLE` labels say nothing (F68/F95). **Three of item 119's six rows
+screen as `CANDIDATE`** — under the old spelling that looked like weak support
+for the column; under this one it is exactly what it is: **silence**.
+
+⚠ **Nothing else in this subsection changes**: *singular* stands, the
+*"why not the union"* argument stands, and the sibling-ids-are-census rule
+stands. **Only the final inference — column ⇒ R1h — becomes column ⇒ evidence.**
 
 **A row's OTHER ids name other functions, and their commits are evidence about
 SIBLING SITES THE ROW DOES NOT PRICE** — F50's census channel, open items 49 and
