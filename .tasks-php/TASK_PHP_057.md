@@ -83,12 +83,46 @@ binary, same run. The instrument is `.tasks-php/probes/segaddr.c`.
 
 `PROTOCOL_PHP.md` §A3a imposes four obligations. **Attack them:**
 
-- ⛔ **Are they the right four?** The manager chose: run the trigger, run a
-  benign control, capture `si_addr`, write it as an EVENT. **What is missing?**
-  ⭐ A candidate the manager considered and did not include: *re-run the trigger
-  against the R1h post-image build*. It was excluded because **PHP 5.0.0 cannot
-  be rebuilt on this box** — **verify that claim**, because if it is wrong, §A3a
-  is missing its most valuable obligation.
+- ⛔⛔ **THEY ARE NOT THE RIGHT FOUR, AND THE MANAGER REFUTED HIMSELF BEFORE YOU
+  ARRIVED. READ THIS BEFORE ANYTHING ELSE IN §1.**
+  §A3a requires four things: run the trigger, run a benign control, capture
+  `si_addr`, write it as an EVENT. **A fifth was considered and dropped —
+  *re-run the trigger against the R1h POST-IMAGE build*, which would make the
+  upstream fix's efficacy measurable on real PHP.** It was dropped because
+  `TASK_PHP_054` agent B wrote *"the hardened build still crashes — **NOT
+  MEASURED**, I cannot rebuild PHP 5.0.0"*, and the manager hardened that into
+  a reason.
+
+  ⛔ **IT IS FALSE.** There is a **tracked, idempotent, documented** build script
+  at `.app-tests/oracle/build-php-5.0.0.sh` in the `php-in-safe-rust` repo whose
+  own header says *"Idempotent: CLEAN extract+build each run; reuses the cached
+  tarball"*, builds with **no sudo and no system install**, and works around the
+  absent `flex`/`bison` with a stub plus a timestamp guard. **Four 5.0.0 builds
+  with four different recorded `cflags` already exist on this box**, two of them
+  carrying `.buildinfo` files. ⭐ Agent B meant *"not within my task"*; **the
+  manager read it as *"not possible here"* and wrote a protocol section around
+  it.** `PROTOCOL.md` **rule 14**, exactly — *a premise in a task file is one an
+  engineer has no reason to doubt* — with the manager as the one who doubted too
+  little.
+
+  ▶ **SO THE QUESTION IS NOT *"is the claim true"*. IT IS:**
+  1. ⭐⭐ **What does a hardened-5.0.0 build actually COST** — wall-clock, disk,
+     and how the R1h patch is applied given the script re-extracts cleanly each
+     run? **Measure it; do not estimate it.**
+  2. ⭐⭐⭐ **Should §A3a require it, or merely permit it?** ⚠ **Requiring it
+     makes every row pay for a full PHP build**, and §A3a's whole merit is being
+     cheap enough that nobody skips it. **Permitting it may mean nobody ever
+     does it.** ▶ **Recommend one, with the cost you measured.**
+  3. ⚠ **What would it buy that the applied post-image does not?** `_056`
+     verified the `ph97` patch's bytes without building anything. **Be concrete
+     about the gap** — my answer is *"whether the fix actually stops the
+     fault, rather than whether it looks like it should"*, but that is the
+     manager's answer again and it is worth exactly as much as the last one.
+
+  ⓘ **The manager did NOT run the build**, deliberately: `_056` was measuring
+  instruction counts at the time, and a concurrent PHP compile would have
+  competed for the machine. **That is the only reason. It is not evidence about
+  the cost.**
 - ⛔⛔ **DOES §A3a QUIETLY DOWN-RANK ROWS WITH NO CLI REPRODUCER?** Most temporal
   rows have none. §A3a says *"where a reproducer exists"* and F120 says in terms
   that a clean run is not a kill (**F3**, `CLAUDE.md` rule 6). ▶ **Is that
@@ -221,6 +255,13 @@ in every task file and it matters most in a round this size.
    reproducer exists"* do more work than I gave it credit for.
    ▶ **Falsifier: a count over the catalogue's `▸ trigger` lines showing most
    temporal rows DO have one.**
+   ⓘ **P1b, added after P1 and pointing the other way** — having already been
+   wrong once in this section, I now predict **§A3a will need a FIFTH
+   obligation and I will have got its FORM wrong too**: I expect the right
+   answer to §1.2's question 2 is *"required for rows whose R1h is one hunk,
+   permitted otherwise"*, and I expect that to be refuted as a distinction that
+   tracks the manager's convenience rather than the evidence. ⭐ **Say so if it
+   survives; I would rather be right than interesting.**
 2. **P2 — F96's R2/R4/R5 numbers will REPRODUCE, and their SENTENCES will owe
    F108's five things.** Conclusions survive, reasons and labels do not — the
    programme's standing pattern. ▶ **Falsifier: any of the three numbers failing
