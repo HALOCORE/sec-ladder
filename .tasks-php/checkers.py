@@ -324,6 +324,26 @@ REGISTRY = {
             "REFUSED to REQUIRED (F123). ⛔ NOT in the sweep: it is 30 s and it "
             "answers a per-row question, not a standing one. ⚠ Pinned to ph97's "
             "patch path; a row edits step 4."),
+    "probes/ph96_arrayaccess_matrix.sh": dict(
+        kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
+        why="⭐⭐⭐ ROW 12's criterion-2 instrument, and the row's whole research "
+            "ground in one table: the FOUR ArrayAccess handlers of "
+            "`Zend/zend_object_handlers.c` share one helper, and the file "
+            "carries BOTH correct spellings (`:384` tests the out-parameter, "
+            "`:413` declines it by passing NULL) and BOTH wrong ones (`:427`, "
+            "`:512`). Prints a 2x2 with a per-cell expectation. ⭐ The two "
+            "faulting cells land on DISTINCT addresses -- 0x14 = "
+            "offsetof(zval,type) via `i_zend_is_true`, 0x10 = "
+            "offsetof(zval,refcount) via `_zval_ptr_dtor` -- so the fault "
+            "address alone says WHICH site ran, and both follow from the "
+            "`Zend/zend.h:287-293` layout rather than being fitted to the "
+            "observation. ⛔ NOT IN THE SWEEP, and the reason is not cost "
+            "(~2 s): it needs the 5.0.0 oracle binary, which lives in ANOTHER "
+            "project's gitignored scratch. A checker that reddens when a "
+            "sibling repo is cleaned is reporting on that repo, not this one "
+            "-- same call as `probes/rebuild_hardened_php.sh`. ▶ Run it by "
+            "hand; it exits non-zero if any cell deviates, and a deviation is "
+            "a RESULT to report, never an expectation to edit (F43/F47)."),
     "cbaseline_diff.py": dict(
         kind="checker", argv=["--selftest"], expect=0, negatives="flag",
         st_expect=0,

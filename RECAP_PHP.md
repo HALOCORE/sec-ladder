@@ -47,24 +47,24 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 11 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL · ph45
         (T1)+ph53+ph52 (T3)+ph55+ph56 (T5)+ph97 (T6) TYPE. 8 of 20 fam. 26 owed
-        to floor 37 (item 121). ⛔ BACKLOG = THE RULE-9 ROWS OPENING ⛔ UNREVIEWED.
-NEXT    ▶ (1) ⭐⭐⭐ ROW 12 = **ph96**, T6's 5th, ON ITS **RESEARCH** GROUND -- THE F116
-        GROUND IS **REFUTED+INVERTED** AND THE DECISION TEXT NEVER INHERITED IT
-        (FIXED). ROW 13 **TEMPORAL**, EXPECTING **NO** ORACLE DISCOUNT (FAULT RATE
-        38.7% vs TYPE 78.6%). ▶ (2) ITEM 129 CENSUS ~289 ITEMS, **NOT** 1 TASK.
+        to floor 37 (item 121). ⛔ BACKLOG 4 = THE RULE-9 ⛔ UNREVIEWED ROWS.
+NEXT    ▶ (1) ⭐⭐⭐ **_060 IS WRITTEN AND DISPATCHED: ROW 12 = ph96**, T6's 5th, WHICH
+        **CLOSES T6**. ⭐ ITS GROUND GREW WHILE I SCOPED IT -- SEE F133. ROW 13
+        **TEMPORAL**, EXPECTING **NO** ORACLE DISCOUNT (FAULT RATE 38.7% vs TYPE
+        78.6%). ▶ (2) ITEM 129 CENSUS ~289 ITEMS, **NOT** 1 TASK.
         ▶ (3) 5 CHECKERS UNSWEPT: FOLD IN. ▶ (4) ITEM 127 RESIDUE = BOOKKEEPING.
         ▶ (5) ⛔⛔ ITEM 105 = **THE USER'S CALL**, NOT MINE.
-✅ DONE  **_059: THE 8th ROUND CLEARED F127-F130, REFUTING 5 OF MY CLAIMS.** ⛔⛔⛔
-        *"INADMISSIBLE"* WITHDRAWN -- F74's BAR IS **NOT A GATE**. ⛔⛔ F129's CORPUS
-        CLAUSE **FALSE**: THE 2 inside_share QUANTITIES ARE INTERLEAVED IN SINGLE
-        SENTENCES **OF THE LAYER**. ⛔⛔ F130 = A **BIRTH DEFECT**. F128 = **LAW 16**.
-⚠ NEW   F131 RULE-9 LISTED **SIX** FINDINGS AS BOTH UNREVIEWED **AND** VERDICTED.
-        F132 ⛔⛔⛔ **A RATCHET'S COUNT IS NOT A MEASURE OF ITS CORPUS** (UNIT = A
-        PARAGRAPH); IT HID A REAL ARRIVAL TWICE AND I MADE 2 OF THE 3 INSTANCES.
-⚠ TRAPS ONE HOME PER FACT (F131). ADJUDICATE THE **SET**, NEVER THE NUMBER (F132:
-        `cbaseline_diff.py`). A VERDICT **REPLACES** ITS ROW. `grep -a`; EVENT NOT
-        STATE; DESCRIBE A PATH, DON'T SPELL IT; NEVER `git add -A`.
-READ    RULE-9 · .memory-php/ · F1-F132 · items 1-134 · _059 REPORT + _058.
+✅ DONE  _059 (8th ROUND, 5 OF MY CLAIMS FELL; F74's BAR **NOT A GATE**). ⭐ _060
+        SCOPED FROM THE TARBALL + ORACLE: 4-HANDLER 2x2 MEASURED, R1h BACKPORT
+        VERIFIED, 2nd LIMB FOUND. ph96 IS **PENDING** IN task_cost -- N14 REFUSED
+        {ph96:1.0}, UNGATED ROWS ARE NOT IN `ROWS`; RECLASSIFY WHEN IT GATES.
+⚠ NEW   F133 ⭐⭐⭐ BOTH CORRECT SPELLINGS **AND** BOTH WRONG ONES IN ONE FILE; THE
+        R1h **COPIES A SIBLING** -> AN R1h SHOWS WHAT WAS **CHOSEN**, NOT KNOWN.
+        F134 ⛔⛔⛔ A DEFECT REPAIRED IN A **TOOL** IS NOT REPAIRED IN THE MANAGER.
+⚠ TRAPS ONE HOME PER FACT (F131). ADJUDICATE THE **SET**, NEVER THE NUMBER (F132).
+        READ DIFF **BODIES**, NEVER `@@` LABELS; NEVER ATTRIBUTE A COMPOUND GREP
+        MATCH (F134). A VERDICT **REPLACES** ITS ROW. `grep -a`; EVENT NOT STATE.
+READ    RULE-9 · .memory-php/ · F1-F134 · items 1-134 · _060 + _059 REPORT.
 ```
 
 ---
@@ -188,6 +188,8 @@ READ    RULE-9 · .memory-php/ · F1-F132 · items 1-134 · _059 REPORT + _058.
 > | ⛔ **F131** | ⛔ **UNREVIEWED** — manager self-finding **about this very table**, 2026-09-15 | ⛔ **NOTHING**, and it may not need to enter: it is a document repair, not a research claim. ⚠ **Its one LAYER-shaped clause is the one to review**: *a verdict-shaped phrase in a verdict column is a verdict, whoever wrote it — so self-narrowing must not share a column with review outcomes, because that erases law 12's distinction.* ▶ **Scoped into `_059` §0 by implication, not as a section: the reviewer reads this table to know what it owes, so if the table is wrong the round is wrong** |
 > | ⭐⭐⭐ **F129** | ⓘ opened ⛔ UNREVIEWED (`_058`'s own round) → ⚠⚠ **UPHELD-NARROWED, AND REFUTED IN TWO CLAUSES** (`_059`) | ✅ **The name collision is UPHELD and UNDER-STATED** — the gap is **8.9 pp on `ph29` and 0.01 pp on `ph45`**, so it is a measurement, never a constant, and `F129` picked the row where they nearly agree. ⛔⛔ **Its CORPUS clause is REFUTED in two documents** — `RECAP_PHP.md`'s `ph97` `98.84 % → 64.50 %` and `.memory-php/03-numbers.md`'s own `ph52` figures are the **`W`** one — **so the two quantities are INTERLEAVED INSIDE SINGLE SENTENCES, not separated between documents.** ⛔⛔⛔ ***"INADMISSIBLE" IS WITHDRAWN***: `F74`'s bar is **not a gate** (four documents, one of them the layer, one of them the same cell), and the conjunction **admits** `ph55` `c-gcc` vs `c-gcc-h` where A1 reads `+0.0000 %` against **66.14 `Ir`/call**. ⛔ **§2 mislabelled family B as W1.** ⛔ **§4a's *"zero of five"* is wrong in the SELF-CRITICAL direction — it is two of five.** ✅ Every arithmetic claim reproduced under a tool sharing no code with the original. ⭐ **The manager's `P2` — written against his own strongest clause, marked low confidence — is the one prediction that held** |
 > | ⛔⛔⛔ **F132** | ⛔ **UNREVIEWED** — manager, 2026-09-15, **two of its three instances made by the manager while landing `_059`** | ⛔ **NOTHING.** ⚠ **What a reviewer owes it: is *"adjudicate the set, never the number"* the right repair, or does the paragraph-unit itself need changing?** ⭐ The tool is committed with four must-fire arms and reproduces `F130`'s `1cc2c0e` baseline without a worktree. ⓘ **It is the strongest evidence on file that *"remember to check"* is not a control** — the person who wrote the warning tripped it twice within the hour |
+> | ⭐⭐⭐ **F133** | ⛔ **UNREVIEWED** — manager, measured 2026-09-15 while scoping row 12 | ⭐⭐ **THE STRONGEST LAYER-SHAPED CLAUSE THE PROGRAMME HAS OPENED ABOUT R1h, AND IT IS THE ONE TO ATTACK**: *an R1h is evidence about what was CHOSEN, not always about what was KNOWN* — because here the repair was already correct, in the same file, in use on 7 of 23 call sites, before the bug was filed. ⚠ **Attack the GENERALISATION, not the measurement**: the 2×2 re-runs from a committed probe in ~2 s, so the cheap review is *"does this hold on any other row's R1h, or is `ph96` the only one?"* ⓘ **It commits the ladder to nothing** — it is a C-side finding, and `CLAUDE.md` rule 6 means the Rust rungs' answer is a result whatever it is. ⛔ **Its scope caveat is load-bearing and must survive any quote**: *no repair in the 163-patch CACHE* ≠ *upstream never fixed it* |
+> | ⛔⛔⛔ **F134** | ⛔ **UNREVIEWED** — manager **about the manager**, 2026-09-15, caught in-flight | ⛔ **NOTHING yet, and the manager deliberately did NOT decide its home.** ⚠ **What a reviewer owes it: is a task file's `§3 TRAPS` the right place for a trap a TOOL already guards, or does it belong in `.memory-php/04-process.md` as a law?** ⭐⭐ **It is the sharpest instance on file of a class `F123`'s unverdicted clause also names** — knowledge stored where the CODE meets it is not stored where the PERSON meets it — and **item 129's census is the instrument that would size it.** ⛔ **Do NOT let it be quoted as moving `same_function`'s measured *"1 of 170"*; the manager states in the body that he did not measure that** |
 >
 > #### ⭐⭐⭐ `F96`, PER GROUP — **SEVEN groups, not the four I wrote** (`_055` §1.1)
 >
@@ -573,7 +575,24 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > departure as progress, and landing `_059` the net said +1 while THREE had
 > arrived. ⭐⭐ The manager made two of the three IN THE EDIT LANDING THE REVIEW
 > OF THE RATCHET, hours after writing the warning. ▶ Adjudicate the SET, by
-> unit text, never the number — `.tasks-php/cbaseline_diff.py`**
+> unit text, never the number — `.tasks-php/cbaseline_diff.py`** ·
+> **F133 ⭐⭐⭐ BOTH CORRECT SPELLINGS OF AN OBLIGATION AND BOTH WRONG ONES LIVED
+> IN ONE FILE, BY ONE AUTHOR — `zend_object_handlers.c` calls one helper from
+> four ArrayAccess handlers; `:384` guards the out-parameter, `:413` declines
+> it by passing NULL, and `:427`/`:512` do neither and SIGSEGV at `0x14` and
+> `0x10`, the two offsets predicted from the struct before the run. The callee
+> GUARANTEES the NULL sentinel on purpose with a comment naming the hazard, and
+> the unmisusable contract was already supported in the vulnerable tree WITH
+> THE VERY NULL TEST `:513` OMITS. Upstream's 2005 fix COPIES the sibling 99
+> lines up. ▶ An R1h is evidence about what was CHOSEN, not always about what
+> was KNOWN** ·
+> **F134 ⛔⛔⛔ A DEFECT REPAIRED IN A TOOL IS NOT REPAIRED IN THE MANAGER — I
+> read a `@@ … @@` hunk label as a claim about what a patch changes, which is
+> the exact `xfuncname` error `preimage_screen.py::same_function` was measured,
+> documented and patched for on 2026-09-12; its docstring describes my error in
+> advance. The repair lived in the code path and I was not on it. A trap
+> documented only where the CODE meets it is documented for the code, not for
+> the person**
 >
 > ⚠⚠ **This index stopped at F59 while F60–F65 existed, and then AT F101 WHILE
 > F113 EXISTED — twelve behind, caught by a pre-handoff audit 2026-09-14.**
@@ -1876,6 +1895,128 @@ which pins `kernel.c:247` and `hardened:175`, one line each.
 The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
+
+### F134 — ⛔⛔⛔ **A DEFECT REPAIRED IN A TOOL IS NOT REPAIRED IN THE MANAGER: I MADE BY HAND, THREE DAYS LATER, THE EXACT ERROR `preimage_screen.py` WAS PATCHED TO STOP MAKING — AND ITS DOCSTRING DESCRIBES MY ERROR IN ADVANCE**
+
+⚠ **Manager self-finding, 2026-09-15, caught in-flight while scoping row 12.
+UNREVIEWED.**
+
+Scoping `ph96` I listed which cached patches touch `zend_object_handlers.c` by
+reading each hunk's **`@@ … @@ <function>` trailing label**, and reported that
+`235e6c0afe1d` touches `zend_std_unset_dimension`. **It does not.** Its body
+edits `zend_std_call_user_call`; the label names the function the hunk **starts
+after**. I caught it only because I went on to read the diff body.
+
+⛔⛔ **AND THIS IS A SOLVED PROBLEM IN THIS REPOSITORY.**
+`.tasks-php/preimage_screen.py::same_function`'s docstring says it in terms:
+
+> *"git's `xfuncname` scans BACKWARDS FROM THE HUNK'S FIRST LINE, so a hunk that
+> begins just before a function definition is labelled with the PRECEDING
+> function while editing only the NEXT one."*
+
+Found by `TASK_PHP_040` §4.3, measured on `be8daf1f47fa` (*"the hunk contains
+ZERO lines of the function it is labelled with — not one context line"*), and
+**repaired by the manager on 2026-09-12 with its own negatives**, because a
+false promotion of an exclusion to a proof is the one direction that screen may
+not fail in.
+
+⭐⭐⭐ **THE FINDING IS NOT *"I MADE A MISTAKE"*. IT IS THAT THE REPAIR LIVED IN
+THE CODE PATH AND I WAS NOT ON IT.** The tool cannot be fooled by `xfuncname`
+any more. The manager reading a patch by hand is not the tool, inherits none of
+its guards, and has no docstring in front of him. ▶ ***A trap documented only
+where the code meets it is documented for the code, not for the person.***
+
+⚠ **SECOND INSTANCE IN THE SAME HOUR, AND IT IS THE SAME SHAPE.** I then ran a
+compound `grep -al 'A\|B'`, got a hit, and attributed it to `A`; it had matched
+`B`, in a different file that does not contain `A` at all. ▶ ***Never attribute
+a compound match.*** Both are **item 115's class** — *a check that reads prose
+and calls it code* — with the twist that here the misleading string was
+**generated by a tool** and therefore looked authoritative.
+
+▶ **THE REMEDY, AND IT IS NOT *"BE CAREFUL"*:** both now sit in a task file's
+`§3 TRAPS` (`_060` trap after §2.5) where a *person* meets them, not only in a
+docstring where the *code* does. ⚠ **What a reviewer owes this: is the traps
+list the right home, or does this belong in `.memory-php/04-process.md` as a
+law?** The manager did not decide, deliberately — ⓘ **it is a claim about how
+this programme's knowledge is stored, which is exactly the shape `F123`'s
+still-unverdicted clause has, and item 129's census is the instrument.**
+
+⚠ **NOT a claim that the tool's measured reach changed.** `same_function`'s
+*"1 of 170"* was measured over one task's screened set; my instance is a **hand**
+reading outside the tool's path, and whether `235e6c0afe1d` is even in that 170
+**I did not measure.** ⛔ **Do not quote this finding as moving that number.**
+
+### F133 — ⭐⭐⭐ **BOTH CORRECT SPELLINGS OF AN OBLIGATION AND BOTH WRONG ONES LIVED IN ONE FILE, BY ONE AUTHOR: THE 2005 REPAIR OF `ph96` CONSISTS OF COPYING A SIBLING 99 LINES UP, AND THE UNMISUSABLE CONTRACT WAS ALREADY SUPPORTED IN THE VULNERABLE TREE**
+
+⚠ **Manager, measured 2026-09-15 while scoping row 12, from the pinned tarball
+and the 5.0.0 oracle. UNREVIEWED. This is a C-side finding; it commits the
+ladder to nothing.**
+
+`Zend/zend_object_handlers.c` calls **one** helper,
+`zend_call_method_with_1_params`, from **four** ArrayAccess handlers. Measured
+end to end (`.tasks-php/probes/ph96_arrayaccess_matrix.sh`, one throwing user
+method per run, `segaddr` shim, 5.0.0 oracle):
+
+| site | handler | contract | result |
+|---|---|---|---|
+| `:384` | `offsetGet` | output, **guarded at `:385 if (!retval)`** | `rc=255`, clean `Uncaught exception` |
+| `:413` | `offsetSet` | **no-output — passes `NULL`** | `rc=255`, clean `Uncaught exception` |
+| `:427` | `offsetExists` | output, **unguarded** | ⛔ `SIGSEGV si_addr=0x14` |
+| `:512` | `offsetUnset` | output, **unguarded** | ⛔ `SIGSEGV si_addr=0x10` |
+
+⭐ **Both fault offsets were computed from `Zend/zend.h:287-293` BEFORE the run
+and matched**: the `zvalue_value` union is 16 B on LP64, so `0x10` is
+`offsetof(zval, refcount)` (`_zval_ptr_dtor`, `zend_execute_API.c:389`) and
+`0x14` is `offsetof(zval, type)` (`i_zend_is_true`). ▶ **The fault ADDRESS names
+WHICH SITE ran** — §A3a criterion 2 sharpening from *"it faults"* to *"it faults
+where the source says it must, and the address discriminates siblings."*
+
+⭐⭐⭐ **THE THREE THINGS THAT MAKE THIS MORE THAN A NULL-DEREF ROW:**
+
+1. **The callee GUARANTEES the sentinel, on purpose, with a comment.**
+   `zend_execute_API.c:592-594` reads *"we may return SUCCESS, and yet retval may
+   be uninitialized, if there was an exception..."*, and `:595` stores `NULL`
+   unconditionally so the hazard is **detectable** — then `:873` returns
+   `SUCCESS` anyway with `EG(exception)` set. **The author named the hazard, made
+   it observable, and three of four callers did not observe it.**
+2. **The unmisusable contract ALREADY EXISTED in the vulnerable tree.**
+   `zend_interfaces.c:48` is
+   `fci.retval_ptr_ptr = retval_ptr_ptr ? retval_ptr_ptr : &retval;`, and
+   `:88-93` disposes of the value **behind its own `if (retval)` NULL test** —
+   ⭐⭐ **the very test `:513` omits, written by the same hand, in the function
+   being called.** Census of 5.0.0: **23 real call sites, 7 already take the
+   no-output contract, 16 take the output contract.**
+3. **So upstream's fix did not DISCOVER a strategy — it COPIED one.**
+   `cf020f133487` (2005-03-19, *"Fix #31185"*) makes `:512` look exactly like
+   `:413`: pass `NULL`, delete the local, delete the dtor.
+
+▶ ⭐⭐ **WHAT THIS CHANGES ABOUT R1h, AND IT IS THE PART WORTH REVIEWING.** The
+programme reads an R1h as *the repair upstream eventually found*. Here the repair
+was **available, correct, in the same file, and already in use on 7 of 23 call
+sites before the bug was filed.** ▶ ***An R1h is evidence about what was CHOSEN,
+not always about what was KNOWN*** — and row 12 is the first row that can price
+**two** upstream-attested repairs of one obligation against each other
+(`_060` §2.6: `NULL`-passing vs guarding).
+
+⛔⛔ **TWO THINGS THE CATALOGUE ENTRY GETS INCOMPLETE, BOTH REPORTED NOT
+REPAIRED** (`patterns-php/` is the engineer's to edit, and `CATALOGUE.md` is a
+landed artefact):
+
+- **`ph96`'s entry names only `:509`/`:512-513`.** The `:427-429`
+  `has_dimension` limb is the same defect, derefs the NULL **twice**
+  (`i_zend_is_true` then the dtor), and is **not mentioned**.
+- **Measured across all 163 cached patches by diff BODY: `:512-513` is repaired
+  by `cf020f133487` uniquely, and `:427-429` by NOTHING.** ⚠⚠ **SCOPE, AND IT
+  BINDS ANY QUOTE OF THIS**: that is the **screened corpus cache**, not php-src's
+  full history. ***"No repair in the cache" is a result (F10); "upstream never
+  fixed it" is a claim this box cannot support.***
+
+⚠⚠ **THE TWO §A3a CAUTIONS TRAVEL WITH EVERY NUMBER ABOVE**: the binary is
+php-in-safe-rust's **oracle** build (`-O3 -march=native -flto`, mysql+webext),
+**not** a museum-default 5.0.0; and **a clean run would NOT have been evidence of
+absence** (F3). ⭐ **A faulting run is evidence of presence — and here two
+non-faulting cells are evidence that the two correct spellings WORK, in the
+vulnerable binary, which is the half that makes this a 2×2 rather than a pair.**
 
 ### F132 — ⛔⛔⛔ **A RATCHET'S COUNT IS NOT A MEASURE OF ITS CORPUS. THE UNIT IS A PARAGRAPH, SO ORDINARY PROSE MOVES THE NUMBER WITH NOTHING REPAIRED AND NOTHING BROKEN — AND IT HID A REAL ARRIVAL TWICE IN ONE DAY**
 

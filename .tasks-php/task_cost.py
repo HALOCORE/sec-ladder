@@ -249,6 +249,28 @@ CLASS = {
                                # may expose (ph07/ph53/ph64 still have no measured
                                # share) IS row debt, and will be charged to those
                                # rows by whatever task measures them.
+    "060": "PENDING",          # BUILD row 12 = ph96, T6's second, which CLOSES
+                               # the family. DISPATCHED, NOT LANDED.
+                               # ⛔⛔ I FIRST WROTE `{"ph96": 1.0}` AND `N14`
+                               # REFUSED IT -- correctly, and the crash was the
+                               # cheapest possible way to be told: `ph96` is not
+                               # in `ROWS` because it has no GATE RECORD, and
+                               # "a row in ROWS that is NOT gated charges cost
+                               # to something that does not exist". ⭐ `_040`
+                               # set the precedent: a build brief for an unbuilt
+                               # row is PENDING, not row cost.
+                               # ▶ WHEN THE ROW GATES, do BOTH in one edit:
+                               # append "ph96" to `ROWS` and reclassify this to
+                               # {"ph96": 1.0}. Doing one without the other is
+                               # what N14 exists to catch.
+                               # ⓘ It will then carry two extras the row did not
+                               # strictly owe -- the second repair strategy
+                               # priced as a control (§2.6) and the `:427-429`
+                               # limb recorded (§2.5) -- and they are still THIS
+                               # row's cost under `_058`'s rule: a control a row
+                               # should have shipped with is that row's debt.
+                               # ph97 came in at 1.00; that is the comparison to
+                               # watch, same family and same shape.
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them
