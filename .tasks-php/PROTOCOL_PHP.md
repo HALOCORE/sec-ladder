@@ -172,13 +172,60 @@ unchanged; only the word *parameter* had to go.
 > refuses your row is a hypothesis about your row before it is a hypothesis
 > about the gate** (`RECAP_PHP.md` F43/F47, open item 24).
 
-### A3. ⚠ Reachability is deliverable #1, in writing, before any rung exists
+### A3. ⚠ Reachability is deliverable #1, **in writing AND — where a reproducer exists — EXECUTED**
 
 A corpus row's `root_cause_id` is a claim about **PHP**, not about the kernel
 you are about to extract. **Settle the defect against the kernel, before
 writing a single rung.** The PAT programme got its bug-class row wrong on four
 patterns, once by a factor of 2.1e9, and those were guesses where these are
 measured — *"should hold better"* is not *"did"*.
+
+#### ⭐⭐⭐ A3a. THERE IS A WORKING PHP 5.0.0 CLI ON THIS BOX. RUN THE TRIGGER.
+
+For the programme's first ten rows this section said *"in writing"* and that is
+all anyone did: **criterion 2 — *does the C exhibit the target error on an
+adversarial input* — was ARGUED on all ten.** It did not have to be.
+`RECAP_PHP.md` **F116**: a built PHP 5.0.0 CLI sits at
+
+    /home/apt/repos_common/php-in-safe-rust/.app-tests/.temp/oracle/bin/php-5.0.0-mysql-webext
+
+and the corpus ships a reproducer per id. **`-v` prints `PHP 5.0.0 (cli)`.**
+⚠ It is outside this repo and is **not** a dependency of any gate — it is an
+instrument, like `objdump`.
+
+▶ **What a row now owes under A3**, when its `▸ trigger` is a PHP snippet:
+
+1. **Run the trigger.** Record the exit status. `139` is `128 + SIGSEGV`.
+2. **Run the benign call in the same breath**, on the same binary, and record
+   that it answers cleanly. A crash with no benign control is half a result.
+3. **Capture `si_addr`** with `.tasks-php/probes/segaddr.c` — an `LD_PRELOAD`
+   shim, because there is **no gdb on this box and memcheck refuses to start**.
+   Its header says how to build it and how to read the output.
+4. **Write the three into `NOTES.md` as an EVENT**: what was run, on which
+   binary, on which date, and what came back.
+
+⚠⚠ **TWO CAUTIONS TRAVEL WITH EVERY SUCH RESULT, AND A ROW THAT OMITS THEM HAS
+OVER-CLAIMED:**
+
+- **Say which build.** That binary is **php-in-safe-rust's oracle build**
+  (`-O3 -march=native -flto`, mysql + webext) and **not** a museum-default one.
+  A fault address is a property of a build.
+- **A clean run is still not evidence of absence** (`RECAP_PHP.md` **F3**) — a
+  reproducer that does not fault may fault on another build, another `-O`, or
+  under ASan. ⭐ **The converse is new and is the whole point: a run that
+  faults, executed, is evidence of PRESENCE, which this programme has never had
+  before.** Write `crashes_pristine_5_0_0 = True` only when you ran it.
+
+⛔ **This does NOT retroactively validate the ten rows built before it.** Their
+criterion 2 was argued; re-running them is a separate, cheap task and is open
+item 120's residue. **Nor does it move the admission bar** — `CLAUDE.md` rule 6
+is unchanged, and *"the reproducer did not fault"* is **not** a kill.
+
+✅ **First row to satisfy this clause: `ph97`** (`TASK_PHP_056`) —
+`mb_get_info()` with zero arguments → `SIG11 si_code=1 si_addr=(nil)`, exit
+`139`, while `mb_get_info("internal_encoding")` returns `ISO-8859-1` on the same
+binary in the same run. Measured by the manager 2026-09-15, **before** the task
+was written.
 
 ### A4. Fidelity evidence, before any rung
 

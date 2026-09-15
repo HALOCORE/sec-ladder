@@ -45,13 +45,23 @@ pinned — one level up: `rc=0` does not mean everything was checked.**
 new `.py` fails as UNFILED and a deleted one fails as STALE, and **no count is
 written down anywhere to go stale.**
 
-⛔ That is not style. **FIVE hardcoded figures in `.tasks-php/` validators went
+⛔ That is not style. **SIX hardcoded figures in `.tasks-php/` validators went
 stale in this programme** — `task_cost.py`'s `owed = 34` (item 93), its
 `total/rows ≈ 6.5` (three times inside one hour), `preimage_screen.py`'s `N10e`,
-`task_cost.py`'s `EMPTY_FAMILIES = 14`, and its `ROWS` at 8 — and
+`task_cost.py`'s `EMPTY_FAMILIES = 14`, its `ROWS` at 8 — and
 `.memory-php/04-process.md` law 6 forbids the class. ⚠⚠ **`EMPTY_FAMILIES` is
 the one to learn from: its guard `0 <= EMPTY_FAMILIES <= owed` was satisfied
 forever by downward drift. A BOUND IS NOT A DERIVATION.**
+
+⛔⛔ **AND THE SIXTH WAS IN THIS FILE, IN A `why`.** `task_cost.py`'s entry read
+*"15 arms"* while the file had **14** — measured 2026-09-15 by counting, and it
+became true only by accident when `N14` was added in the same edit. ⭐ **The
+structure carried no literal and the PROSE ABOUT the structure carried one**, so
+the ratchet's own law had a hole exactly one level up from where it was written.
+▶ **`N12` closes it: every `"<n> arms"` claim in a `why` is now CHECKED against
+the arm names the checker actually prints when it runs.** ⚠ Note what this is
+not: it does not forbid the literal, it *derives* it. A number a reader can
+check is worth keeping; a number nobody recomputes is the defect.
 
 --------------------------------------------------------------------------------
 ⛔⛔ AND THE FIRST RUN FOUND ONE — `citecheck` IS **NOT** RED FOR THE REASON
@@ -99,6 +109,7 @@ STALE entries — **it never tunes the pattern to make a hit go away.**
 """
 
 import os
+import re
 import subprocess
 import sys
 
@@ -148,11 +159,13 @@ REGISTRY = {
             "`TASK_PHP_005/006/008_REPORT` -- three files written as one path, "
             "in a paragraph headed 'NAME COLLISION, DO NOT BE MISLED'. A FALSE "
             "POSITIVE, adjudicated and NOT repaired: silencing a checker by "
-            "editing its input is the opposite of the ratchet. ⚠ `rot` also "
-            "rises transiently per in-flight task, because a task file cites its "
-            "report before the report exists -- so READ THE COUNT, never the "
-            "exit code. ▶ Both arms are red for this same one cause: --selftest "
-            "fails N5d/N4, which assert rot == 0."),
+            "editing its input is the opposite of the ratchet. ▶ Both arms are "
+            "red for this same one cause: --selftest fails N5d/N4, which assert "
+            "rot == 0. ⭐ 2026-09-15: the `rot rises transiently per in-flight "
+            "task` caveat was NARROWED AND THEN REPAIRED -- it only ever rose "
+            "for a task whose report is SPLIT (`_REPORT_E2E3E4.md` did not match "
+            "`endswith('_REPORT.md')`); measured at 1 vs 2, then fixed with N6a-c "
+            "so BOTH spellings are benign. READ THE COUNT anyway."),
     "coverage.py": dict(
         kind="checker", argv=[], expect=0, negatives="none", st_expect=None,
         why="166 corpus rows accounted for in CATALOGUE.md. ⚠ Carries its own "
@@ -171,8 +184,11 @@ REGISTRY = {
     "cbaseline_check.py": dict(
         kind="checker", argv=[], expect=0, negatives="flag", st_expect=0,
         why="F108: every cross-language percentage must name WHICH C COMPILER. "
-            "9 arms, RATCHET=69 hand-adjudicated hits. ⛔ A bare run REPORTS and "
-            "does not check -- the sweep must run the flag arm too."),
+            "10 arms, RATCHET=69 hand-adjudicated hits. ⛔ A bare run REPORTS "
+            "and does not check -- the sweep must run the flag arm too. "
+            "⛔⛔ This entry said `9 arms` until N12 measured it: N8b was never "
+            "counted, and the arms printed NOTHING on pass, so the claim was "
+            "uncheckable as well as wrong. Both repaired 2026-09-15."),
     "preimage_screen.py": dict(
         kind="checker", argv=[], expect=0, negatives="flag", st_expect=0,
         why="F64/F68/F95: the R1h pre-image screen and its FOUR outcomes, of "
@@ -191,7 +207,11 @@ REGISTRY = {
         why="⛔ THE LIVE INSTANCE THAT PROVES THIS FILE'S POINT: on 2026-09-15 a "
             "bare run exited 0 while --selftest exited 1 on N1 (two new task "
             "files unclassified). 15 arms; N1 also caught ROWS stale at 8 the "
-            "moment it was first run."),
+            "moment it was first run. ⭐ N14 (2026-09-15) makes ROWS itself "
+            "derived-and-checked against results-php/gate/, which is the one "
+            "staleness N1 cannot see; its must-fire evidence is the committed "
+            "probes/n14_mustfire.py. ⚠ This `why` said 15 while the file had "
+            "14 -- N12 now derives the number."),
     "php50_align_sweep.py": dict(
         kind="checker", argv=["--selftest"], expect=0, negatives="inline",
         st_expect=0,
@@ -242,6 +262,15 @@ REGISTRY = {
         why="⭐ THIS FILE. Files itself so the ratchet is total. ⛔ Its standing "
             "arm is --audit, NOT a bare run, because a bare run executes the "
             "whole sweep -- and the sweep must not run it recursively (N10)."),
+    "probes/n14_mustfire.py": dict(
+        kind="checker", argv=[], expect=0, negatives="inline", st_expect=None,
+        why="⭐ §H EVIDENCE, COMMITTED RATHER THAN RUN ONCE AND DISCARDED: shows "
+            "task_cost.py's N14 arm FAILING in both directions (ROWS stale "
+            "against the gated corpus; a phantom row in ROWS). An arm that "
+            "passes is not an arm that works -- F10. ⚠ It monkeypatches "
+            "task_cost's ROWS/CLASS in-process and never writes; rc=0 means the "
+            "demonstration held. ⓘ It is the first `.py` in probes/ and the "
+            "reason _disk() now looks there at all."),
 }
 
 
@@ -307,6 +336,46 @@ def audit(disk, registry):
     return problems
 
 
+_ARMS_CLAIM = re.compile(r"(\d+)\s+arms\b")
+_ARM_TOKEN = re.compile(rb"\bN\d+[a-z]*\b")
+
+
+def arm_count_problems(registry, observed):
+    """Every `"<n> arms"` claim in a `why`, checked against what the checker PRINTS.
+
+    `observed` maps a registry name to the SET of arm tokens (`N1`, `N10b`, …)
+    seen on that checker's own output across all the argv the sweep gave it.
+    Pure, so the selftest can drive it over a synthetic map.
+
+    ⛔⛔ THE DEFECT THIS EXISTS FOR, measured 2026-09-15: `task_cost.py`'s entry
+    said *"15 arms"* and the file had **14**. The registry deliberately carries
+    no count literal; its PROSE did, and nothing recomputed it. A `why` is read
+    by a human deciding whether a sweep is thorough, so a count in one is load
+    bearing.
+
+    ⚠ A checker with no `"<n> arms"` claim is silently fine -- this arm polices
+    claims that exist, it does not require one.
+    """
+    problems = []
+    for name, e in sorted(registry.items()):
+        m = _ARMS_CLAIM.search(e.get("why", ""))
+        if not m:
+            continue
+        claimed = int(m.group(1))
+        seen = observed.get(name)
+        if seen is None:
+            problems.append(f"{name}: `why` claims {claimed} arms and the sweep "
+                            f"captured no output for it -- an unrunnable claim "
+                            f"is the same defect one step earlier")
+            continue
+        if len(seen) != claimed:
+            problems.append(f"{name}: `why` claims {claimed} arms; its own "
+                            f"output names {len(seen)} "
+                            f"({', '.join(sorted(seen)) or 'none'}). "
+                            f"Recount and re-file -- a bound is not a derivation")
+    return problems
+
+
 def sweep(registry, runner):
     """Run every `kind == "checker"`'s STANDING arm and, where it has one, its
     SELFTEST arm. `runner(name, argv) -> rc`. ⛔ Skips this file (N10)."""
@@ -324,16 +393,39 @@ def sweep(registry, runner):
 
 
 def _disk():
-    return sorted(f for f in os.listdir(TASKS) if f.endswith(".py"))
+    """Every `.py` the ratchet is responsible for, as a flat list of names.
+
+    ⛔⛔ THIS USED TO BE `.tasks-php/*.py` ONLY, AND `probes/` WAS A BLIND SPOT.
+    It agreed with the truth for as long as `probes/` held nothing but C
+    sources -- F49's shape and item 114's exactly: *a checker can agree with the
+    truth for a long time because the state that would separate them has never
+    occurred.* `n14_mustfire.py` is the first `.py` to land there, and it HAS a
+    standing verdict, so without this it would have been a checker no ratchet
+    could see. ⭐ Caught while adding it, not after.
+    """
+    flat = [f for f in os.listdir(TASKS) if f.endswith(".py")]
+    pdir = os.path.join(TASKS, "probes")
+    if os.path.isdir(pdir):
+        flat += ["probes/" + f for f in os.listdir(pdir) if f.endswith(".py")]
+    return sorted(flat)
+
+
+# Arm tokens seen on each checker's own output, accumulated by `_run` across
+# every argv the sweep gives it. ⚠ It is a SET, not a count: `--selftest` and a
+# bare run often print overlapping arms, and adding them would double-count.
+_OBSERVED = {}
 
 
 def _run(name, argv):
     try:
         r = subprocess.run([sys.executable, os.path.join(TASKS, name)] + list(argv),
                            capture_output=True, timeout=600, cwd=ROOT)
-        return r.returncode
     except subprocess.TimeoutExpired:
         return "TIMEOUT"
+    toks = set(_ARM_TOKEN.findall(r.stdout or b"")) | \
+        set(_ARM_TOKEN.findall(r.stderr or b""))
+    _OBSERVED.setdefault(name, set()).update(t.decode() for t in toks)
+    return r.returncode
 
 
 def report(do_run=True):
@@ -364,6 +456,28 @@ def report(do_run=True):
             print(f"  {mark}{name:24s} {' '.join(argv):12s} rc={rc} "
                   f"(expect {exp})")
         print()
+
+        # ⭐ N12, and it can only run once the sweep has actually run: every
+        # `"<n> arms"` claim in a `why`, checked against the arm names the
+        # checker printed. Derived, not pinned -- see this file's header.
+        claims = [(n, _ARMS_CLAIM.search(e["why"]).group(1))
+                  for n, e in sorted(REGISTRY.items())
+                  if _ARMS_CLAIM.search(e.get("why", ""))]
+        print("ARM-COUNT CLAIMS -- `why` prose vs what the checker PRINTS")
+        for n, c in claims:
+            seen = _OBSERVED.get(n, set())
+            mark = "ok " if len(seen) == int(c) else "⛔ "
+            print(f"  {mark}{n:24s} claims {c:>3s}  observed {len(seen):>3d}")
+        if not claims:
+            print("  ⓘ VACUOUS TODAY -- no `why` states an arm count, so this "
+                  "arm cannot fire. It is not passing.")
+        print()
+        problems += arm_count_problems(REGISTRY, _OBSERVED)
+        if problems:
+            print("⛔ PROBLEMS (after the sweep)")
+            for p in problems:
+                print("   " + p)
+            print()
 
     bad = [r for r in rows if not r[4]]
     if bad:
@@ -499,6 +613,29 @@ def selftest():
     check("N11", not missing,
           f"every checker in the manager's previous hand-sweep is filed: "
           f"missing={missing}")
+
+    # ⭐ N12 -- the arm-count claims. `arm_count_problems` is PURE, so these run
+    #   over a synthetic observation map and need no sweep.
+    #   ⛔ THE DEFECT IT IS FOR: `task_cost.py`'s `why` said `15 arms` while the
+    #   file had 14, and `cbaseline_check.py`'s said `9` while it had 10 AND
+    #   printed no arm names at all. The registry carries no count literal; its
+    #   PROSE did, and nothing recomputed it.
+    r = {"x.py": dict(REGISTRY["quota.py"], why="⭐ 3 arms, all inline")}
+    check("N12a", arm_count_problems(r, {"x.py": {"N1", "N2", "N3"}}) == [],
+          "a `why` claiming 3 arms passes when the checker prints exactly 3")
+    check("N12b", any("claims 3 arms" in p
+                      for p in arm_count_problems(r, {"x.py": {"N1", "N2"}})),
+          "⭐ a `why` that OVERSTATES its arm count is caught -- the "
+          "task_cost.py `15 vs 14` defect, measured 2026-09-15")
+    check("N12c", any("captured no output" in p
+                      for p in arm_count_problems(r, {})),
+          "⭐⭐ a `why` claiming arms for a checker that PRINTS NO ARM NAMES is "
+          "caught -- the cbaseline_check.py defect: a silent pass makes the "
+          "claim uncheckable, which is worse than wrong")
+    check("N12d", arm_count_problems(
+              {"y.py": dict(REGISTRY["quota.py"], why="no count here")}, {}) == [],
+          "MUST-NOT-FIRE: a `why` with no arm-count claim is silently legal -- "
+          "this arm polices claims that exist, it does not mandate one")
 
     print()
     print("SELFTEST " + ("PASS" if not fails else f"FAIL {fails}"))

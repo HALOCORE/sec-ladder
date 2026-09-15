@@ -58,10 +58,26 @@ def exists(p):
         return all(glob.glob(re.sub(r'\{[^}]*\}', a, p)) for a in inner.split(','))
     return bool(glob.glob(p)) if '*' in p else os.path.exists(p)
 
+#  A task's report, in EITHER naming. ⛔⛔ THIS USED TO BE `endswith('_REPORT.md')`
+#  AND THE SPLIT NAMING SLIPPED PAST IT. `TASK_PHP_054` returned three reports --
+#  `..._REPORT_E2E3E4.md`, `..._REPORT_E5E6E7E8.md`, `..._REPORT_S4S5S6T2T4T6.md`
+#  -- none of which ends in `_REPORT.md`, so all three scored as ROT while the
+#  task was in flight, and the count went 1 -> 4 -> 1 as they landed.
+#  ⭐ THAT IS THE MEASURED HALF OF F117, AND IT IS NARROWER THAN EVERY DOCUMENT
+#  SAID: rot does NOT rise for an in-flight task in general, only for one whose
+#  report is SPLIT. A task with a plain `_REPORT.md` never moved it. Measured
+#  2026-09-15 by citing both spellings from the same live file: 1 and 2.
+#  ▶ Repaired rather than documented, because `.tasks-php/README.md` has stated
+#  the exception in words since Phase 0 ("Ignore a MISSING report for a task that
+#  is still open") and this checker simply never inherited it -- the THIRD
+#  un-inherited caution the programme has caught, now the third to be closed.
+_REPORT = re.compile(r'_REPORT(?:_[A-Za-z0-9]+)?\.md$')
+
+
 def benign(doc, p):
     """A missing path is EXPECTED, not rot, when:"""
     if p in BENIGN: return True
-    if p.endswith('_REPORT.md'): return True          # a report not yet written
+    if _REPORT.search(p): return True                 # a report not yet written
     # scratch under .temp/ is re-derivable and CLAUDE.md rule 1 mandates deleting
     # it once the gates are green -- a historical report citing its own deleted
     # blobs is the rule working, not a broken pointer.
@@ -345,6 +361,21 @@ def selftest():
     #    failure count for the live manager docs.
     ck('N4', rot == 0,
        f'the LIVE-doc rot count is untouched by this extension: {rot}')
+
+    # ⛔ N6 MUST-FIRE: BOTH report spellings are benign, and a non-report is NOT.
+    #    The arm for the F117 repair above. Without the last clause, widening
+    #    `_REPORT` to something sloppy would pass and this checker would go
+    #    quiet on real rot.
+    ck('N6a', benign('x', '.tasks-php/TASK_PHP_056_REPORT.md'),
+       'a plain `_REPORT.md` that does not exist yet is benign (unchanged)')
+    ck('N6b', benign('x', '.tasks-php/TASK_PHP_054_REPORT_E2E3E4.md'),
+       '⭐ a SPLIT `_REPORT_E2E3E4.md` is benign too -- the three-report task '
+       'that made rot read 4, which every document mis-explained as "rot rises '
+       'per in-flight task"')
+    ck('N6c', not benign('x', '.tasks-php/TASK_PHP_056.md')
+       and not benign('x', 'patterns-php/ph97-x/spec.md'),
+       'MUST-NOT-FIRE: a task SPEC and a row file are still rot when missing -- '
+       'the widening did not swallow the checker')
     print()
     print('SELFTEST ' + ('PASS' if not fails else f'FAIL {fails}'))
     return 1 if fails else 0

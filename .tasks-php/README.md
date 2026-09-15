@@ -18,10 +18,21 @@ duplication · §H validators land with their negatives.
 
 **`python3 .tasks-php/checkers.py`** — the register of every `.py` here, what it
 is, and **the argv the sweep must use**. Run that rather than a hand-written
-shell loop over each checker in turn. ⛔ **5 of the 14 checkers run their §H
+shell loop over each checker in turn. ⛔ **Several checkers run their §H
 negatives only under `--selftest`, and a bare sweep runs their REPORT and reads
-it as a VERDICT.** It files itself, so the registry *is* the ratchet and there is
-no count to go stale.
+it as a VERDICT** — the tool prints how many on every run, under *"of which
+FLAG-GATED negatives"*. It files itself, so the registry *is* the ratchet and
+there is no count to go stale.
+
+> ⛔⛔ **AND THIS PARAGRAPH CARRIED ONE ANYWAY** — it read *"5 of the 14
+> checkers"* until 2026-09-15, when adding a sixteenth entry made it wrong in
+> the same edit that added it. ⭐ **That is the day's third instance of the
+> identical class**: `task_cost.py`'s `why` said *"15 arms"* with 14,
+> `cbaseline_check.py`'s said *"9"* with 10 **and printed no arm names at all**,
+> and this line. **The structures carry no literals; the PROSE ABOUT them did.**
+> ▶ `checkers.py` **N12** now derives every `"<n> arms"` claim from what the
+> checker actually prints — **and the fix here is not a better number, it is no
+> number**: the count is one the tool reports.
 
 > ⚠ **The old hand-written shell loop is deliberately NOT spelled out above, and
 > the reason is worth one line.** It contained a shell variable inside a path
@@ -63,12 +74,22 @@ enforces citation hygiene.
 
 > ⛔⛔ **AND THE EXCEPTION IN THE PARAGRAPH ABOVE WAS NEVER INHERITED BY THE
 > CHECKER THAT REPLACED THIS GREP.** `citecheck.py` exits `1 if rot else 0` and
-> counts an in-flight task's not-yet-written report as `rot`, **so it cannot
+> counted an in-flight task's not-yet-written report as `rot`, **so it could not
 > tell *a task is running* from *a citation rotted*** — the distinction this
-> README states in words. ▶ **Read `citecheck`'s COUNT, never its exit code.**
-> ⓘ **Third un-inherited caution in three rounds** (F108's C-compiler rule and
-> `_env_block`'s three-equal-fields caution were the first two) — which makes it
-> a rate, not a coincidence.
+> README states in words. ⓘ **Third un-inherited caution in three rounds**
+> (F108's C-compiler rule and `_env_block`'s three-equal-fields caution were the
+> first two) — which makes it a rate, not a coincidence.
+>
+> ✅ **CLOSED 2026-09-15 — and the claim above was narrower than anyone wrote.**
+> `benign()` whitelisted `endswith('_REPORT.md')` all along, so a task with a
+> **plain** report never moved the count. What moved it was the **SPLIT**
+> naming: `TASK_PHP_054` returned `_REPORT_E2E3E4.md`, `_REPORT_E5E6E7E8.md` and
+> `_REPORT_S4S5S6T2T4T6.md`, none of which ends in `_REPORT.md` — **that** is why
+> rot read `1 → 4 → 1`. Measured by citing both spellings from the same live
+> file: **1 and 2.** ▶ **Repaired, not documented**: `benign()` now matches both,
+> with must-fire arms `N6a`/`N6b` and a `N6c` that keeps a missing task *spec*
+> rot. ⚠ **Still read the COUNT, never the exit code** — the one standing rot is
+> an adjudicated false positive and the exit code cannot say so.
 
 ## Sibling directory convention
 

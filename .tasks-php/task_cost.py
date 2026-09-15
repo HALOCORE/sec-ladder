@@ -157,6 +157,17 @@ CLASS = {
                                # from an artefact _050 had already written and
                                # three committed gate runs nobody had read.
                                # Corpus-wide, charged to no row.
+    "056": "PENDING",          # BUILD row 11 = ph97, T6's first row. IN FLIGHT.
+                               # ⛔ It is `PENDING` and NOT `{"ph97": 1.0}` for a
+                               # mechanical reason worth stating: `ROWS` below is
+                               # the BUILT corpus, `ph97` is not in it yet, and
+                               # charging an unbuilt row raises `KeyError`. ▶ On
+                               # landing: add `ph97` to `ROWS` AND change this to
+                               # `{"ph97": 1.0}` -- N14 fails until the first half
+                               # is done, and N1 never saw the second half.
+                               # ⚠ The FIRST-IN-FAMILY premium applies (T6 is
+                               # family 8 of 20), which is the projection's
+                               # stated risk driver -- not the axis.
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them
@@ -527,6 +538,37 @@ def selftest():
           f"PENDING={pend:.0f} is at most a quarter of ROW={rowsum:.0f} — past "
           f"that, the marginal figure understates and must be restated rather "
           f"than quoted")
+
+    # ⛔⛔ N14 MUST FIRE IF `ROWS` GOES STALE AGAINST THE BUILT CORPUS, and it
+    #    exists because `ROWS` ALREADY DID: it sat at 8 while `ph55` and `ph56`
+    #    were built and gated (the comment above the 2026-09-14 block), and
+    #    nothing here noticed -- `N1` watches TASK files, not ROWS. Every number
+    #    this file publishes divides by `len(ROWS)`, so a stale list makes the
+    #    marginal rate, the projection and the whole per-row series wrong at
+    #    once, silently, in the forgiving direction.
+    #
+    # ⭐ DERIVED, NOT PINNED. `.memory-php/04-process.md` law 6 and item 114's
+    #    lesson: `quota.py` counted a DIRECTORY as a built row and agreed with
+    #    the truth for nine rows because no row had ever been half-built. The
+    #    authority is the GATE RECORD -- a row with a directory and no record is
+    #    in progress, and must NOT be in `ROWS`.
+    #    ⚠ `ph00-smoke` is a relocated PAT calibration kernel with no PHP
+    #    provenance; it prices nothing and is excluded, the same exclusion
+    #    `quota.py` and the RECAP's count command make.
+    gated = {os.path.basename(p).split("-")[0]
+             for p in glob.glob(os.path.join(ROOT, "results-php/gate/ph*.json"))}
+    gated.discard("ph00")
+    missing = sorted(gated - set(ROWS))
+    phantom = sorted(set(ROWS) - gated)
+    print(f"  ⓘ  N14: gated rows = {len(gated)} · ROWS = {len(ROWS)} · "
+          f"missing from ROWS = {missing or 'none'} · "
+          f"in ROWS but not gated = {phantom or 'none'}")
+    check("N14", not missing and not phantom,
+          f"`ROWS` equals the gated corpus -- missing {missing or 'none'}, "
+          f"phantom {phantom or 'none'}. A row that is BUILT but absent from "
+          f"ROWS divides every published rate by too small a number; a row in "
+          f"ROWS that is NOT gated charges cost to something that does not "
+          f"exist")
 
     print()
     print("SELFTEST " + ("PASS" if not fails else f"FAIL {fails}"))

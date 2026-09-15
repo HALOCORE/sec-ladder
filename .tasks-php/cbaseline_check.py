@@ -255,8 +255,26 @@ def main(argv):
 
 
 def selftest():
-    """MUST-FIRE NEGATIVES -- every one asserts this checker can FAIL."""
+    """MUST-FIRE NEGATIVES -- every one asserts this checker can FAIL.
+
+    ⛔⛔ THIS USED TO PRINT ONLY `SELFTEST PASS (0 failures)`, AND THAT IS A
+    DEFECT, NOT A STYLE. A checker whose arms are silent when they pass is
+    indistinguishable from a checker with NO ARMS -- `checkers.py` N12 measured
+    exactly that on 2026-09-15: this file's registry entry claimed `9 arms` and
+    the observable count was **0**. ⭐ It is F10's rule (quota.py prints
+    `VACUOUS TODAY` rather than passing silently) applied one level up: SAY
+    WHICH ARM RAN.
+
+    ⚠ The claim was also wrong: there are **10** arms, not 9 -- `N8b` is a
+    separate assertion and was never counted. Seventh stale count literal in a
+    `.tasks-php/` validator.
+    """
     fails = []
+    ran = []
+
+    def arm(tag):
+        if tag not in ran:
+            ran.append(tag)
 
     def mk(txt):
         return [u for _, u in units_from_string(txt)]
@@ -283,24 +301,29 @@ def selftest():
 
     # N1 THE DEFECT THIS EXISTS FOR MUST SCORE AS A HIT. The real sentence,
     #    from .memory-php/02-ladder.md.
+    arm('N1')
     if not scores('A says C is +33 % dearer than naive safe Rust.'):
         fails.append('N1 the target defect does NOT score as a hit')
 
     # N2 THE LABELLED FORM MUST NOT. The real sentence, STATISTICS_001.md:92.
+    arm('N2')
     if scores('`ph29/large`, `c-gcc` vs `safe_naive`: A says C is +33.01 % DEARER.'):
         fails.append('N2 a correctly labelled claim scored as a hit')
 
     # N3 A MAGNITUDE IS REQUIRED. Prose about C with no number is not a figure.
+    arm('N3')
     if scores('The C rungs are paying for PHP request boundary work.'):
         fails.append('N3 fired on a claim carrying no magnitude')
 
     # N4 A CROSS-LANGUAGE TOKEN IS REQUIRED. A pure Rust-vs-Rust figure must
     #    not fire, or the count is meaningless.
+    arm('N4')
     if scores('`safe_tuned` is +3.7 % against `safe_naive` on this row.'):
         fails.append('N4 fired on a same-language figure')
 
     # N5 THE `C` TOKEN MUST NOT MATCH INSIDE WORDS OR PATHS. If it did, every
     #    paragraph mentioning CWE, CVE or a .c file would be a hit.
+    arm('N5')
     for bad in ('CWE-125 costs 12 %.', 'See uuencode.c:66, +5 %.',
                 'The CVE is +8 %.', 'C99 flags add 3 %.'):
         if scores(bad):
@@ -308,16 +331,20 @@ def selftest():
 
     # N6 clang ALONE must satisfy the rule as much as gcc alone does NOT get a
     #    free pass -- assert BASE recognises every spelling in use.
+    arm('N6')
     for good in ('c-gcc', 'c-clang', 'c-gcc-h', 'c-clang-h'):
         if not BASE.search('X %s Y' % good):
             fails.append('N6 BASE does not recognise %r' % good)
 
     # N7 THE RATCHET MUST BE ABLE TO FAIL. Assert the comparison, not the data.
+    arm('N7')
     if not (RATCHET + 1 > RATCHET):
         fails.append('N7 ratchet comparison is inert')
 
     # N8 THE SCAN LIST MUST BE NON-EMPTY AND EVERY ENTRY MUST EXIST -- a
     #    mistyped glob would report "0 hits" as a clean bill of health.
+    arm('N8')
+    arm('N8b')
     if len(SCAN) < 10:
         fails.append('N8 scan list has only %d entries' % len(SCAN))
     for p in SCAN:
@@ -326,12 +353,26 @@ def selftest():
 
     # N9 AND THE COUNT MUST NOT BE ZERO. A checker that finds nothing on a
     #    corpus known to contain the defect is broken, not clean.
+    arm('N9')
     if len(hits()) == 0:
         fails.append('N9 zero hits on a corpus known to carry the defect')
 
-    for f in fails:
-        print('FAIL %s' % f)
-    print('SELFTEST %s (%d failures)' % ('PASS' if not fails else 'FAIL', len(fails)))
+    # ⭐ EVERY ARM NAMES ITSELF, PASS OR FAIL. `checkers.py` N12 reads these
+    #   names to check this file's registry entry against reality, so a silent
+    #   pass would make the claim uncheckable -- which is how `9 arms` stood
+    #   while there were 10.
+    bad_tags = {f.split()[0] for f in fails}
+    for tag in ran:
+        hit = [f for f in fails if f.split()[0] == tag]
+        if hit:
+            for f in hit:
+                print('  FAIL  %s' % f)
+        else:
+            print('  PASS  %s' % tag)
+    print('SELFTEST %s (%d arms, %d failures)'
+          % ('PASS' if not fails else 'FAIL', len(ran), len(fails)))
+    assert not (bad_tags - set(ran)), \
+        'an arm reported a failure without registering itself: %s' % (bad_tags - set(ran))
     return 1 if fails else 0
 
 
