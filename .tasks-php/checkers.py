@@ -266,6 +266,32 @@ REGISTRY = {
         why="⭐ THIS FILE. Files itself so the ratchet is total. ⛔ Its standing "
             "arm is --audit, NOT a bare run, because a bare run executes the "
             "whole sweep -- and the sweep must not run it recursively (N10)."),
+    "refetch.sh": dict(
+        kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
+        why="⛔ NETWORK. Regenerates the manager's gitignored scratch downloads "
+            "under .temp/mgr/ -- mbfl sources at three tags, two patches, and "
+            "the UPSTREAM_001 batch (F34/F36). ⚠⚠ NEVER IN A SWEEP: it curls "
+            "github, and the standing rule on the patch cache is REPORT, DO NOT "
+            "GUESS, NEVER RE-FETCH (F115 -- 3 of 163 cached patches do not bind "
+            "to their filename sha, and re-fetching would destroy the evidence "
+            "for that). ⭐ Committed as CLAUDE.md rule 1's generator; run it only "
+            "if the scratch is gone AND you have decided you need it. ⓘ It sat "
+            "outside the ratchet until 2026-09-15."),
+    "probes/fdset_census.sh": dict(
+        kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
+        why="ph16's 7-site FD_SET census, run once when the row was built. A "
+            "shell probe over the pristine tarball with no standing verdict. "
+            "ⓘ It sat OUTSIDE the ratchet until 2026-09-15, because _disk() "
+            "globbed `.py` only."),
+    "probes/rebuild_hardened_php.sh": dict(
+        kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
+        why="⭐⭐ PROTOCOL_PHP §A3a obligation 5's generator: build PHP 5.0.0, "
+            "apply the row's R1h, rebuild, and run the trigger against both. "
+            "Measured 30 s cold / 683 ms incremental / 60 MB, no sudo, no "
+            "network -- the number that turned §A3a's fifth obligation from "
+            "REFUSED to REQUIRED (F123). ⛔ NOT in the sweep: it is 30 s and it "
+            "answers a per-row question, not a standing one. ⚠ Pinned to ph97's "
+            "patch path; a row edits step 4."),
     "probes/n14_mustfire.py": dict(
         kind="checker", argv=[], expect=0, negatives="inline", st_expect=None,
         why="⭐ §H EVIDENCE, COMMITTED RATHER THAN RUN ONCE AND DISCARDED: shows "
@@ -432,11 +458,21 @@ def _disk():
     occurred.* `n14_mustfire.py` is the first `.py` to land there, and it HAS a
     standing verdict, so without this it would have been a checker no ratchet
     could see. ⭐ Caught while adding it, not after.
+
+    ⛔⛔ AND `.sh` WAS THE SECOND HALF OF THE SAME BLIND SPOT, LEFT OPEN FOR
+    HALF A DAY. The first pass widened `.py` only, and `probes/fdset_census.sh`
+    had been sitting outside the ratchet the whole time -- then the manager
+    added `probes/rebuild_hardened_php.sh`, a script `PROTOCOL_PHP.md` §A3a now
+    REQUIRES a row to run, and it landed outside the ratchet too. ⭐ This is
+    exactly the defect `TASK_PHP_057` caught in `citecheck.py`: **a repair that
+    fixes one limb of its own mechanism is worse than no repair, because the
+    gap reads as closed.** ▶ Extensions live in ONE tuple now.
     """
-    flat = [f for f in os.listdir(TASKS) if f.endswith(".py")]
+    exts = (".py", ".sh")
+    flat = [f for f in os.listdir(TASKS) if f.endswith(exts)]
     pdir = os.path.join(TASKS, "probes")
     if os.path.isdir(pdir):
-        flat += ["probes/" + f for f in os.listdir(pdir) if f.endswith(".py")]
+        flat += ["probes/" + f for f in os.listdir(pdir) if f.endswith(exts)]
     return sorted(flat)
 
 

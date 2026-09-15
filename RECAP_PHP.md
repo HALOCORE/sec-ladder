@@ -46,25 +46,25 @@ between them read `CLAUDE.md`'s top table.
 
 ```
 STATE   ⭐ ROWS BUILT 11 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL · ph45
-        (T1)+ph53+ph52 (T3)+ph55+ph56 (T5)+ph97 (T6) TYPE. 8 of 20 fam. 26 owed to
-        a floor of **37**, not 40 (item 121). NOTHING RUNNING.
-NEXT    ▶ (1) ⭐⭐ DISPATCH _057, WRITTEN AND HELD -- **BACKLOG 13, GROWN THREE ROUNDS
-        RUNNING**, largest since the mining wave. ⛔ BEFORE ROW 12. ▶ (2) ROW 12 =
-        ph96 CLOSES T6 -- BUT ITEM 121: T6's NAME IS FALSE OF 3 OF ITS 5 ROWS, AND
-        ROW 12's POINT IS A FAMILY-LEVEL FINDING. ▶ (3) ⚠ ROW 13 SHOULD BE TEMPORAL:
-        15 OF 26 OWED ARE, 1 IS BUILT. ▶ (4) ⛔⛔ ITEM 105 OWED TO THE USER: (a)
-        check.py = 33-ROW RE-GATE, SMALLER TCB; (c) LEAVE IT. ⭐ I PROCEED (c).
-⚠ NEW   F124 ROW 11: ⭐ P1 SURVIVES BOTH HALVES -- THE OPTIONAL COSTS **0.0000 Ir/call**,
-        SAFETY FREE BY CONSTRUCTION. F125 ⭐⭐⭐ MOVING THE COMPARE INTO libc MAKES A1
-        READ **-28.61% CHEAPER** WHILE THE PROGRAM IS **+9.39% DEARER** -- A1 CAN
-        REPORT THE SIGN BACKWARDS. F126 THE OPENER PREMIUM REFUTED IN SIGN (2.19 vs
-        PIN 4.00); **PROJECTION MOVED TO ~70..~92, MIDDLE ~73.**
-⚠ WRONG MY §A3a DROPPED ITS BEST OBLIGATION ON A FALSE PREMISE VIA A 4-DOC CHAIN:
-        "I DIDN'T"->"NOT OWED"->"I CAN'T"->"ONE CAN'T" (F123). MY n14 MUST-FIRE
-        PROBE ONLY WORKED ON A CLEAN TREE -- MAKE THEM DIFFERENTIAL.
-⚠ TRAPS `grep -a` ALWAYS. A COUNT IN PROSE **ABOUT** A TOOL GOES STALE LIKE ONE IN IT
-        (x8 NOW, INCL. THE ANTI-PIN ARM). EVENT NOT STATE. .web/: NEVER `git add -A`.
-READ    RULE-9 · .memory-php/ · F1-F126 · items 1-126 · _056 + ADJUDICATION_003/004.
+        (T1)+ph53+ph52 (T3)+ph55+ph56 (T5)+ph97 (T6) TYPE. 8 of 20 fam. 26 owed
+        to a floor of 37 (item 121). NOTHING RUNNING; _057 CLEARED 13 -> BACKLOG 1.
+NEXT    ▶ (1) ⭐⭐⭐ ITEM 127, THE REVIEWER'S **BINDING** PRIORITY: MEASURE
+        inside_share ON ph03, ph16, ph29. 5 OF 11 ROWS NEVER MEASURED IT, 3 OF
+        THOSE PUBLISH AN A1 HEADLINE, AND ph29's ONLY FIGURES SIT IN A DOCSTRING
+        DISCLAIMING THE COMPARISON WE PUBLISH FROM IT. ENGINEER, ~20min+3 REGATES.
+        ▶ (2) ITEM 129 THE "UNSURE OF" CENSUS. ▶ (3) ROW 12 = ph96 CLOSES T6 --
+        BUT ITEM 121: T6's NAME IS FALSE OF 3 OF ITS 5 ROWS. ▶ (4) ROW 13
+        TEMPORAL: 15 OF 26 OWED ARE, 1 BUILT. ▶ (5) ⛔⛔ ITEM 105 IS THE USER'S.
+⚠ NEW   F127 ⭐⭐⭐ 7th ROUND: ONLY **3 OF 16** ENTRIES HAD BOTH CONCLUSION AND REASON
+        UPHELD. §A3a's 5th OBLIGATION NOW **REQUIRED** -- THE CHECK I CALLED TOO
+        EXPENSIVE COSTS **30 SECONDS**. F125: A1 CAN REPORT THE SIGN BACKWARDS.
+⚠ WRONG **FOUR OF MY OWN SAME-DAY REPAIRS WERE DEFECTIVE**: F122 FIXED ONE LIMB OF
+        ITS OWN MECHANISM (6 REPORTS WRONG-SIDED); THE BUILD LABEL WAS -O0 NOT
+        -O3lto IN 4 PLACES; F126's RANGE WENT STALE WITHIN THE HOUR. ALL REPAIRED.
+⚠ TRAPS WHEN A REPAIR HAS TWO LIMBS, ASSERT THEY **AGREE**, NOT THAT EACH WORKS. A
+        COUNT IN PROSE ABOUT A TOOL GOES STALE LIKE ONE IN IT (x8). `grep -a`
+        ALWAYS; EVENT NOT STATE; .web/: NEVER `git add -A`.
+READ    RULE-9 · .memory-php/ · F1-F127 · items 1-129 · _057 + ADJUDICATION_003/004.
 ```
 
 ---
@@ -156,7 +156,20 @@ READ    RULE-9 · .memory-php/ · F1-F126 · items 1-126 · _056 + ADJUDICATION_
 > | ⛔ **F123** | ⛔ **UNREVIEWED** — manager, about the manager, 2026-09-15 | ⛔ **NOTHING.** ⭐ **Its layer-shaped clause is the one to review**: *an engineer's own uncertainty may be DEFERRED but not DOWNGRADED; the next task inherits its stated priority, not the manager's.* **Not in the layer, and not on my say-so** |
 > | ⭐ **F124** | ⛔ **UNREVIEWED** — the row-11 round | ⛔ **NOTHING YET.** ⚠ `P1` is the first prediction to survive in both halves for several rounds, which is exactly when to check it hardest |
 > | ⭐⭐ **F125** | ⛔ **UNREVIEWED** | ⛔ **NOTHING**, and it is the highest-stakes of the four: it bears on *which statistic*, the programme's largest open thread. ▶ **Does it change `F91`'s axis, or is it that claim with a number on it at last?** |
-> | **F126** | ⛔ **UNREVIEWED** | ⛔ **NOTHING.** ⚠ It moves a PUBLISHED figure, so the reviewer should check the two causes are separable as claimed |
+> | **F126** | ⚠ **UPHELD / REASON REFUTED** (`_057`) | ✅ split + `ph07` sensitivity both reproduce. ⛔ separability named the WRONG PAIR — there are **three** causes — and the published range was **stale within the hour**. **Corrected in place as an EVENT** |
+> | **F114** | ⚠ **UPHELD-NARROWED** (`_057`) | ✅ conclusion upheld. ⛔ the one-cell shape is **permissive, not forcing** — it explains why nobody noticed, not why it happened |
+> | **F115** | ✅✅ **UPHELD, BOTH HALVES** (`_057`) | ⭐ one of only three clean survivals; second method was an independent 12-line byte reader over all 163 patches |
+> | **F116** | ✅ **UPHELD / REASON REFUTED** (`_057`) | ⛔ **its evidence is NOT re-derivable — the log AND its generator are both gitignored.** F51/F99's defect, **fourth instance** |
+> | **F117** | ✅✅ **UPHELD, BOTH HALVES** (`_057`) | ⭐ clean survival |
+> | **F118** | ✅ decision stands on its OTHER reason | ⛔⛔ **its stated ground is REFUTED AND INVERTED** — F116 helps the **type** axis ~2× more than the temporal one, and `ph97` is a type row |
+> | **F119** | ✅ **UPHELD, UNDER-STATED / REASON REFUTED** | ⛔ the `memset` mechanism is a **`p03`** fact and explains the wrong column; the record's own `domain` forbids the comparison. **Re-state on the stronger reading** → item 128 |
+> | **F120** | ✅ **UPHELD (12/12) / NARROWED** | ⛔ **the build label was wrong in four places**; the benign control under-states. ✅ Both repaired |
+> | **F121** | ✅✅ **UPHELD, BOTH HALVES** (`_057`) | ⭐ clean survival; `N12` tracked two further count moves while it ran |
+> | **F122** | ⚠ **UPHELD-NARROWED / REASON REFUTED IN PART** | ⛔⛔ **the repair fixed ONE LIMB of its own mechanism** — six reports on the wrong side of the LIVE/HIST split. ✅ Repaired + `N6d` |
+> | **F123** | ✅✅ **UPHELD AND UNDER-STATED** (`_057`) | ⭐⭐⭐ **the check costs 30 SECONDS**, measured and reproduced. §A3a obligation 5 is now **REQUIRED** |
+> | **F124** | ⚠ **UPHELD-NARROWED / REASON REFUTED** | ⛔ the control priced the **TEST**, not the discriminant; *"by construction"* holds for the **size leg only**. ✅ Corrected in place |
+> | **F125** | ⚠ **UPHELD-NARROWED / REASON REFUTED** | ⛔⛔ **both clauses of its disclaimer are false** — see **F127**, which is the bigger finding it produced |
+> | ⭐ **F127** | ⛔ **UNREVIEWED** — `_057`'s own round | ⛔ **NOTHING.** ⚠ **It is a reviewer finding, so law 12 cuts the other way** — but item 127 is an ENGINEER task and will test it directly |
 >
 > #### ⭐⭐⭐ `F96`, PER GROUP — **SEVEN groups, not the four I wrote** (`_055` §1.1)
 >
@@ -177,18 +190,16 @@ READ    RULE-9 · .memory-php/ · F1-F126 · items 1-126 · _056 + ADJUDICATION_
 > the same sentence**, (d) **with input + opt/mode + the row's caution**, (d′)
 > **mechanism half only, corpus half re-dated**, (e), (f). ⛔ **NOT (b)'s R2/R4/R5. NOT (h).**
 >
-> ▶ **NEXT REVIEW SCOPE: `F114`–`F126`, THIRTEEN, all UNREVIEWED** — plus
-> **R2/R4/R5**. ✅ **`TASK_PHP_057` IS WRITTEN AND HELD**, ordered by stakes,
-> and its §1 is `F120`/`F123`. ⚠⚠ **Seven of the thirteen are MANAGER findings
-> from one probe each**; law 12 and six consecutive rounds say assume them
-> narrowable. ⭐ **`F125` is the highest-stakes** (it bears on *which
-> statistic*); **`F120`/`F123` are the most attackable** (a rule I wrote about my
-> own measurement, and my own four-document error).
-> ⓘ **Backlog trend: 14 → 2 → 7 → 1 → 4 → 2 → 6 → 13.** ⛔⛔ **THE BACKLOG HAS
-> GROWN FOR THREE ROUNDS AND IS NOW THE LARGEST SINCE THE MINING WAVE.**
-> ▶ ⭐ **DISPATCH `_057` BEFORE BUILDING ROW 12.** The programme has been
-> producing findings faster than it verifies them for three rounds running, and
-> that is the one trend no measurement in here corrects.
+> ✅✅ **`TASK_PHP_057` CLOSED ALL THIRTEEN PLUS `R2`/`R4`/`R5` IN ONE ROUND —
+> the largest backlog since the mining wave, cleared.** ⓘ **Backlog trend:
+> 14 → 2 → 7 → 1 → 4 → 2 → 6 → 13 → 1.**
+> ▶ **NEXT REVIEW SCOPE: `F127` alone**, and it is a REVIEWER finding, so law 12
+> cuts the other way. ⭐ **Item 127 is an ENGINEER task that tests it directly**,
+> which is a better check than another reading.
+> ⛔ **NOTHING IS OWED ON `F96` ANY MORE.** R2/R4/R5 are verdicted: R2 upheld
+> (**0 of F108's 5** things paid), R4 narrowed (*"outside both arms"* is FALSE —
+> arm 2 holds on the clang column F96 never looked at), R5's **conclusion
+> refuted** (the prediction stands; *"half-refuted"* over-claimed).
 >
 > ⛔ **SEVEN THINGS `_050` §8.1 FORBIDS THE LAYER**, and they are enumerated in
 > its report. ▶ **Read that list before adding anything from `F109`, `F110`,
@@ -475,7 +486,14 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > **F126 ⭐⭐⭐ the first-in-family premium is REFUTED IN SIGN at n = 8 (openers
 > 2.19, follow-on 3.17, pin 4.00 from n = 1) — and `N11`, the arm that should
 > have caught it, ASSERTED THE PREMIUM'S DIRECTION, so it reported the data as
-> the failure**
+> the failure** ·
+> **F127 ⭐⭐⭐ the SEVENTH consecutive round, and its biggest result is in none
+> of the thirteen findings: FIVE built rows never measured `inside_share`, THREE
+> of those publish an `A1` headline, and `ph29`'s only figures live in a
+> docstring that disclaims the very comparison this file publishes from it.
+> Three of sixteen entries had both conclusion and reason upheld. §A3a's fifth
+> obligation is now REQUIRED because the cost is THIRTY SECONDS, and four of my
+> own same-day repairs were found defective**
 >
 > ⚠⚠ **This index stopped at F59 while F60–F65 existed, and then AT F101 WHILE
 > F113 EXISTED — twelve behind, caught by a pre-handoff audit 2026-09-14.**
@@ -1779,6 +1797,117 @@ The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
 
+### F127 — ⭐⭐⭐ **THE SEVENTH CONSECUTIVE ROUND, AND ITS BIGGEST RESULT IS NOT ONE OF THE THIRTEEN FINDINGS: FIVE BUILT ROWS NEVER MEASURED `inside_share`, AND THREE OF THEM PUBLISH AN `A1` HEADLINE**
+
+`TASK_PHP_057`, 1112 lines, **reached every section**. ⚠ **UNREVIEWED.**
+Brackets `66/0` and `24/0`, first and last, unmoved.
+
+⛔⛔⛔ **THE TASK FILE ASSERTED *"`inside_share` is in every row's `controls/`
+already"* AND IT IS IN ONE.** ✅ **Manager-verified across all eleven built
+rows**: `ph97` has a dedicated control; `ph29`, `ph45`, `ph52`, `ph55`, `ph56`
+carry a value somewhere; and **`ph03`, `ph07`, `ph16`, `ph53`, `ph64` have none
+at all.** ⭐⭐ **Three of the rows with no measured `inside_share` publish an
+`A1` headline.**
+
+⭐⭐⭐ **AND `ph29` IS WORSE THAN MISSING.** Its only figures — `0.655 / 0.669`
+for R3-vs-R4 and `0.927 / 0.655` for C-vs-Rust — live **in a Python docstring in
+`controls/spellings.py`**, and **that docstring says in terms that A1 is NOT
+right for this row's C-vs-Rust column and *"that comparison is not made here"*.**
+⛔ **It is made elsewhere**: this file's *which statistic* cell publishes
+*"on `ph29/large` A says C is +33 % dearer than naive safe Rust"* — **the exact
+comparison the row's own control disclaims**, on the row at the centre of the
+programme's largest open thread.
+
+▶ ⭐⭐⭐ **THIS IS THE NEXT TASK AND THE REVIEWER'S BINDING PRIORITY:** measure
+`inside_share` on `ph03`, `ph16`, `ph29`. *"More important than any finding in
+this round, including the one it came out of."* → item **127**.
+
+### ⭐⭐ THE ROUND'S SCORE — CONCLUSION AND REASON, SEPARATELY
+
+**Sixteen entries verdicted. THREE had both halves cleanly upheld** (`F115`,
+`F117`, `F121`). ⭐ **`F123` is UPHELD AND UNDER-STATED.** Everything else split.
+
+| | |
+|---|---|
+| ⛔ **REASON refuted, conclusion survived** | `F116` (its evidence is **not** re-derivable — log *and* generator gitignored, **4th instance**), `F118`, `F119`, `F124`, `F125`, `F126`, `F96 R4` |
+| ⚠ **narrowed** | `F114`, `F120`, `F122`, `F96 R2` |
+| ⛔ **conclusion refuted** | `F96 R5` — the prediction stands and *"half-refuted"* over-claimed |
+
+⭐⭐ **SEVENTH CONSECUTIVE ROUND.** The pattern is now beyond doubt and is the
+strongest evidence on file for `04-process.md` law 12: **a conclusion reached by
+a manager or an engineer tends to survive; the REASON given for it tends not
+to.**
+
+### ⛔⛔ FOUR THINGS IT FOUND IN MY OWN REPAIRS, ALL FROM TODAY
+
+1. ⛔⛔ **`F122`'s repair FIXED ONE LIMB OF ITS OWN MECHANISM.** I widened
+   `benign()` to accept split report names and **left `LIVE`/`HIST` on
+   `endswith('_REPORT.md')`** — so a split-named report was benign in one half
+   and a **live doc** in the other. ⭐ **SIX reports on the wrong side**, not the
+   three I would have guessed. **`N6a`/`N6b`/`N6c` all passed throughout,
+   because every one tests `benign()` and none tests the PARTITION.**
+   ✅ **Repaired: one predicate, one place, plus `N6d` which asserts the two
+   halves AGREE.** ▶ ⭐ **THE LESSON: when a repair has two limbs, the arm must
+   assert they agree, not that each works.**
+2. ⛔⛔ **THE BUILD LABEL WAS WRONG IN FOUR PLACES** — I wrote
+   `-O3 -march=native -flto` and **the measured binary is `-O0`**; those flags
+   belong to the sibling `-O3lto`/`-maxlto` variants, which carry `.buildinfo`
+   files the plain one does not. ⭐⭐ **The caution whose entire point is *say
+   which build* named the wrong build.** ✅ **Corrected in `§A3a`, `F120` and
+   `segaddr.c`.** ⓘ **Measured on all three tiers: `si_code=1 si_addr=(nil)`
+   rc `139` on each, so nothing downstream moved** — *luck, not a reason to
+   relax the rule.*
+3. ⛔ **`F126`'s published range was stale within the hour** (above).
+4. ⛔ **`F124`'s `P1` priced the discriminant TEST, not the discriminant**
+   (above).
+
+### ⭐⭐⭐ AND THE FIFTH OBLIGATION IS NOW *REQUIRED*, BECAUSE THE COST IS **30 SECONDS**
+
+The reviewer **ran the hardened build end to end**, and ✅ **the manager
+reproduced it**: **cold build 30 s · incremental rebuild after the R1h patch
+683 ms · 60 MB · no sudo · no network**; pristine `rc 139` → post-image `rc 0`.
+
+⛔⛔ **SO MY SECOND REASON FOR OMITTING IT WAS AS WRONG AS MY FIRST.** *"Requiring
+it makes every row pay for a full PHP compile"* does not survive `30 s`.
+⭐ **`F123` is therefore UPHELD AND UNDER-STATED: the engineer's *"cheapest
+remaining check"* was not merely defensible, it was an UNDER-STATEMENT** — and
+`_057` rules my §1.2a question 1 decidable and answers **NO, the demotion was
+not justified**, because *`PROTOCOL.md` rule 14 is run the premise before you
+write it into a task file.*
+
+✅ **LANDED: `§A3a` obligation 5 is REQUIRED**, gated on *"the pre-image run
+faulted"*, **with the measured cost written into the section so nobody re-derives
+it as impossible a third time**, and the generator committed at
+`.tasks-php/probes/rebuild_hardened_php.sh`.
+
+⭐ **`§A3a` also gained the obligation NOBODY had thought of: REPEAT THE RUN.**
+`ph75`'s trigger returns **`SIGABRT`, `SIGSEGV` or exit `255` depending on the
+run**, and `ph79`'s `si_addr` took **four different values in four runs** while
+`ph97`'s is `(nil)` every time. **§A3a said *record the exit status* once.**
+
+### ⛔ `F119` MUST BE RE-STATED ON ITS REAL EVIDENCE — AND THE REAL ONE IS STRONGER
+
+`F119`'s conclusion is **UPHELD and UNDER-STATED** (96 cells = 48 `isolated` +
+48 `whole`, three draws, bit-identical, md5 reproduced by an independently
+chosen recipe). ⛔ **Its REASON is refuted and it is a category error:** the
+mechanism *"100 % of the ±7 swing is inside a libc `memset` callee, which
+`kernel_exclusive_ir` excludes structurally"* is a claim about **A1**, while
+**48 of the 96 cells are the `whole` column, which that immunity cannot
+protect.** ▶ **The finding explains the stability of column Y with the immunity
+of column X.**
+
+⛔⛔ **AND THE `memset` FACT IS ANOTHER PATTERN'S.** `ph53`'s own `NOTES.md` §8b
+says its `memset` of `8·n_decl ≤ 128` bytes is **inlined to `xmm` stores — inside
+`kernel`, not a libc callee at all.** The `__memset_avx2_unaligned_erms`
+measurement in the layer is a **`p03`, PAT-side** fact.
+
+⚠⚠ **AND THE RECORD'S OWN `domain` FIELD FORBIDS THE COMPARISON F119 MAKES** —
+*"comparable ONLY against a record with the same `envp_stack_bytes`"*, and F119
+compares across three different values. ⭐ **The honest reading is stronger: the
+±7 term did not fire on this row at all, on three draws, INCLUDING in the column
+that is supposed to be vulnerable — so the `domain` guard is more conservative
+than this row needs.** → item **128**.
+
 ### F126 — ⭐⭐⭐ **THE FIRST-IN-FAMILY PREMIUM IS REFUTED IN SIGN AT n = 8, AND THE ARM THAT SHOULD HAVE CAUGHT IT ASSERTED THE PREMIUM'S DIRECTION**
 
 Manager, 2026-09-15, on `ph97` landing. ⚠ **UNREVIEWED.**
@@ -1824,11 +1953,22 @@ only so `N15b` can **report** the gap — and `N15b` is printed as an `ⓘ`, **n
 `check`, because the first draft wrote it as `check(cond or True)`, which prints
 `PASS` while being unfalsifiable** — §H's own target.
 
-▶ ⚠ **A PUBLISHED FIGURE MOVES: `~94–127, middle ~110` → `~70 .. ~92, middle
-~73`.** The tool now prints **what the old pin would have said (~92)** beside it,
-so the change is visible rather than silent. ⛔ **Part of the fall is item 121's
-floor (40 → 37) and part is `ph97` landing; they are separable in the tool's own
-output and should not be quoted as one effect.**
+▶ ⚠ **A PUBLISHED FIGURE MOVES.** ⛔⛔ **AND THE FIGURE I WROTE HERE WAS STALE
+WITHIN THE HOUR — `TASK_PHP_057` CAUGHT IT.** I ran `task_cost.py`, wrote
+`~70 .. ~92, middle ~73` into this file, **then changed the floor 40 → 37 and
+never re-ran the report.** ⭐ **That is F119/M2's own rule — quote a re-gateable
+reading as an EVENT, never a STATE — broken in the same commit whose trap line
+carries it.**
+
+▶ **AS AN EVENT: `~63 .. ~82, middle ~66`, as `python3 .tasks-php/task_cost.py`
+printed at `af135f9`.** ⚠ **Do not quote it without re-running it.** The tool
+prints what the old pin would have said beside it, so the change stays visible.
+
+⛔ **AND MY SEPARABILITY CLAIM NAMED THE WRONG PAIR** (`_057` §4). I said the
+fall was *floor* plus *`ph97` landing*; **there are THREE causes** — the opener
+rate, the floor, and the row — and the tool separates a different pair than the
+one I named. ▶ **A range that moved for three reasons is exactly what gets
+quoted as one.**
 
 ⓘ **`N9` — the arm whose entire purpose is to stop figures being pinned — turned
 out to hardcode `40` itself.** **Eighth stale literal in a `.tasks-php/`
@@ -1878,12 +2018,17 @@ a number on it at last?**
 Verus **47/0**, twin **54/0**, Miri clean, identity `norel` at both levels as
 pinned. **Brackets `66/0` unmoved; `22/0` → `24/0`.**
 
-⭐⭐⭐ **`P1` HOLDS, AND IT IS THE CRASH COURSE'S PARAGRAPH.** The optional's
-discriminant costs **`+0.0000 Ir/call` on BOTH inputs**, and `Option<&[u8;21]>`
-is **8 bytes by compile-time assertion**. ▶ ***The null-as-absent idiom is the
-one C mistake whose safe-Rust replacement is free by construction*** — a niche
-optimisation, not a trade. ⭐ **A prediction surviving is rare here and is
-reported as plainly as a refutation.**
+⭐⭐ **`P1` HOLDS — NARROWED BY `_057`, AND THE NARROWING IS WORTH MORE THAN THE
+HEADLINE.** ⛔ **The control priced the discriminant *TEST*, not the
+discriminant**, and the `0.0000` is *stronger* than I wrote: the check is not
+made cheap, **it is REMOVED** — a `cmp`+`jne` over 20 000 calls would have cost
+40 000 `Ir` and the record shows none. ⛔ **And *"free by construction"* splits
+in two**: the SIZE leg is by construction (`Option<&[u8;21]>` is **8 bytes** by
+compile-time assertion — a niche optimisation, not a trade); the RUNTIME leg is
+**by ELISION**, which is the optimiser's choice and not the type system's.
+▶ **State both legs or state neither.** ⭐ **A prediction surviving is rare here
+and is reported as plainly as a refutation — but *this* prediction survived on a
+measurement of something adjacent to what it claimed.**
 
 ⛔ **AND THE ENGINEER REFUSED MY FALSIFIER, RIGHTLY.** I wrote *"any step
 attributable to the discriminant"*; **a falsifier containing *"attributable to"*
@@ -1972,8 +2117,9 @@ Manager, 2026-09-15, **before** `TASK_PHP_056` was written. ⚠ **UNREVIEWED**
 narrowable. Nothing measured or re-gated; brackets `66/0` and `22/0` unmoved.
 
 **F116 said the C-side bar *can* be measured. This is the first time anybody
-did it.** On the oracle CLI (`php-in-safe-rust`'s build, `-O3 -march=native
--flto`, mysql + webext — **not** a museum-default one), under
+did it.** On the oracle CLI (`php-in-safe-rust`'s build, mysql + webext, **`-O0`**
+— **not** a museum-default one; ⛔ **this said `-O3 -march=native -flto` for one
+day, which is the SIBLING variants' flags — F127**), under
 `.tasks-php/probes/segaddr.c`:
 
 | run | result |
@@ -7197,7 +7343,7 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 ## Open items — carried, not closed
 
 ⚠ **THE NUMBERS HAVE GAPS AND THAT IS CORRECT — DO NOT "REPAIR" THEM.**
-**122 rows present, numbered 1 → 126, with 45–47 and 106 ABSENT** and a
+**125 rows present, numbered 1 → 129, with 45–47 and 106 ABSENT** and a
 growing set retired IN PLACE as `~~N~~`; no number is ever reused.
 ⚠ **Verified 2026-09-15 by the check below**, not by trusting this line — the
 count, the maximum and the gap set are all re-derived, and this sentence exists
@@ -7371,3 +7517,6 @@ the wrong one.
 | 124 | ⭐⭐ **THE SWEEP CANNOT TELL *A TASK IS IN FLIGHT* FROM *SOMETHING ROTTED*, AND IT IS NOW MEASURED IN TWO DIFFERENT CHECKERS** | **F122** and a live instance. `citecheck.py`'s rot rose while `_054`'s three **split-named** reports were unwritten (**repaired**); and on 2026-09-15 `contract_audit.py` went RED mid-build, its `N8` ratchet reporting three UNFILED `VERDICT` hits in `ph97`'s `c/*` **because `_056` was still writing them**. ⭐ **The ratchet was working perfectly** — the first hit was REAL and the sentence moved to `NOTES.md`; the other two were filed with reasons. ⛔ **What is missing is CONTEXT: `checkers.py` files `contract_audit.py` as `expect=0` and a reader meets a failure with no way to tell which kind it is.** ▶ **The repair's shape already exists**: `quota.py`'s `N1` prints `⏳ IN PROGRESS` for a row with a directory and no gate record, and declares itself `VACUOUS TODAY` rather than passing silently (item 114, F10). ⛔⛔ **DO NOT SUPPRESS THE RED** — an unfiled adjudication SHOULD block. **LABEL it.** ⓘ Not done on the day because `_056` might have been reading the file (`PROTOCOL.md` rule 11) |
 | 125 | ⭐⭐ **HOW MANY *"CHEAPEST REMAINING CHECK"* ITEMS SIT IN A `WHAT I AM UNSURE OF` SECTION, DEMOTED ONCE AND NEVER REVISITED?** | **F123**, and it is the question the manager cannot answer about the manager. `_051` §8.1 called the PHP-rebuild check *"the cheapest remaining"*; `_052` §1.5 demoted it to *"nice to have, skip it"*; two rounds later a different agent said *"I cannot"*; today it was absent from a protocol section. ⛔ **No step was a lie, and nothing in this repo would have caught it.** ▶ **A COUNT OVER THE `§ WHAT I AM UNSURE OF` SECTIONS OF THE LANDED REPORTS WOULD ANSWER IT** — every build and review report has one, by DoD. ⚠⚠ **THE MANAGER DELIBERATELY IS NOT THE ONE WHO SCOPES IT**, because the finding is about the manager's own demotions. ▶ **Give it to a reviewer.** ⭐ **The layer-shaped claim it would test**: *an engineer's own uncertainty may be DEFERRED but not DOWNGRADED; the next task inherits its STATED priority, not the manager's.* ⛔ **Not in `.memory-php/` and not going there unreviewed** |
 | 126 | ⚠ **`PROTOCOL_PHP.md` §A3a IS INCOMPLETE BY ONE OBLIGATION, AND WHETHER TO ADD IT IS A REAL TRADE** | **F123**. The fifth obligation — *re-run the trigger against the R1h POST-IMAGE build* — would make the upstream fix's efficacy measurable on real PHP, and the reason it was omitted was false. ⛔ **But it is NOT simply owed.** ▶ **The trade, stated so a reviewer can rule on it: REQUIRING it makes every row pay for a full PHP compile, and §A3a's entire merit is being cheap enough that nobody skips it; PERMITTING it may mean nobody ever does it.** ⚠ **And a third question nobody has answered: what does it buy over verifying the applied post-image BYTES, which `_056` did without building anything?** ⓘ **Routed to `TASK_PHP_057` §1.2 with the manager's own answer registered as a prediction (`P1b`) and predicted to be wrong.** ⚠ **Until it rules, §A3a must not read as complete** |
+| 127 | ⭐⭐⭐ **FIVE BUILT ROWS NEVER MEASURED `inside_share`, AND THREE OF THEM PUBLISH AN `A1` HEADLINE — MEASURE `ph03`, `ph16`, `ph29`** | **F127**, and **`TASK_PHP_057`'s BINDING resume priority**: *"more important than any finding in this round, including the one it came out of."* ✅ **Manager-verified across all eleven rows**: only `ph97` has a dedicated control; `ph29`/`ph45`/`ph52`/`ph55`/`ph56` carry a value somewhere; **`ph03`, `ph07`, `ph16`, `ph53`, `ph64` have NONE.** ⛔⛔ **`ph29` is worse than missing**: its only figures live in a **docstring in `controls/spellings.py`** which says in terms that **A1 is not right for this row's C-vs-Rust column and *"that comparison is not made here"*** — while this file's *which statistic* cell publishes exactly that comparison (*"A says C is +33 % dearer"*) from this row, **the row at the centre of the programme's largest open thread.** ▶ **ENGINEER TASK, ~20 min + 3 re-gates.** ⚠ **`.memory-php/03-numbers.md` treats `inside_share` as a live per-cell discipline; on 5 of 11 rows it is aspirational.** ⛔ **The manager's own task file asserted *"`inside_share` is in every row's `controls/` already"* — a rule-14 premise, false, and the reviewer checked it instead of believing it** |
+| 128 | ⚠ **`F119` MUST BE RE-STATED ON ITS REAL EVIDENCE, AND THE REAL ONE IS STRONGER** | **F127** / `_057` §3.3. `F119`'s conclusion is UPHELD and UNDER-STATED — **96 cells (48 `isolated` + 48 `whole`), three `envp_stack_bytes` draws, bit-identical, md5 reproduced by an independently chosen recipe.** ⛔ **Its REASON is a category error**: *"100 % of the ±7 swing is inside a libc `memset` callee, which `kernel_exclusive_ir` excludes structurally"* is a claim about **A1**, yet **half the evidence is the `whole` column, which that immunity cannot protect** — the finding explains the stability of column Y with the immunity of column X. ⛔⛔ **And the `memset` fact is another pattern's**: `ph53`'s own `NOTES.md` §8b says its `memset` (`8·n_decl ≤ 128` B) is **inlined to `xmm` stores, inside `kernel`, not a libc callee**; `__memset_avx2_unaligned_erms` is a **`p03`/PAT-side** measurement. ⚠ **The record's own `domain` field forbids the comparison F119 makes** (*"comparable ONLY against a record with the same `envp_stack_bytes`"*). ▶ ⭐ **THE STRONGER STATEMENT: the ±7 term did not fire on this row at all, on three draws, INCLUDING in the vulnerable column — so the `domain` guard is more conservative than this row needs.** ⓘ Item 117 stays CLOSED either way |
+| 129 | ⭐⭐ **THE `WHAT I AM UNSURE OF` CENSUS — AND THE REVIEWER SAYS TO SCOPE IT ANYWAY** | **F123**/**F127**, item 125's successor with a ruling. The manager wrote that he *"deliberately is not the one who scopes it"* because the finding is about his own demotions. ⛔ **`TASK_PHP_057` §9 item 4 overrules that: *"Scope it anyway — F123 is one instance and the whole finding is that the RATE matters, not the instance."*** ⭐ **That reviewer priority BINDS** (the task file said so, and F123 is the record of what happens when a stated priority is re-ranked). ▶ **THE TASK: every landed `_REPORT.md` has a `WHAT I AM UNSURE OF` section by DoD; count the items, and for each ask whether the NEXT task inherited it, demoted it, or dropped it silently.** ⭐ **The law it would test, in `_057`'s strengthened wording**: *an engineer's own estimate of a check's COST is evidence, and demoting a check on cost grounds without measuring the cost is `PROTOCOL.md` rule 14.* ⛔ **Not in `.memory-php/` and not going there unreviewed** |

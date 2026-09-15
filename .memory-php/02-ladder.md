@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F126** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F127** live in `RECAP_PHP.md`
 > ⭐ **and the statistic decision is `.tasks-php/STATISTICS_001.md`, committed**
 > (⚠ this said *F1–F41* for seven findings, then *F1–F48* for forty-two
 > more, then *F1–F90* for eleven more — `PROTOCOL.md` rule 13, **and it

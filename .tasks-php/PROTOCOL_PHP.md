@@ -201,15 +201,64 @@ instrument, like `objdump`.
 3. **Capture `si_addr`** with `.tasks-php/probes/segaddr.c` — an `LD_PRELOAD`
    shim, because there is **no gdb on this box and memcheck refuses to start**.
    Its header says how to build it and how to read the output.
-4. **Write the three into `NOTES.md` as an EVENT**: what was run, on which
+4. ⭐ **REPEAT THE TRIGGER RUN, and say whether the result is REPRODUCIBLE.**
+   ⛔ **This obligation exists because a single run is not a result.** `ph75`'s
+   trigger returns **`SIGABRT`, `SIGSEGV` or exit `255` depending on the run**,
+   and `ph79`'s `si_addr` took **four different values in four runs** (ASLR)
+   while `ph97`'s is `(nil)` every time. ▶ **Record which of the three you have:
+   a stable signal, a stable signal with a varying address, or a flaky one.**
+   *(`TASK_PHP_057` §1.2, which found this; it is NOT the manager's obligation
+   and the manager did not think of it.)*
+5. ⭐⭐⭐ **RE-RUN THE TRIGGER AGAINST THE R1h POST-IMAGE BUILD — REQUIRED,
+   GATED ON *"the pre-image run faulted"*.** If the row's trigger did **not**
+   fault, this is vacuous and you skip it, saying so.
+6. **Write all of it into `NOTES.md` as an EVENT**: what was run, on which
    binary, on which date, and what came back.
+
+> ### ⭐⭐⭐ WHY #5 IS *REQUIRED*, AND THE NUMBER THAT SETTLES IT
+>
+> **It makes the upstream fix's efficacy measurable on real PHP**, which is the
+> strongest evidence a row can carry about its own R1h — and the programme has
+> never had it.
+>
+> ⛔⛔ **IT WAS OMITTED FROM THIS SECTION FOR ONE DAY ON TWO SUCCESSIVE FALSE
+> REASONS, AND BOTH WERE THE MANAGER'S.** First *"PHP 5.0.0 cannot be rebuilt on
+> this box"* (**false** — there is a tracked, idempotent build script). Then,
+> when that fell, *"requiring it makes every row pay for a full PHP compile"*.
+> ✅ **MEASURED, `TASK_PHP_057` §1.2, and reproduced by the manager:**
+>
+> | | |
+> |---|---|
+> | cold build, from the cached tarball | **30 seconds** |
+> | **incremental rebuild after applying the R1h patch** | **683 ms** |
+> | disk | 60 MB, deleted after |
+> | sudo / network | **neither** |
+> | pristine → post-image, on `ph97` | `rc 139` → `rc 0` |
+>
+> ⭐ **Thirty seconds is not a cost that justifies omitting the most valuable
+> obligation in this section.** The generator is committed at
+> `.tasks-php/probes/rebuild_hardened_php.sh`; **run it, do not re-derive it.**
+>
+> ⚠⚠ **THE FULL HISTORY IS `RECAP_PHP.md` F123 AND IT IS KEPT DELIBERATELY**:
+> an engineer called this *"the cheapest remaining check"*, the manager's next
+> task file demoted it to *"nice to have, skip it"*, a third party said *"I
+> cannot"*, and it arrived here as impossible. **No step was a lie.** ▶ **The
+> cost is written into this section so nobody re-derives it as impossible a
+> third time.**
 
 ⚠⚠ **TWO CAUTIONS TRAVEL WITH EVERY SUCH RESULT, AND A ROW THAT OMITS THEM HAS
 OVER-CLAIMED:**
 
 - **Say which build.** That binary is **php-in-safe-rust's oracle build**
-  (`-O3 -march=native -flto`, mysql + webext) and **not** a museum-default one.
+  (mysql + webext) and **not** a museum-default one, **and it is built `-O0`.**
   A fault address is a property of a build.
+  > ⛔⛔ **THIS CLAUSE SAID `-O3 -march=native -flto` FOR ONE DAY.** Those flags
+  > are the SIBLING variants' (`-O3lto`, `-maxlto`, which ship `.buildinfo`
+  > files); the plain binary has none and its `config.status` says `-O0`.
+  > ⭐ **The caution whose whole point is *say which build* named the wrong
+  > build** — `RECAP_PHP.md` F127. ✅ Measured on all three tiers: `ph97`'s
+  > trigger gives `si_code=1 si_addr=(nil)` rc `139` on **each**, so nothing
+  > downstream moved. ⚠ **That is luck, not a reason to relax the rule.**
 - **A clean run is still not evidence of absence** (`RECAP_PHP.md` **F3**) — a
   reproducer that does not fault may fault on another build, another `-O`, or
   under ASan. ⭐ **The converse is new and is the whole point: a run that

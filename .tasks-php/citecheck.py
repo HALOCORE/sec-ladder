@@ -74,10 +74,25 @@ def exists(p):
 _REPORT = re.compile(r'_REPORT(?:_[A-Za-z0-9]+)?\.md$')
 
 
+# ⛔⛔ THESE TWO USED `endswith('_REPORT.md')` WHILE `benign()` ABOVE HAD ALREADY
+#   BEEN WIDENED TO `_REPORT` (F122) -- so the SPLIT naming was benign in one
+#   half of the repair and a LIVE DOC in the other. Six reports were on the
+#   wrong side of it: TASK_PHP_001's three and TASK_PHP_054's three. ⭐ A repair
+#   that fixes one limb of its own mechanism is worse than no repair, because
+#   the finding reads as closed. ⓘ Found by TASK_PHP_057's reviewer, hours
+#   after F122 landed, and `N6c` could not reach it -- N6c tests `benign()`,
+#   and this is the PARTITION.
+#   ▶ ONE SPELLING, ONE PLACE. `_REPORT` is the predicate for both halves now.
+def _is_report(path):
+    return bool(_REPORT.search(path))
+
+
+
+
 def benign(doc, p):
     """A missing path is EXPECTED, not rot, when:"""
     if p in BENIGN: return True
-    if _REPORT.search(p): return True                 # a report not yet written
+    if _is_report(p): return True                     # a report not yet written
     # scratch under .temp/ is re-derivable and CLAUDE.md rule 1 mandates deleting
     # it once the gates are green -- a historical report citing its own deleted
     # blobs is the rule working, not a broken pointer.
@@ -87,8 +102,8 @@ def benign(doc, p):
     if p.startswith(('common/', 'common-php/layout', 'patterns/ph00-smoke')): return True
     return False
 
-LIVE = [d for d in DOCS if not d.endswith('_REPORT.md')]
-HIST = [d for d in DOCS if d.endswith('_REPORT.md')]
+LIVE = [d for d in DOCS if not _is_report(d)]
+HIST = [d for d in DOCS if _is_report(d)]
 
 rot = 0
 for doc in DOCS:
@@ -376,6 +391,25 @@ def selftest():
        and not benign('x', 'patterns-php/ph97-x/spec.md'),
        'MUST-NOT-FIRE: a task SPEC and a row file are still rot when missing -- '
        'the widening did not swallow the checker')
+
+    # ⛔⛔ N6d MUST-FIRE: the LIVE/HIST PARTITION AND `benign()` USE THE SAME
+    #   PREDICATE. This is the arm that was missing. F122's repair widened
+    #   `benign()` and left `LIVE`/`HIST` on `endswith('_REPORT.md')`, so a
+    #   SPLIT-named report was benign in one half and a live doc in the other --
+    #   SIX reports on the wrong side (TASK_PHP_001's three, TASK_PHP_054's
+    #   three). ⭐ `N6a`/`N6b`/`N6c` all passed throughout, because every one of
+    #   them tests `benign()` and none of them tests the PARTITION.
+    #   ▶ THE LESSON, and it is item 124's class one level down: when a repair
+    #   has two limbs, the arm must assert they AGREE, not that each works.
+    _split = '.tasks-php/TASK_PHP_054_REPORT_E2E3E4.md'
+    _plain = '.tasks-php/TASK_PHP_055_REPORT.md'
+    _spec = '.tasks-php/TASK_PHP_054.md'
+    ck('N6d', all(_is_report(d) == benign('x', d) for d in (_split, _plain))
+       and not _is_report(_spec) and not benign('x', _spec)
+       and not any(_is_report(d) for d in LIVE),
+       'the LIVE/HIST partition and benign() agree on BOTH report spellings and '
+       f'on a task spec, and no LIVE doc is a report: {len(LIVE)} live, '
+       f'{len(HIST)} historical')
     print()
     print('SELFTEST ' + ('PASS' if not fails else f'FAIL {fails}'))
     return 1 if fails else 0

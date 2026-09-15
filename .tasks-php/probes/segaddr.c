@@ -31,8 +31,17 @@
  * ⚠⚠ TWO CAUTIONS THAT TRAVEL WITH EVERY RESULT FROM THIS PROBE:
  *
  * 1. **Name the build you measured on.** The 5.0.0 CLI on this box is
- *    php-in-safe-rust's ORACLE build (-O3 -march=native -flto, mysql+webext),
+ *    php-in-safe-rust's ORACLE build, mysql+webext -- and it is built **-O0**.
  *    NOT a museum-default one. A fault address is a property of a build.
+ *
+ *    /!\ THIS LINE SAID `-O3 -march=native -flto` FOR ONE DAY AND THAT WAS
+ *    WRONG. Those flags belong to the SIBLING variants `-O3lto` and `-maxlto`,
+ *    which carry `.buildinfo` files; the plain `-mysql-webext` binary has none
+ *    and its `config.status` says `-O0`. The caution whose entire point is SAY
+ *    WHICH BUILD named the wrong build. Found by TASK_PHP_057's reviewer.
+ *    +  Measured on all THREE tiers, ph97's trigger: si_code=1 si_addr=(nil)
+ *       rc=139 on each. So the label was wrong and nothing downstream moved --
+ *       which is luck, not a reason to relax the rule.
  *
  * 2. **A clean run is NOT evidence of absence** -- `RECAP_PHP.md` F3. A
  *    reproducer that does not fault here may still fault on another build, at
