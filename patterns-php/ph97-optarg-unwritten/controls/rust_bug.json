@@ -1,0 +1,68 @@
+{
+ "variants": {
+  "unchecked": {
+   "why": "`unwrap_unchecked()` on an unguarded optional -- the one that reproduces C, at the same address",
+   "source": "unsafe.rs",
+   "adversarial": {
+    "exit": "TIMEOUT",
+    "stdout": "",
+    "segaddr": null,
+    "panic": null
+   },
+   "benign": {
+    "exit": 0,
+    "stdout": "9594554053753204562"
+   }
+  },
+  "unwrap": {
+   "why": "safe Rust, `.unwrap()` on an unguarded optional -- the defect becomes a DETECTED fault",
+   "source": "safe_naive.rs",
+   "adversarial": {
+    "exit": 101,
+    "stdout": "",
+    "segaddr": null,
+    "panic": "thread 'main' (3978168) panicked at /home/apt/repos_common/sec-ladder/.temp/php97/rustbug/v01/k.rs:149:7:"
+   },
+   "benign": {
+    "exit": 0,
+    "stdout": "9594554053753204562"
+   }
+  }
+ },
+ "problems": [],
+ "opt_sweep_unchecked": {
+  "O0": {
+   "exit": -6,
+   "stdout": "",
+   "segaddr": null
+  },
+  "O1": {
+   "exit": "TIMEOUT",
+   "stdout": "",
+   "segaddr": null
+  },
+  "O2": {
+   "exit": "TIMEOUT",
+   "stdout": "",
+   "segaddr": null
+  },
+  "O3": {
+   "exit": "TIMEOUT",
+   "stdout": "",
+   "segaddr": null
+  }
+ },
+ "shipped_unsafe_on_adversarial": {
+  "exit": 0,
+  "stdout": "1265852909175663616"
+ },
+ "derived_from_sha256": {
+  "patterns/ph97-optarg-unwritten/safe_naive.rs": "5090c3a4fa8a4e5812788f2ecb2f455b8e8697d3a12a3dfd7444671f4147b135",
+  "patterns/ph97-optarg-unwritten/unsafe.rs": "9be56986e321f3b87bbcc0b29f0d90aa5bc7ce94f6c0467bfad5dd30220339af",
+  "patterns/ph97-optarg-unwritten/inputs/adversarial-absent.bin": "cfc7574e0a73dbe8463d981095f89aa3a3af420d63013879cb127aa8f30fbf76"
+ },
+ "pin": {
+  "regenerate": "python3 controls/rust_bug.py",
+  "note": "two rustc builds and four runs; under a minute"
+ }
+}

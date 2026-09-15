@@ -1,0 +1,22 @@
+From f7326d6279629ccd80cc77fa389584f36434a2fd Mon Sep 17 00:00:00 2001
+From: Antony Dovgal <tony2001@php.net>
+Date: Fri, 28 Jan 2005 02:00:39 +0000
+Subject: [PATCH] MFB: fix #31732
+
+---
+ ext/mbstring/mbstring.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/mbstring/mbstring.c b/ext/mbstring/mbstring.c
+index d28f17b0a7cf..1b0bac429d7d 100644
+--- a/ext/mbstring/mbstring.c
++++ b/ext/mbstring/mbstring.c
+@@ -3229,7 +3229,7 @@ PHP_FUNCTION(mb_get_info)
+ 		RETURN_FALSE;
+ 	}
+ 
+-	if (!strcasecmp("all", typ)) {
++	if (!typ || !strcasecmp("all", typ)) {
+ 		array_init(return_value);
+ 		if ((name = (char *)mbfl_no_encoding2name(MBSTRG(current_internal_encoding))) != NULL) {
+ 			add_assoc_string(return_value, "internal_encoding", name, 1);

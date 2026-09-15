@@ -1,0 +1,58 @@
+{
+ "cell": "unsafe.rs, O3/isolated",
+ "problems": [],
+ "statistic": "A1 = callgrind exclusive Ir of the `kernel` symbol, divided by the calls the driver makes",
+ "variants": {
+  "unwrap_unchecked (shipped)": {
+   "dir": "v00",
+   "by_input": {
+    "small.bin": {
+     "kernel_exclusive_ir": 11107522,
+     "whole_program_ir": 12720307,
+     "inside_share_pct": 87.32117864765371,
+     "checksum": "9594554053753204562",
+     "ir_per_call": 555.3761
+    },
+    "large.bin": {
+     "kernel_exclusive_ir": 12931596,
+     "whole_program_ir": 14603879,
+     "inside_share_pct": 88.54904919439555,
+     "checksum": "2871891596321943169",
+     "ir_per_call": 4310.532
+    }
+   }
+  },
+  "unwrap (checked)": {
+   "dir": "v01",
+   "by_input": {
+    "small.bin": {
+     "kernel_exclusive_ir": 11107522,
+     "whole_program_ir": 12720307,
+     "inside_share_pct": 87.32117864765371,
+     "checksum": "9594554053753204562",
+     "ir_per_call": 555.3761
+    },
+    "large.bin": {
+     "kernel_exclusive_ir": 12931596,
+     "whole_program_ir": 14603879,
+     "inside_share_pct": 88.54904919439555,
+     "checksum": "2871891596321943169",
+     "ir_per_call": 4310.532
+    }
+   }
+  }
+ },
+ "discriminant_cost_ir_per_call": {
+  "small.bin": 0.0,
+  "large.bin": 0.0
+ },
+ "derived_from_sha256": {
+  "patterns/ph97-optarg-unwritten/unsafe.rs": "9be56986e321f3b87bbcc0b29f0d90aa5bc7ce94f6c0467bfad5dd30220339af",
+  "patterns/ph97-optarg-unwritten/inputs/small.bin": "066ef6297d4db1d6d962fac0eb635dc9c56b161e20b3e4cc3a3e68c941f35a9d",
+  "patterns/ph97-optarg-unwritten/inputs/large.bin": "4d810d9535c226a6b597ce6fe2e5451f26cbafb867228f5f9e45942daab63ff2"
+ },
+ "pin": {
+  "regenerate": "python3 controls/optional_cost.py",
+  "note": "two rustc builds and four callgrind runs; minutes"
+ }
+}

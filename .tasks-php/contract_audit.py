@@ -169,6 +169,33 @@ ADJUDICATED = {
     "ph55-opdata-stride/kernel_hardened.c:326": (
         "FALSE-POSITIVE", "\"../NOTES.md \u00a75 shows why `git apply` refuses it\" -- "
                 "POINTER class, same as kernel.c:473."),
+    # ---- row 11 (ph97), adjudicated 2026-09-15 when the ratchet fired on it ----
+    # ⚠ THE ROW'S FIRST HIT WAS REAL AND WAS REPAIRED BEFORE MEASURING, WHICH IS
+    # THE WHOLE POINT OF FIRING EARLY.  The comment as first written ended
+    # "A kernel that derived one from the other would have deleted the
+    # mechanism" -- a VERDICT on a design argument that lives in ph96's
+    # catalogue `risk` note and in TASK_PHP_056 §2.5, i.e. F98's shape.  It was
+    # moved to NOTES.md §14 (gate-only) and the c/* comment now POINTS at it.
+    # What is left is the classifier's adjective spelling, below.
+    "ph97-optarg-unwritten/kernel.c:323": (
+        "FALSE-POSITIVE", "\"TWO INDEPENDENT BYTES: `num_args` is read from b[0] "
+                "and `arg.type` from b[1], and neither is computed from the other\" "
+                "-- `independent` describes TWO BYTES OF THIS RECORD, decoded on "
+                "the two lines immediately below, and the claim is checkable FROM "
+                "THIS FILE.  It cannot age out of step with the file asserting it, "
+                "which is the property the VERDICT class lacks.  It is not a "
+                "corroboration between two artefacts, which is what `_INDEP` "
+                "exists to catch.  ⭐ THIRD INSTANCE OF THE SAME SPELLING DEFECT "
+                "-- ph29:23 (`independently cached`) and emalloc_shim.h:640 "
+                "(`order-independent`) are the other two -- so the adjective/adverb "
+                "false positive is a RECURRING class, absorbed correctly by the "
+                "ratchet at one hand-adjudication each.  ⚠ Deliberately NOT "
+                "reworded to dodge the grep: rewording to make a checker quiet is "
+                "the anti-pattern this table exists instead of."),
+    "ph97-optarg-unwritten/kernel_hardened.c:356": (
+        "FALSE-POSITIVE", "the same sentence as kernel.c:323 -- kernel_hardened.c "
+                "is c/kernel.c plus the one-line backport, so its comments are "
+                "duplicated by construction, exactly as ph55's are."),
     "(SHARED)/emalloc_shim.h:640": (
         "FALSE-POSITIVE", "\"order-independent per field\" -- `independent` inside "
                           "a COMPOUND ADJECTIVE describing the tally's mixing "

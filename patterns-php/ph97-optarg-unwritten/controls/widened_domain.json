@@ -1,0 +1,347 @@
+{
+ "cells": [
+  "c-gcc",
+  "c-gcc-h",
+  "c-clang",
+  "c-clang-h",
+  "safe_naive",
+  "safe_tuned",
+  "unsafe",
+  "verus"
+ ],
+ "inputs": [
+  "small.bin",
+  "large.bin",
+  "adversarial-absent.bin",
+  "adversarial-typefail.bin",
+  "adversarial-toomany.bin",
+  "adversarial-nullvalue.bin",
+  "adversarial-nowin.bin"
+ ],
+ "table": {
+  "small.bin": {
+   "c-gcc": {
+    "exit": 0,
+    "stdout": "9594554053753204562",
+    "segaddr": null
+   },
+   "c-gcc-h": {
+    "exit": 0,
+    "stdout": "9594554053753204562",
+    "segaddr": null
+   },
+   "c-clang": {
+    "exit": 0,
+    "stdout": "9594554053753204562",
+    "segaddr": null
+   },
+   "c-clang-h": {
+    "exit": 0,
+    "stdout": "9594554053753204562",
+    "segaddr": null
+   },
+   "safe_naive": {
+    "exit": 0,
+    "stdout": "9594554053753204562",
+    "segaddr": null
+   },
+   "safe_tuned": {
+    "exit": 0,
+    "stdout": "9594554053753204562",
+    "segaddr": null
+   },
+   "unsafe": {
+    "exit": 0,
+    "stdout": "9594554053753204562",
+    "segaddr": null
+   },
+   "verus": {
+    "exit": 0,
+    "stdout": "9594554053753204562",
+    "segaddr": null
+   }
+  },
+  "large.bin": {
+   "c-gcc": {
+    "exit": 0,
+    "stdout": "2871891596321943169",
+    "segaddr": null
+   },
+   "c-gcc-h": {
+    "exit": 0,
+    "stdout": "2871891596321943169",
+    "segaddr": null
+   },
+   "c-clang": {
+    "exit": 0,
+    "stdout": "2871891596321943169",
+    "segaddr": null
+   },
+   "c-clang-h": {
+    "exit": 0,
+    "stdout": "2871891596321943169",
+    "segaddr": null
+   },
+   "safe_naive": {
+    "exit": 0,
+    "stdout": "2871891596321943169",
+    "segaddr": null
+   },
+   "safe_tuned": {
+    "exit": 0,
+    "stdout": "2871891596321943169",
+    "segaddr": null
+   },
+   "unsafe": {
+    "exit": 0,
+    "stdout": "2871891596321943169",
+    "segaddr": null
+   },
+   "verus": {
+    "exit": 0,
+    "stdout": "2871891596321943169",
+    "segaddr": null
+   }
+  },
+  "adversarial-absent.bin": {
+   "c-gcc": {
+    "exit": 139,
+    "stdout": "",
+    "segaddr": "[segaddr] SIG11 si_code=1 si_addr=(nil)"
+   },
+   "c-gcc-h": {
+    "exit": 0,
+    "stdout": "1265852909175663616",
+    "segaddr": null
+   },
+   "c-clang": {
+    "exit": 139,
+    "stdout": "",
+    "segaddr": "[segaddr] SIG11 si_code=1 si_addr=0x1"
+   },
+   "c-clang-h": {
+    "exit": 0,
+    "stdout": "1265852909175663616",
+    "segaddr": null
+   },
+   "safe_naive": {
+    "exit": 0,
+    "stdout": "1265852909175663616",
+    "segaddr": null
+   },
+   "safe_tuned": {
+    "exit": 0,
+    "stdout": "1265852909175663616",
+    "segaddr": null
+   },
+   "unsafe": {
+    "exit": 0,
+    "stdout": "1265852909175663616",
+    "segaddr": null
+   },
+   "verus": {
+    "exit": 0,
+    "stdout": "1265852909175663616",
+    "segaddr": null
+   }
+  },
+  "adversarial-typefail.bin": {
+   "c-gcc": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "c-gcc-h": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "c-clang": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "c-clang-h": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "safe_naive": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "safe_tuned": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "unsafe": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "verus": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   }
+  },
+  "adversarial-toomany.bin": {
+   "c-gcc": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "c-gcc-h": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "c-clang": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "c-clang-h": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "safe_naive": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "safe_tuned": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "unsafe": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "verus": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   }
+  },
+  "adversarial-nullvalue.bin": {
+   "c-gcc": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "c-gcc-h": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "c-clang": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "c-clang-h": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "safe_naive": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "safe_tuned": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "unsafe": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   },
+   "verus": {
+    "exit": 0,
+    "stdout": "7284756796784009216",
+    "segaddr": null
+   }
+  },
+  "adversarial-nowin.bin": {
+   "c-gcc": {
+    "exit": 0,
+    "stdout": "0",
+    "segaddr": null
+   },
+   "c-gcc-h": {
+    "exit": 0,
+    "stdout": "0",
+    "segaddr": null
+   },
+   "c-clang": {
+    "exit": 0,
+    "stdout": "0",
+    "segaddr": null
+   },
+   "c-clang-h": {
+    "exit": 0,
+    "stdout": "0",
+    "segaddr": null
+   },
+   "safe_naive": {
+    "exit": 0,
+    "stdout": "0",
+    "segaddr": null
+   },
+   "safe_tuned": {
+    "exit": 0,
+    "stdout": "0",
+    "segaddr": null
+   },
+   "unsafe": {
+    "exit": 0,
+    "stdout": "0",
+    "segaddr": null
+   },
+   "verus": {
+    "exit": 0,
+    "stdout": "0",
+    "segaddr": null
+   }
+  }
+ },
+ "problems": [],
+ "r1_r1h_disagreements": [],
+ "faulting_cells": [
+  [
+   "adversarial-absent.bin",
+   "c-clang"
+  ],
+  [
+   "adversarial-absent.bin",
+   "c-gcc"
+  ]
+ ],
+ "r1_segaddr": "[segaddr] SIG11 si_code=1 si_addr=(nil)",
+ "r1h_answer_on_absent": {
+  "exit": 0,
+  "stdout": "1265852909175663616",
+  "segaddr": null
+ },
+ "derived_from_sha256": {
+  "patterns/ph97-optarg-unwritten/c/kernel.c": "a9780ac2091b026736f3f557bb49e2d4d4ff8711c0089226c8b48b0fd1c4892b",
+  "patterns/ph97-optarg-unwritten/c/kernel_hardened.c": "5d671ca3166716b306377a09c6f8307446087583fc545c0e858d382dcfbb6082",
+  "patterns/ph97-optarg-unwritten/safe_naive.rs": "5090c3a4fa8a4e5812788f2ecb2f455b8e8697d3a12a3dfd7444671f4147b135",
+  "patterns/ph97-optarg-unwritten/safe_tuned.rs": "380df7386da9cdebb361155066a732609c326634a72ccc2e9fdf1904d5075901",
+  "patterns/ph97-optarg-unwritten/unsafe.rs": "9be56986e321f3b87bbcc0b29f0d90aa5bc7ce94f6c0467bfad5dd30220339af",
+  "patterns/ph97-optarg-unwritten/verus.rs": "b443de3dad4ed9e4699b86eaec8c27df5f725b27b070c3b911b986527ba44622"
+ },
+ "pin": {
+  "regenerate": "python3 controls/widened_domain.py",
+  "note": "runs the built O3/isolated binaries; minutes"
+ }
+}

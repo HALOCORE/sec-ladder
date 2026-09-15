@@ -1,0 +1,34 @@
+{
+ "patch": "patterns-php/ph97-optarg-unwritten/controls/f7326d627962.patch",
+ "problems": [],
+ "from_sha": "f7326d6279629ccd80cc77fa389584f36434a2fd",
+ "filename_prefix": "f7326d627962",
+ "binds": true,
+ "patch_plus_lines": [
+  "\tif (!typ || !strcasecmp(\"all\", typ)) {"
+ ],
+ "patch_minus_lines": [
+  "\tif (!strcasecmp(\"all\", typ)) {"
+ ],
+ "check_rc": 0,
+ "check_hunk": "Hunk #1 succeeded at 3216 (offset -13 lines).",
+ "apply_rc": 0,
+ "bytes_moved": true,
+ "post_image_line": "\tif (!typ || !strcasecmp(\"all\", typ)) {",
+ "post_image_lineno": 3219,
+ "post_image_matches_patch": true,
+ "gitignore_trap": {
+  "check_rc": 0,
+  "apply_rc": 0,
+  "bytes_moved": true,
+  "skipped": false
+ },
+ "derived_from_sha256": {
+  "patterns/ph97-optarg-unwritten/c/kernel.c": "a9780ac2091b026736f3f557bb49e2d4d4ff8711c0089226c8b48b0fd1c4892b",
+  "patterns/ph97-optarg-unwritten/c/kernel_hardened.c": "5d671ca3166716b306377a09c6f8307446087583fc545c0e858d382dcfbb6082"
+ },
+ "pin": {
+  "regenerate": "python3 controls/r1h_backport.py",
+  "note": "seconds; reads the tarball, writes only under .temp/"
+ }
+}

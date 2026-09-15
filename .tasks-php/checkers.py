@@ -206,12 +206,16 @@ REGISTRY = {
         kind="checker", argv=[], expect=0, negatives="flag", st_expect=0,
         why="⛔ THE LIVE INSTANCE THAT PROVES THIS FILE'S POINT: on 2026-09-15 a "
             "bare run exited 0 while --selftest exited 1 on N1 (two new task "
-            "files unclassified). 15 arms; N1 also caught ROWS stale at 8 the "
+            "files unclassified). 16 arms; N1 also caught ROWS stale at 8 the "
             "moment it was first run. ⭐ N14 (2026-09-15) makes ROWS itself "
             "derived-and-checked against results-php/gate/, which is the one "
             "staleness N1 cannot see; its must-fire evidence is the committed "
-            "probes/n14_mustfire.py. ⚠ This `why` said 15 while the file had "
-            "14 -- N12 now derives the number."),
+            "probes/n14_mustfire.py. ⭐⭐ N15 (same day) DERIVES the opener rate "
+            "instead of pinning it, after the pinned OPENER_RATE=4.00 was "
+            "refuted IN SIGN at n=8 by ph97 landing -- and N11, which asserted "
+            "the premium's DIRECTION, had to be rewritten because it could not "
+            "express the answer. ⚠ This `why` said 15 twice: at 14 arms and "
+            "again at 16 -- N12 derives it now, and caught both."),
     "php50_align_sweep.py": dict(
         kind="checker", argv=["--selftest"], expect=0, negatives="inline",
         st_expect=0,
@@ -337,7 +341,33 @@ def audit(disk, registry):
 
 
 _ARMS_CLAIM = re.compile(r"(\d+)\s+arms\b")
-_ARM_TOKEN = re.compile(rb"\bN\d+[a-z]*\b")
+# ⭐ AN ARM IS A LINE THAT CARRIES A VERDICT. A checker also prints `ⓘ` REPORT
+#   lines that name themselves (`task_cost.py`'s `N15b`, `quota.py`'s VACUOUS
+#   `N1`), and counting those inflates the total -- the first draft of this
+#   scanned every `N<n>` token anywhere in the output and read 17 where there
+#   were 16. ⛔ The question this arm exists to answer is "HOW MANY THINGS CAN
+#   FAIL", so a report must not count. ⓘ Caught within hours of N12 landing, by
+#   N12, on its own author's file.
+#   ⚠ TWO LINE SHAPES EXIST IN THIS CORPUS and a derivation must take both:
+#     verdict-FIRST   `  PASS  N1: ...`          (task_cost, cbaseline, checkers)
+#     verdict-LAST    `  N1 MUST-FIRE  ... OK`   (contract_audit, quota)
+#   ⛔ A pattern anchored on one of them reads the other as ZERO ARMS, which the
+#   first attempt did to contract_audit -- and "observed 0" is exactly the
+#   silent-checker failure N12c exists to catch, so a narrow pattern here would
+#   have manufactured the defect it was written to detect.
+_ARM_NAME = re.compile(r"\bN\d+[a-z]*\b")
+_ARM_VERDICT = re.compile(r"(?<![A-Za-z])(?:PASS|FAIL|OK)(?![A-Za-z])")
+_NOT_AN_ARM = "REPORT (no verdict)"
+
+
+def _arms_in(text):
+    """Arm names on lines that CARRY A VERDICT. A report is not an arm."""
+    out = set()
+    for ln in text.splitlines():
+        if _NOT_AN_ARM in ln or not _ARM_VERDICT.search(ln):
+            continue
+        out.update(_ARM_NAME.findall(ln))
+    return out
 
 
 def arm_count_problems(registry, observed):
@@ -422,9 +452,9 @@ def _run(name, argv):
                            capture_output=True, timeout=600, cwd=ROOT)
     except subprocess.TimeoutExpired:
         return "TIMEOUT"
-    toks = set(_ARM_TOKEN.findall(r.stdout or b"")) | \
-        set(_ARM_TOKEN.findall(r.stderr or b""))
-    _OBSERVED.setdefault(name, set()).update(t.decode() for t in toks)
+    text = (r.stdout or b"").decode("utf-8", "replace") + \
+        (r.stderr or b"").decode("utf-8", "replace")
+    _OBSERVED.setdefault(name, set()).update(_arms_in(text))
     return r.returncode
 
 

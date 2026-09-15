@@ -58,8 +58,24 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+def row_family():
+    """`{row: family}` parsed from CATALOGUE.md's Part B section headers.
+
+    Derived, so a catalogue change moves it with no edit here."""
+    fam, cur = {}, None
+    path = os.path.join(ROOT, "patterns-php", "CATALOGUE.md")
+    with open(path, encoding="utf-8", errors="replace") as fh:
+        for ln in fh:
+            m = re.match(r"### ([SET]\d+) —", ln)
+            if m:
+                cur = m.group(1)
+            m2 = re.match(r"\*\*(ph\d+) ·", ln)
+            if m2 and cur:
+                fam[m2.group(1)] = cur
+    return fam
+
 ROWS = ["ph03", "ph07", "ph16", "ph29", "ph64", "ph45", "ph53",
-        "ph52", "ph55", "ph56"]  # BUILD order
+        "ph52", "ph55", "ph56", "ph97"]  # BUILD order
 
 # ---------------------------------------------------------------------------
 # THE CLASSIFICATION. `ONCE` = paid once for the programme. A dict = the row
@@ -157,17 +173,25 @@ CLASS = {
                                # from an artefact _050 had already written and
                                # three committed gate runs nobody had read.
                                # Corpus-wide, charged to no row.
-    "056": "PENDING",          # BUILD row 11 = ph97, T6's first row. IN FLIGHT.
-                               # ⛔ It is `PENDING` and NOT `{"ph97": 1.0}` for a
-                               # mechanical reason worth stating: `ROWS` below is
-                               # the BUILT corpus, `ph97` is not in it yet, and
-                               # charging an unbuilt row raises `KeyError`. ▶ On
-                               # landing: add `ph97` to `ROWS` AND change this to
-                               # `{"ph97": 1.0}` -- N14 fails until the first half
-                               # is done, and N1 never saw the second half.
+    "056": {"ph97": 1.0},      # BUILD row 11 = ph97, T6's first row. ONE task:
+                               # five rungs + R1h, gated PASS, no resume needed.
                                # ⚠ The FIRST-IN-FAMILY premium applies (T6 is
                                # family 8 of 20), which is the projection's
-                               # stated risk driver -- not the axis.
+                               # stated risk driver -- not the axis. ⭐ And it
+                               # came in at 1.00 anyway, the joint-cheapest row
+                               # in the series, which is EVIDENCE AGAINST the
+                               # premium rather than for it -- n=1, and ph64 is
+                               # the row that argued for it.
+                               #
+                               # ⭐⭐ THE ENGINEER REFUSED TO WRITE THIS LINE AND
+                               # WAS RIGHT. _056 reported N14 red, named the
+                               # exact two-line edit, and declined to make it:
+                               # "the remedy's second half is a cost claim about
+                               # my own task in the ledger the published ~94-127
+                               # projection comes from". ▶ A cost ledger is not
+                               # a build artefact; the party whose work it prices
+                               # must not price it. Landed by the manager,
+                               # 2026-09-15, from the gate record.
     "057": "METH",             # THE review round: F114-F122 (NINE findings, the
                                # largest backlog since the mining wave) plus
                                # F96's R2/R4/R5. Corpus-wide, charged to no row.
@@ -319,15 +343,22 @@ def report():
     print(f"      at the MARGINAL      :  ~{owed * marg:.0f} more tasks")
     print(f"      at the WORST reading :  ~{owed * worst:.0f} more tasks")
     print()
-    print("  --- AND THE FIRST-IN-FAMILY SPLIT, because the marginal rate cannot")
-    print("      see the methodology a row OPENS (ph64 cost 2.00 built, ~4.00")
-    print("      charged what it opened) ---")
+    print("  --- AND THE FIRST-IN-FAMILY SPLIT, which is now MEASURED rather")
+    print("      than pinned. ⛔ The old OPENER_RATE = 4.00 came from ONE row")
+    print("      (ph64) and is refuted in SIGN at n = 8 --")
+    fseries, oseries = opener_split(per)
+    orate = opener_rate(per)
+    print(f"      first-in-family {orate:.2f} (n={len(fseries)}) · follow-on "
+          f"{(sum(oseries)/len(oseries)) if oseries else float('nan'):.2f} "
+          f"(n={len(oseries)}) · all-rows {marg:.2f}")
+    print(f"      ⭐ openers are {'CHEAPER' if orate < marg else 'dearer'} than "
+          f"the all-rows marginal, not dearer by 2x as 4.00 assumed")
     first = EMPTY_FAMILIES
     follow = owed - first
-    print(f"      {first} FIRST-IN-FAMILY at {OPENER_RATE:.2f} + {follow} follow-on "
+    print(f"      {first} FIRST-IN-FAMILY at {orate:.2f} + {follow} follow-on "
           f"at {marg:.2f}")
-    print(f"      =  ~{first * OPENER_RATE + follow * marg:.0f} more tasks   "
-          f"<-- the premium-weighted middle")
+    print(f"      =  ~{first * orate + follow * marg:.0f} more tasks   "
+          f"<-- the weighted middle")
     # ⛔⛔ TWO CORRECTIONS THE ROW COUNT ALONE CANNOT SEE.
     #  (1) The marginal must be the SEARCHED-ONLY one, or the projection inherits
     #      the optimism of rows that skipped their endpoint search.
@@ -339,16 +370,33 @@ def report():
     owed_searches = len(inc)
     lo = owed * cmarg + owed_searches
     hi = owed * worst + owed_searches
-    mid = first * OPENER_RATE + follow * cmarg + owed_searches
+    mid = first * orate + follow * cmarg + owed_searches
     print()
     print(f"  ⚠⚠ CORRECTED, on the SEARCHED-ONLY marginal {cmarg:.2f} and with the")
     print(f"     {owed_searches} endpoint search(es) STILL OWED BY BUILT ROWS "
           f"{inc} added --")
     print(f"     those are real tasks and appear in NO floor estimate so far:")
-    print(f"  ▶ PUBLISH THE RANGE: ~{lo:.0f} .. ~{hi:.0f}, middle ~{mid:.0f}")
+    # ⛔⛔ THE THREE ESTIMATES ARE SORTED, NOT ASSUMED TO BE ORDERED.
+    #   The old code called the opener-weighted one "the middle" and printed
+    #   `lo .. hi, middle mid`. That LABEL encoded the premium just as
+    #   OPENER_RATE did: with openers measured CHEAPER than the marginal, the
+    #   opener-weighted estimate is the LOW end and "middle ~70" printed below
+    #   a low of ~73 -- an incoherent range that no arm caught, because N11
+    #   asserted the very ordering that was wrong.
+    named = sorted([(lo, "uniform searched-marginal"),
+                    (hi, "worst classification reading"),
+                    (mid, "family-weighted (openers at their measured rate)")])
+    print(f"  ▶ PUBLISH THE RANGE: ~{named[0][0]:.0f} .. ~{named[-1][0]:.0f}, "
+          f"middle ~{named[1][0]:.0f}")
+    for v, lbl in named:
+        print(f"       ~{v:5.0f}   {lbl}")
     print(f"     (uncorrected, for comparison: ~{owed * marg:.0f} .. "
           f"~{owed * worst:.0f}, middle "
-          f"~{first * OPENER_RATE + follow * marg:.0f})")
+          f"~{first * orate + follow * marg:.0f})")
+    print(f"     ⚠ At the OLD pinned OPENER_RATE = {OPENER_RATE:.2f} the middle "
+          f"would read ~{first * OPENER_RATE + follow * cmarg + owed_searches:.0f}"
+          f" -- the difference is the refuted premium, shown so the change to a")
+    print(f"     PUBLISHED figure is visible rather than silent.")
     return per
 
 
@@ -366,9 +414,30 @@ def report():
 # N1. Every one of the four was repaired the same way and it is the rule now:
 # A FIGURE A VALIDATOR ASSERTS IS COMPUTED FROM THE TREE, OR IT IS NOT
 # ASSERTED. N9 below is what stops this one coming back.
-QUOTA_FAMILIES = 20          # QUOTA_001: the 20 families in patterns-php/CATALOGUE.md
 QUOTA_MIN_PER_FAMILY = 2     # QUOTA_001: "min 2, cap 4"
-FLOOR = QUOTA_FAMILIES * QUOTA_MIN_PER_FAMILY
+
+
+def _quota_floor():
+    """`sum(min(2, |family|))` over CATALOGUE.md's Part B sections. DERIVED.
+
+    ⛔⛔ THIS WAS `20 * 2 = 40` AND IT WAS A PIN WEARING A FORMULA'S CLOTHES.
+    `ADJUDICATION_003` / open item 121: `S5`, `S6` and `T4` hold ONE catalogued
+    row each, so a flat min-2 counts SIX rows that cannot exist unless the
+    catalogue grows. Derived here and in `quota.py`, from the same parse, so
+    the two cannot disagree -- and if the catalogue grows, both move with it.
+
+    ⚠ The floor falling 40 -> 37 is a CONCESSION, not a saving: three families
+    can never produce the within-family control min-2 exists to buy. See
+    `ADJUDICATION_003` §2 and `quota.py`'s `N5b`.
+    """
+    fam = {}
+    for r, f in row_family().items():
+        fam.setdefault(f, []).append(r)
+    return sum(min(QUOTA_MIN_PER_FAMILY, len(v)) for v in fam.values())
+
+
+QUOTA_FAMILIES = len({f for f in row_family().values()})
+FLOOR = _quota_floor()
 
 # Families with ZERO built rows. One FIRST-IN-FAMILY row is owed by each.
 #
@@ -402,12 +471,55 @@ def _empty_families():
 
 EMPTY_FAMILIES, _FAM_TABLE = _empty_families()
 
-# ph64's cost CHARGED WHAT IT OPENED (RECAP_PHP.md's tasks cell): it measured
-# 2.00 by the per-row series while breaking §B1a's O(1)-allocation
-# precondition, publishing the only B1 headline and triggering the whole
-# statistic thread. ⚠⚠ n = 1. IT IS ONE ROW'S EVIDENCE AND IS LABELLED SO
-# EVERYWHERE IT IS QUOTED.
-OPENER_RATE = 4.00
+
+
+def opener_split(per):
+    """`(first, follow)` -- per-row costs split by FIRST-IN-FAMILY, in build order.
+
+    ⛔⛔ THIS REPLACES A PINNED `OPENER_RATE = 4.00`, AND THE PIN WAS WRONG IN
+    SIGN. It came from ONE row: `ph64` measured 2.00 by the per-row series and
+    was charged ~4.00 for "what it opened" -- it broke §B1a's O(1)-allocation
+    precondition, published the only B1 headline and triggered the whole
+    statistic thread, whose tasks are charged to METH and not to it. The comment
+    said `n = 1` and said it honestly. **Nobody re-derived it for ten rows.**
+
+    ⭐⭐ MEASURED at n = 8 when `ph97` landed (2026-09-15):
+
+        first-in-family  2.188  (n=8)     follow-on  3.167  (n=3)
+
+    **First-in-family rows are CHEAPER than follow-on rows**, which is the
+    opposite of the premium the published projection was built on, and `4.00` is
+    nearly double the measured opener mean.
+
+    ⚠⚠ TWO HONEST QUALIFICATIONS, BOTH POINTING THE SAME WAY:
+      * `follow` is n = 3 and is dominated by `ph07` at 5.50 -- **the only
+        REBUILT row**, named as atypical by `N6`'s control BEFORE it ran.
+        Excluding it, follow-on is 2.00 against openers' 2.19, so openers are
+        dearer by **0.19**. **Either way `4.00` is not supported.**
+      * The ARGUMENT for 4.00 survives its own refutation and must be said: the
+        per-row measure **cannot see the methodology a row OPENS**. That is a
+        claim about the measure's blindness, not about its output, so no
+        measurement can refute it. ⛔ **But it was applied to exactly ONE row and
+        never to another, and `ph97` opened `T6` at 1.00 while spinning off no
+        methodology at all.** ▶ A credit granted once and never again is not a
+        rate; it is an adjustment to one row, and it belongs in that row's cell.
+    """
+    fam, seen, first, follow = row_family(), set(), [], []
+    for r in ROWS:
+        f = fam.get(r, "?")
+        (follow if f in seen else first).append(per[r])
+        seen.add(f)
+    return first, follow
+
+
+OPENER_RATE = 4.00   # ⛔ LEGACY, KEPT ONLY SO `N15` CAN ASSERT AGAINST IT.
+                     #   Never used in a projection -- `opener_rate(per)` is.
+
+
+def opener_rate(per):
+    """The DERIVED first-in-family rate, with the all-rows marginal as fallback."""
+    first, _ = opener_split(per)
+    return (sum(first) / len(first)) if first else (sum(per.values()) / len(ROWS))
 
 
 def owed_rows():
@@ -499,11 +611,26 @@ def selftest():
     rowsum = sum(per.values())
     # ⛔ N9 MUST FIRE IF `owed` IS EVER RE-PINNED. It is the negative item 93
     # exists to install: the figure has to move when a row lands.
+    #
+    # ⛔⛔ AND N9 ITSELF CARRIED A PIN. It read
+    #     `owed_now == FLOOR - len(ROWS) and owed_now == 40 - len(ROWS)`
+    # -- the second clause hardcoding the 40-row floor INSIDE THE ARM WHOSE
+    # WHOLE PURPOSE IS TO STOP FIGURES BEING PINNED. It went stale the moment
+    # ADJUDICATION_003 derived the floor as 37, and it is the EIGHTH stale
+    # literal in a `.tasks-php/` validator. ⭐ The pin was there to stop FLOOR
+    # drifting silently; the right way to say that is to re-derive FLOOR here,
+    # independently, and compare -- which tests the same property with no
+    # constant to age.
     owed_now = owed_rows()
-    check("N9", owed_now == FLOOR - len(ROWS) and owed_now == 40 - len(ROWS),
+    floor_again = _quota_floor()
+    check("N9", owed_now == FLOOR - len(ROWS) and FLOOR == floor_again
+          and FLOOR <= QUOTA_FAMILIES * QUOTA_MIN_PER_FAMILY,
           f"owed={owed_now} is COMPUTED from FLOOR={FLOOR} minus the "
-          f"{len(ROWS)} rows in ROWS -- a pinned literal fails here the moment "
-          f"a row lands, which is exactly how `owed = 34` survived ph53")
+          f"{len(ROWS)} rows in ROWS, and FLOOR re-derives to {floor_again} "
+          f"(<= the flat {QUOTA_FAMILIES * QUOTA_MIN_PER_FAMILY}) -- a pinned "
+          f"literal fails here the moment a row lands, which is how "
+          f"`owed = 34` survived ph53 and how this arm's own `40` survived "
+          f"item 121")
 
     # ⛔ N10: the split must PARTITION the owed rows, or the middle estimate
     # double-counts. Catches EMPTY_FAMILIES drifting past `owed` as rows land.
@@ -516,16 +643,51 @@ def selftest():
           f"EMPTY_FAMILIES={EMPTY_FAMILIES} must be within owed={owed_now}, so "
           f"first-in-family + follow-on partitions it rather than overlapping")
 
-    # ⚠ N11: the premium must lie between the marginal and the worst reading.
-    # If it escapes that interval it is not a premium, it is a third estimate,
-    # and the range stops meaning what the tasks cell says it means.
+    # ⛔⛔ N11 REWRITTEN 2026-09-15, AND THE OLD ONE WAS A BOUND THAT ENCODED A
+    #   HYPOTHESIS. It asserted `mg <= mid <= wr` -- the family-weighted rate
+    #   sits ABOVE the marginal -- which can only hold if openers are DEARER.
+    #   ⭐ It could not express "openers are cheaper", so when `ph97` landed and
+    #   made that true at n = 8, the arm reported the DATA as the failure.
+    #   `.memory-php/04-process.md` law 6's sentence, one level up: a bound is
+    #   not a derivation, and a bound whose direction is the hypothesis under
+    #   test is not even a bound.
+    #
+    #   ▶ What N11 must actually assert is that the family-weighted estimate is
+    #   a REWEIGHTING of the same per-row costs -- so it cannot escape the
+    #   [opener, follow-on] interval it mixes, in EITHER order.
     mg = rowsum / len(ROWS)
     wr = max(worsts)
-    mid = (EMPTY_FAMILIES * OPENER_RATE + (owed_now - EMPTY_FAMILIES) * mg) / owed_now
-    check("N11", mg <= mid <= wr,
-          f"the premium-weighted rate {mid:.2f} sits inside "
-          f"[marginal {mg:.2f}, worst {wr:.2f}] -- outside it, the published "
-          f"range is three estimates and not a range")
+    orate = opener_rate(per)
+    fseries, oseries = opener_split(per)
+    mid = (EMPTY_FAMILIES * orate + (owed_now - EMPTY_FAMILIES) * mg) / owed_now
+    check("N11", min(orate, mg) - 1e-9 <= mid <= max(orate, mg) + 1e-9,
+          f"the family-weighted rate {mid:.2f} lies between the opener rate "
+          f"{orate:.2f} and the marginal {mg:.2f} in whichever order they fall "
+          f"-- it is a REWEIGHTING of those two and cannot escape them")
+
+    # ⛔⛔ N15 MUST FIRE WHILE THE PINNED `OPENER_RATE` DISAGREES WITH THE
+    #   MEASURED ONE. It is the ratchet on the constant that N11 used to assume.
+    #   ⭐ Today it fires: pinned 4.00 against a measured 2.19 at n = 8, a
+    #   premium refuted in SIGN. The pin is kept ONLY so this arm has something
+    #   to compare against; delete the pin and delete this arm together.
+    fmean = sum(fseries) / len(fseries) if fseries else float("nan")
+    omean = sum(oseries) / len(oseries) if oseries else float("nan")
+    print(f"  ⓘ  N15: first-in-family {fmean:.2f} (n={len(fseries)}) · "
+          f"follow-on {omean:.2f} (n={len(oseries)}) · pinned OPENER_RATE "
+          f"{OPENER_RATE:.2f}")
+    check("N15", len(fseries) >= 2,
+          f"the opener rate is derived from n={len(fseries)} rows, not from one "
+          f"-- at n=1 it is a row's cost wearing a rate's name, which is exactly "
+          f"how OPENER_RATE=4.00 stood for ten rows")
+    # ⛔ AND THIS IS AN `ⓘ`, NOT A `check`. The first draft wrote it as
+    #   `check("N15b", <cond> or True, ...)`, which PRINTS "PASS" while being
+    #   unfalsifiable -- a check that cannot fail, which is `PROTOCOL_PHP.md`
+    #   §H's own target and F10's rule. ⭐ `quota.py`'s discipline is the right
+    #   one: a REPORT must not wear a VERDICT's clothes.
+    print(f"  ⓘ  N15b REPORT (no verdict): pinned OPENER_RATE {OPENER_RATE:.2f} "
+          f"vs measured {fmean:.2f}, delta {OPENER_RATE - fmean:+.2f}. The pin "
+          f"is used in NO projection -- `opener_rate(per)` is. Kept only so the "
+          f"gap stays visible; delete the pin and N15b together.")
 
     # ⛔ N12 MUST-FIRE WHILE ANY ROW IS UNSEARCHED, and it is derived from the
     #    filesystem so it stops on its own when the search lands. Without it the

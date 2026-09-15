@@ -1,0 +1,116 @@
+{
+ "tables": {
+  "SELS": {
+   "c": [
+    "all",
+    "internal_encoding",
+    "http_input",
+    "http_output",
+    "func_overload"
+   ],
+   "model": [
+    "all",
+    "internal_encoding",
+    "http_input",
+    "http_output",
+    "func_overload"
+   ],
+   "rust": {
+    "safe_naive.rs": [
+     "all",
+     "internal_encoding",
+     "http_input",
+     "http_output",
+     "func_overload"
+    ],
+    "safe_tuned.rs": [
+     "all",
+     "internal_encoding",
+     "http_input",
+     "http_output",
+     "func_overload"
+    ],
+    "unsafe.rs": [
+     "all",
+     "internal_encoding",
+     "http_input",
+     "http_output",
+     "func_overload"
+    ],
+    "verus.rs": [
+     "all",
+     "internal_encoding",
+     "http_input",
+     "http_output",
+     "func_overload"
+    ]
+   }
+  },
+  "NAMES": {
+   "c": [
+    "",
+    "pass",
+    "ISO-8859-1"
+   ],
+   "model": [
+    "",
+    "pass",
+    "ISO-8859-1"
+   ],
+   "rust": {
+    "safe_naive.rs": [
+     "",
+     "pass",
+     "ISO-8859-1"
+    ],
+    "safe_tuned.rs": [
+     "",
+     "pass",
+     "ISO-8859-1"
+    ],
+    "unsafe.rs": [
+     "",
+     "pass",
+     "ISO-8859-1"
+    ],
+    "verus.rs": [
+     "",
+     "pass",
+     "ISO-8859-1"
+    ]
+   }
+  }
+ },
+ "census": {
+  "total_sites": 12,
+  "mb_get_info_chain": [
+   3219,
+   3233,
+   3237,
+   3241,
+   3245
+  ],
+  "other_sites": [
+   357,
+   453,
+   660,
+   662,
+   1274,
+   1276,
+   3035
+  ]
+ },
+ "problems": [],
+ "derived_from_sha256": {
+  "patterns/ph97-optarg-unwritten/c/kernel.c": "a9780ac2091b026736f3f557bb49e2d4d4ff8711c0089226c8b48b0fd1c4892b",
+  "patterns/ph97-optarg-unwritten/safe_naive.rs": "5090c3a4fa8a4e5812788f2ecb2f455b8e8697d3a12a3dfd7444671f4147b135",
+  "patterns/ph97-optarg-unwritten/safe_tuned.rs": "380df7386da9cdebb361155066a732609c326634a72ccc2e9fdf1904d5075901",
+  "patterns/ph97-optarg-unwritten/unsafe.rs": "9be56986e321f3b87bbcc0b29f0d90aa5bc7ce94f6c0467bfad5dd30220339af",
+  "patterns/ph97-optarg-unwritten/verus.rs": "b443de3dad4ed9e4699b86eaec8c27df5f725b27b070c3b911b986527ba44622",
+  "patterns/ph97-optarg-unwritten/model.py": "925a66396209f6129d4a6c86324a3e94bd02f6cdd65cc45ee4ccfc362667663c"
+ },
+ "pin": {
+  "regenerate": "python3 controls/tables.py",
+  "note": "seconds"
+ }
+}

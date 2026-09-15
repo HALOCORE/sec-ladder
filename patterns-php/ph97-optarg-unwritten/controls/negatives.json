@@ -1,0 +1,57 @@
+{
+ "mutants": {
+  "comment": {
+   "verified": 47,
+   "errors": 0,
+   "rc": 0,
+   "first_error": "",
+   "must_verify": true,
+   "ok": true,
+   "why": "\u2705 MUST-NOT-FIRE. A comment-only edit must leave the file verifying. Without this arm a harness that failed on everything would look like four successful attacks."
+  },
+  "invert": {
+   "verified": 46,
+   "errors": 1,
+   "rc": 1,
+   "first_error": "error: precondition not satisfied",
+   "must_verify": false,
+   "ok": true,
+   "why": "\u26d4 INVERT the guard. A disjunct is still there and it still short-circuits, so a proof that merely wanted `something || ...` would stay green. It must not: the guard has to be the one that rules `None` OUT."
+  },
+  "parse_ok": {
+   "verified": 45,
+   "errors": 2,
+   "rc": 1,
+   "first_error": "error: postcondition not satisfied",
+   "must_verify": false,
+   "ok": true,
+   "why": "\u26d4\u26d4 STRENGTHEN the parser's postcondition to *SUCCESS means the out-parameter was written* -- what a reader expects and what zend_parse_parameters does not promise. It must FAIL, and it must fail in `parse_va_args`: with zero arguments the parser really does return SUCCESS having written nothing. That is the defect, stated as a contract the code cannot meet."
+  },
+  "r1": {
+   "verified": 46,
+   "errors": 1,
+   "rc": 1,
+   "first_error": "error: precondition not satisfied",
+   "must_verify": false,
+   "ok": true,
+   "why": "\u2b50\u2b50\u2b50 DELETE f7326d627962 -- the 2005 fix, the whole of it. The file must STOP VERIFYING, on `opt_get`'s `requires t.is_some()`, at the first compare site. This is the row's claim as an experiment."
+  },
+  "spec_order": {
+   "verified": 45,
+   "errors": 2,
+   "rc": 1,
+   "first_error": "error: invariant not satisfied at end of loop body",
+   "must_verify": false,
+   "ok": true,
+   "why": "\u26d4 REVERSE the type spec -- \"s|\" instead of \"|s\". The scanner's loop invariant names the minimum and maximum after each character, and with the marker LAST the minimum is ONE, not zero. The file must stop verifying, which is the ORDER-DEPENDENCE of the defect as an experiment."
+  }
+ },
+ "problems": [],
+ "derived_from_sha256": {
+  "patterns/ph97-optarg-unwritten/verus.rs": "b443de3dad4ed9e4699b86eaec8c27df5f725b27b070c3b911b986527ba44622"
+ },
+ "pin": {
+  "regenerate": "python3 controls/negatives.py",
+  "note": "one verus run per mutant; minutes"
+ }
+}

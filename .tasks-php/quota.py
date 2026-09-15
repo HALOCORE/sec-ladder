@@ -144,21 +144,44 @@ print(f'  {"fam":<4} {"n":>3}  {"built":>5}  status   name')
 owed = 0
 for f, rs in famrows.items():
     nb = sum(1 for r in rs if r in built)
-    if nb == 0:   st, need = 'OWES 2', 2
-    elif nb == 1: st, need = 'OWES 1', 1
-    else:         st, need = 'open',   0     # open until a row moves no answer; cap 4
+    # ⛔⛔ THE TARGET IS `min(2, |family|)`, NOT 2. ADJUDICATION_003, open item
+    #   121: S5, S6 and T4 hold ONE catalogued row each, so a flat min-2 asks
+    #   for SIX rows that cannot exist unless the catalogue grows. Derived from
+    #   the parsed table, so it moves on its own if the catalogue does.
+    target = min(2, len(rs))
+    need = max(0, target - nb)
+    if need == 0:  st = 'open' if nb >= target else 'CLOSED'
+    else:          st = f'OWES {need}'
+    if len(rs) < 2:
+        st += ' (n=1)'
     owed += need
     # ⚠ this used to read '<== both built rows', which was true only while the
     # tree had exactly two. Name the rows instead of counting them.
     mark = ('  <== ' + ', '.join(r for r in rs if r in built)) if nb >= 2 else ''
     print(f'  {f:<4} {len(rs):>3}  {nb:>5}  {st:<7}  {famname.get(f,"?")[:44]}{mark}')
 
-print(f'\n  minimum rows still owed to reach 2/family: {owed}')
-print(f'  floor = {len(famrows)} families x 2 = {len(famrows)*2} rows;'
-      f' built {len(built)}; remaining {len(famrows)*2 - len(built)}')
+singletons = sorted(f for f, rs in famrows.items() if len(rs) < 2)
+FLOOR = sum(min(2, len(rs)) for rs in famrows.values())
+print(f'\n  minimum rows still owed: {owed}')
+print(f'  floor = sum of min(2, |family|) over {len(famrows)} families = {FLOOR}'
+      f' rows; built {len(built)}; remaining {FLOOR - len(built)}')
+print(f'  ⓘ a flat "20 x 2" would read {len(famrows)*2} -- the difference is the'
+      f' {len(singletons)} SINGLETON famil{"y" if len(singletons)==1 else "ies"}'
+      f' {singletons}')
 print('\n  ⚠ "min 2" is a FLOOR, not a target: a family stays OPEN until a new row')
 print('    moves none of PLAN_PHP.md §9\'s six answers, cap 4. So this is the')
 print('    cheapest possible programme, not the expected one.')
+if singletons:
+    print(f'\n  ⛔⛔ AND THE {len(singletons)} SINGLETON FAMILIES ARE A CONCEDED'
+          f' LIMIT OF THE CORPUS, not an')
+    print('     accounting detail. QUOTA_001 gives min-2 a REASON: "n = 1 cannot')
+    print('     detect the S1 effect, and S1 proves n = 1 would have published a')
+    print('     wrong answer." ph55/ph56 then measured what it buys -- one family,')
+    print('     one fix shape, TWO COMPLETELY DIFFERENT HARMS, a result neither')
+    print(f'     row has alone. ▶ {singletons} can NEVER produce that, and whatever')
+    print('     they publish is a one-row claim with no within-family control.')
+    print('     ADJUDICATION_003 §2. ⚠ They are NOT down-ranked: all pass the')
+    print('     C-side bar (CLAUDE.md rule 6).')
 
 axes = collections.Counter()
 for f, rs in famrows.items():
@@ -239,6 +262,41 @@ print(f'  N4 MUST-FIRE      no orphan gate records: '
       f'{len(orphan_records)} -> {"OK" if not orphan_records else "FAIL"}')
 if orphan_records:
     _neg.append(f'N4: gate record(s) with no row directory: {orphan_records}')
+
+# ⭐ N5 MUST-FIRE: the floor is a DERIVATION, not `families x 2`. It lands with
+#    ADJUDICATION_003 (open item 121). The two halves are asserted separately so
+#    a failure says WHICH property broke.
+#    ⚠ `.memory-php/04-process.md` law 6: a bound is not a derivation, and `40`
+#    was a pin. Seven pinned figures in `.tasks-php/` validators have gone stale.
+_floor_flat = len(famrows) * 2
+_floor_derived = sum(min(2, len(rs)) for rs in famrows.values())
+_n5a = _floor_derived == FLOOR and FLOOR <= _floor_flat
+print(f'  N5 MUST-FIRE      floor is derived, not families x 2: '
+      f'{FLOOR} <= {_floor_flat} -> {"OK" if _n5a else "FAIL"}')
+if not _n5a:
+    _neg.append(f'N5: FLOOR {FLOOR} is not the derived sum, or exceeds the flat '
+                f'{_floor_flat} -- min(2,n) can never be larger')
+
+# ⛔ N5b MUST-FIRE WHILE ANY SINGLETON EXISTS, and it DECLARES ITSELF VACUOUS
+#    rather than passing silently when none does -- F10, and quota.py's own N1
+#    is the precedent. Without this, a catalogue that grew S5/S6/T4 to two rows
+#    would make the derived and flat floors equal again and NOTHING would record
+#    that the concession had been discharged.
+if singletons:
+    _n5b = FLOOR < _floor_flat
+    print(f'  N5b MUST-FIRE     {len(singletons)} singleton famil'
+          f'{"y" if len(singletons)==1 else "ies"} {singletons} make the derived '
+          f'floor STRICTLY smaller: {FLOOR} < {_floor_flat} -> '
+          f'{"OK" if _n5b else "FAIL"}')
+    if not _n5b:
+        _neg.append(f'N5b: {singletons} are singletons yet the derived floor '
+                    f'{FLOOR} did not fall below the flat {_floor_flat}')
+else:
+    print('  N5b MUST-FIRE     ⓘ VACUOUS TODAY -- no family has fewer than 2 '
+          'rows, so the derived and flat floors coincide and this arm cannot '
+          'fire. It is NOT passing. ⭐ If you are reading this, item 121\'s '
+          'concession has been discharged and ADJUDICATION_003 §5 route (c) '
+          'happened -- say so there.')
 
 if _neg:
     print(f'\n⛔ {len(_neg)} NEGATIVE(S) FAILED:')
