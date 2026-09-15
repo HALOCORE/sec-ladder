@@ -1,0 +1,58 @@
+{
+ "problems": [],
+ "mutants": {
+  "shipped": {
+   "verified": 36,
+   "errors": 0,
+   "exit": 0,
+   "error_lines": [],
+   "what": "the file as it is",
+   "must_fail": false
+  },
+  "r1": {
+   "verified": 35,
+   "errors": 1,
+   "exit": 1,
+   "error_lines": [
+    "error: precondition not satisfied",
+    "error: precondition not satisfied",
+    "error: aborting due to 2 previous errors"
+   ],
+   "what": "delete the :385 NULL test at the READ shape",
+   "must_fail": true
+  },
+  "r1exists": {
+   "verified": 35,
+   "errors": 1,
+   "exit": 1,
+   "error_lines": [
+    "error: precondition not satisfied",
+    "error: precondition not satisfied",
+    "error: aborting due to 2 previous errors"
+   ],
+   "what": "delete the same test at the EXISTS shape",
+   "must_fail": true
+  },
+  "status_ok": {
+   "verified": 33,
+   "errors": 3,
+   "exit": 1,
+   "error_lines": [
+    "error: postcondition not satisfied",
+    "error: postcondition not satisfied",
+    "error: postcondition not satisfied",
+    "error: postcondition not satisfied"
+   ],
+   "what": "strengthen call_method's postcondition to *SUCCESS means the out-parameter was written*",
+   "must_fail": true
+  }
+ },
+ "status_ok_fails_in_the_callee": true,
+ "derived_from_sha256": {
+  "patterns/ph96-outparam-unwritten/verus.rs": "d5138bd7bcdcc11101694bb00c97f40c839944c4df6088bea9efb889b1b4e13d"
+ },
+ "pin": {
+  "regenerate": "python3 controls/negatives.py",
+  "note": "four Verus runs; a few minutes"
+ }
+}

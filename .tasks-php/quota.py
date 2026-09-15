@@ -140,20 +140,52 @@ for name, dec, cnt in secA:
 print(f'  {"TOTAL":<28} {tot_cnt:>3}   (headers declare {tot_dec}, table has {len(rowA)})')
 
 print('\n--- families, and the quota (QUOTA_001 rule: min 2, cap 4) ---')
-print(f'  {"fam":<4} {"n":>3}  {"built":>5}  status   name')
-owed = 0
-for f, rs in famrows.items():
-    nb = sum(1 for r in rs if r in built)
+def family_status(nb, n):
+    """PURE. The quota label and the shortfall for a family of `n` catalogued
+    rows with `nb` built. -> (status, need).
+
+    ⚠ EXTRACTED 2026-09-15 so the `N6` arm drives THE SAME CODE the table
+    prints, rather than a copy of it. A negative that re-implements its subject
+    tests the copy.
+    """
     # ⛔⛔ THE TARGET IS `min(2, |family|)`, NOT 2. ADJUDICATION_003, open item
     #   121: S5, S6 and T4 hold ONE catalogued row each, so a flat min-2 asks
     #   for SIX rows that cannot exist unless the catalogue grows. Derived from
     #   the parsed table, so it moves on its own if the catalogue does.
-    target = min(2, len(rs))
+    target = min(2, n)
     need = max(0, target - nb)
-    if need == 0:  st = 'open' if nb >= target else 'CLOSED'
+    # ⛔⛔⛔ THIS READ `'open' if nb >= target else 'CLOSED'` UNTIL 2026-09-15,
+    #   AND THE SECOND BRANCH WAS UNREACHABLE. `need` is `max(0, target - nb)`,
+    #   so `need == 0` IS `nb >= target` -- the guard and the ternary tested the
+    #   SAME condition, the ternary was always True, and `CLOSED` could never
+    #   print. Four families have met quota (S1, T3, T5, T6) and all four
+    #   printed `open`, which is the OPPOSITE of what a reader takes it to mean.
+    #   ⭐ Caught when the manager wrote "T6 ✅CLOSED" in `RECAP_PHP.md`'s START
+    #   HERE box and checked it against this tool, which said `open`.
+    #
+    # ⚠⚠ THE REPAIR ENCODES AN INFERRED INTENT AND SAYS SO. The reading that
+    #   makes both labels meaningful is: once the quota is met, distinguish a
+    #   family that can still take MORE catalogued rows (`open`) from one whose
+    #   catalogued rows are ALL built (`CLOSED`, i.e. exhausted). That is the
+    #   only reading under which `CLOSED` is reachable at all.
+    #   ⓘ IT CHANGES NO LABEL TODAY -- no family is exhausted (`nb == len(rs)`
+    #   holds nowhere), so the defect is VACUOUS NOW and would have mislabelled
+    #   the FIRST exhausted family. A branch that cannot be taken is not a
+    #   branch that is right (`F10`'s shape: vacuous and passing look alike).
+    #   ▶ N6 below asserts the branch is reachable, so this cannot regress
+    #   silently.
+    if need == 0:  st = 'CLOSED' if nb >= n else 'open'
     else:          st = f'OWES {need}'
-    if len(rs) < 2:
+    if n < 2:
         st += ' (n=1)'
+    return st, need
+
+
+print(f'  {"fam":<4} {"n":>3}  {"built":>5}  status   name')
+owed = 0
+for f, rs in famrows.items():
+    nb = sum(1 for r in rs if r in built)
+    st, need = family_status(nb, len(rs))
     owed += need
     # ⚠ this used to read '<== both built rows', which was true only while the
     # tree had exactly two. Name the rows instead of counting them.
@@ -297,6 +329,55 @@ else:
           'fire. It is NOT passing. ⭐ If you are reading this, item 121\'s '
           'concession has been discharged and ADJUDICATION_003 §5 route (c) '
           'happened -- say so there.')
+
+# ⛔⛔⛔ N6 MUST-FIRE: BOTH quota labels are REACHABLE, and they are reachable
+#    on the RIGHT inputs. Until 2026-09-15 `CLOSED` could not print at all --
+#    the guard `need == 0` and the ternary `nb >= target` tested the SAME
+#    condition, so the ternary was a constant. ⭐ NOTHING CAUGHT IT because a
+#    dead branch and a correct branch look identical from the outside: every
+#    family that met quota printed `open`, which is what a reader expected to
+#    see for most of them, and the four quota-met families are all non-exhausted
+#    so the wrong label never showed. ⚠ THE ARM DRIVES `family_status` ITSELF,
+#    not a copy of its logic -- a negative that re-implements its subject tests
+#    the copy. `.memory-php/04-process.md` law 6's shape: a branch that cannot
+#    be taken is not a branch that is right.
+_n6_cases = [
+    # (nb, n)        -> expected label      why this case exists
+    ((2, 5), 'open'),      # quota met, rows left        -- T6 today
+    ((5, 5), 'CLOSED'),    # EXHAUSTED                   -- the dead branch
+    ((1, 5), 'OWES 1'),    # short                       -- the ordinary case
+    ((1, 1), 'CLOSED (n=1)'),  # singleton, built        -- min(2,n) is the point
+    ((0, 1), 'OWES 1 (n=1)'),  # singleton, unbuilt      -- S5/S6/T4 today
+]
+_n6_bad = [(a, want, family_status(*a)[0])
+           for a, want in _n6_cases if family_status(*a)[0] != want]
+print(f'  N6 MUST-FIRE      both labels reachable on the right inputs: '
+      f'{len(_n6_cases) - len(_n6_bad)}/{len(_n6_cases)} '
+      f'-> {"OK" if not _n6_bad else "FAIL"}')
+if _n6_bad:
+    for a, want, got in _n6_bad:
+        _neg.append(f'N6: family_status{a} -> {got!r}, expected {want!r}')
+
+# ⭐ N6b MUST-FIRE: and `CLOSED` is reachable from the LIVE catalogue's own
+#    shapes, not only from synthetic ones -- otherwise N6 could pass on inputs
+#    the corpus can never present. It DECLARES ITSELF VACUOUS rather than
+#    passing silently when no family is exhausted (F10, and N1/N5b's precedent).
+_exhausted = [f for f, rs in famrows.items()
+              if sum(1 for r in rs if r in built) >= len(rs)]
+if _exhausted:
+    _n6b = all(family_status(len(famrows[f]), len(famrows[f]))[0].startswith('CLOSED')
+               for f in _exhausted)
+    print(f'  N6b MUST-FIRE     {len(_exhausted)} exhausted famil'
+          f'{"y" if len(_exhausted)==1 else "ies"} {_exhausted} label CLOSED: '
+          f'{"OK" if _n6b else "FAIL"}')
+    if not _n6b:
+        _neg.append(f'N6b: {_exhausted} are exhausted but do not label CLOSED')
+else:
+    print('  N6b MUST-FIRE     ⓘ VACUOUS TODAY -- no family has all its '
+          'catalogued rows built, so the CLOSED branch is unreachable FROM THE '
+          'CORPUS and only N6 covers it. It is NOT passing. ⭐ If you are '
+          'reading this, a family has been exhausted -- say so in RECAP_PHP.md, '
+          'because that is the first one in the programme.')
 
 if _neg:
     print(f'\n⛔ {len(_neg)} NEGATIVE(S) FAILED:')

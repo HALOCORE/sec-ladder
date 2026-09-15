@@ -1,0 +1,69 @@
+{
+ "problems": [],
+ "offsets_from_zend_h": {
+  "refcount": "0x10",
+  "type": "0x14"
+ },
+ "caution": [
+  "the CLI half was taken on php-in-safe-rust's ORACLE build, NOT a museum-default 5.0.0",
+  "a clean run would NOT have been evidence of absence (RECAP_PHP.md F3); a faulting run IS evidence of presence"
+ ],
+ "mutant_build_rc": 1,
+ "mutant_diagnostic": "/home/apt/repos_common/sec-ladder/.temp/php96/faddr/mutant.c:93:14: error: size of array \u2018ph96_assert_refcount_10\u2019 is negative 93 | typedef char ph96_assert_refcount_10[ | ^~~~~~~~~~~~~~~~~~~~~~~ /home/apt/repos_common/sec-ladder/.temp/php96/faddr/mutant.c:95:14: error: size of array \u2018ph96_assert_type_14\u2019 is negative 95 | typedef char ph96_assert_type_14[(offsetof(ph96_zval, type) == 0x14) ? 1 : -",
+ "cells": {
+  "c-gcc-R1/unset (:512-513)": {
+   "exit": 139,
+   "si_addr": "0x10",
+   "stdout": ""
+  },
+  "c-gcc-R1/exists (:427-429)": {
+   "exit": 139,
+   "si_addr": "0x14",
+   "stdout": ""
+  },
+  "c-gcc-R1h/unset (:512-513)": {
+   "exit": 0,
+   "si_addr": null,
+   "stdout": "15642763268152511488"
+  },
+  "c-gcc-R1h/exists (:427-429)": {
+   "exit": 139,
+   "si_addr": "0x14",
+   "stdout": ""
+  },
+  "c-clang-R1/unset (:512-513)": {
+   "exit": 139,
+   "si_addr": "0x10",
+   "stdout": ""
+  },
+  "c-clang-R1/exists (:427-429)": {
+   "exit": 139,
+   "si_addr": "0x14",
+   "stdout": ""
+  },
+  "c-clang-R1h/unset (:512-513)": {
+   "exit": 0,
+   "si_addr": null,
+   "stdout": "15642763268152511488"
+  },
+  "c-clang-R1h/exists (:427-429)": {
+   "exit": 139,
+   "si_addr": "0x14",
+   "stdout": ""
+  }
+ },
+ "benign_control": {
+  "exit": 0,
+  "stdout": "18106149370596871061"
+ },
+ "derived_from_sha256": {
+  "patterns/ph96-outparam-unwritten/c/kernel.c": "60e76a48f6d96ea25f06b34ac809df9dcc555346b4db633e8cdda9464a7dd6d6",
+  "patterns/ph96-outparam-unwritten/c/kernel.h": "24098a782f14f1676add83ae154276818781c2ddeaf39faced1524bf61c88b15",
+  "patterns/ph96-outparam-unwritten/c/kernel_hardened.c": "182067abe556c1ad8c449c4bf3acdebab3f684b776c543fa1de55af42fdc7c6b",
+  "patterns/ph96-outparam-unwritten/inputs/adversarial-unset.bin": "5c7844ab9c91a8daf43ca97874c5676f0ad19b52784f10fb7fc6d8f04d308beb"
+ },
+ "pin": {
+  "regenerate": "python3 controls/fault_addr.py",
+  "note": "five C builds and nine runs; under a minute"
+ }
+}

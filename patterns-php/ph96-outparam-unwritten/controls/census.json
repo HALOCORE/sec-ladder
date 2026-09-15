@@ -1,0 +1,187 @@
+{
+ "raw_grep_hits": 32,
+ "problems": [],
+ "api_lines_excluded": [
+  {
+   "file": "Zend/zend_interfaces.c",
+   "line": 30
+  },
+  {
+   "file": "Zend/zend_interfaces.c",
+   "line": 32
+  },
+  {
+   "file": "Zend/zend_interfaces.h",
+   "line": 40
+  },
+  {
+   "file": "Zend/zend_interfaces.h",
+   "line": 42
+  },
+  {
+   "file": "Zend/zend_interfaces.h",
+   "line": 43
+  },
+  {
+   "file": "Zend/zend_interfaces.h",
+   "line": 45
+  },
+  {
+   "file": "Zend/zend_interfaces.h",
+   "line": 46
+  },
+  {
+   "file": "Zend/zend_interfaces.h",
+   "line": 48
+  },
+  {
+   "file": "Zend/zend_interfaces.h",
+   "line": 49
+  }
+ ],
+ "sites": 23,
+ "no_output": [
+  {
+   "file": "ext/spl/spl_engine.h",
+   "line": 46,
+   "retval_arg": "NULL"
+  },
+  {
+   "file": "ext/spl/spl_engine.h",
+   "line": 56,
+   "retval_arg": "NULL"
+  },
+  {
+   "file": "ext/spl/spl_iterators.c",
+   "line": 967,
+   "retval_arg": "NULL"
+  },
+  {
+   "file": "Zend/zend_objects.c",
+   "line": 78,
+   "retval_arg": "NULL"
+  },
+  {
+   "file": "Zend/zend_object_handlers.c",
+   "line": 413,
+   "retval_arg": "NULL"
+  },
+  {
+   "file": "Zend/zend_interfaces.c",
+   "line": 228,
+   "retval_arg": "NULL"
+  },
+  {
+   "file": "Zend/zend_interfaces.c",
+   "line": 239,
+   "retval_arg": "NULL"
+  }
+ ],
+ "output": [
+  {
+   "file": "ext/spl/spl_iterators.c",
+   "line": 206,
+   "retval_arg": "&retval"
+  },
+  {
+   "file": "ext/spl/spl_iterators.c",
+   "line": 232,
+   "retval_arg": "&child"
+  },
+  {
+   "file": "ext/spl/spl_iterators.c",
+   "line": 786,
+   "retval_arg": "&retval"
+  },
+  {
+   "file": "ext/spl/spl_iterators.c",
+   "line": 848,
+   "retval_arg": "&retval"
+  },
+  {
+   "file": "ext/spl/spl_iterators.c",
+   "line": 861,
+   "retval_arg": "&retval"
+  },
+  {
+   "file": "ext/spl/spl_iterators.c",
+   "line": 1108,
+   "retval_arg": "&retval"
+  },
+  {
+   "file": "ext/spl/spl_iterators.c",
+   "line": 1110,
+   "retval_arg": "&zchildren"
+  },
+  {
+   "file": "ext/spl/spl_iterators.c",
+   "line": 1140,
+   "retval_arg": "&intern->u.caching.zstr"
+  },
+  {
+   "file": "Zend/zend_object_handlers.c",
+   "line": 384,
+   "retval_arg": "&retval"
+  },
+  {
+   "file": "Zend/zend_object_handlers.c",
+   "line": 427,
+   "retval_arg": "&retval"
+  },
+  {
+   "file": "Zend/zend_object_handlers.c",
+   "line": 512,
+   "retval_arg": "&retval"
+  },
+  {
+   "file": "Zend/zend_interfaces.c",
+   "line": 105,
+   "retval_arg": "&retval"
+  },
+  {
+   "file": "Zend/zend_interfaces.c",
+   "line": 143,
+   "retval_arg": "&more"
+  },
+  {
+   "file": "Zend/zend_interfaces.c",
+   "line": 161,
+   "retval_arg": "&iter->value"
+  },
+  {
+   "file": "Zend/zend_interfaces.c",
+   "line": 184,
+   "retval_arg": "&retval"
+  },
+  {
+   "file": "Zend/zend_exceptions.c",
+   "line": 525,
+   "retval_arg": "&str"
+  }
+ ],
+ "unparsed": [],
+ "expected": {
+  "sites": 23,
+  "no_output": 7,
+  "output": 16
+ },
+ "measured": {
+  "sites": 23,
+  "no_output": 7,
+  "output": 16
+ },
+ "arrayaccess_cells": {
+  "Zend/zend_object_handlers.c:384": "output",
+  "Zend/zend_object_handlers.c:413": "no_output",
+  "Zend/zend_object_handlers.c:427": "output",
+  "Zend/zend_object_handlers.c:512": "output"
+ },
+ "mustfire_wrong_index_noout": 0,
+ "derived_from_sha256": {
+  "patterns/ph96-outparam-unwritten/spec.md": "1478f145afbf735bed7972e37e427a787ded5731ab1eff692cbf5c43b449868d"
+ },
+ "pin": {
+  "regenerate": "python3 controls/census.py",
+  "note": "one tar walk over 1170 files, seconds"
+ }
+}

@@ -1,0 +1,166 @@
+{
+ "problems": [],
+ "definition_used": "W",
+ "definition_note": "inside_share_W = kernel exclusive Ir / callgrind summary total. NOT F74's (A1/n_iters)/marginal_ir_per_call -- F129.",
+ "build_root": "/home/apt/repos_common/sec-ladder/.temp/php-scratch/build/ph96",
+ "cells": {
+  "c-gcc": {
+   "small.bin": {
+    "A1": 7170888,
+    "W": 7627848,
+    "inside_share_W_pct": 94.00931953547055,
+    "ir_per_call": 358.5444,
+    "inside_share_F74": 0.9484548845329737
+   },
+   "large.bin": {
+    "A1": 7283381,
+    "W": 7555716,
+    "inside_share_W_pct": 96.39564271605762,
+    "ir_per_call": 2913.3524,
+    "inside_share_F74": 0.9944098602942933
+   }
+  },
+  "c-clang": {
+   "small.bin": {
+    "A1": 7992386,
+    "W": 8446906,
+    "inside_share_W_pct": 94.6190948496408,
+    "ir_per_call": 399.6193,
+    "inside_share_F74": 0.9583886130896707
+   },
+   "large.bin": {
+    "A1": 8081563,
+    "W": 8351458,
+    "inside_share_W_pct": 96.76828884249912,
+    "ir_per_call": 3232.6252,
+    "inside_share_F74": 0.9956802242311306
+   }
+  },
+  "c-gcc-h": {
+   "small.bin": {
+    "A1": 7184739,
+    "W": 7641727,
+    "inside_share_W_pct": 94.01983347481531,
+    "ir_per_call": 359.23695,
+    "inside_share_F74": 0.948255068102629
+   },
+   "large.bin": {
+    "A1": 7299741,
+    "W": 7572104,
+    "inside_share_W_pct": 96.40307370316097,
+    "ir_per_call": 2919.8964,
+    "inside_share_F74": 0.9944406073114413
+   }
+  },
+  "c-clang-h": {
+   "small.bin": {
+    "A1": 8007990,
+    "W": 8462462,
+    "inside_share_W_pct": 94.62955343255899,
+    "ir_per_call": 400.3995,
+    "inside_share_F74": 0.9591785645841319
+   },
+   "large.bin": {
+    "A1": 8097819,
+    "W": 8367666,
+    "inside_share_W_pct": 96.77512223838762,
+    "ir_per_call": 3239.1276,
+    "inside_share_F74": 0.9956895931635491
+   }
+  },
+  "safe_naive": {
+   "small.bin": {
+    "A1": 6346654,
+    "W": 6980295,
+    "inside_share_W_pct": 90.922432361383,
+    "ir_per_call": 317.3327,
+    "inside_share_F74": 0.9453147248949924
+   },
+   "large.bin": {
+    "A1": 6319878,
+    "W": 6768436,
+    "inside_share_W_pct": 93.37279690610947,
+    "ir_per_call": 2527.9512,
+    "inside_share_F74": 0.9940392668818887
+   }
+  },
+  "safe_tuned": {
+   "small.bin": {
+    "A1": 7639267,
+    "W": 8272895,
+    "inside_share_W_pct": 92.34091572538996,
+    "ir_per_call": 381.96335,
+    "inside_share_F74": 0.9510092371277761
+   },
+   "large.bin": {
+    "A1": 7588640,
+    "W": 8037185,
+    "inside_share_W_pct": 94.41912809024552,
+    "ir_per_call": 3035.456,
+    "inside_share_F74": 0.9950389924571968
+   }
+  },
+  "unsafe": {
+   "small.bin": {
+    "A1": 6960509,
+    "W": 7594176,
+    "inside_share_W_pct": 91.65588208648312,
+    "ir_per_call": 348.02545,
+    "inside_share_F74": 0.9479882599694922
+   },
+   "large.bin": {
+    "A1": 6997183,
+    "W": 7445767,
+    "inside_share_W_pct": 93.97531510185586,
+    "ir_per_call": 2798.8732,
+    "inside_share_F74": 0.994596173527405
+   }
+  },
+  "verus": {
+   "small.bin": {
+    "A1": 6960509,
+    "W": 7594160,
+    "inside_share_W_pct": 91.65607519462324,
+    "ir_per_call": 348.02545,
+    "inside_share_F74": 0.9479882599694922
+   },
+   "large.bin": {
+    "A1": 6997183,
+    "W": 7445751,
+    "inside_share_W_pct": 93.97551704321029,
+    "ir_per_call": 2798.8732,
+    "inside_share_F74": 0.994596173527405
+   }
+  }
+ },
+ "inside_share_F74": {
+  "c-gcc/small.bin": 0.9484548845329737,
+  "c-gcc/large.bin": 0.9944098602942933,
+  "c-clang/small.bin": 0.9583886130896707,
+  "c-clang/large.bin": 0.9956802242311306,
+  "safe_naive/small.bin": 0.9453147248949924,
+  "safe_naive/large.bin": 0.9940392668818887,
+  "safe_tuned/small.bin": 0.9510092371277761,
+  "safe_tuned/large.bin": 0.9950389924571968,
+  "unsafe/small.bin": 0.9479882599694922,
+  "unsafe/large.bin": 0.994596173527405,
+  "verus/small.bin": 0.9479882599694922,
+  "verus/large.bin": 0.994596173527405,
+  "c-gcc-h/small.bin": 0.948255068102629,
+  "c-gcc-h/large.bin": 0.9944406073114413,
+  "c-clang-h/small.bin": 0.9591785645841319,
+  "c-clang-h/large.bin": 0.9956895931635491
+ },
+ "W_range_pct": [
+  90.922432361383,
+  96.77512223838762
+ ],
+ "derived_from_sha256": {
+  "patterns/ph96-outparam-unwritten/inputs/small.bin": "5d1c02bfba22e048adf8eba82249e425beec829d0032111ee7da24cdc1da65c4",
+  "patterns/ph96-outparam-unwritten/inputs/large.bin": "38c8533fe346eed44f0f19b7db2eeeb3fd69482507acce5d8082943af4b3660a"
+ },
+ "pin": {
+  "regenerate": "python3 controls/inside_share.py",
+  "note": "16 callgrind runs off the gate's own build root; minutes"
+ }
+}

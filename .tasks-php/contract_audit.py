@@ -196,6 +196,27 @@ ADJUDICATED = {
         "FALSE-POSITIVE", "the same sentence as kernel.c:323 -- kernel_hardened.c "
                 "is c/kernel.c plus the one-line backport, so its comments are "
                 "duplicated by construction, exactly as ph55's are."),
+    "ph96-outparam-unwritten/kernel.h:112": (
+        "FALSE-POSITIVE", "\"`shape_raw` is a third independent byte\" -- "
+                "`independent` describes A BYTE OF THIS RECORD, whose decode is "
+                "written out in the table on the eight lines immediately above, "
+                "and the claim is checkable FROM THIS FILE.  It cannot age out of "
+                "step with the file asserting it, which is the property the "
+                "VERDICT class lacks, and it is not a corroboration between two "
+                "artefacts, which is what `_INDEP` exists to catch.  "
+                "\u26d4\u26d4 FOURTH INSTANCE OF THE SAME SPELLING DEFECT -- "
+                "ph29:23 (`independently cached`), emalloc_shim.h:640 "
+                "(`order-independent`) and ph97 kernel.c:323 / "
+                "kernel_hardened.c:356 (`TWO INDEPENDENT BYTES`) are the others.  "
+                "\u2b50 TASK_PHP_056 called the class RECURRING at three; at four "
+                "it is the ratchet's single largest entry class, and every one of "
+                "them is an ADJECTIVE.  A reviewer may want to decide whether that "
+                "is the intended steady state.  \u26d4 NO REGEX CHANGE IS "
+                "PROPOSED: \u00a7F6a and the ratchet rule both forbid it, and the "
+                "false-positive direction is the safe one.  \u26a0 Deliberately "
+                "NOT reworded to dodge the grep -- and on this row rewording would "
+                "also cost a 32-cell re-measure, which is the second reason not "
+                "to."),
     "(SHARED)/emalloc_shim.h:640": (
         "FALSE-POSITIVE", "\"order-independent per field\" -- `independent` inside "
                           "a COMPOUND ADJECTIVE describing the tally's mixing "

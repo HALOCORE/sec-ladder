@@ -1,0 +1,80 @@
+{
+ "commit": "cf020f133487d36a8b1d9cfd16ec456f7f07952e",
+ "problems": [],
+ "from_sha": "cf020f133487d36a8b1d9cfd16ec456f7f07952e",
+ "filename_prefix": "cf020f133487",
+ "binds": true,
+ "scratch_toplevel": "/home/apt/repos_common/sec-ladder/.temp/php96/r1hctl",
+ "apply_check": {
+  "(default)": 1,
+  "-C1": 1,
+  "-C0": 1,
+  "-3": 1
+ },
+ "applies": false,
+ "context_lines_absent_from_5_0_0": [
+  "SEPARATE_ARG_IF_REF(offset);",
+  "zval_ptr_dtor(&offset);"
+ ],
+ "preimage_shape_ok": true,
+ "backport_diffstat": "Zend/zend_object_handlers.c | 4 +---\n 1 file changed, 1 insertion(+), 3 deletions(-)",
+ "backport_diffstat_summary": "1 file changed, 1 insertion(+), 3 deletions(-)",
+ "upstream_diffstat_summary": "1 file changed, 1 insertion(+), 3 deletions(-)",
+ "site_diff": {
+  "ph96_read_dimension": {
+   "r1_only": [],
+   "r1h_only": []
+  },
+  "ph96_write_dimension": {
+   "r1_only": [],
+   "r1h_only": []
+  },
+  "ph96_has_dimension": {
+   "r1_only": [],
+   "r1h_only": []
+  },
+  "ph96_unset_dimension": {
+   "r1_only": [
+    "ph96_zval *retval;",
+    "ph96_call_method(b, slot, &retval, n_rel, &core);",
+    "ph96_zval_ptr_dtor(&retval, n_rel);"
+   ],
+   "r1h_only": [
+    "ph96_call_method(b, slot, (ph96_zval **) 0, n_rel, &core);"
+   ]
+  },
+  "ph96_call_method": {
+   "r1_only": [],
+   "r1h_only": []
+  },
+  "ph96_zval_ptr_dtor": {
+   "r1_only": [],
+   "r1h_only": []
+  },
+  "ph96_is_true": {
+   "r1_only": [],
+   "r1h_only": []
+  },
+  "ph96_call_function": {
+   "r1_only": [],
+   "r1h_only": []
+  },
+  "ph96_fold_zval": {
+   "r1_only": [],
+   "r1h_only": []
+  },
+  "kernel": {
+   "r1_only": [],
+   "r1h_only": []
+  }
+ },
+ "derived_from_sha256": {
+  "patterns/ph96-outparam-unwritten/c/kernel.c": "60e76a48f6d96ea25f06b34ac809df9dcc555346b4db633e8cdda9464a7dd6d6",
+  "patterns/ph96-outparam-unwritten/c/kernel_hardened.c": "182067abe556c1ad8c449c4bf3acdebab3f684b776c543fa1de55af42fdc7c6b",
+  "patterns/ph96-outparam-unwritten/controls/cf020f133487.patch": "435cd42d7e53cddf25950dad17f8f727d512bce068edfc7344463386c030d2da"
+ },
+ "pin": {
+  "regenerate": "python3 controls/r1h_backport.py",
+  "note": "one tar extract, one git init, seconds"
+ }
+}

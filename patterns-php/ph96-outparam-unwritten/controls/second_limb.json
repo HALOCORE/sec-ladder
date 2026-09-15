@@ -1,0 +1,168 @@
+{
+ "problems": [],
+ "build": "O1 -g for C, O3 isolated for Rust",
+ "note": "every cell is driven on the SAME four one-window inputs, each carrying one SUCCESS-with-nothing-written record at the named shape",
+ "cells": {
+  "c-gcc": {
+   "exists": {
+    "exit": 139,
+    "stdout": "",
+    "si_addr": "0x14"
+   },
+   "unset": {
+    "exit": 139,
+    "stdout": "",
+    "si_addr": "0x10"
+   },
+   "read": {
+    "exit": 0,
+    "stdout": "6482687999966814208",
+    "si_addr": null
+   },
+   "write": {
+    "exit": 0,
+    "stdout": "13271252501389517824",
+    "si_addr": null
+   }
+  },
+  "c-gcc-h": {
+   "exists": {
+    "exit": 139,
+    "stdout": "",
+    "si_addr": "0x14"
+   },
+   "unset": {
+    "exit": 0,
+    "stdout": "8401637430525373440",
+    "si_addr": null
+   },
+   "read": {
+    "exit": 0,
+    "stdout": "6482687999966814208",
+    "si_addr": null
+   },
+   "write": {
+    "exit": 0,
+    "stdout": "13271252501389517824",
+    "si_addr": null
+   }
+  },
+  "safe_naive": {
+   "exists": {
+    "exit": 0,
+    "stdout": "6482687999966814208",
+    "si_addr": null
+   },
+   "unset": {
+    "exit": 0,
+    "stdout": "8401637430525373440",
+    "si_addr": null
+   },
+   "read": {
+    "exit": 0,
+    "stdout": "6482687999966814208",
+    "si_addr": null
+   },
+   "write": {
+    "exit": 0,
+    "stdout": "13271252501389517824",
+    "si_addr": null
+   }
+  },
+  "safe_tuned": {
+   "exists": {
+    "exit": 0,
+    "stdout": "6482687999966814208",
+    "si_addr": null
+   },
+   "unset": {
+    "exit": 0,
+    "stdout": "8401637430525373440",
+    "si_addr": null
+   },
+   "read": {
+    "exit": 0,
+    "stdout": "6482687999966814208",
+    "si_addr": null
+   },
+   "write": {
+    "exit": 0,
+    "stdout": "13271252501389517824",
+    "si_addr": null
+   }
+  },
+  "unsafe": {
+   "exists": {
+    "exit": 0,
+    "stdout": "6482687999966814208",
+    "si_addr": null
+   },
+   "unset": {
+    "exit": 0,
+    "stdout": "8401637430525373440",
+    "si_addr": null
+   },
+   "read": {
+    "exit": 0,
+    "stdout": "6482687999966814208",
+    "si_addr": null
+   },
+   "write": {
+    "exit": 0,
+    "stdout": "13271252501389517824",
+    "si_addr": null
+   }
+  },
+  "verus": {
+   "exists": {
+    "exit": 0,
+    "stdout": "6482687999966814208",
+    "si_addr": null
+   },
+   "unset": {
+    "exit": 0,
+    "stdout": "8401637430525373440",
+    "si_addr": null
+   },
+   "read": {
+    "exit": 0,
+    "stdout": "6482687999966814208",
+    "si_addr": null
+   },
+   "write": {
+    "exit": 0,
+    "stdout": "13271252501389517824",
+    "si_addr": null
+   }
+  }
+ },
+ "verdict": {
+  "unset_limb_repaired_by_cf020f133487": true,
+  "exists_limb_repaired_by_cf020f133487": false,
+  "exists_limb_faults_in_both_c_rungs": true,
+  "no_rust_rung_faults_on_either_limb": true
+ },
+ "fault_addresses": {
+  "unset": "0x10",
+  "exists": "0x14"
+ },
+ "cache": {
+  "offsetunset": [
+   "cf020f133487.patch"
+  ],
+  "offsetexists": [],
+  "patches_scanned": 163
+ },
+ "derived_from_sha256": {
+  "patterns/ph96-outparam-unwritten/c/kernel.c": "60e76a48f6d96ea25f06b34ac809df9dcc555346b4db633e8cdda9464a7dd6d6",
+  "patterns/ph96-outparam-unwritten/c/kernel_hardened.c": "182067abe556c1ad8c449c4bf3acdebab3f684b776c543fa1de55af42fdc7c6b",
+  "patterns/ph96-outparam-unwritten/safe_naive.rs": "5af5e09afcd707d2a59723735f8545f6a609519c95ab064e3bd69824096b78cc",
+  "patterns/ph96-outparam-unwritten/safe_tuned.rs": "32e8aea838dd0c2c3758db8ac20911ce858ae4de022ce5c6fbfead0cc71af415",
+  "patterns/ph96-outparam-unwritten/unsafe.rs": "13e19f01427ce6d333e767eeca2c263844c6c484a5ef5f98d81b89164374d98e",
+  "patterns/ph96-outparam-unwritten/verus.rs": "d5138bd7bcdcc11101694bb00c97f40c839944c4df6088bea9efb889b1b4e13d"
+ },
+ "pin": {
+  "regenerate": "python3 controls/second_limb.py",
+  "note": "six builds (one through Verus) and 24 runs; minutes"
+ }
+}

@@ -1,0 +1,338 @@
+{
+ "problems": [],
+ "cells": {
+  "c-gcc": {
+   "adversarial-corefail.bin": {
+    "exit": 0,
+    "stdout": "4064536775858279424"
+   },
+   "adversarial-nowin.bin": {
+    "exit": 0,
+    "stdout": "0"
+   },
+   "adversarial-read.bin": {
+    "exit": 0,
+    "stdout": "13723813837593952256"
+   },
+   "adversarial-unset.bin": {
+    "exit": -11,
+    "stdout": ""
+   },
+   "adversarial-write.bin": {
+    "exit": 0,
+    "stdout": "2065634265307104256"
+   },
+   "large.bin": {
+    "exit": 0,
+    "stdout": "8180791582099779575"
+   },
+   "small.bin": {
+    "exit": 0,
+    "stdout": "18106149370596871061"
+   }
+  },
+  "c-gcc-h": {
+   "adversarial-corefail.bin": {
+    "exit": 0,
+    "stdout": "4064536775858279424"
+   },
+   "adversarial-nowin.bin": {
+    "exit": 0,
+    "stdout": "0"
+   },
+   "adversarial-read.bin": {
+    "exit": 0,
+    "stdout": "13723813837593952256"
+   },
+   "adversarial-unset.bin": {
+    "exit": 0,
+    "stdout": "15642763268152511488"
+   },
+   "adversarial-write.bin": {
+    "exit": 0,
+    "stdout": "2065634265307104256"
+   },
+   "large.bin": {
+    "exit": 0,
+    "stdout": "8180791582099779575"
+   },
+   "small.bin": {
+    "exit": 0,
+    "stdout": "18106149370596871061"
+   }
+  },
+  "c-clang": {
+   "adversarial-corefail.bin": {
+    "exit": 0,
+    "stdout": "4064536775858279424"
+   },
+   "adversarial-nowin.bin": {
+    "exit": 0,
+    "stdout": "0"
+   },
+   "adversarial-read.bin": {
+    "exit": 0,
+    "stdout": "13723813837593952256"
+   },
+   "adversarial-unset.bin": {
+    "exit": 0,
+    "stdout": "18121308747923605504"
+   },
+   "adversarial-write.bin": {
+    "exit": 0,
+    "stdout": "2065634265307104256"
+   },
+   "large.bin": {
+    "exit": 0,
+    "stdout": "8180791582099779575"
+   },
+   "small.bin": {
+    "exit": 0,
+    "stdout": "18106149370596871061"
+   }
+  },
+  "c-clang-h": {
+   "adversarial-corefail.bin": {
+    "exit": 0,
+    "stdout": "4064536775858279424"
+   },
+   "adversarial-nowin.bin": {
+    "exit": 0,
+    "stdout": "0"
+   },
+   "adversarial-read.bin": {
+    "exit": 0,
+    "stdout": "13723813837593952256"
+   },
+   "adversarial-unset.bin": {
+    "exit": 0,
+    "stdout": "15642763268152511488"
+   },
+   "adversarial-write.bin": {
+    "exit": 0,
+    "stdout": "2065634265307104256"
+   },
+   "large.bin": {
+    "exit": 0,
+    "stdout": "8180791582099779575"
+   },
+   "small.bin": {
+    "exit": 0,
+    "stdout": "18106149370596871061"
+   }
+  },
+  "safe_naive": {
+   "adversarial-corefail.bin": {
+    "exit": 0,
+    "stdout": "4064536775858279424"
+   },
+   "adversarial-nowin.bin": {
+    "exit": 0,
+    "stdout": "0"
+   },
+   "adversarial-read.bin": {
+    "exit": 0,
+    "stdout": "13723813837593952256"
+   },
+   "adversarial-unset.bin": {
+    "exit": 0,
+    "stdout": "15642763268152511488"
+   },
+   "adversarial-write.bin": {
+    "exit": 0,
+    "stdout": "2065634265307104256"
+   },
+   "large.bin": {
+    "exit": 0,
+    "stdout": "8180791582099779575"
+   },
+   "small.bin": {
+    "exit": 0,
+    "stdout": "18106149370596871061"
+   }
+  },
+  "safe_tuned": {
+   "adversarial-corefail.bin": {
+    "exit": 0,
+    "stdout": "4064536775858279424"
+   },
+   "adversarial-nowin.bin": {
+    "exit": 0,
+    "stdout": "0"
+   },
+   "adversarial-read.bin": {
+    "exit": 0,
+    "stdout": "13723813837593952256"
+   },
+   "adversarial-unset.bin": {
+    "exit": 0,
+    "stdout": "15642763268152511488"
+   },
+   "adversarial-write.bin": {
+    "exit": 0,
+    "stdout": "2065634265307104256"
+   },
+   "large.bin": {
+    "exit": 0,
+    "stdout": "8180791582099779575"
+   },
+   "small.bin": {
+    "exit": 0,
+    "stdout": "18106149370596871061"
+   }
+  },
+  "unsafe": {
+   "adversarial-corefail.bin": {
+    "exit": 0,
+    "stdout": "4064536775858279424"
+   },
+   "adversarial-nowin.bin": {
+    "exit": 0,
+    "stdout": "0"
+   },
+   "adversarial-read.bin": {
+    "exit": 0,
+    "stdout": "13723813837593952256"
+   },
+   "adversarial-unset.bin": {
+    "exit": 0,
+    "stdout": "15642763268152511488"
+   },
+   "adversarial-write.bin": {
+    "exit": 0,
+    "stdout": "2065634265307104256"
+   },
+   "large.bin": {
+    "exit": 0,
+    "stdout": "8180791582099779575"
+   },
+   "small.bin": {
+    "exit": 0,
+    "stdout": "18106149370596871061"
+   }
+  },
+  "verus": {
+   "adversarial-corefail.bin": {
+    "exit": 0,
+    "stdout": "4064536775858279424"
+   },
+   "adversarial-nowin.bin": {
+    "exit": 0,
+    "stdout": "0"
+   },
+   "adversarial-read.bin": {
+    "exit": 0,
+    "stdout": "13723813837593952256"
+   },
+   "adversarial-unset.bin": {
+    "exit": 0,
+    "stdout": "15642763268152511488"
+   },
+   "adversarial-write.bin": {
+    "exit": 0,
+    "stdout": "2065634265307104256"
+   },
+   "large.bin": {
+    "exit": 0,
+    "stdout": "8180791582099779575"
+   },
+   "small.bin": {
+    "exit": 0,
+    "stdout": "18106149370596871061"
+   }
+  }
+ },
+ "inputs": [
+  "adversarial-corefail.bin",
+  "adversarial-nowin.bin",
+  "adversarial-read.bin",
+  "adversarial-unset.bin",
+  "adversarial-write.bin",
+  "large.bin",
+  "small.bin"
+ ],
+ "model_stdout": {
+  "adversarial-corefail.bin": "4064536775858279424",
+  "adversarial-nowin.bin": "0",
+  "adversarial-read.bin": "13723813837593952256",
+  "adversarial-unset.bin": "15642763268152511488",
+  "adversarial-write.bin": "2065634265307104256",
+  "large.bin": "8180791582099779575",
+  "small.bin": "18106149370596871061"
+ },
+ "faulting_set": [
+  "adversarial-unset.bin/c-gcc"
+ ],
+ "r1_vs_r1h_disagreements": [
+  "adversarial-unset.bin/c-gcc-vs-c-gcc-h",
+  "adversarial-unset.bin/c-clang-vs-c-clang-h"
+ ],
+ "opt_sweep": {
+  "gcc-O0": {
+   "exit": 139,
+   "si_addr": "0x10",
+   "stdout": "",
+   "outcome": "SIGSEGV -- the defect, detected"
+  },
+  "gcc-O1": {
+   "exit": 139,
+   "si_addr": "0x10",
+   "stdout": "",
+   "outcome": "SIGSEGV -- the defect, detected"
+  },
+  "gcc-O2": {
+   "exit": 139,
+   "si_addr": "0x10",
+   "stdout": "",
+   "outcome": "SIGSEGV -- the defect, detected"
+  },
+  "gcc-O3": {
+   "exit": 139,
+   "si_addr": "0x10",
+   "stdout": "",
+   "outcome": "SIGSEGV -- the defect, detected"
+  },
+  "clang-O0": {
+   "exit": 139,
+   "si_addr": "0x10",
+   "stdout": "",
+   "outcome": "SIGSEGV -- the defect, detected"
+  },
+  "clang-O1": {
+   "exit": 139,
+   "si_addr": "0x10",
+   "stdout": "",
+   "outcome": "SIGSEGV -- the defect, detected"
+  },
+  "clang-O2": {
+   "exit": 0,
+   "si_addr": null,
+   "stdout": "18121308747923605504",
+   "outcome": "SILENT WRONG ANSWER -- UB exploited, not lowered"
+  },
+  "clang-O3": {
+   "exit": 0,
+   "si_addr": null,
+   "stdout": "18121308747923605504",
+   "outcome": "SILENT WRONG ANSWER -- UB exploited, not lowered"
+  }
+ },
+ "opt_sweep_distinct_outcomes": [
+  "SIGSEGV -- the defect, detected",
+  "SILENT WRONG ANSWER -- UB exploited, not lowered"
+ ],
+ "declared_but_unreached": "the four Rust rungs carry the `:385` guard at `:427` and R1h does not (spec.md's divergence ledger, last entry). No input in `inputs/` reaches that state, by design -- an input that did would fault in R1h and stage 7h fails a row whose R1h fires a sanitizer on ANY input. controls/second_limb.py drives it.",
+ "derived_from_sha256": {
+  "patterns/ph96-outparam-unwritten/c/kernel.c": "60e76a48f6d96ea25f06b34ac809df9dcc555346b4db633e8cdda9464a7dd6d6",
+  "patterns/ph96-outparam-unwritten/c/kernel_hardened.c": "182067abe556c1ad8c449c4bf3acdebab3f684b776c543fa1de55af42fdc7c6b",
+  "patterns/ph96-outparam-unwritten/safe_naive.rs": "5af5e09afcd707d2a59723735f8545f6a609519c95ab064e3bd69824096b78cc",
+  "patterns/ph96-outparam-unwritten/safe_tuned.rs": "32e8aea838dd0c2c3758db8ac20911ce858ae4de022ce5c6fbfead0cc71af415",
+  "patterns/ph96-outparam-unwritten/unsafe.rs": "13e19f01427ce6d333e767eeca2c263844c6c484a5ef5f98d81b89164374d98e",
+  "patterns/ph96-outparam-unwritten/verus.rs": "d5138bd7bcdcc11101694bb00c97f40c839944c4df6088bea9efb889b1b4e13d",
+  "patterns/ph96-outparam-unwritten/model.py": "683c1953e54702cda301d8d248164af6d53174d1cabfa5673f5972f70f882b04"
+ },
+ "pin": {
+  "regenerate": "python3 controls/widened_domain.py",
+  "note": "eight builds and 56 runs; minutes"
+ }
+}

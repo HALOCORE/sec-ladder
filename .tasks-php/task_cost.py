@@ -75,7 +75,7 @@ def row_family():
     return fam
 
 ROWS = ["ph03", "ph07", "ph16", "ph29", "ph64", "ph45", "ph53",
-        "ph52", "ph55", "ph56", "ph97"]  # BUILD order
+        "ph52", "ph55", "ph56", "ph97", "ph96"]  # BUILD order
 
 # ---------------------------------------------------------------------------
 # THE CLASSIFICATION. `ONCE` = paid once for the programme. A dict = the row
@@ -249,8 +249,28 @@ CLASS = {
                                # may expose (ph07/ph53/ph64 still have no measured
                                # share) IS row debt, and will be charged to those
                                # rows by whatever task measures them.
-    "060": "PENDING",          # BUILD row 12 = ph96, T6's second, which CLOSES
-                               # the family. DISPATCHED, NOT LANDED.
+    "060": {"ph96": 1.0},      # BUILD row 12 = ph96, T6's second, which CLOSED
+                               # the family. ONE task, gated PASS, no resume --
+                               # joint-cheapest in the series with ph97, its
+                               # own sibling. ⭐ THE OPENER PREMIUM IS REFUTED
+                               # AGAIN: T6's two rows cost 1.00 each.
+                               # ⛔⛔ I FIRST WROTE `{"ph96": 1.0}` BEFORE THE
+                               # ROW EXISTED AND `N14` REFUSED IT -- correctly:
+                               # an ungated row is not in `ROWS`, and "a row in
+                               # ROWS that is NOT gated charges cost to
+                               # something that does not exist". It was PENDING
+                               # for exactly as long as it was unbuilt, which is
+                               # what PENDING is for (`_040` set the precedent).
+                               # ▶ BOTH EDITS LANDED TOGETHER, which is what
+                               # N14 exists to force: `ph96` joined `ROWS` in
+                               # the same commit this line stopped saying
+                               # PENDING. Doing one without the other is the
+                               # failure it catches.
+                               # ⓘ It carries two extras the row did not
+                               # strictly owe -- the second repair strategy
+                               # priced (§2.6) and the `:427-429` limb measured
+                               # (§2.5) -- still this row's cost under `_058`'s
+                               # rule, and the 1.00 is with them included.
                                # ⛔⛔ I FIRST WROTE `{"ph96": 1.0}` AND `N14`
                                # REFUSED IT -- correctly, and the crash was the
                                # cheapest possible way to be told: `ph96` is not

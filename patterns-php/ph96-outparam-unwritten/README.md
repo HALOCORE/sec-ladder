@@ -1,0 +1,98 @@
+# ph96 — SUCCESS does not mean the out-parameter was written
+
+**The reader's entry point.** `spec.md` is the declaration the gate enforces;
+`NOTES.md` is the measurements; this is the map.
+
+---
+
+## The row in one paragraph
+
+PHP 5.0.0's `zend_std_unset_dimension` (`Zend/zend_object_handlers.c:506-517`)
+declares `zval *retval;`, hands its address to `zend_call_method_with_1_params`,
+and calls `zval_ptr_dtor(&retval)` — **with no test of any kind.** The callee
+deliberately writes `*fci->retval_ptr_ptr = NULL` at `zend_execute_API.c:595`,
+under its own comment *"we may return SUCCESS, and yet retval may be
+uninitialized, if there was an exception"*, and returns `SUCCESS` anyway at
+`:873`. `_zval_ptr_dtor`'s first statement is `(*zval_ptr)->refcount--`.
+
+⭐⭐ **The STATUS is tested and the OUT-PARAMETER is not.**
+`zend_interfaces.c:81` tests the status and raises `E_CORE_ERROR`, which does not
+return. `I12/O1` names four things that must be tested — *a NULL return,
+sentinel, status code, **or NULL-able out-parameter*** — and it is the last that
+nothing here looks at. That is why this is not `ph60`: **the call succeeds.**
+
+---
+
+## Five things worth reading, in order
+
+1. ⭐⭐⭐ **The 2×2.** One helper, four `ArrayAccess` handlers, and **both correct
+   spellings and both wrong spellings are in one file by one author**: `:385`
+   tests the output two lines after an identical call; `:413` takes the
+   no-output contract 99 lines before `:512` does not. **The 2005 repair did not
+   invent a strategy — it copied the sibling.** `NOTES.md` §2 has it measured on
+   a real PHP 5.0.0 CLI, four handlers and a benign control.
+2. ⭐⭐⭐ **The two repairs cost EXACTLY the same, and under `c-clang` they are
+   the same machine code.** `controls/repair_price.py`, `O3/isolated`, measured
+   on `c-gcc` AND `c-clang`: `+0.0000 Ir/call` in all four cells. The mechanism
+   is in `NOTES.md` §7.1 — *removing the output does not delete the NULL test,
+   it relocates it into the shared helper*, where `zend_interfaces.c:89` already
+   wrote it.
+3. ⛔⛔⛔ **The upstream fix is incomplete, and this row measures it on real PHP.**
+   `zend_std_has_dimension` at `:427-429` has the same defect;
+   `cf020f133487` does not touch it; a rebuilt, patched 5.0.0 still faults there.
+   `NOTES.md` §5 — **with the scope of the claim, which is narrow.**
+4. ⛔⛔ **The C failure mode is build-dependent.** `c-gcc` faults at every `-O`;
+   `c-clang` above `-O1` turns the null dereference into a **silent wrong
+   answer**.
+   `NOTES.md` §6. Safe Rust is the only rung whose detection does not move.
+5. ⭐ **`R1h` is a BACKPORT, not an application.** `git apply` refuses the cached
+   patch at every context width; the three-line hand backport reproduces
+   upstream's own diffstat exactly. `NOTES.md` §4.
+
+---
+
+## The tree
+
+```
+ph96-outparam-unwritten/
+  spec.md      the hashed contract the gate enforces
+  NOTES.md     the measurements, and what is NOT established (§12)
+  README.md    this file
+  model.py     three independent implementations + the synthetic sweep
+  c/  kernel.h kernel.c kernel_hardened.c main.c  emalloc_shim.h -> common-php/
+  safe_naive.rs  safe_tuned.rs  unsafe.rs  verus.rs
+  inputs/ gen.py + small.bin large.bin
+          + adversarial-{unset,read,write,corefail,nowin}.bin
+  controls/  _pin.py  cf020f133487.patch
+             r1h_backport.py   the BACKPORT, verdicts from the bytes
+             rebuild_hardened_php.sh   §A3a obligation 5, on real PHP
+             second_limb.py    ⛔ the limb cf020f133487 does not repair
+             repair_price.py   ⭐ the two attested repairs, priced
+             fault_addr.py     0x10 and 0x14, and the build-time assertions
+             widened_domain.py 8 cells x 7 inputs + the opt-level sweep
+             inside_share.py   both definitions of the name, labelled
+             negatives.py      four Verus mutants
+             rust_bug.py       can Rust reproduce it on purpose?
+             census.py         23 call sites, 7 already safe, 16 not
+             tables.py         the constants, six transcriptions
+             spellings.py      does every backticked span actually pin?
+             rlimit_bisect.sh  the SMT budget, read for monotonicity
+```
+
+## Running it
+
+```sh
+python3 harness-php/gate.py --tool build   ph96-outparam-unwritten --all
+python3 harness-php/gate.py --tool measure ph96-outparam-unwritten
+python3 harness-php/gate.py --tool report  ph96-outparam-unwritten
+python3 harness-php/gate.py                ph96-outparam-unwritten   # fails on tables
+python3 harness-php/gate.py --tool report  ph96-outparam-unwritten
+python3 harness-php/gate.py                ph96-outparam-unwritten   # green
+```
+
+⚠ **Never run `harness/check.py` directly on a php row** — everything goes
+through `harness-php/gate.py`, which builds the shim, verifies the digest bridge
+and checks provenance first (`PROTOCOL_PHP.md` §E).
+
+⚠ `inputs/*.bin` are gitignored and are regenerated byte-for-byte by
+`python3 inputs/gen.py`, which refuses to write a corpus that misses an arm.

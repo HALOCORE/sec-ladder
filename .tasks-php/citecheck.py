@@ -367,15 +367,46 @@ def selftest():
        'no `__pycache__` / `.pyc` in CONTROL_CLAIMS -- a compiled copy carries '
        'the same strings and would double every hit')
 
-    # ⚠ N5d MUST-NOT-FIRE: the new layer is a WARNING, like the row layer.
-    #   It must not change the LIVE-doc failure count.
-    ck('N5d', rot == 0,
-       f'the controls/ layer leaves the LIVE-doc rot count untouched: {rot}')
+    # ⚠ N5d / N4 MUST-NOT-FIRE: both extensions (the `controls/*` layer and the
+    #   row `spec.md`/`NOTES.md` layer) are WARNINGS and must not feed the
+    #   LIVE-doc failure count.
+    #
+    # ⛔⛔⛔ THESE TWO ARMS ASSERTED `rot == 0` UNTIL 2026-09-15, AND THEY HAD
+    #   BEEN FAILING FOR 43 COMMITS WITH THE SWEEP PRINTING `ok` THE WHOLE TIME.
+    #   Written at `4297b1d` when the live rot happened to be 0, they pinned that
+    #   ABSOLUTE value while their own message makes a RELATIVE claim
+    #   ("untouched by this extension"). The standing adjudicated false positive
+    #   arrived at `3448a5a` the next day, rot became 1, and both arms went red
+    #   -- blaming an extension that had nothing to do with it.
+    #   ⭐ NOTHING CAUGHT IT because `citecheck` is the one checker registered
+    #   `expect=1` (it carries that standing rot), `checkers.py` judges by
+    #   `rc == expect`, and a failing arm exits 1 exactly like the standing rot
+    #   does. THE EXIT CODE COULD NOT TELL THEM APART -- which is the warning
+    #   `.tasks-php/README.md` already gives for the BARE run ("read the COUNT,
+    #   never the exit code") and which nobody inherited for the SELFTEST run.
+    #   ⚠ `.memory-php/04-process.md` law 6: a bound is not a derivation, and a
+    #   pinned figure goes stale. This is the EIGHTH in `.tasks-php/` validators.
+    #
+    # ▶ THE REPAIR IS THE RELATIVE CLAIM, STATED STRUCTURALLY AND INDEPENDENT OF
+    #   HOW MANY ROTS EXIST: the rot-bearing set is `LIVE`, derived from `DOCS`;
+    #   the extensions read `CONTROL_CLAIMS` and `patterns-php/*/spec.md`. The
+    #   inertness the arms claim is exactly that those sets are DISJOINT, so no
+    #   extension input can ever reach `rot`. That is checkable at any rot value.
+    _live = set(LIVE)
+    _ext = set(CONTROL_CLAIMS) | set(specs) | {
+        d.replace('/spec.md', '/NOTES.md') for d in specs}
+    ck('N5d', not (_live & _ext),
+       f'the controls/ + row layers are DISJOINT from the rot-bearing LIVE set '
+       f'({len(_live)} live docs, {len(_ext)} extension inputs, '
+       f'{len(_live & _ext)} shared) -- so no extension input can reach `rot`, '
+       f'whatever `rot` happens to be (it is {rot} today)')
 
-    # N4 MUST-NOT-FIRE: the extension is a WARNING and must not change the
-    #    failure count for the live manager docs.
-    ck('N4', rot == 0,
-       f'the LIVE-doc rot count is untouched by this extension: {rot}')
+    # N4 MUST-FIRE (capability): and the extensions are actually POPULATED, or
+    #   "disjoint" would be satisfied vacuously by an extension that reads
+    #   nothing -- which is the shape N5b guards against one layer down.
+    ck('N4', len(_ext) > 0 and len(_live) > 0,
+       f'both sets are non-empty, so N5d\'s disjointness is a real separation '
+       f'and not an empty one: {len(_live)} live, {len(_ext)} extension')
 
     # ⛔ N6 MUST-FIRE: BOTH report spellings are benign, and a non-report is NOT.
     #    The arm for the F117 repair above. Without the last clause, widening

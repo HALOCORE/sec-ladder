@@ -1,0 +1,87 @@
+{
+ "problems": [],
+ "input": "one window, one SUCCESS-with-nothing-written record at the READ shape",
+ "variants": {
+  "unwrap (safe, guard deleted)": {
+   "O0": {
+    "exit": 101,
+    "stdout": "",
+    "stderr": "thread 'main' (450970) panicked at /home/apt/repos_common/sec-ladder/.temp/php96/rustbug/v00/k.rs:133:7: called `Option::unwrap()` on a `None` value note: run with `RUST_BACKTRACE=1` environment varia"
+   },
+   "O1": {
+    "exit": 101,
+    "stdout": "",
+    "stderr": "thread 'main' (451005) panicked at /home/apt/repos_common/sec-ladder/.temp/php96/rustbug/v00/k.rs:133:7: called `Option::unwrap()` on a `None` value note: run with `RUST_BACKTRACE=1` environment varia"
+   },
+   "O2": {
+    "exit": 101,
+    "stdout": "",
+    "stderr": "thread 'main' (451040) panicked at /home/apt/repos_common/sec-ladder/.temp/php96/rustbug/v00/k.rs:133:7: called `Option::unwrap()` on a `None` value note: run with `RUST_BACKTRACE=1` environment varia"
+   },
+   "O3": {
+    "exit": 101,
+    "stdout": "",
+    "stderr": "thread 'main' (451075) panicked at /home/apt/repos_common/sec-ladder/.temp/php96/rustbug/v00/k.rs:133:7: called `Option::unwrap()` on a `None` value note: run with `RUST_BACKTRACE=1` environment varia"
+   }
+  },
+  "unchecked (unsafe, guard deleted)": {
+   "O0": {
+    "exit": -6,
+    "stdout": "",
+    "stderr": "thread 'main' (451110) panicked at /home/apt/repos_common/sec-ladder/.temp/php96/rustbug/v01/k.rs:147:16: unsafe precondition(s) violated: hint::unreachable_unchecked must never be reached This indica"
+   },
+   "O1": {
+    "exit": 0,
+    "stdout": "18140867572253662208",
+    "stderr": ""
+   },
+   "O2": {
+    "exit": 0,
+    "stdout": "18140867572253662208",
+    "stderr": ""
+   },
+   "O3": {
+    "exit": 0,
+    "stdout": "18140867572253662208",
+    "stderr": ""
+   }
+  },
+  "SHIPPED unsafe.rs (N0)": {
+   "O0": {
+    "exit": 0,
+    "stdout": "6482687999966814208",
+    "stderr": ""
+   },
+   "O1": {
+    "exit": 0,
+    "stdout": "6482687999966814208",
+    "stderr": ""
+   },
+   "O2": {
+    "exit": 0,
+    "stdout": "6482687999966814208",
+    "stderr": ""
+   },
+   "O3": {
+    "exit": 0,
+    "stdout": "6482687999966814208",
+    "stderr": ""
+   }
+  }
+ },
+ "safe_unwrap_detected": true,
+ "unsafe_unchecked_outcomes": {
+  "O0": -6,
+  "O1": 0,
+  "O2": 0,
+  "O3": 0
+ },
+ "derived_from_sha256": {
+  "patterns/ph96-outparam-unwritten/safe_naive.rs": "5af5e09afcd707d2a59723735f8545f6a609519c95ab064e3bd69824096b78cc",
+  "patterns/ph96-outparam-unwritten/unsafe.rs": "13e19f01427ce6d333e767eeca2c263844c6c484a5ef5f98d81b89164374d98e"
+ },
+ "pin": {
+  "regenerate": "python3 controls/rust_bug.py",
+  "note": "twelve rustc builds and twelve runs; a minute"
+ }
+}
