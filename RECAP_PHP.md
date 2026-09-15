@@ -48,22 +48,22 @@ between them read `CLAUDE.md`'s top table.
 STATE   ⭐ ROWS BUILT 11 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL · ph45
         (T1)+ph53+ph52 (T3)+ph55+ph56 (T5)+ph97 (T6) TYPE. 8 of 20 fam. 26 owed
         to floor 37 (item 121). ⛔ BACKLOG = THE RULE-9 ROWS OPENING ⛔ UNREVIEWED.
-NEXT    ▶ (1) ⭐⭐⭐ ROW 12 = **ph96** (closes T6); ROW 13 **TEMPORAL** -- 15 of 26
-        owed are, and that axis has ONE built row. ▶ (2) ITEM 129 CENSUS ~289
-        ITEMS, **NOT** A ONE-TASK JOB, A REVIEWER RUNS IT. ▶ (3) 5 CHECKERS STILL
-        UNSWEPT -- **FOLD IN, DON'T DISPATCH**. ▶ (4) ITEM 127 RESIDUE = BOOKKEEPING.
-        ▶ (5) ⛔⛔ ITEM 105 IS THE USER'S DECISION, NOT MINE.
-✅ DONE  **_059: THE 8th ROUND CLEARED F127-F130 AND REFUTED FIVE OF MY CLAIMS.**
-        ⛔⛔⛔ *"INADMISSIBLE"* WITHDRAWN -- F74's BAR IS **NOT A GATE**. ⛔⛔ F129's
-        CORPUS CLAUSE **FALSE**: THE TWO inside_share QUANTITIES ARE INTERLEAVED
-        INSIDE SINGLE SENTENCES **OF THE LAYER**. ⛔⛔ F130's HEADLINE **REFUTED**
-        (A **BIRTH DEFECT**). ITEMS 132+134 CLOSED; F128 LANDED AS **LAW 16**.
+NEXT    ▶ (1) ⭐⭐⭐ ROW 12 = **ph96**, T6's 5th, ON ITS **RESEARCH** GROUND -- THE F116
+        GROUND IS **REFUTED+INVERTED** AND THE DECISION TEXT NEVER INHERITED IT
+        (FIXED). ROW 13 **TEMPORAL**, EXPECTING **NO** ORACLE DISCOUNT (FAULT RATE
+        38.7% vs TYPE 78.6%). ▶ (2) ITEM 129 CENSUS ~289 ITEMS, **NOT** 1 TASK.
+        ▶ (3) 5 CHECKERS UNSWEPT: FOLD IN. ▶ (4) ITEM 127 RESIDUE = BOOKKEEPING.
+        ▶ (5) ⛔⛔ ITEM 105 = **THE USER'S CALL**, NOT MINE.
+✅ DONE  **_059: THE 8th ROUND CLEARED F127-F130, REFUTING 5 OF MY CLAIMS.** ⛔⛔⛔
+        *"INADMISSIBLE"* WITHDRAWN -- F74's BAR IS **NOT A GATE**. ⛔⛔ F129's CORPUS
+        CLAUSE **FALSE**: THE 2 inside_share QUANTITIES ARE INTERLEAVED IN SINGLE
+        SENTENCES **OF THE LAYER**. ⛔⛔ F130 = A **BIRTH DEFECT**. F128 = **LAW 16**.
 ⚠ NEW   F131 RULE-9 LISTED **SIX** FINDINGS AS BOTH UNREVIEWED **AND** VERDICTED.
-        F132 ⛔⛔⛔ **A RATCHET'S COUNT IS NOT A MEASURE OF ITS CORPUS** -- THE UNIT
-        IS A PARAGRAPH; IT HID A REAL ARRIVAL TWICE, AND I MADE 2 OF 3 LANDING IT.
-⚠ TRAPS ONE HOME PER FACT (F131). ADJUDICATE THE **SET**, NEVER THE NUMBER
-        (F132: `cbaseline_diff.py`). A VERDICT **REPLACES** ITS ROW. `grep -a`;
-        EVENT NOT STATE; DESCRIBE A PATH; NEVER `git add -A`.
+        F132 ⛔⛔⛔ **A RATCHET'S COUNT IS NOT A MEASURE OF ITS CORPUS** (UNIT = A
+        PARAGRAPH); IT HID A REAL ARRIVAL TWICE AND I MADE 2 OF THE 3 INSTANCES.
+⚠ TRAPS ONE HOME PER FACT (F131). ADJUDICATE THE **SET**, NEVER THE NUMBER (F132:
+        `cbaseline_diff.py`). A VERDICT **REPLACES** ITS ROW. `grep -a`; EVENT NOT
+        STATE; DESCRIBE A PATH, DON'T SPELL IT; NEVER `git add -A`.
 READ    RULE-9 · .memory-php/ · F1-F132 · items 1-134 · _059 REPORT + _058.
 ```
 
@@ -2983,8 +2983,47 @@ null-deref"* — **a quality judgement the bar does not carry**, `CLAUDE.md` rul
 temporal axis stays at ONE row while `quota.py` says 15 of the 30 owed rows are
 temporal.** Half the remaining programme has `n = 1` of experience. ▶ **That is
 the strongest argument for A's or B's pick and I am overruling it on one ground
-only: F116 landed in the same round, and a measurable C-side bar lowers the cost
-of temporal rows specifically.** ⭐ **Rows 13–14 go temporal, with the oracle.**
+only:** ~~F116 landed in the same round, and a measurable C-side bar lowers the
+cost of temporal rows specifically.~~ ⭐ ~~Rows 13–14 go temporal, with the
+oracle.~~
+
+> ⛔⛔⛔ **THAT GROUND IS REFUTED AND INVERTED, AND THIS TEXT NEVER INHERITED THE
+> CORRECTION — CAUGHT 2026-09-15 WHILE DECIDING ROW 12.** `TASK_PHP_057` §3.2
+> measured it **two ways that share no code** and got the same ordering both
+> times: executed reproducers fault on **78.6 % of type rows, 58.5 % of spatial,
+> and only 38.7 % of temporal**; the corpus's own `crashes_pristine_5_0_0`
+> column, populated years before this programme, gives **70.6 / 43.2 / 32.6 %**.
+> **`95.5 %` of temporal ids are filed `build=asan`.** ⭐ **The mechanism is not
+> subtle: a use-after-free reads memory that is STILL MAPPED, so it returns
+> stale bytes instead of faulting — `SIGSEGV` + `si_addr` is structurally
+> WEAKEST on exactly the axis `F116` claimed it helps most.**
+>
+> ▶ **SO `F116`/§A3a LOWERS A *TYPE* ROW'S COST BY ABOUT TWICE WHAT IT LOWERS A
+> TEMPORAL ROW'S — and `ph97`, the row it was used to justify, IS A TYPE ROW.**
+>
+> ✅ **THE DECISION SURVIVES; THE GROUND DOES NOT.** The reviewer's own words —
+> ***"Replace the ground, keep the decision."*** `F118`'s *other*, research-grade
+> reason stands unaided: **T6 is five rows of ONE obligation (`I12`) failed five
+> different ways, and three of them have the guard PRESENT AND PASSING.**
+> ⭐ **`ph96`'s repair hardens that obligation by a DIFFERENT STRATEGY — remove
+> the output rather than test it — which is a result the programme does not
+> have.** That is why row 12 is `ph96`, and it never needed `F116`.
+>
+> ⛔⛔ **WHAT THE REFUTATION ACTUALLY COSTS, AND IT IS NOT A DOWN-RANK**
+> (`CLAUDE.md` rule 6, and the reviewer said so in terms): **waiting does not
+> make a temporal row cheaper.** The *"rows 13–14 go temporal, **with the
+> oracle**"* clause was a promise of a discount that does not exist on that axis.
+> ▶ **Temporal rows should expect §A3a criterion 2 to read `NO CLI REPRODUCER`
+> more often than not, and to lean on ASan/Miri instead — that is a METHOD
+> consequence to plan for, NOT a reason to defer them again.** ⚠⚠ **A low
+> executed-fault rate is `F3`: NOT evidence of absence, and NEVER a kill.**
+>
+> ⭐⭐⭐ **AND THE PROPAGATION IS THE LESSON, AGAIN.** `_057` verdicted this and
+> the RULE-9 table has carried *"its stated ground is REFUTED AND INVERTED"*
+> ever since — **while the decision text everyone actually reads, the one that
+> says what to build next, kept asserting the refuted ground as live.**
+> **`F129`'s exact defect — the index corrected, the prose not — FOURTH
+> instance**, and this time in the sentence that chooses the next three rows.
 
 ▶ **WHAT WOULD OVERTURN THIS**, registered now: if the `ph97` build finds
 `zend_parse_parameters` undetachable from `EG(argument_stack)`, T6's row becomes
