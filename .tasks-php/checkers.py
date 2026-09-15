@@ -10,9 +10,14 @@ every `.tasks-php/*.py`, what it is, and the argv the manager's sweep must use.
 WHY THIS FILE EXISTS
 --------------------------------------------------------------------------------
 
-**The manager's routine sweep is `for f in ...; do python3 .tasks-php/$f.py; done`
-and it reports *"twelve checkers green"*. Measured 2026-09-15: FOUR of them do
-not run their §H negatives on a bare invocation at all.**
+**The manager's routine sweep was a shell loop running each checker in this
+directory with NO ARGUMENTS, reporting *"twelve checkers green"*. Measured
+2026-09-15: FOUR of them do not run their §H negatives on a bare invocation.**
+
+⚠ The loop is described rather than quoted on purpose: spelled out, it contains a
+shell variable inside a path under this directory, which `citecheck.py` reads as
+a rooted path citation and reports as ROT. **It cost two spurious rot entries on
+2026-09-15 before the string was removed** -- see `.tasks-php/README.md`.
 
     contract_audit.py   negatives INLINE  -- 8 arms on every run     <- the right design
     preimage_screen.py  negatives behind  --selftest

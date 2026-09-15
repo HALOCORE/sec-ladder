@@ -18,9 +18,20 @@ duplication · §H validators land with their negatives.
 
 **`python3 .tasks-php/checkers.py`** — the register of every `.py` here, what it
 is, and **the argv the sweep must use**. Run that rather than a hand-written
-loop: ⛔ **5 of the 14 checkers run their §H negatives only under `--selftest`,
-and a bare sweep runs their REPORT and reads it as a VERDICT.** It files itself,
-so the registry *is* the ratchet and there is no count to go stale.
+shell loop over each checker in turn. ⛔ **5 of the 14 checkers run their §H
+negatives only under `--selftest`, and a bare sweep runs their REPORT and reads
+it as a VERDICT.** It files itself, so the registry *is* the ratchet and there is
+no count to go stale.
+
+> ⚠ **The old hand-written shell loop is deliberately NOT spelled out above, and
+> the reason is worth one line.** It contained a shell variable inside a path
+> under this directory. `citecheck.py` reads that as a rooted path citation and
+> reports it as **rot** — so writing the loop out here added a rot entry **in the
+> edit that documented the rot problem**, and the first attempt to explain the
+> entry *in prose* added a **second** one, because the explanation quoted the
+> string. ⭐ **Both removed the same day; the note survives without the string.**
+> ⓘ **Fourth instance of *a check that reads prose and calls it code*** (item
+> 115's class), and the *transient* half of F117 in miniature.
 
 ## Naming
 
@@ -78,7 +89,8 @@ silently and this README went on describing it.
 ▶ **It is recorded as lapsed rather than deleted, and NOT revived**, because the
 thing it was a proxy for is now measured directly and far better: the **RULE-9
 table in `RECAP_PHP.md`** verdicts every finding, and the programme's standing
-record — *five consecutive review rounds refuted manager or engineer claims, and
-in the last one not one finding survived as written* — is a stronger rigour
+record — *SIX consecutive review rounds refuted manager or engineer claims; in
+`_053` not one finding survived as written, and in `_055` three of four
+conclusions survived while ZERO of four REASONS did* — is a stronger rigour
 signal than a counter nobody incremented. ⚠ **A lapsed convention left described
 as live is worse than no convention**: it makes a reader think the signal exists.
