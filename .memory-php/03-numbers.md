@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F128** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F129** live in `RECAP_PHP.md`
 > (⚠ this said *F1–F41* for **forty-nine** findings, then *F1–F90* for **eleven** more — `PROTOCOL.md` rule 13, **and it has now rotted THREE TIMES.** ✅ **`.tasks-php/boxcheck.py` CHECKS THIS LINE against the actual highest finding as of 2026-09-13, so it is the last time.**
 > **Count it yourself: `grep -c '^### F' RECAP_PHP.md`.**)
 > ⭐ **And the statistic decision — which column every row publishes in — is
@@ -39,6 +39,37 @@
 ---
 
 ## Landed 2026-09-13 from `TASK_PHP_043` — which column, and what a figure owes
+
+- ⛔⛔⛔ **READ THIS BEFORE ANY `inside_share` FIGURE BELOW: TWO DIFFERENT
+  QUANTITIES WEAR THAT NAME IN THIS PROGRAMME, AND EVERY FIGURE IN THIS FILE IS
+  THE FIRST ONE.**
+
+  | | definition | needs |
+  |---|---|---|
+  | ⭐ **`F74`'s — THIS FILE'S** | `(kernel_exclusive_ir / n_iters) / marginal_ir_per_call` | nothing; it is arithmetic over two committed records |
+  | **the `W` one** | `kernel exclusive Ir / callgrind whole-run total Ir` | a callgrind run |
+
+  On `ph29`'s `c-gcc`/`small.bin` cell they read **0.8045** and **0.8933**. ⛔ **The
+  only control the corpus ships — `patterns-php/ph97-optarg-unwritten/controls/inside_share.py`,
+  now byte-identical in four rows — computes the `W` one.** ⚠ **So does every copy
+  of it.** ▶ **Say which you mean.**
+
+  ⚠⚠ **THE NEXT SENTENCE IS THE TELL, AND IT IS WHY THIS CAUTION IS HERE**:
+  *"already computed for every cell in every record"* is **true of `F74`'s and
+  false of the `W` one**, and the file never said which — **`F88`'s own rule,
+  *name the denominator*, broken by the quantity `F88`'s neighbours are measured
+  in, in the document that states `F88`.**
+
+  > ⚠ **STATUS, STATED PLAINLY: the finding behind this box (`F129`,
+  > `TASK_PHP_058`) is UNREVIEWED, and rule 9 says this layer carries what
+  > survived a full engineer→reviewer cycle.** It is admitted anyway because it
+  > **changes no figure and asserts no new result** — it labels figures already
+  > here, all of which stay correct once labelled — and because the alternative
+  > is a layer that reads as authoritative while four gated controls compute a
+  > different number under the same name. ▶ **A reviewer may overturn the
+  > wording; the two definitions are arithmetic and were re-derived by the
+  > manager from the committed records.** ⛔ **`F74`'s form exceeds `1.0` on 15
+  > of 360 corpus cells and nobody has explained why — open item 133.**
 
 - ⭐⭐⭐ **WHICH STATISTIC RESOLVES A CODE DIFFERENCE IS DECIDED BY
   `inside_share`, AND IT IS ALREADY COMPUTED FOR EVERY CELL IN EVERY RECORD.**

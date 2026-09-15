@@ -1,0 +1,161 @@
+{
+ "row": "ph29-recvfrom-alloc",
+ "cell_spec": "O3 / isolated",
+ "definition": "100 * callgrind exclusive Ir of the `kernel` symbol / callgrind `summary:` total Ir for the same run",
+ "not_this_definition": "(kernel_exclusive_ir / n_iters) / marginal_ir_per_call -- F74's share, which every published `inside_share` figure in this programme uses and which is a DIFFERENT number",
+ "n_iters": {
+  "small.bin": 25000,
+  "large.bin": 12000
+ },
+ "matrix": {
+  "c-gcc": {
+   "small.bin": {
+    "kernel_exclusive_ir": 39273585,
+    "whole_program_ir": 43965614,
+    "inside_share_pct": 89.32795752607936,
+    "n_iters": 25000,
+    "ir_per_call": 1570.9434
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 120800132,
+    "whole_program_ir": 127161801,
+    "inside_share_pct": 94.99718551485442,
+    "n_iters": 12000,
+    "ir_per_call": 10066.677666666666
+   }
+  },
+  "c-clang": {
+   "small.bin": {
+    "kernel_exclusive_ir": 28335859,
+    "whole_program_ir": 32887640,
+    "inside_share_pct": 86.15959977669422,
+    "n_iters": 25000,
+    "ir_per_call": 1133.43436
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 86864573,
+    "whole_program_ir": 93156608,
+    "inside_share_pct": 93.24574484292086,
+    "n_iters": 12000,
+    "ir_per_call": 7238.714416666667
+   }
+  },
+  "c-gcc-h": {
+   "small.bin": {
+    "kernel_exclusive_ir": 39322352,
+    "whole_program_ir": 44014409,
+    "inside_share_pct": 89.33972508866358,
+    "n_iters": 25000,
+    "ir_per_call": 1572.89408
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 120828536,
+    "whole_program_ir": 127190233,
+    "inside_share_pct": 94.99828182561785,
+    "n_iters": 12000,
+    "ir_per_call": 10069.044666666667
+   }
+  },
+  "c-clang-h": {
+   "small.bin": {
+    "kernel_exclusive_ir": 28273143,
+    "whole_program_ir": 32824848,
+    "inside_share_pct": 86.13335543853852,
+    "n_iters": 25000,
+    "ir_per_call": 1130.92572
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 86835243,
+    "whole_program_ir": 93127202,
+    "inside_share_pct": 93.24369371690132,
+    "n_iters": 12000,
+    "ir_per_call": 7236.27025
+   }
+  },
+  "safe_naive": {
+   "small.bin": {
+    "kernel_exclusive_ir": 28068358,
+    "whole_program_ir": 38625110,
+    "inside_share_pct": 72.66868107301183,
+    "n_iters": 25000,
+    "ir_per_call": 1122.73432
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 90821295,
+    "whole_program_ir": 128690806,
+    "inside_share_pct": 70.57325835693344,
+    "n_iters": 12000,
+    "ir_per_call": 7568.44125
+   }
+  },
+  "safe_tuned": {
+   "small.bin": {
+    "kernel_exclusive_ir": 23441029,
+    "whole_program_ir": 34719054,
+    "inside_share_pct": 67.51632403348317,
+    "n_iters": 25000,
+    "ir_per_call": 937.64116
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 79788966,
+    "whole_program_ir": 119273107,
+    "inside_share_pct": 66.89602376166825,
+    "n_iters": 12000,
+    "ir_per_call": 6649.0805
+   }
+  },
+  "unsafe": {
+   "small.bin": {
+    "kernel_exclusive_ir": 24951895,
+    "whole_program_ir": 36227912,
+    "inside_share_pct": 68.87478085957589,
+    "n_iters": 25000,
+    "ir_per_call": 998.0758
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 85283038,
+    "whole_program_ir": 124765171,
+    "inside_share_pct": 68.35484399728831,
+    "n_iters": 12000,
+    "ir_per_call": 7106.919833333333
+   }
+  },
+  "verus": {
+   "small.bin": {
+    "kernel_exclusive_ir": 24951895,
+    "whole_program_ir": 36229334,
+    "inside_share_pct": 68.87207752701167,
+    "n_iters": 25000,
+    "ir_per_call": 998.0758
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 85283038,
+    "whole_program_ir": 124793694,
+    "inside_share_pct": 68.33922073017568,
+    "n_iters": 12000,
+    "ir_per_call": 7106.919833333333
+   }
+  }
+ },
+ "problems": [],
+ "summary": {
+  "n": 7,
+  "as_expected": 7
+ },
+ "derived_from_sha256": {
+  "patterns/ph29-recvfrom-alloc/c/kernel.c": "e573fa2222df64095e646ca2bd7c0452dddb73db3f11888481c1b05e59c2dab7",
+  "patterns/ph29-recvfrom-alloc/c/kernel.h": "85f54a50aefbdd12f7dd578fe39e732bcc288dcb4c99b81dbcfdc5cecf4557a3",
+  "patterns/ph29-recvfrom-alloc/c/kernel_hardened.c": "8be2e7fb4a408cd33a257b6351b5d5895e910377b7a371c4b594e44de8f673b5",
+  "patterns/ph29-recvfrom-alloc/c/main.c": "81c8b1ba89eba2383a4dc2a4411db773b3af0486842d841775f3cfaf8975457a",
+  "patterns/ph29-recvfrom-alloc/safe_naive.rs": "f7cda41d92e94e8dd53e424110f8618e94e9b18d64e1d2fa8ab939d4a1a135f4",
+  "patterns/ph29-recvfrom-alloc/safe_tuned.rs": "ac8e84a7653be6b96f0f3776af24be8c8e78c3b6d38eee7c8a4b2709b33e9907",
+  "patterns/ph29-recvfrom-alloc/unsafe.rs": "bb1c9e48af4bd95f7f03cd89ff8c2410ec322060ff586d6f6ace1d5aefece1c3",
+  "patterns/ph29-recvfrom-alloc/verus.rs": "5ebc37500853348cbc3775e997f69c179abefb41429470c0a9c6a931ecd2893b",
+  "patterns/ph29-recvfrom-alloc/inputs/small.bin": "bd9a39d44f6c7bb691c27f50c8dbce350dcaa7a5ca366dd6970f0e2530f7c181",
+  "patterns/ph29-recvfrom-alloc/inputs/large.bin": "943897b8cad062d1d2d4095ee9c40292e49424c2d1d487d0fba594d843af00f6"
+ },
+ "pin": {
+  "regenerate": "python3 controls/inside_share.py",
+  "note": "16 callgrind runs over the already-built O3/isolated cells; minutes"
+ }
+}

@@ -158,8 +158,8 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
     "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
-    "patterns/ph29-recvfrom-alloc/NOTES.md": "6d42013da14b41ad1d672772a13437fd0e529dd28e760d908218d51bc5960e7c",
-    "patterns/ph29-recvfrom-alloc/README.md": "c3bec74ff2ea1adc6ceb2dfae745e481c005e3f21120912bec77cbc978a7ad1f",
+    "patterns/ph29-recvfrom-alloc/NOTES.md": "c83c8290cf98f13924c8edd20c3a7e3638c324fe3336dc0fdcb5a493356a8203",
+    "patterns/ph29-recvfrom-alloc/README.md": "5977b487f593a755e5720928d2d4d8a31a44e610353103ffe418eb5eba289b33",
     "patterns/ph29-recvfrom-alloc/c/emalloc_shim.h": "aa9abf48535e8df93c9398e96c044697a784d73c40d7a7ccc830b5ee308c378f",
     "patterns/ph29-recvfrom-alloc/c/kernel.c": "e573fa2222df64095e646ca2bd7c0452dddb73db3f11888481c1b05e59c2dab7",
     "patterns/ph29-recvfrom-alloc/c/kernel.h": "85f54a50aefbdd12f7dd578fe39e732bcc288dcb4c99b81dbcfdc5cecf4557a3",
@@ -167,14 +167,16 @@
     "patterns/ph29-recvfrom-alloc/c/main.c": "81c8b1ba89eba2383a4dc2a4411db773b3af0486842d841775f3cfaf8975457a",
     "patterns/ph29-recvfrom-alloc/controls/445daac3ab1a.patch": "48ac72d125ac39d200271013d1743fd3a87113db444c0697113483cbf8c1c1c2",
     "patterns/ph29-recvfrom-alloc/controls/6ac8ffdfea10.patch": "00776f9576ef3b5a602bb0da38196c304ddbb43e228358b19d8b273b0c2c82af",
+    "patterns/ph29-recvfrom-alloc/controls/_pin.py": "27a61285c765a7861f90714f67072872f4abaf976742faca8d123ec3adf0b56d",
     "patterns/ph29-recvfrom-alloc/controls/allocator.c": "0e1830055e141fc9103b5cef06fc7f5eb6fc834d989ee1e9fc0f336b2c946e08",
     "patterns/ph29-recvfrom-alloc/controls/allocator.py": "f4cceae46efdb4a6e7a9bdf2ead7f17f4f8aafba83370ebedda121eeabd1be2a",
     "patterns/ph29-recvfrom-alloc/controls/fix_scope.py": "21b611ffb89a5320b41839fb79d1cd28ed9dc3b223651ac0030b37605d381313",
     "patterns/ph29-recvfrom-alloc/controls/fortify.py": "fec3144030a9d7048dfd9f94fc9719db8ed26a4581ec0e3f734f37704e70b7c0",
+    "patterns/ph29-recvfrom-alloc/controls/inside_share.py": "10666ce0cb6e542159e3ff323843e86c88ada6b7253826ebf45792aa80cc484c",
     "patterns/ph29-recvfrom-alloc/controls/negatives.py": "b526c620b4fecfd0f2e912bac11b03668c66e20a4ab4a47f6859af58c3786591",
     "patterns/ph29-recvfrom-alloc/controls/oracle.c": "56ba375246d788b5d3d4ed1a7c004dc900b23e865ab0f95124a1c96da15a54d6",
     "patterns/ph29-recvfrom-alloc/controls/oracle.py": "fd9f64e9a00c47a72a367415bd1826a82b6a2686bbbd39f78795d7f690938982",
-    "patterns/ph29-recvfrom-alloc/controls/spellings.py": "2e537fa854358a4dbe61fb0f4aa628b4f62327524f7bf2a6aad72f38435af1ee",
+    "patterns/ph29-recvfrom-alloc/controls/spellings.py": "10e206913ba6d8c55286e8f9449442abfad9d59791b8d362e3e5fc3a8da59a2a",
     "patterns/ph29-recvfrom-alloc/inputs/gen.py": "b4579a235250e9d2f789e019626dec9d294d46122cf4315238f059310deec917",
     "patterns/ph29-recvfrom-alloc/model.py": "47a04eff7d3176dcaaf7c77e391eccdd22a8228b54ed53547823d14767d0a66e",
     "patterns/ph29-recvfrom-alloc/safe_naive.rs": "f7cda41d92e94e8dd53e424110f8618e94e9b18d64e1d2fa8ab939d4a1a135f4",
@@ -255,9 +257,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3305,
+    "bytes": 3306,
     "nvars": 49,
-    "envp_stack_bytes": 3697,
+    "envp_stack_bytes": 3698,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -1357,7 +1359,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==461891==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058 at pc 0x559408476f13 bp 0x7ffc9d588b50 sp 0x7ffc9d5882f8 WRITE of size 4 at 0x503000000058 thread T0 #0 0x559408476f12 in __interceptor_memcpy (/home/ap",
+      "diagnostic": "================================================================= ==50685==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058 at pc 0x557d3cb58f13 bp 0x7ffdd4168c30 sp 0x7ffdd41683d8 WRITE of size 4 at 0x503000000058 thread T0 #0 0x557d3cb58f12 in __interceptor_memcpy (/home/apt",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1390,7 +1392,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==461896==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058 at pc 0x555e4d648f13 bp 0x7ffc00438030 sp 0x7ffc004377d8 WRITE of size 4 at 0x503000000058 thread T0 #0 0x555e4d648f12 in __interceptor_memcpy (/home/ap",
+      "diagnostic": "================================================================= ==50691==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x503000000058 at pc 0x564ed58f7f13 bp 0x7ffebb4bc880 sp 0x7ffebb4bc028 WRITE of size 4 at 0x503000000058 thread T0 #0 0x564ed58f7f12 in __interceptor_memcpy (/home/apt",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1562,7 +1564,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 0.1,
+        "seconds": 0.2,
         "stdout": "1046656",
         "model_stdout": "1046656",
         "stderr": ""
@@ -1609,6 +1611,7 @@
     "verdict": "FRESH"
   },
   "controls_json": {
+    "inside_share.json": "FRESH",
     "spellings.json": "FRESH"
   },
   "failures": [],

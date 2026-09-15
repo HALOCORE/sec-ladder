@@ -3,14 +3,14 @@
     "regenerate": "python3 patterns-php/ph29-recvfrom-alloc/controls/spellings.py --verus",
     "note": "The pin covers the two rung sources the variants are derived from, verus.rs (the R4 admissibility half -- BOTH halves of it: the twin must verify AND compile to the same kernel), spec.md (the declaration the audit runs against), inputs/gen.py (the corpus every number is measured over) and this script. It does NOT cover results-php/ph29-recvfrom-alloc.json: stage 3 compares against that record at run time and prints the delta, which is a stronger check than a hash of it."
   },
-  "measured_utc": "2026-09-11T05:54:46Z",
+  "measured_utc": "2026-09-15T09:10:45Z",
   "derived_from_sha256": {
     "patterns/ph29-recvfrom-alloc/safe_tuned.rs": "ac8e84a7653be6b96f0f3776af24be8c8e78c3b6d38eee7c8a4b2709b33e9907",
     "patterns/ph29-recvfrom-alloc/unsafe.rs": "bb1c9e48af4bd95f7f03cd89ff8c2410ec322060ff586d6f6ace1d5aefece1c3",
     "patterns/ph29-recvfrom-alloc/verus.rs": "5ebc37500853348cbc3775e997f69c179abefb41429470c0a9c6a931ecd2893b",
     "patterns/ph29-recvfrom-alloc/spec.md": "9452bbd9628444bf81fc61b9033f9208b4792630673d4a7d429961d70b3bf190",
     "patterns/ph29-recvfrom-alloc/inputs/gen.py": "b4579a235250e9d2f789e019626dec9d294d46122cf4315238f059310deec917",
-    "patterns/ph29-recvfrom-alloc/controls/spellings.py": "2e537fa854358a4dbe61fb0f4aa628b4f62327524f7bf2a6aad72f38435af1ee"
+    "patterns/ph29-recvfrom-alloc/controls/spellings.py": "10e206913ba6d8c55286e8f9449442abfad9d59791b8d362e3e5fc3a8da59a2a"
   },
   "probes": [
     {

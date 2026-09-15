@@ -86,6 +86,8 @@ python3 patterns-php/ph29-recvfrom-alloc/controls/fix_scope.py
 python3 patterns-php/ph29-recvfrom-alloc/controls/fortify.py
 python3 patterns-php/ph29-recvfrom-alloc/controls/oracle.py
 python3 patterns-php/ph29-recvfrom-alloc/controls/negatives.py
+python3 patterns-php/ph29-recvfrom-alloc/controls/spellings.py --verus
+python3 patterns-php/ph29-recvfrom-alloc/controls/inside_share.py   # NOTES.md §15
 ```
 
 ⚠ **A green gate here does not mean the upstream fix is complete** — it cannot,

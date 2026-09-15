@@ -956,6 +956,147 @@
       ],
       "verdict": "tool exited",
       "tool_returncode": 0
+    },
+    {
+      "row": "ph16-fdset-index",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph56-fetchmode-arith: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph97-optarg-unwritten: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph16-fdset-index: uses_allocator=False -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph16-fdset-index: ext/standard/streamsfuncs.c, ext/standard/streamsfuncs.c are in the manifest (b08f942de907, b08f942de907)",
+        "  ph16-fdset-index: OK  ext/standard/streamsfuncs.c:518-548  930 bytes  sha256 e3fbdff6d5e63f8e  tier=narrowed",
+        "  ph16-fdset-index: OK+1 ext/standard/streamsfuncs.c:653-718  2007 bytes  sha256 bad87d1ad43233f1  -- \u26a0\u26a0 THE CALLER FRAME, AND ON THIS ROW IT IS NOT CONTEXT -- IT IS THE OB",
+        "  ph16-fdset-index: per-span overlap: span0 31% (5/16), span1 15% (6/39)  -- the UNION is what is reported below, and it is what 2 cited spans oblige the row to",
+        "  ph16-fdset-index: kernel overlap 20% (11/55 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=narrowed is expected to clear 25% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph16-fdset-index: \u26a0\u26a0 THE OVERLAP IS BELOW WHAT tier=narrowed LEADS A READER TO EXPECT (20% < 25%). This is REPORTED and does not refuse the row. Either the citation is wrong, or the tier is (`modelled` is the honest answer for a re-expressed mechanism), or the heuristic is wrong about this row -- say which in NOTES.md, because a reviewer will ask.",
+        "  ph16-fdset-index: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph16-fdset-index: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH16_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph56-fetchmode-arith": {
+          "row_specific_words": 1586,
+          "prefix_words": 1586,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph97-optarg-unwritten": {
+          "row_specific_words": 1315,
+          "prefix_words": 1315,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph16-fdset-index"
+      ],
+      "tool_argv": [
+        "ph16-fdset-index"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
     }
   ]
 }

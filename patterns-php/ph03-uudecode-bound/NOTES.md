@@ -1285,3 +1285,77 @@ being written down — `mbfl_strcut` walks `p += mbtab[*p]`, so its arms are the
 lead-byte classes and an all-ASCII benign corpus takes exactly one of them,
 which is this defect with a different name. The rule carries; the word
 *parameter* did not.
+
+## 14. ⭐⭐ `inside_share` PER CELL — MEASURED, NOT ASSUMED
+
+`TASK_PHP_058`. This row published an `A1` headline with **no
+`inside_share` measured anywhere in it** (`RECAP_PHP.md` **F127**: five built
+rows had none, three of them publishing `A1`). `controls/inside_share.py` —
+byte-identical to the copies in `ph16`, `ph29` and `ph97`, pinned, seven
+must-fire arms — measures every cell. `n_iters` is **read from each input's own
+header** (`common-php/slb.py`): 25000 on `small.bin`, 20000 on `large.bin`.
+
+    inside_share = 100 x A1 / W,  W = callgrind's own `summary:` total, same run
+
+⚠⚠ **A SECOND QUANTITY WEARS THIS NAME.** `F74`'s is
+`(kernel_exclusive_ir / n_iters) / marginal_ir_per_call` — a slope, not a run —
+and it is the one every figure in `RECAP_PHP.md` and `.memory-php/02-ladder.md`
+quotes. The two differ; `.tasks-php/php58_record_share.py` computes the F74 one
+for this row from the committed records. **Say which you mean.**
+
+| cell | `small.bin` A1/call | share | `large.bin` A1/call | share |
+|---|---:|---:|---:|---:|
+| `c-gcc` | 7369.72 | **97.93 %** | 52913.94 | **99.18 %** |
+| `c-clang` | 6244.69 | **97.63 %** | 45050.94 | **99.05 %** |
+| `c-gcc-h` | 7338.72 | **97.92 %** | 52711.94 | **99.18 %** |
+| `c-clang-h` | 6272.69 | **97.64 %** | 45249.94 | **99.06 %** |
+| `safe_naive` | 9363.69 | **95.12 %** | 68632.94 | **95.03 %** |
+| `safe_tuned` | 7648.34 | **94.09 %** | 55973.94 | **93.97 %** |
+| `unsafe` | 6817.38 | **93.41 %** | 49897.94 | **93.29 %** |
+| `verus` | 6817.38 | **90.13 %** | 49897.94 | **93.34 %** |
+
+⚠ **EIGHT INDEPENDENT PER-CELL RATIOS, NOT A COMPARISON.** Both C columns are
+present so that no reader takes it for one.
+⚠ `whole` cells are absent because the ratio is **undefined** there, not 100 %:
+at `O3`/`whole` the kernel is inlined into `main`, and this row's own
+measurement record carries `kernel_exclusive_ir: null` for all eight of those
+cells on both inputs — 16 entries, measured, not assumed.
+
+⭐ **THE ONE CELL THAT MOVES, AND IT IS A KNOWN RESULT ARRIVING BY A NEW ROUTE.**
+`verus`/`small.bin` reads **90.13 %** against `unsafe`'s **93.41 %** while their
+`A1/call` is **identical to the digit** (6817.38) and `spec.md` pins the two
+kernels byte-identical. The difference is entirely in the denominator: the
+`verus` binary's whole-run total is **182 455 030 → 189 103 077 Ir, +3.64 %**.
+That is `F74`'s family-B null, whose corpus maximum is *"`+3.652 %`
+(`ph03`/`small`)"* — **this cell** — reproduced here from the run total instead
+of from the marginal. ▶ **A1's null on that pair is `0.000 %` and the
+whole-program column's is 3.6 pp: the share matrix shows WHY, on the row that
+owns the corpus maximum.**
+
+⛔ **A HIGH SHARE IS NOT A CERTIFICATE** (`RECAP_PHP.md` F109): `ph55`'s C cells
+sit at 74–83 % and A1 still read `0.000 %` on that row's own defect site,
+because the defect lived in an uninlinable callee. What decides a statistic is
+whether **the DIFFERENCE** lands inside the symbol, not the level. ▶ Applied to
+this row under `F74`'s two-condition rule (`.memory-php/02-ladder.md`;
+(ii) `|Δinside_share| ≤ 0.02`), at `O3/isolated`, both inputs:
+
+| pair | `small.bin` Δshare | `large.bin` Δshare | rule (ii) |
+|---|---:|---:|---|
+| §8b's headline, `c-gcc` vs `c-gcc-h` | 0.0001 | 0.0000 | **PASS** |
+| `c-clang` vs `c-clang-h` | 0.0001 | 0.0000 | **PASS** |
+| `safe_tuned` vs `unsafe` (the `fixed-R4 bound`) | 0.0066 | 0.0067 | **PASS** |
+| `safe_naive` vs `safe_tuned` | 0.0100 | 0.0104 | **PASS** |
+| `unsafe` vs `verus` (the null) | **0.0330** | 0.0005 | **FAIL** (small) |
+| `c-gcc` vs `safe_naive` | 0.0277 | 0.0417 | **FAIL** |
+| `c-clang` vs `safe_naive` | 0.0248 | 0.0406 | **FAIL** |
+
+✅ **This row's own R1-vs-R1h headline and its `fixed-R4 bound` both PASS**, and
+they are same-language pairs, which is where `PROTOCOL_PHP.md` §B1a and F89 both
+say the confounds cancel. ⛔ **Its CROSS-LANGUAGE pairs FAIL (ii) on both C
+columns and both inputs** — so an `A1` C-vs-Rust figure from this row needs the
+same qualification `ph29` §15 gives its own.
+⚠⚠ **AND THE NULL PAIR FAILING ON `small.bin` IS A FACT ABOUT THE RULE, NOT
+ABOUT THE ROW:** `unsafe` vs `verus` is the one comparison whose true A1
+difference is **known to be exactly 0**, and (ii) refuses it — because the
++3.64 % sits in the denominator. **Reported, not repaired: whether F74's rule
+should exempt an `identity`-pinned pair is the manager's to rule on.**

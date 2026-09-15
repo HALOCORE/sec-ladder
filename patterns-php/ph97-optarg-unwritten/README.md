@@ -121,4 +121,6 @@ and the file stops verifying, on that precondition, at that site.
 | `controls/rust_bug.py` | the two Rust variants that DO delete the 2005 guard, built and run — ⛔ **and neither reproduces C's fault**; see its docstring |
 | `controls/negatives.py` | must-fire mutants of `verus.rs`, including the 2005 line's deletion |
 | `controls/spellings.py` | every backticked span in `spec.md`'s `idiom`, matched against every rung it scopes to |
+| `controls/inside_share.py` | `NOTES.md` 8.6 — the per-cell share matrix, both C columns, seven must-fire arms; byte-identical to the copies in `ph03`, `ph16` and `ph29` |
+| `controls/optional_cost.py` | `NOTES.md` 8.5 — `unwrap_unchecked` against `unwrap`, one function body apart: `+0.0000 Ir/call` |
 | `controls/rlimit_bisect.sh` | the proof budget, re-derived in both configurations |

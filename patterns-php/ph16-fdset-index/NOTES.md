@@ -891,6 +891,81 @@ project looks at.
 
 ---
 
+## §13 ⭐⭐ `inside_share` PER CELL — MEASURED, AND THIS ROW IS THE CORPUS'S HIGH END
+
+`TASK_PHP_058`. This row published an `A1` headline with **no `inside_share`
+measured anywhere in it** (`RECAP_PHP.md` **F127**). `controls/inside_share.py`
+— byte-identical to the copies in `ph03`, `ph29` and `ph97`, pinned, seven
+must-fire arms — measures every cell. `n_iters` is **read from each input's own
+header** (`common-php/slb.py`): 25000 on `small.bin`, 12000 on `large.bin`.
+
+    inside_share = 100 x A1 / W,  W = callgrind's own `summary:` total, same run
+
+⚠⚠ **A SECOND QUANTITY WEARS THIS NAME.** `F74`'s is
+`(kernel_exclusive_ir / n_iters) / marginal_ir_per_call` — a slope, not a run —
+and it is the one every figure in `RECAP_PHP.md` and `.memory-php/02-ladder.md`
+quotes. `.tasks-php/php58_record_share.py` computes it for this row from the
+committed records. **Say which you mean.**
+
+| cell | `small.bin` A1/call | share | `large.bin` A1/call | share |
+|---|---:|---:|---:|---:|
+| `c-gcc` | 3683.26 | **99.41 %** | 26475.67 | **99.60 %** |
+| `c-clang` | 3614.63 | **99.40 %** | 26670.53 | **99.61 %** |
+| `c-gcc-h` | 4079.73 | **99.47 %** | 29380.01 | **99.64 %** |
+| `c-clang-h` | 3837.48 | **99.44 %** | 28427.57 | **99.63 %** |
+| `safe_naive` | 4730.79 | **99.39 %** | 34691.54 | **99.66 %** |
+| `safe_tuned` | 3554.99 | **99.20 %** | 25459.03 | **99.53 %** |
+| `unsafe` | 3598.98 | **99.21 %** | 25937.22 | **99.54 %** |
+| `verus` | 3598.98 | **99.21 %** | 25937.22 | **99.54 %** |
+
+⭐ **EVERY CELL IS 99.20–99.66 %, A SPREAD OF 0.46 pp — the tightest in the
+corpus** on this definition, against `ph29`'s 66.9–95.0 %. This kernel does
+essentially all of its own work inside its own symbol, on both languages and
+both compilers. ⚠ `ph45`'s much-quoted 0.055–0.094 is the OTHER definition and
+is not comparable with the column above.
+⚠ **EIGHT INDEPENDENT PER-CELL RATIOS, NOT A COMPARISON.** Both C columns are
+present so that no reader takes it for one.
+⚠ `whole` cells are absent because the ratio is **undefined** there, not 100 %:
+at `O3`/`whole` the kernel is inlined into `main`, and this row's own
+measurement record carries `kernel_exclusive_ir: null` for all eight of those
+cells on both inputs — 16 entries, measured, not assumed.
+
+⛔ **A HIGH SHARE IS NOT A CERTIFICATE** (`RECAP_PHP.md` F109): `ph55`'s C cells
+sit at 74–83 % and A1 still read `0.000 %` on that row's own defect site.
+What decides a statistic is whether **the DIFFERENCE** lands inside the symbol.
+▶ Under `F74`'s two-condition rule (`.memory-php/02-ladder.md`;
+(ii) `|Δinside_share| ≤ 0.02`), at `O3/isolated`, both inputs, **every pair this
+row publishes PASSES, and so does every pair it does not**:
+
+| pair | `small.bin` Δshare | `large.bin` Δshare | rule (ii) |
+|---|---:|---:|---|
+| §8a's headline, `c-gcc` vs `c-gcc-h` | 0.0037 | 0.0017 | **PASS** |
+| `c-clang` vs `c-clang-h` | 0.0024 | 0.0014 | **PASS** |
+| `safe_tuned` vs `unsafe` (the `fixed-R4 bound`) | 0.0003 | 0.0006 | **PASS** |
+| `safe_naive` vs `safe_tuned` | 0.0029 | 0.0002 | **PASS** |
+| `unsafe` vs `verus` (the null) | 0.0000 | 0.0000 | **PASS** |
+| §8b's `c-gcc` vs `safe_tuned` | 0.0009 | 0.0020 | **PASS** |
+| `c-clang` vs `safe_tuned` | 0.0018 | 0.0016 | **PASS** |
+| `c-gcc` vs `safe_naive` | 0.0038 | 0.0019 | **PASS** |
+| `c-clang` vs `safe_naive` | 0.0047 | 0.0014 | **PASS** |
+
+⭐⭐ **THE MAXIMUM IS `0.0047`, A QUARTER OF THE BAR, AND THE CROSS-LANGUAGE
+PAIRS ARE AMONG THE TIGHTEST.** ▶ **So §8b's *"R3 is faster than C"* is a
+cross-language `A1` claim that the rule ADMITS** — which `ph29`'s same claim is
+not (`Δ` 0.2355 there). ⚠ **That is a fact about these two rows and not about
+the axis**: `RECAP_PHP.md` F108's requirement to carry **both** C columns is
+unaffected, and both are above.
+
+⚠⚠ **ONE CAUTION THE MATRIX ABOVE CANNOT CARRY, BECAUSE IT IS ABOUT THE OTHER
+DEFINITION.** Ten of this row's `small.bin` F74-shares read **above 1.0**
+(largest `1.0279`), which no quantity called a *share* can do. The numerator
+counts a run of 25000 calls and the denominator is a slope taken at
+`collapse.probe_iters`, so they are not two parts of one run. ▶ **The Δ column
+above is unaffected — it is a difference of two such ratios, and both are
+inflated together — but do not quote a bare F74-share from this row's
+`small.bin` cells as a percentage of anything.** (`TASK_PHP_058`;
+`.tasks-php/php58_record_share.py` prints the tally.)
+
 ## Trusted-item arguments
 
 The gate requires one section per trusted item and prints it; only a human can

@@ -1,0 +1,161 @@
+{
+ "row": "ph16-fdset-index",
+ "cell_spec": "O3 / isolated",
+ "definition": "100 * callgrind exclusive Ir of the `kernel` symbol / callgrind `summary:` total Ir for the same run",
+ "not_this_definition": "(kernel_exclusive_ir / n_iters) / marginal_ir_per_call -- F74's share, which every published `inside_share` figure in this programme uses and which is a DIFFERENT number",
+ "n_iters": {
+  "small.bin": 25000,
+  "large.bin": 12000
+ },
+ "matrix": {
+  "c-gcc": {
+   "small.bin": {
+    "kernel_exclusive_ir": 92081388,
+    "whole_program_ir": 92626029,
+    "inside_share_pct": 99.4120000545419,
+    "n_iters": 25000,
+    "ir_per_call": 3683.25552
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 317708014,
+    "whole_program_ir": 318972616,
+    "inside_share_pct": 99.6035390072482,
+    "n_iters": 12000,
+    "ir_per_call": 26475.667833333333
+   }
+  },
+  "c-clang": {
+   "small.bin": {
+    "kernel_exclusive_ir": 90365805,
+    "whole_program_ir": 90907926,
+    "inside_share_pct": 99.40365925848974,
+    "n_iters": 25000,
+    "ir_per_call": 3614.6322
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 320046417,
+    "whole_program_ir": 321308499,
+    "inside_share_pct": 99.60720553489,
+    "n_iters": 12000,
+    "ir_per_call": 26670.53475
+   }
+  },
+  "c-gcc-h": {
+   "small.bin": {
+    "kernel_exclusive_ir": 101993201,
+    "whole_program_ir": 102537790,
+    "inside_share_pct": 99.46888946992128,
+    "n_iters": 25000,
+    "ir_per_call": 4079.72804
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 352560086,
+    "whole_program_ir": 353824636,
+    "inside_share_pct": 99.6426054402837,
+    "n_iters": 12000,
+    "ir_per_call": 29380.007166666666
+   }
+  },
+  "c-clang-h": {
+   "small.bin": {
+    "kernel_exclusive_ir": 95936934,
+    "whole_program_ir": 96479041,
+    "inside_share_pct": 99.43810905002672,
+    "n_iters": 25000,
+    "ir_per_call": 3837.47736
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 341130813,
+    "whole_program_ir": 342392881,
+    "inside_share_pct": 99.6313977100476,
+    "n_iters": 12000,
+    "ir_per_call": 28427.56775
+   }
+  },
+  "safe_naive": {
+   "small.bin": {
+    "kernel_exclusive_ir": 118269785,
+    "whole_program_ir": 118990751,
+    "inside_share_pct": 99.39409912624217,
+    "n_iters": 25000,
+    "ir_per_call": 4730.7914
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 416298533,
+    "whole_program_ir": 417739200,
+    "inside_share_pct": 99.65512764902121,
+    "n_iters": 12000,
+    "ir_per_call": 34691.544416666664
+   }
+  },
+  "safe_tuned": {
+   "small.bin": {
+    "kernel_exclusive_ir": 88874724,
+    "whole_program_ir": 89595716,
+    "inside_share_pct": 99.19528295303762,
+    "n_iters": 25000,
+    "ir_per_call": 3554.98896
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 305508386,
+    "whole_program_ir": 306949079,
+    "inside_share_pct": 99.53064104160417,
+    "n_iters": 12000,
+    "ir_per_call": 25459.032166666668
+   }
+  },
+  "unsafe": {
+   "small.bin": {
+    "kernel_exclusive_ir": 89974452,
+    "whole_program_ir": 90695435,
+    "inside_share_pct": 99.20505039752001,
+    "n_iters": 25000,
+    "ir_per_call": 3598.97808
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 311246696,
+    "whole_program_ir": 312687380,
+    "inside_share_pct": 99.53925738864166,
+    "n_iters": 12000,
+    "ir_per_call": 25937.224666666665
+   }
+  },
+  "verus": {
+   "small.bin": {
+    "kernel_exclusive_ir": 89974452,
+    "whole_program_ir": 90695458,
+    "inside_share_pct": 99.20502523952192,
+    "n_iters": 25000,
+    "ir_per_call": 3598.97808
+   },
+   "large.bin": {
+    "kernel_exclusive_ir": 311246696,
+    "whole_program_ir": 312687366,
+    "inside_share_pct": 99.53926184532828,
+    "n_iters": 12000,
+    "ir_per_call": 25937.224666666665
+   }
+  }
+ },
+ "problems": [],
+ "summary": {
+  "n": 7,
+  "as_expected": 7
+ },
+ "derived_from_sha256": {
+  "patterns/ph16-fdset-index/c/kernel.c": "ff22c491a032f45a6a6424184076685f9e28ef9355c82dac8bfbaea9de9b7fd7",
+  "patterns/ph16-fdset-index/c/kernel.h": "a6298aab5c0887bcb4c4e3a6604a77c6f02319963af78211f362e7f9e5ee558f",
+  "patterns/ph16-fdset-index/c/kernel_hardened.c": "19fe2eee20e6164a449129ac2f43eeacbe25c9651082c71c124395a11ef3276d",
+  "patterns/ph16-fdset-index/c/main.c": "fc133ba398d04701dfa47c556b5c23068c1b2c5b71c425fca033ef52479bad14",
+  "patterns/ph16-fdset-index/safe_naive.rs": "f35b51a241c5bb10de3df83773e1585b12b7bb05a6f9622acc67fb127e6b4ba3",
+  "patterns/ph16-fdset-index/safe_tuned.rs": "6a8e8f8331c6616c9fc460f47ca335e9090270a620b7e02c6914bbf4dd237eac",
+  "patterns/ph16-fdset-index/unsafe.rs": "d76cd5c85a6982649d52fe162b93f5ca0d47b67dd87991ef85694543109f2763",
+  "patterns/ph16-fdset-index/verus.rs": "523aca5a64c4b9ac7cd8b88a4e769cb077078fe02b4edcfd1c674b3c9da834b9",
+  "patterns/ph16-fdset-index/inputs/small.bin": "5d3b1fba065ded677ca911aaf697b438d11daabc11937e0d556b6713105ff796",
+  "patterns/ph16-fdset-index/inputs/large.bin": "1ca759daf9848004a624c7f7033e4d5b7651d8b5e3d3445062a8e1104c47d609"
+ },
+ "pin": {
+  "regenerate": "python3 controls/inside_share.py",
+  "note": "16 callgrind runs over the already-built O3/isolated cells; minutes"
+ }
+}

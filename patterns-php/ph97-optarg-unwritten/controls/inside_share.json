@@ -1,18 +1,26 @@
 {
+ "row": "ph97-optarg-unwritten",
  "cell_spec": "O3 / isolated",
  "definition": "100 * callgrind exclusive Ir of the `kernel` symbol / callgrind `summary:` total Ir for the same run",
+ "not_this_definition": "(kernel_exclusive_ir / n_iters) / marginal_ir_per_call -- F74's share, which every published `inside_share` figure in this programme uses and which is a DIFFERENT number",
+ "n_iters": {
+  "small.bin": 20000,
+  "large.bin": 3000
+ },
  "matrix": {
   "c-gcc": {
    "small.bin": {
     "kernel_exclusive_ir": 38881170,
     "whole_program_ir": 39338098,
     "inside_share_pct": 98.83845934798373,
+    "n_iters": 20000,
     "ir_per_call": 1944.0585
    },
    "large.bin": {
     "kernel_exclusive_ir": 48425302,
     "whole_program_ir": 48706381,
     "inside_share_pct": 99.42291134297167,
+    "n_iters": 3000,
     "ir_per_call": 16141.767333333333
    }
   },
@@ -21,12 +29,14 @@
     "kernel_exclusive_ir": 15400757,
     "whole_program_ir": 16834442,
     "inside_share_pct": 91.4836203065121,
+    "n_iters": 20000,
     "ir_per_call": 770.03785
    },
    "large.bin": {
     "kernel_exclusive_ir": 18682938,
     "whole_program_ir": 20176369,
     "inside_share_pct": 92.59811812521866,
+    "n_iters": 3000,
     "ir_per_call": 6227.646
    }
   },
@@ -35,12 +45,14 @@
     "kernel_exclusive_ir": 38835018,
     "whole_program_ir": 39291898,
     "inside_share_pct": 98.83721575374139,
+    "n_iters": 20000,
     "ir_per_call": 1941.7509
    },
    "large.bin": {
     "kernel_exclusive_ir": 48367634,
     "whole_program_ir": 48648665,
     "inside_share_pct": 99.42232536082953,
+    "n_iters": 3000,
     "ir_per_call": 16122.544666666667
    }
   },
@@ -49,12 +61,14 @@
     "kernel_exclusive_ir": 15390761,
     "whole_program_ir": 16824456,
     "inside_share_pct": 91.47850605095344,
+    "n_iters": 20000,
     "ir_per_call": 769.53805
    },
    "large.bin": {
     "kernel_exclusive_ir": 18668620,
     "whole_program_ir": 20162061,
     "inside_share_pct": 92.59281578406096,
+    "n_iters": 3000,
     "ir_per_call": 6222.873333333333
    }
   },
@@ -63,12 +77,14 @@
     "kernel_exclusive_ir": 11347522,
     "whole_program_ir": 12960387,
     "inside_share_pct": 87.55542562116393,
+    "n_iters": 20000,
     "ir_per_call": 567.3761
    },
    "large.bin": {
     "kernel_exclusive_ir": 13195596,
     "whole_program_ir": 14867911,
     "inside_share_pct": 88.75218583162086,
+    "n_iters": 3000,
     "ir_per_call": 4398.532
    }
   },
@@ -77,12 +93,14 @@
     "kernel_exclusive_ir": 13955912,
     "whole_program_ir": 15568777,
     "inside_share_pct": 89.64038729567518,
+    "n_iters": 20000,
     "ir_per_call": 697.7956
    },
    "large.bin": {
     "kernel_exclusive_ir": 16527835,
     "whole_program_ir": 18200150,
     "inside_share_pct": 90.81153177308978,
+    "n_iters": 3000,
     "ir_per_call": 5509.278333333334
    }
   },
@@ -91,12 +109,14 @@
     "kernel_exclusive_ir": 11107522,
     "whole_program_ir": 12720445,
     "inside_share_pct": 87.32023132838513,
+    "n_iters": 20000,
     "ir_per_call": 555.3761
    },
    "large.bin": {
     "kernel_exclusive_ir": 12931596,
     "whole_program_ir": 14603969,
     "inside_share_pct": 88.548503492441,
+    "n_iters": 3000,
     "ir_per_call": 4310.532
    }
   },
@@ -105,20 +125,28 @@
     "kernel_exclusive_ir": 11107522,
     "whole_program_ir": 12720443,
     "inside_share_pct": 87.3202450575031,
+    "n_iters": 20000,
     "ir_per_call": 555.3761
    },
    "large.bin": {
     "kernel_exclusive_ir": 12931596,
     "whole_program_ir": 14603967,
     "inside_share_pct": 88.54851561907802,
+    "n_iters": 3000,
     "ir_per_call": 4310.532
    }
   }
  },
  "problems": [],
+ "summary": {
+  "n": 7,
+  "as_expected": 7
+ },
  "derived_from_sha256": {
   "patterns/ph97-optarg-unwritten/c/kernel.c": "a9780ac2091b026736f3f557bb49e2d4d4ff8711c0089226c8b48b0fd1c4892b",
+  "patterns/ph97-optarg-unwritten/c/kernel.h": "9653a228a3d1817e8db93ed492d03d95e94519bb04bd25e181b379835aaa7a31",
   "patterns/ph97-optarg-unwritten/c/kernel_hardened.c": "5d671ca3166716b306377a09c6f8307446087583fc545c0e858d382dcfbb6082",
+  "patterns/ph97-optarg-unwritten/c/main.c": "c259c2ce88e5445c7317f7bafb62e0b10ff4648264cea90f5974b7f93a60f35f",
   "patterns/ph97-optarg-unwritten/safe_naive.rs": "5090c3a4fa8a4e5812788f2ecb2f455b8e8697d3a12a3dfd7444671f4147b135",
   "patterns/ph97-optarg-unwritten/safe_tuned.rs": "380df7386da9cdebb361155066a732609c326634a72ccc2e9fdf1904d5075901",
   "patterns/ph97-optarg-unwritten/unsafe.rs": "9be56986e321f3b87bbcc0b29f0d90aa5bc7ce94f6c0467bfad5dd30220339af",

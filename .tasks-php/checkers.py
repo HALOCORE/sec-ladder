@@ -301,6 +301,40 @@ REGISTRY = {
             "task_cost's ROWS/CLASS in-process and never writes; rc=0 means the "
             "demonstration held. ⓘ It is the first `.py` in probes/ and the "
             "reason _disk() now looks there at all."),
+
+    # --- TASK_PHP_058, adjudicated BY HAND by the manager -------------------
+    "php58_mutate_arms.py": dict(
+        kind="checker", argv=[], expect=0, negatives="inline", st_expect=None,
+        why="⭐⭐ §H DONE PROPERLY -- it ATTACKS the shipped control instead of "
+            "exercising it. It mutates `controls/inside_share.py`'s four "
+            "decisions in-process and asserts the control's own 7 must-fire "
+            "arms CATCH each one: 5 must-fire mutations all caught, 1 "
+            "must-NOT-fire clean. ⚠ `PROTOCOL_PHP.md` §H's own words -- *a gate "
+            "run EXERCISES a validator on the rows that pass; it does not "
+            "ATTACK it* -- and this is the attack. ▶ SWEPT: it builds nothing, "
+            "runs in a second and never writes to a row."),
+    "php58_record_share.py": dict(
+        kind="checker", argv=["--selftest"], expect=0, negatives="flag",
+        st_expect=0,
+        why="⭐⭐⭐ COMPUTES F74's SHARE -- the OTHER quantity called "
+            "`inside_share` -- for every built row from the COMMITTED records, "
+            "running nothing. `(kernel_exclusive_ir / n_iters) / "
+            "marginal_ir_per_call`, which is what every figure in RECAP_PHP.md "
+            "and .memory-php/03-numbers.md actually is, and NOT what the rows' "
+            "`controls/inside_share.py` computes. ⛔⛔ IT IS DELIBERATELY NOT A "
+            "ROW CONTROL: it derives from the gate record, which every gate run "
+            "rewrites, so it could never be pinned -- a sidecar that cannot be "
+            "pinned is a number with no staleness signal. ⚠ Swept under "
+            "`--selftest` and NOT bare: the bare run is a 360-cell REPORT, and "
+            "a bare sweep reading a report as a verdict is the defect this "
+            "registry's own header warns about. ⛔ THIS ENTRY CARRIED THE ARM "
+            "COUNT AND N12 REFUSED IT -- correctly in form, wrongly in "
+            "substance: the tool DOES run its arms and prints them, in the "
+            "`ok <n> <name>` dialect `controls/inside_share.py` uses, which "
+            "N12's `PASS|FAIL|OK` + `N<d>` pattern cannot read. ▶ The count is "
+            "REMOVED rather than the regex widened (the registry's own rule), "
+            "and the blind spot is open item 131 -- three tools now speak that "
+            "dialect and N12 could not tell if any went silent."),
 }
 
 

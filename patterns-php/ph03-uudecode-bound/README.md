@@ -30,7 +30,7 @@ allocation.
 | `c/kernel_hardened.c` | R1h — the real upstream fix `f95c1df58349` (2004), **and why it is incomplete** |
 | `safe_naive.rs` | R2 — and its header explains why R2–R5 are *not* ports of R1h |
 | `verus.rs` | R5 — 25 verified / 0 errors; the proof's refusal of the 2004 fix is the row's headline |
-| `controls/` | the runs that must FAIL, and the two upstream patches, kept so the citations survive with no network |
+| `controls/` | the runs that must FAIL, the two upstream patches kept so the citations survive with no network, and `inside_share.py` — `NOTES.md` 14, the per-cell matrix, with seven must-fire arms of its own |
 
 ## Three things a reader should not get wrong
 

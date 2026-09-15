@@ -47,6 +47,36 @@ computed and both are printed:
     have comparable callee share, which R3-vs-R4 on this row does
     (`inside_share` 0.655 vs 0.669); it is NOT right for this row's C-vs-Rust
     column (0.927 vs 0.655) and that comparison is not made here.
+
+    ⛔⛔ **THOSE FOUR NUMBERS SHIPPED NAKED AND `TASK_PHP_058` DRESSED THEM.**
+    They were right -- all four reproduce to the digit -- but they named
+    NEITHER the cell, NOR the compiler, NOR which of the two quantities called
+    `inside_share` they are. **F108 asks for five things and this carried
+    none of them.** In full:
+
+        cell        `large.bin` / `O3` / `isolated`  (NOT `small.bin`, which
+                    is the input the A1 headline above is quoted on -- so the
+                    share and the headline it qualifies are different cells)
+        definition  **F74's** share, `(kernel_exclusive_ir / n_iters) /
+                    marginal_ir_per_call` -- NOT the `W` share this row's own
+                    `controls/inside_share.py` computes. On `c-gcc`/`small.bin`
+                    the two read 0.8045 and 0.8933; they are not interchangeable
+        R3-vs-R4    `safe_tuned` 0.6551 vs `unsafe` 0.6690
+        C-vs-Rust   `c-gcc` 0.9266 vs `safe_tuned` 0.6551.  ⚠ **`c-clang` is
+                    0.9122** -- one compiler stood in for both, and F108's fifth
+                    thing is WHICH COMPILER, with both columns
+
+    ⭐ **THE DISCLAIMER IS RIGHT AND MUST NOT BE NARROWED.** `.memory-php/02-ladder.md`
+    states F74's corrected two-condition bar -- (i) `min(inside_share)` HIGH and
+    (ii) `|Δinside_share| <= 0.02` -- and this pair's Δ is **0.2715**, over
+    thirteen times the bar. It fails on `c-clang` too (**0.2571**).
+
+    ⛔⛔⛔ **AND `RECAP_PHP.md` PUBLISHES A COMPARISON THIS DISCLAIMER DOES NOT
+    EVEN COVER.** Its *which statistic* cell reads *"on `ph29/large` A says C is
+    +33 % dearer than naive safe Rust"* -- **`safe_naive`, one rung off the
+    `safe_tuned` named here**. That pair's Δ is **0.2355**, and it fails the bar
+    too. ⚠ **The `+33.01 %` itself reproduces exactly; what it lacks is the
+    other C column -- `c-clang` reads `-4.36 %`, the OPPOSITE SIGN.**
   * **the two-point slope, `Ir` per window byte**, kept because `ph07` and
     `ph16` publish it and a reader comparing the three rows needs the same
     column. ⚠ **THE TWO DISAGREE ON THIS ROW AND NEITHER IS WRONG**:

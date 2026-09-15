@@ -188,18 +188,20 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
     "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
-    "patterns/ph16-fdset-index/NOTES.md": "2ececa14f96de669f0ce41487cb74e6c648e46706b2174c9d9985d22fa563062",
-    "patterns/ph16-fdset-index/README.md": "45bcb6cc2d87a1e4fa8e4a01cbbde0d70e91a66458461881a952140c846daecf",
+    "patterns/ph16-fdset-index/NOTES.md": "d7559e7409f3b45644c636aae15a0dedb1d593a56294248939355144369745a8",
+    "patterns/ph16-fdset-index/README.md": "7073667af4289c9761ad295de64472d0c887783af302b9c412d543cfbff44248",
     "patterns/ph16-fdset-index/c/emalloc_shim.h": "aa9abf48535e8df93c9398e96c044697a784d73c40d7a7ccc830b5ee308c378f",
     "patterns/ph16-fdset-index/c/kernel.c": "ff22c491a032f45a6a6424184076685f9e28ef9355c82dac8bfbaea9de9b7fd7",
     "patterns/ph16-fdset-index/c/kernel.h": "a6298aab5c0887bcb4c4e3a6604a77c6f02319963af78211f362e7f9e5ee558f",
     "patterns/ph16-fdset-index/c/kernel_hardened.c": "19fe2eee20e6164a449129ac2f43eeacbe25c9651082c71c124395a11ef3276d",
     "patterns/ph16-fdset-index/c/main.c": "fc133ba398d04701dfa47c556b5c23068c1b2c5b71c425fca033ef52479bad14",
     "patterns/ph16-fdset-index/controls/99e290f882c9.patch": "b9d7ac6cbbe2017839d24ff7b35ecde8fb3803a2c22f27ef994fb512d070ffde",
+    "patterns/ph16-fdset-index/controls/_pin.py": "8819da390894ca2eefa71cf93bf7a3e2f2de5bf8679cbf3b8e00172216a3e831",
     "patterns/ph16-fdset-index/controls/fix_scope.py": "fd5384d5562cbf11773fb0c653b1046db422cf92ca95dce8cd962ababf5341fb",
     "patterns/ph16-fdset-index/controls/fortify.py": "a0b25510f299d11bbc4045b45c5ef481e2056f67aa6ed062e89b4761cc48b00c",
     "patterns/ph16-fdset-index/controls/guard_equiv.c": "f8155ba4dabad389c09141d85ffdf645987d4186295af2055c65ce72b58e2f87",
     "patterns/ph16-fdset-index/controls/guard_equiv.py": "9f500001822365a9d55a28594946562403ee38dbf086894f067bbc9f6e8e7842",
+    "patterns/ph16-fdset-index/controls/inside_share.py": "10666ce0cb6e542159e3ff323843e86c88ada6b7253826ebf45792aa80cc484c",
     "patterns/ph16-fdset-index/controls/miri_vs_asan.py": "7bfa89cb5720818f713a662f253a2649b743349e3e3bc4dea7201acc288430ce",
     "patterns/ph16-fdset-index/controls/negatives.py": "f80bbca9190d2a533b64a2e56b8a2d6228fb7ba1f6428fc1fb5e7beb45a3bb1c",
     "patterns/ph16-fdset-index/controls/oracle.py": "6fcbb454682be49b361ecfe9c3525855e64279e3159e05e61c1847efdd957508",
@@ -284,9 +286,9 @@
     }
   ],
   "marginal_ir_env": {
-    "bytes": 3305,
+    "bytes": 3306,
     "nvars": 49,
-    "envp_stack_bytes": 3697,
+    "envp_stack_bytes": 3698,
     "tuning_vars": {
       "LD_PRELOAD": "/usr/libexec/coreutils/libstdbuf.so"
     },
@@ -1395,7 +1397,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==3997527==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7fd70ff000c0 at pc 0x5647f13f6845 bp 0x7ffd0e001920 sp 0x7ffd0e001910 READ of size 8 at 0x7fd70ff000c0 thread T0 #0 0x5647f13f6844 in ph16_stream_array_to_fd_set /",
+      "diagnostic": "================================================================= ==45817==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f0fef1000c0 at pc 0x5556441a6845 bp 0x7ffd1b02b1d0 sp 0x7ffd1b02b1c0 READ of size 8 at 0x7f0fef1000c0 thread T0 #0 0x5556441a6844 in ph16_stream_array_to_fd_set /ho",
       "declared_hang": false,
       "hung": false,
       "stdout": "",
@@ -1600,7 +1602,7 @@
         "expected_exit": 0,
         "ub": false,
         "leak": false,
-        "seconds": 1.6,
+        "seconds": 1.7,
         "stdout": "11295096062038360481",
         "model_stdout": "11295096062038360481",
         "stderr": ""
@@ -1635,6 +1637,7 @@
     "verdict": "FRESH"
   },
   "controls_json": {
+    "inside_share.json": "FRESH",
     "spellings.json": "FRESH"
   },
   "failures": [],

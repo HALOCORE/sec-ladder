@@ -66,7 +66,7 @@ the bound lives in the platform's data structure instead of in the code.
 | `spec.md` | the contract the gate enforces, and the hashed declaration |
 | `NOTES.md` | **the measurements** — §2 fortify, §3 the oracle, §4 the fix, §8 the ladder and its mechanism, §10 Verus |
 | `model.py` | three independent implementations, and the arm table over the calls the driver actually makes |
-| `controls/` | `oracle.py` `fortify.py` `fix_scope.py` `guard_equiv.py` `negatives.py` `miri_vs_asan.py` `spellings.py` — each with its must-fire and must-NOT-fire cases |
+| `controls/` | `oracle.py` `fortify.py` `fix_scope.py` `guard_equiv.py` `negatives.py` `miri_vs_asan.py` `spellings.py` `inside_share.py` — each with its must-fire and must-NOT-fire cases |
 
 ⭐ **`R3ship − R4ship` IS NEGATIVE ON THIS ROW — `safe_tuned` measures cheaper
 than `unsafe` — AND BOTH ENDPOINTS HAVE NOW BEEN SEARCHED** (`controls/spellings.py`,

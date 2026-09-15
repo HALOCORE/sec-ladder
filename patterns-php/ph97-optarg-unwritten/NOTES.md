@@ -417,6 +417,25 @@ the same run — the denominator is named because a percentage owes one. Every
 figure below is `O3/isolated` and is measured by `controls/inside_share.py` over
 the cells `--tool build` produced, not inherited from anywhere:
 
+> ⚠⚠ **AND A SECOND QUANTITY WEARS THIS NAME** (`TASK_PHP_058`). `F74`'s
+> `inside_share` is `(kernel_exclusive_ir / n_iters) / marginal_ir_per_call` —
+> a **slope** taken at `collapse.probe_iters`, not a run — and it is the one
+> every figure in `RECAP_PHP.md` and in `.memory-php/02-ladder.md` quotes,
+> including the two-condition rule that consumes it. On this row's
+> `c-gcc`/`small.bin` cell the two read **98.84 %** and **99.28 %**;
+> corpus-wide the F74 one exceeds `1.0` on 15 cells, which no quantity called a
+> *share* can do. `.tasks-php/php58_record_share.py` computes it from the
+> committed records. **The table below is the W one. Say which you mean.**
+>
+> ⚠ **`n_iters` IS NOW READ FROM EACH INPUT'S OWN HEADER**
+> (`common-php/slb.py`) rather than from a `CALLS = {...}` literal in the
+> control — `TASK_PHP_058` §2.1, because the three rows this control was ported
+> to have three different pairs and a copied count has rotted nine times in this
+> programme. Both literals were correct, and they were still literals.
+> ✅ **The regenerated table is identical to the digit, which is the control for
+> the change**, and the control is now byte-identical in `ph03`, `ph16`, `ph29`
+> and this row (`sha256sum` them) with seven must-fire arms inside it.
+
 | cell | `small.bin` A1/call | share | `large.bin` A1/call | share |
 |---|---:|---:|---:|---:|
 | `c-gcc` | 1944.06 | **98.84 %** | 16141.77 | **99.42 %** |
