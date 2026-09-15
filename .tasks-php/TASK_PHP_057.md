@@ -1,12 +1,21 @@
-# TASK_PHP_057 — **THE REVIEW ROUND: NINE UNREVIEWED FINDINGS AND THE THREE CLAUSES `F96` STILL OWES.** ⛔ The backlog has GROWN for two rounds and is the largest since the mining wave
+# TASK_PHP_057 — **THE REVIEW ROUND: THIRTEEN UNREVIEWED FINDINGS AND THE THREE CLAUSES `F96` STILL OWES.** ⛔ The backlog has GROWN for THREE rounds and is the largest since the mining wave
+
+> ⛔⛔ **SCOPE GREW BETWEEN WRITING AND DISPATCH, AND THAT IS ITSELF THE
+> PROBLEM.** This file was written for `F114`–`F122`. While it waited for one
+> agent to finish a row, **`F123`–`F126` landed** — three of them manager
+> findings, one of them about the manager. ▶ **The queue is producing findings
+> faster than it verifies them, three rounds running.** ⭐ **You are not expected
+> to finish. §0 says how to stop.**
 
 **Role:** research **reviewer / analyst**. **One agent, alone.**
 **Report:** `.tasks-php/TASK_PHP_057_REPORT.md` — **write the FILE** (rule 10).
 
 ⚠⚠⚠ **YOUR JOB IS TO FALSIFY, NOT TO CONFIRM.** `.memory-php/04-process.md`
 **law 12**: *a manager finding from one probe or two rows should be assumed
-narrowable until a reviewer has had it.* **Five of the nine findings below are
-manager findings from one probe each.**
+narrowable until a reviewer has had it.* **Seven of the thirteen findings below
+are manager findings from one probe each** — count them in `RECAP_PHP.md`'s
+RULE-9 table rather than trusting this line, which was written when there were
+nine and said *"five of the nine"*.
 
 ⭐⭐⭐ **THE STANDING RECORD, QUOTED SO YOU KNOW WHAT NORMAL LOOKS LIKE.** **Six
 consecutive review rounds have refuted manager or engineer claims.** At `_053`
@@ -22,15 +31,34 @@ valuable output.
 
 ## §0 ⛔ THE SCOPE IS BIG. READ THIS PARAGRAPH BEFORE PLANNING YOUR TIME.
 
-**Nine findings plus three prediction clauses is more than any previous round
-took**, and the honest reason is that the manager built two rows' worth of
-process while the review queue stood still. ⛔ **DO NOT SPREAD YOURSELF EVENLY.**
+**Thirteen findings plus three prediction clauses is more than any previous
+round took — by a factor of two** — and the honest reason is that the manager
+built two rows' worth of process and a row while the review queue stood still.
+⛔ **DO NOT SPREAD YOURSELF EVENLY.**
 
-▶ **THE ORDER BELOW IS BY STAKES AND IT IS BINDING.** Work §1 → §2 → §3 → §4 in
-order. ⭐ **If you run out of depth, STOP AND SAY WHERE.** A report that verdicts
-§1 and §2 properly and says *"I did not reach §4"* is worth more than one that
-touches all nine shallowly — and the second kind is how a round produces
-confirmations instead of verdicts.
+> ⚠ **This paragraph said *"Nine findings"* when it was written and the number
+> was stale before dispatch.** Left corrected rather than deleted because it is
+> the same class as `F121`/`F126` — **a count in prose about a thing goes stale
+> exactly like a count inside it**, and this file's own §6.5 says so.
+
+▶ **THE ORDER BELOW IS BY STAKES AND IT IS BINDING.** Work §1 → §1.5 → §2 → §3
+→ §4 in order. ⭐ **If you run out of depth, STOP AND SAY WHERE.** A report that
+verdicts §1 and §1.5 properly and says *"I did not reach §4"* is worth more than
+one that touches all thirteen shallowly — and the second kind is how a round
+produces confirmations instead of verdicts.
+
+⭐⭐⭐ **STOPPING CLEANLY IS A FIRST-CLASS OUTCOME HERE, NOT A FAILURE.**
+`TASK_PHP_051` stopped mid-row with a `§9 ORDER TO RESUME IN` and `_052`
+finished from it — the cheapest handoff this programme has had. ▶ **If you stop,
+write a `§N ORDER TO RESUME IN` naming what is left AND THE PRIORITY YOU WOULD
+GIVE IT.**
+
+⛔⛔ **AND YOUR STATED PRIORITY BINDS THE MANAGER. THAT IS NEW, AND `F123` IS WHY.**
+An engineer wrote *"it is the cheapest remaining check and it is not done"*; the
+manager's next task file demoted it to *"nice to have, skip it"*; two rounds
+later it had become a thing the protocol treated as **impossible**. ▶ **Say
+plainly what you would do next and how urgent it is. It will be CARRIED, not
+re-ranked.**
 
 ⭐ **Most of this is CHEAP.** Every figure in §1, §3 and §4 comes from committed
 records, a committed tool, or a binary that already exists. **No build, no
@@ -181,6 +209,46 @@ rests on scratch, which is **F51/F99's defect** and has now bitten three times.
 
 ---
 
+## §1.5 ⭐⭐⭐ `F125` — THE HIGHEST-STAKES FINDING IN THE QUEUE, BECAUSE IT TOUCHES *WHICH STATISTIC*
+
+**Landed after this file was written.** `TASK_PHP_056` built `ph97`'s ASCII
+compare twice — **in the kernel** and **in libc** — and measured both:
+
+| compare lives in | `kernel_exclusive_ir` (**A1**) | whole-program Ir | `inside_share` |
+|---|---|---|---|
+| **the kernel** | 38 881 170 | 39 338 098 | **98.84 %** |
+| **libc** | 27 756 101 | 43 032 368 | **64.50 %** |
+
+**Same checksum both ways** (`9594554053753204562`). ⭐⭐⭐ **A1 reads the row
+`−28.61 %` CHEAPER while the program is `+9.39 %` MORE EXPENSIVE — the statistic
+reports the SIGN BACKWARDS across a symbol boundary.**
+
+▶ **What to do with it:**
+
+1. ⭐ **Re-derive both rows from `controls/libc_compare.json`.** The manager did;
+   do it independently and say whether the two percentages are computed the way
+   you would compute them.
+2. ⭐⭐⭐ **THE QUESTION THAT MATTERS: does this change `F91`'s axis, or is it
+   that claim with a number on it at last?** `F91`/item 72 says *"same-language
+   differences are 1–2 instructions under 50–394× of callee noise, so only A
+   resolves them; cross-language the callee work IS the effect."* **This
+   measurement says A1's blindness is not noise but a LEVER an implementation
+   choice can pull** — and *"put the work in a callee"* is not exotic, **it is
+   what calling libc means.**
+3. ⚠ **Check the row's own disclaimer is adequate.** It says no published figure
+   is shown wrong, because every php row measures a kernel that does its own
+   work and `inside_share` is reported per cell. ⛔ **Is that true of all eleven
+   built rows? Check `inside_share` across the corpus rather than taking it.**
+   ⭐ **If any built row has a low `inside_share` on the cells its headline
+   rests on, that is a much bigger finding than this one.**
+4. ⚠ **`F125` is a MANAGER-verified engineer finding from ONE row and ONE
+   substitution.** Law 12.
+
+⛔ **DO NOT build anything to answer this.** `inside_share` is in every row's
+`controls/` already.
+
+---
+
 ## §2 ⭐⭐ `F96`'s R2 / R4 / R5 — THE ONLY CLAUSES OF `F96` STILL OWED
 
 `F96` is **verdicted per group** at `_055` (seven groups). **R3 was verdicted by
@@ -276,6 +344,22 @@ an item was closed rather than investigated, and it is quoted from
 - **`F122`** — rot rose for SPLIT report naming, not for in-flight tasks.
   ▶ **Re-run the two-spelling measurement.** ⚠ **And check `N6c`**: the widening
   must not have swallowed a real rot. Try a citation that *should* be rot.
+- ⭐ **`F124`** — row 11. The row's own `§13` lists **nine** uncertainties; the
+  largest is that **no disassembly explains why `R3`'s iterator pipelines are
+  `+23 %` over `R2`'s indexed loops** — a cost with a hypothesis and no
+  mechanism. ▶ **The claim worth attacking is `P1`**: *the optional's
+  discriminant costs `0.0000 Ir/call`, so the safety is free BY CONSTRUCTION.*
+  ⚠⚠ **A prediction surviving in both halves is rare here and is exactly when to
+  check hardest.** Is `0.0000` a measurement or an artefact of what the two
+  binaries share? ⓘ The row says they are *"one function body apart"* — verify it.
+- **`F126`** — the opener premium refuted in sign. ▶ **Two things to check:**
+  (a) the split is **8 openers / 3 follow-ons**, and follow-on is dominated by
+  `ph07` at 5.50, **the only rebuilt row** — does the conclusion survive dropping
+  it? (the manager says yes, weakly: 2.19 vs 2.00). (b) ⭐ **A PUBLISHED FIGURE
+  MOVED** — `~94–127, middle ~110` → `~70 .. ~92, middle ~73`. **The manager
+  claims the two causes (floor 40 → 37, and `ph97` landing) are separable in the
+  tool's own output. Verify that, because a range that moved for two reasons at
+  once is the kind of thing that gets quoted as one.**
 
 ---
 
@@ -343,14 +427,18 @@ in every task file and it matters most in a round this size.
    drop or down-rank a row. **If you conclude a row should be reconsidered, the
    only admissible grounds are C-side.**
 10. **Brackets**: `harness/measure.py --check-stale` → **`66/0`** (must NEVER
-    move); `harness-php/gate.py --tool measure --check-stale` → **`22/0`**, or
-    **`24/0`** if `_056` has landed. **Quote first and last. You should move
-    neither** — if you do, you have run something you should not have.
+    move); `harness-php/gate.py --tool measure --check-stale` → **`24/0`**
+    (`_056` has landed). **Quote first and last. You should move neither** — if
+    you do, you have run something you should not have.
 
 ---
 
 ## §7 DEFINITION OF DONE
 
+0. ⭐⭐⭐ **§1.5's question 3 IS THE ONE I MOST WANT ANSWERED AND IT IS NOT IN
+   ANY FINDING**: *does any BUILT row's headline rest on a cell with a low
+   `inside_share`?* **Eleven rows, the data is already in each `controls/`, and
+   if the answer is yes it is a bigger finding than anything else in this file.**
 1. ⭐⭐⭐ **EVERY FINDING YOU REACH GETS A VERDICT IN THE PROGRAMME'S OWN
    VOCABULARY**: `UPHELD` · `UPHELD-NARROWED` · `UPHELD-ON-NEW-GROUND` ·
    `REFUTED IN PART` · `REFUTED` · `NOT A MEASURABLE CLAIM`. **And the
