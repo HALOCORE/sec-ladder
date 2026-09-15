@@ -168,6 +168,21 @@ CLASS = {
                                # ⚠ The FIRST-IN-FAMILY premium applies (T6 is
                                # family 8 of 20), which is the projection's
                                # stated risk driver -- not the axis.
+    "057": "METH",             # THE review round: F114-F122 (NINE findings, the
+                               # largest backlog since the mining wave) plus
+                               # F96's R2/R4/R5. Corpus-wide, charged to no row.
+                               # ⚠ CLASSIFIED WHILE _056 WAS STILL RUNNING, and
+                               # that is a deliberate exception to PROTOCOL rule
+                               # 11 (do not edit what a running agent reads).
+                               # `task_ids()` globs the DISK, so merely WRITING
+                               # TASK_PHP_057.md already made N1 red -- and a
+                               # running engineer that sweeps the checkers would
+                               # have chased a failure with nothing to do with
+                               # its work. ⭐ A certain harm beats a negligible
+                               # race. ▶ The general rule: writing the NEXT task
+                               # file is not free while an agent runs; either
+                               # classify it in the same breath, or do not write
+                               # it until the agent lands.
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them
