@@ -207,6 +207,25 @@ CLASS = {
                                # file is not free while an agent runs; either
                                # classify it in the same breath, or do not write
                                # it until the agent lands.
+
+    # --- 2026-09-15, item 127 ----------------------------------------------
+    # ⭐ THE PRECEDENT IS `_028` AND IT IS THE SAME THREE ROWS. That task added
+    #    `spellings` to ph03/ph16/ph29 and split 1/3 each; this one adds the
+    #    `inside_share` matrix those three never got, and the split is copied
+    #    rather than re-argued.
+    # ⚠ WHY NOT `METH`, when the question it answers (is A1 admissible
+    #    cross-language?) is the statistic thread's. Because `_046` -- "search
+    #    ph52's endpoints + its MISSING CONTROL" -- set the rule that a control
+    #    a row should have shipped with is THAT ROW's debt, not methodology's.
+    #    The thread asked the question; the rows owe the measurement.
+    # ⚠ `ph97` IS RE-GATED BY THIS TASK TOO (its template hardcodes `n_iters`
+    #    where `slb.read` would derive it) AND IS DELIBERATELY NOT CHARGED. A
+    #    two-line fix plus a re-gate is not a quarter of this task, and charging
+    #    the row that DONATED the template would make being the template look
+    #    expensive. ⓘ Said here because an uncommented 1/3 split over four
+    #    re-gated rows is exactly the kind of silent judgement `PESSIMISM` exists
+    #    to be tested against.
+    "058": {"ph03": 1 / 3, "ph16": 1 / 3, "ph29": 1 / 3},
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them
@@ -702,14 +721,39 @@ def selftest():
 
     # ⚠ N13 MUST-NOT-FIRE: the searched-only marginal must not EXCEED the worst
     #   reading, or the two estimates have swapped roles and the range is wrong.
+    #
+    # ⛔⛔ THIS ARM ASSERTED A DIRECTION UNTIL 2026-09-15 AND THE DIRECTION IS
+    #    FALSE. It read `rowsum/len(ROWS) <= cmarg <= max(worsts)`, justified as
+    #    *"an unsearched row can only make the all-rows figure LOOK cheaper,
+    #    never dearer"* -- and `_058` refuted it the day it was written, by
+    #    charging 1/3 of a task to `ph03`, which is UNSEARCHED. An unsearched row
+    #    is not an intrinsically CHEAP row; it is a row missing ONE KIND of task,
+    #    and any other task charged to it raises the all-rows figure ABOVE the
+    #    searched-only one. Measured: all-rows 2.55, searched-only 2.54.
+    #
+    # ⭐⭐ SECOND ARM IN THIS FILE TO ASSERT AN EFFECT'S SIGN AND THEREFORE
+    #    REPORT THE DATA AS THE FAILURE -- `N11` was the first (F126, the
+    #    first-in-family premium, refuted in sign at n=8 after standing on n=1).
+    #    ⚠ AND THE TELL WAS VISIBLE WITHOUT THE REFUTATION: the comment above
+    #    said the arm was for *"must not EXCEED the worst reading"* -- ONE bound
+    #    -- while the code asserted TWO. **When a check's prose and its predicate
+    #    disagree about how many conditions there are, the extra one is usually
+    #    the unmeasured assumption.**
+    #
+    # ▶ Repaired the same way N11 was: assert the bound the comment actually
+    #   justifies, and REPORT the ordering instead of requiring it.
     if inc:
         csum = sum(v for k, v in per.items() if k not in inc)
         cmarg = csum / (len(ROWS) - len(inc))
-        check("N13", rowsum / len(ROWS) <= cmarg <= max(worsts),
-              f"the searched-only marginal {cmarg:.2f} sits between the all-rows "
-              f"marginal {rowsum / len(ROWS):.2f} and the worst reading "
-              f"{max(worsts):.2f} -- an unsearched row can only make the "
-              f"all-rows figure LOOK cheaper, never dearer")
+        amarg = rowsum / len(ROWS)
+        check("N13", cmarg <= max(worsts),
+              f"the searched-only marginal {cmarg:.2f} does not exceed the worst "
+              f"reading {max(worsts):.2f} -- past that the two estimates have "
+              f"swapped roles and the published range is upside down")
+        print(f"  ⓘ  N13b REPORT (no verdict): searched-only {cmarg:.2f} vs "
+              f"all-rows {amarg:.2f}, delta {cmarg - amarg:+.2f}. ⛔ The SIGN is "
+              f"NOT asserted: unsearched rows {inc} carry non-search cost too, "
+              f"so either ordering is legitimate and neither is evidence.")
 
     check("N8", pend <= 0.25 * rowsum,
           f"PENDING={pend:.0f} is at most a quarter of ROW={rowsum:.0f} — past "
