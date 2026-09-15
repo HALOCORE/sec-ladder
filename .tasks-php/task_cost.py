@@ -138,6 +138,21 @@ CLASS = {
     "051": {"ph56": 1.0},      # BUILD row 10 = ph56, stopped at 5 of 6 rungs
     "052": {"ph56": 1.0},      # FINISH row 10: R5, spec.md, gate, statistic
     "053": "METH",             # THE review round, F96/F110/F111/F112 (DONE)
+
+    # --- 2026-09-15 --------------------------------------------------------
+    # ⚠ N1 CAUGHT BOTH OF THESE the moment it was run after they were written,
+    # which is the second time this arm has done exactly its job.
+    "054": "ONCE",             # SCREEN ROW 11: all 13 unentered families, 45
+                               # candidate rows, THREE agents in parallel. A
+                               # one-time survey like the mining wave -- it
+                               # prices no row and is not repeated per row.
+                               # ⭐ It also produced the ORACLE finding (a
+                               # working PHP 5.0.0 CLI + per-id reproducers,
+                               # cited by no manager document), which is
+                               # corpus-wide and charged to no row.
+    "055": "METH",             # THE review round: F96 DECOMPOSED, F113, and
+                               # the manager's own M4 (made and refuted before
+                               # dispatch). Corpus-wide, charged to no row.
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them

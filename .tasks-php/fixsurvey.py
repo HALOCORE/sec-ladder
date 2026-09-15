@@ -109,6 +109,51 @@ def selftest():
         print("            ❌ DID NOT FIRE: no fat rows, so this guard is inert")
         ok = False
 
+    # -----------------------------------------------------------------------
+    # §H -- THE SHA-BINDING ARMS (TASK_PHP_054). The verdict is a PURE function
+    # of (header bytes, requested sha) so these drive it on synthetic input and
+    # do not depend on the cache's current contents.
+    # -----------------------------------------------------------------------
+    real = b"From 4f68f3774c34948ac651344d73c9d9e0a08801e6 Mon Sep 17 00:00"
+    cases = [
+        ("B1 MUST-NOT-FIRE  a patch carrying the sha it is filed under",
+         binding_verdict(real, "4f68f3774c34") == "OK", True),
+        ("B2 MUST-FIRE      a patch carrying a DIFFERENT sha",
+         binding_verdict(real, "49bd45a2c175").startswith("BOUND-TO-OTHER:"),
+         True),
+        ("B3 MUST-FIRE      an HTML error page / truncated file has no header",
+         binding_verdict(b"<!DOCTYPE html><html>", "deadbeefdead") == "NO-HEADER",
+         True),
+        ("B4 MUST-FIRE      `From ` present but not followed by 40 hex -- the "
+         "exact hole the old startswith(b'From ') check left open",
+         binding_verdict(b"From the desk of nobody at all, 2026", "abc123abc123")
+         == "NO-HEADER", True),
+        ("B5 MUST-NOT-FIRE  a 40-hex sha matched by a 12-hex request PREFIX",
+         binding_verdict(real, "4f68f3774c34948a") == "OK", True),
+        ("B6 MUST-FIRE      empty bytes are NOT silently OK",
+         binding_verdict(b"", "4f68f3774c34") == "NO-HEADER", True),
+    ]
+    for label, got, want in cases:
+        print(f"{label}")
+        if got == want:
+            print("            ✅")
+        else:
+            print("            ❌ arm did not behave as stated")
+            ok = False
+
+    # B7 ⭐ THE RATCHET. It is DERIVED from the cache, never a literal -- five
+    #    hardcoded figures in .tasks-php/ validators have gone stale
+    #    (04-process.md law 6), and `EMPTY_FAMILIES` proved that A BOUND IS NOT
+    #    A DERIVATION. A change here is a FINDING to adjudicate by hand, not a
+    #    number to update.
+    live = scan_bindings()
+    print(f"B7 ⓘ  cached patches whose binding does not hold: {len(live)}")
+    for f, v in live:
+        print(f"            {f[:-len('.patch')]}  {v}")
+    if not live:
+        print("            ⚠ ZERO today. If this was non-zero yesterday, the "
+              "cache was re-fetched and the evidence is GONE -- say so.")
+
     print(f"\nselftest: {'PASS' if ok else 'FAIL'}   "
           f"({len(seen)} catalogue rows, {len(cat)} with an id)")
     return 0 if ok else 1
@@ -171,6 +216,65 @@ def fetch(sha):
             os.remove(p)
             return None
     return p
+
+
+# ---------------------------------------------------------------------------
+# ⛔⛔ THE SHA BINDING -- TASK_PHP_054, 2026-09-15
+#
+# `fetch()` above validated a cached patch by `startswith(b"From ")` ALONE. That
+# is a check on the SHAPE of the header and not on its CONTENT -- `RECAP_PHP.md`
+# F10's class, *a guard that is a string search is a guard with a spelling*.
+#
+# MEASURED: 3 of the 163 cached patches carry a `From <sha>` that is NOT the sha
+# they were requested under. Reproduced live, three ways:
+#
+#     a made-up sha            -> HTTP 404          (GitHub does not substitute)
+#     a known-good corpus sha  -> From <same sha>   (4f68f3774c34, ph55's R1h)
+#     these three              -> HTTP 200, NO redirect, From <a DIFFERENT sha>
+#
+#   49bd45a2c175  (ph79/LOGIC-025) -> bc9f2fb8dfadc1dba4264695ded28f673c54dc75
+#   abb09693ac4d  (ph78/CRASH-159) -> 6a6c273893178bb9b59c117e31761fe0193d0c9f
+#   ed4c0245c7ca  (ph75/CRASH-161) -> 9dfa843a386b65b18353c510f032e322004d0bb7
+#
+# ⭐ AND THE CONTENT IS THE RIGHT COMMIT ANYWAY: for all three the `Subject:`
+# and the file count match what this survey records for that row. Agent B's
+# narrowing, independently reached: both of its two carry the correct BUG NUMBER
+# in the subject. ▶ So this looks like a BINDING ERROR OVER AN MFH / CHERRY-PICK
+# TWIN, not an unrelated patch.
+#
+# ⚠⚠ THE MECHANISM IS UNEXPLAINED AND THIS CODE DOES NOT GUESS AT IT. It
+# REPORTS the class and changes no verdict, because the mismatch is a fact about
+# the corpus's sha and upstream's history, NOT a corruption of the cache -- and
+# deleting or re-fetching the file would destroy the evidence for it.
+# ---------------------------------------------------------------------------
+_FROM_SHA = re.compile(rb"\AFrom ([0-9a-f]{40}) ")
+
+
+def binding_verdict(head, requested):
+    """Pure. `head` = first bytes of a patch file, `requested` = the sha it was
+    cached under. Returns "OK" | "BOUND-TO-OTHER:<sha>" | "NO-HEADER"."""
+    m = _FROM_SHA.match(head or b"")
+    if not m:
+        return "NO-HEADER"
+    carried = m.group(1).decode()
+    return "OK" if carried.startswith(requested) else "BOUND-TO-OTHER:" + carried
+
+
+def scan_bindings(patdir=None):
+    """Every cached patch, checked against the sha it is filed under."""
+    patdir = patdir or PAT
+    out = []
+    if not os.path.isdir(patdir):
+        return out
+    for f in sorted(os.listdir(patdir)):
+        p = os.path.join(patdir, f)
+        if not os.path.isfile(p) or not f.endswith(".patch"):
+            continue
+        with open(p, "rb") as fh:
+            v = binding_verdict(fh.read(64), f[:-len(".patch")])
+        if v != "OK":
+            out.append((f, v))
+    return out
 
 
 def parse(p):
@@ -301,6 +405,27 @@ def main():
     print(f"\n⚠ fixes touching >= 5 files (F34's 'inside a rewrite' shape): {len(big)}")
     for x in sorted(big, key=lambda r: -r["n_files"])[:12]:
         print(f"   {x['row']:6} {x['sha'][:12]}  {x['n_files']:3} files  {x['subject'][:60]}")
+
+    # ⛔⛔ THE SHA BINDING -- reported, never acted on. See the block above fetch().
+    bad = scan_bindings()
+    print(f"\n⛔ CACHED PATCHES WHOSE `From <sha>` IS NOT THE SHA THEY ARE FILED "
+          f"UNDER: {len(bad)}")
+    if bad:
+        by_sha = {}
+        for x in flat:
+            by_sha.setdefault(x["sha"][:12], []).append(f"{x['row']}/{x['id']}")
+        for f, v in bad:
+            who = ", ".join(by_sha.get(f[:-len('.patch')], ["(no corpus row)"]))
+            print(f"   {f[:-len('.patch')]}  {v}")
+            print(f"      cited by: {who}")
+        print("   ⚠⚠ THE CONTENT IS STILL THE RIGHT COMMIT on every instance "
+              "measured so far -- subject, bug number and file count all match "
+              "the row. Treat this as a BINDING question over an MFH/cherry-pick "
+              "twin, NOT as a corrupt cache, and NEVER re-fetch or delete: that "
+              "destroys the only evidence there is.")
+        print("   ▶ A row whose R1h is named by one of these owes an R1h "
+              "DECISION before a build task (PROTOCOL_PHP.md §C), the same as a "
+              "row whose ids name several commits.")
 
 
 if __name__ == "__main__":
