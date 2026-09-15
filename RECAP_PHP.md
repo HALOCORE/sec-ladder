@@ -47,24 +47,24 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 11 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL · ph45
         (T1)+ph53+ph52 (T3)+ph55+ph56 (T5)+ph97 (T6) TYPE. 8 of 20 fam. 26 owed
-        to floor 37 (item 121). ⛔ BACKLOG **4** (F127-F130), BIGGEST SINCE _057.
-NEXT    ▶ (1) ⭐⭐⭐ A **REVIEW ROUND**, SCOPE F129+F130 FIRST: F129 REDEFINES WHAT
-        EVERY `inside_share` FIGURE MEANS AND ITS NUMBERS ARE **MANAGER-VERIFIED,
-        NOT REVIEWED** -- law 12 is sharpest here. ▶ (2) ITEM 129 "UNSURE OF"
-        CENSUS -- ~289 ITEMS, **NOT** A ONE-TASK JOB; SCOPE MEASURED IN THE ITEM.
-        ▶ (3) ITEM 132 PIN F74's (i), FREE. ▶ (4) ITEM 134 `BASE`'s SPELLING.
-        ▶ (5) ROW 12 = ph96. ▶ (6) ⛔⛔ ITEM 105 IS THE USER'S DECISION, NOT MINE.
-⚠ NEW   F129 **TWO QUANTITIES WEAR THE NAME `inside_share`** (0.8045 vs 0.8933
-        SAME CELL; F74's EXCEEDS 1.0 ON 15/360). F130 ⭐⭐⭐ **A RATCHET NOTHING
-        EVER INVOKED** -- GATED ON A FLAG NO CALLER PASSED; IT HAD ALREADY DRIFTED.
-⚠ WRONG **I OVER-CLAIMED IN F129 AND CORRECTED IT MYSELF**: c-clang's -4.36% IS
-        **NOT NEW** -- _049 FILED IT 09-13 IN .memory-php/ AND IN ITEM 111. THE
-        REAL DEFECT IS THAT THE HEADLINE CELL NEVER INHERITED IT. ALSO: MY P5
-        SAID THE BAR WAS UNWRITTEN -- IT IS, IN THE LAYER THAT OUTRANKS ME.
-⚠ TRAPS AN ARM MAY ASSERT A DIRECTION ONLY IF IT DEFENDS A **PUBLISHED** FINDING,
-        AND THEN MUST PRINT THE MARGIN. `grep -a`; EVENT NOT STATE; DESCRIBE A
-        PATH, DON'T SPELL IT (x7); NEVER `git add -A`; NOTIFIED != FINISHED.
-READ    RULE-9 · .memory-php/ · F1-F130 · items 1-134 · _058 + ADJUDICATION_003/004.
+        to floor 37 (item 121). ⛔ BACKLOG = THE RULE-9 ROWS OPENING ⛔ UNREVIEWED.
+NEXT    ▶ (1) ⭐⭐⭐ **_059 IS WRITTEN AND DISPATCHED** -- THE 8th REVIEW ROUND,
+        F129 -> F130 -> F127 -> F128, + ITEM 132 AS A **PRECONDITION** (F74's
+        BAR IS A CONJUNCTION; ONE CONJUNCT CANNOT VERDICT IT). ▶ (2) ITEM 129
+        "UNSURE OF" CENSUS -- ~289 ITEMS, **NOT** A ONE-TASK JOB.
+        ▶ (3) ITEM 134 `BASE`'s SPELLING (IN _059 §2.2). ▶ (4) ROW 12 = ph96;
+        ROW 13 TEMPORAL. ▶ (5) ⛔⛔ ITEM 105 IS THE USER'S DECISION, NOT MINE.
+⚠ NEW   F131 ⛔⛔⛔ **RULE-9 LISTED SIX FINDINGS AS *BOTH* UNREVIEWED AND
+        VERDICTED** (F120-F125): _057's BATCH WAS APPENDED BELOW, NOT APPLIED
+        ABOVE. MERGED TO ONE ROW PER KEY. ⭐ THE TABLE HELD THE SENTENCE THAT
+        DIAGNOSES IT. ⭐⭐ F128's CELL SCANNED AS A VERDICT -> BACKLOG UNCOUNTABLE.
+⭐ OPEN  **DOES F74's BAR FORBID 81% OF THE CROSS-LANGUAGE COLUMN, OR HAS IT BEEN
+        MISREAD?** MANAGER TALLY, UNVERIFIED, 198 PAIRS: x-lang 17 PASS/71 FAIL,
+        same-lang 99/11. _059 §1.3 MUST SETTLE IT -- IT CUTS BOTH WAYS.
+⚠ TRAPS ONE HOME PER FACT (F131 x3). AN ARM MAY ASSERT A DIRECTION ONLY TO DEFEND
+        A **PUBLISHED** FINDING, AND MUST PRINT THE MARGIN. `grep -a`; EVENT NOT
+        STATE; DESCRIBE A PATH, DON'T SPELL IT (x7); NEVER `git add -A`.
+READ    RULE-9 · .memory-php/ · F1-F131 · items 1-134 · _059 + _058.
 ```
 
 ---
@@ -140,6 +140,25 @@ READ    RULE-9 · .memory-php/ · F1-F130 · items 1-134 · _058 + ADJUDICATION_
 > from a live claim unless it is struck. Strike it in the same edit.** ⭐ **That is item 73's shape — a correction APPENDED
 > instead of APPLIED — and the START HERE box warns about it in terms.**
 >
+> ⛔⛔⛔ **FOURTH INSTANCE, 2026-09-15, AND IT WAS SIX ROWS AT ONCE — CAUGHT WHILE
+> WRITING THE BRIEF FOR THE ROUND THIS TABLE GOVERNS.** `F120`, `F121`, `F122`,
+> `F123`, `F124` and `F125` each appeared **TWICE IN THIS ONE TABLE**: as
+> `⛔ UNREVIEWED` in the rows that opened them, and as `✅ UPHELD` / `⚠ NARROWED`
+> in the rows `TASK_PHP_057` added underneath. **A table that decides what may
+> enter the authoritative layer listed six findings as both unreviewed and
+> verdicted.** ⭐⭐ **THE MECHANISM, AND IT IS WHY THIS KEEPS HAPPENING: `_057`
+> verdicted a BATCH, and the batch was APPENDED to the bottom instead of APPLIED
+> to the rows at the top** — item 73 exactly, in the block whose own preamble
+> cites item 73. ⚠ **The previous three instances were ONE row each and were
+> repaired by striking. Striking six would have doubled the table to preserve
+> nothing**, so they are **MERGED**: one row per finding, carrying the opening
+> date *and* the verdict *and* whatever the opening row asked that is still
+> live. ▶ ⭐⭐⭐ **THE REAL REPAIR IS THE SHAPE, NOT THE SIX ROWS: this table is
+> an INDEX and an index has one row per key. `F96`'s own cell said so —
+> *"the table's one-cell-per-finding shape is what forced the mis-filing"* —
+> and that sentence was in the table while six keys had two rows.**
+> ⛔ **A verdict must REPLACE the row it verdicts. Never add one below it.**
+>
 > | finding | verdict | what entered `.memory-php/`, and what did NOT |
 > |---|---|---|
 > | **F107** | ⚠ **UPHELD-NARROWED** (`_053`) | ✅ *option (b) does not exist* **fully upheld**, all three grounds re-derived **plus a FOURTH**. ⛔ its *"three of four refutations"* **count does not reproduce** — the advice may enter, the count may not |
@@ -150,12 +169,6 @@ READ    RULE-9 · .memory-php/ · F1-F130 · items 1-134 · _058 + ADJUDICATION_
 > | **F112** | ⚠ **UPHELD-NARROWED** (`_053`) | ⛔ the `rlimit` floor is **3**, not 2, so the *"`n = 2`"* coincidence is **REFUTED**; its control is **broken** (item 115). ⚠ *"the row had to buy it"* remains **UNPROVEN** |
 > | ⭐ **F113** | ✅ ~~**UNREVIEWED**~~ **VERDICTED ON ALL FOUR POINTS AT `_055`** — headline survives on the measurement, ⛔ **the `iff` argument I gave it is a NON-SEQUITUR**, and the period is `(cell,axis)`-dependent too | `_053`'s own round. ⚠⚠ **Its `§B5` correction DID land**, because it is a measurement, **and its SCOPE (1 row against 3) landed with it** after the manager first shipped it without — item **118** |
 > | **F96** | ✅✅ **VERDICTED PER GROUP AT `TASK_PHP_055`. NOT `UNREVIEWED`, AND NOT PERMANENTLY MARKED — EVERY GROUP HAD A CHEAP SECOND METHOD AND THE LAST ONE WAS IN THE ROW'S OWN `spec.md` ALL ALONG** | ⛔ **The *"no cheap second method"* ground was wrong TWICE OVER** — F114 found the first half, `_055` the second. ⚠ **Replaced entirely, not appended** (item 73) |
-> | ⭐ **F120** | ⛔ **UNREVIEWED** — manager, one probe, 2026-09-15 | ⛔ **NOTHING.** It is a measurement AND a rule written by the same person in the same sitting, and the rule (`§A3a`) binds every future row. ▶ **Attack the rule, not the `si_addr`** |
-> | **F121** | ⛔ **UNREVIEWED** — manager, 2026-09-15 | ⛔ **NOTHING**, and it may not need to enter: it is a validator repair, not a research claim. ⚠ **Its one LAYER-shaped clause — *law 6 covers prose about code, not only code* — is the part that would need review** |
-> | **F122** | ⛔ **UNREVIEWED** — manager, 2026-09-15 | ⛔ **NOTHING.** ⚠ It NARROWS F117, which is itself unreviewed — **a narrowing of an unreviewed finding is not a verdict on it** |
-> | ⛔ **F123** | ⛔ **UNREVIEWED** — manager, about the manager, 2026-09-15 | ⛔ **NOTHING.** ⭐ **Its layer-shaped clause is the one to review**: *an engineer's own uncertainty may be DEFERRED but not DOWNGRADED; the next task inherits its stated priority, not the manager's.* **Not in the layer, and not on my say-so** |
-> | ⭐ **F124** | ⛔ **UNREVIEWED** — the row-11 round | ⛔ **NOTHING YET.** ⚠ `P1` is the first prediction to survive in both halves for several rounds, which is exactly when to check it hardest |
-> | ⭐⭐ **F125** | ⛔ **UNREVIEWED** | ⛔ **NOTHING**, and it is the highest-stakes of the four: it bears on *which statistic*, the programme's largest open thread. ▶ **Does it change `F91`'s axis, or is it that claim with a number on it at last?** |
 > | **F126** | ⚠ **UPHELD / REASON REFUTED** (`_057`) | ✅ split + `ph07` sensitivity both reproduce. ⛔ separability named the WRONG PAIR — there are **three** causes — and the published range was **stale within the hour**. **Corrected in place as an EVENT** |
 > | **F114** | ⚠ **UPHELD-NARROWED** (`_057`) | ✅ conclusion upheld. ⛔ the one-cell shape is **permissive, not forcing** — it explains why nobody noticed, not why it happened |
 > | **F115** | ✅✅ **UPHELD, BOTH HALVES** (`_057`) | ⭐ one of only three clean survivals; second method was an independent 12-line byte reader over all 163 patches |
@@ -163,15 +176,16 @@ READ    RULE-9 · .memory-php/ · F1-F130 · items 1-134 · _058 + ADJUDICATION_
 > | **F117** | ✅✅ **UPHELD, BOTH HALVES** (`_057`) | ⭐ clean survival |
 > | **F118** | ✅ decision stands on its OTHER reason | ⛔⛔ **its stated ground is REFUTED AND INVERTED** — F116 helps the **type** axis ~2× more than the temporal one, and `ph97` is a type row |
 > | **F119** | ✅ **UPHELD, UNDER-STATED / REASON REFUTED** | ⛔ the `memset` mechanism is a **`p03`** fact and explains the wrong column; the record's own `domain` forbids the comparison. **Re-state on the stronger reading** → item 128 |
-> | **F120** | ✅ **UPHELD (12/12) / NARROWED** | ⛔ **the build label was wrong in four places**; the benign control under-states. ✅ Both repaired |
-> | **F121** | ✅✅ **UPHELD, BOTH HALVES** (`_057`) | ⭐ clean survival; `N12` tracked two further count moves while it ran |
-> | **F122** | ⚠ **UPHELD-NARROWED / REASON REFUTED IN PART** | ⛔⛔ **the repair fixed ONE LIMB of its own mechanism** — six reports on the wrong side of the LIVE/HIST split. ✅ Repaired + `N6d` |
-> | **F123** | ✅✅ **UPHELD AND UNDER-STATED** (`_057`) | ⭐⭐⭐ **the check costs 30 SECONDS**, measured and reproduced. §A3a obligation 5 is now **REQUIRED** |
-> | **F124** | ⚠ **UPHELD-NARROWED / REASON REFUTED** | ⛔ the control priced the **TEST**, not the discriminant; *"by construction"* holds for the **size leg only**. ✅ Corrected in place |
-> | **F125** | ⚠ **UPHELD-NARROWED / REASON REFUTED** | ⛔⛔ **both clauses of its disclaimer are false** — see **F127**, which is the bigger finding it produced |
+> | **F120** | ⓘ opened ⛔ UNREVIEWED (manager, one probe, 2026-09-15) → ✅ **UPHELD (12/12) / NARROWED** (`_057`) | ⛔ **the build label was wrong in four places**; the benign control under-states. ✅ Both repaired. ⚠⚠ **RESIDUE FROM THE OPENING ROW, AND THE VERDICT CELL DOES NOT SAY IT WAS ANSWERED**: it is *a measurement AND a rule written by the same person in the same sitting*, and the rule (`§A3a`) **binds every future row** — ▶ ***attack the rule, not the `si_addr`***. The `12/12` is the MEASUREMENT half |
+> | **F121** | ⓘ opened ⛔ UNREVIEWED (manager, 2026-09-15) → ✅✅ **UPHELD, BOTH HALVES** (`_057`) | ⭐ clean survival; `N12` tracked two further count moves while it ran. ⓘ The opening row's doubt — *"it may not need to enter at all: a validator repair, not a research claim"* — stands; its one LAYER-shaped clause is *law 6 covers prose about code, not only code* |
+> | **F122** | ⓘ opened ⛔ UNREVIEWED (manager, 2026-09-15) → ⚠ **UPHELD-NARROWED / REASON REFUTED IN PART** (`_057`) | ⛔⛔ **the repair fixed ONE LIMB of its own mechanism** — six reports on the wrong side of the LIVE/HIST split. ✅ Repaired + `N6d`. ⓘ The opening caution is now spent: it narrowed `F117`, and `F117` has since been **UPHELD, BOTH HALVES** |
+> | **F123** | ⓘ opened ⛔ UNREVIEWED (manager, **about the manager**, 2026-09-15) → ✅✅ **UPHELD AND UNDER-STATED** (`_057`) | ⭐⭐⭐ **the check costs 30 SECONDS**, measured and reproduced. §A3a obligation 5 is now **REQUIRED**. ⛔⛔ **ITS LAYER-SHAPED CLAUSE IS STILL NOT VERDICTED AND STILL NOT IN THE LAYER**: *an engineer's own uncertainty may be DEFERRED but not DOWNGRADED; the next task inherits its stated priority, not the manager's.* ▶ **That is what item 129's census tests — a verdict on the INSTANCE is not a verdict on the RULE** |
+> | **F124** | ⓘ opened ⛔ UNREVIEWED (the row-11 round) → ⚠ **UPHELD-NARROWED / REASON REFUTED** (`_057`) | ⛔ the control priced the **TEST**, not the discriminant; *"by construction"* holds for the **size leg only**. ✅ Corrected in place. ⭐ **The opening row's instinct was right and is worth keeping as method**: *`P1` was the first prediction to survive in both halves for several rounds, which is exactly when to check it hardest* — and checking it hardest is what broke the reason |
+> | **F125** | ⓘ opened ⛔ UNREVIEWED → ⚠ **UPHELD-NARROWED / REASON REFUTED** (`_057`) | ⛔⛔ **both clauses of its disclaimer are false** — see **F127**, which is the bigger finding it produced. ⚠⚠ **THE OPENING ROW'S QUESTION WAS NEVER ANSWERED AND IS NOW BIGGER**: *does it change `F91`'s axis, or is it that claim with a number on it at last?* ▶ `F129` lands on the same axis from a third direction, so **answer it in `_059`, not later** |
 > | ⭐ **F127** | ⛔ **UNREVIEWED** — `_057`'s own round | ⛔ **NOTHING.** ⚠ **It is a reviewer finding, so law 12 cuts the other way** — but item 127 is an ENGINEER task and will test it directly, and it is dispatched as `_058` |
-> | **F128** | ⚠ **UPHELD-NARROWED BY ITS OWN SWEEP, SAME DAY** | ✅ The `N13` defect is real and repaired; ⭐ **a THIRD instance found (`N5`)**. ⛔⛔ **But its RULE as worded is WITHDRAWN — too broad: five correct arms assert a direction legitimately.** Replaced by the Kind-A/Kind-B rule, item 130. ⚠ **Still a manager self-finding, and the sweep was the manager's too** |
+> | **F128** | ⛔ **UNREVIEWED** — ⚠⚠ **self-narrowed by its own sweep the same day, which is the MANAGER ON THE MANAGER AND NOT A REVIEW.** ⛔ **This cell used to read *"UPHELD-NARROWED BY ITS OWN SWEEP"*, which scans as a verdict and made the backlog uncountable from the column that is supposed to carry it** | ✅ The `N13` defect is real and repaired; ⭐ **a THIRD instance found (`N5`)**. ⛔⛔ **But its RULE as worded is WITHDRAWN — too broad: five correct arms assert a direction legitimately.** Replaced by the Kind-A/Kind-B rule, item 130. ⚠ **Still a manager self-finding, and the sweep was the manager's too** |
 > | ⭐⭐⭐ **F130** | ⛔ **UNREVIEWED** — manager self-finding | ⛔ **NOTHING.** ✅ The un-run ratchet is measured against a worktree and the bare run is **demonstrated failing**; the eight adjudications are written out. ⚠ **What a reviewer owes it: are the eight really benign, and does `BASE` now need widening after all?** — the standing note refused that **seven** times, and the eighth instance cuts the other way |
+> | ⛔ **F131** | ⛔ **UNREVIEWED** — manager self-finding **about this very table**, 2026-09-15 | ⛔ **NOTHING**, and it may not need to enter: it is a document repair, not a research claim. ⚠ **Its one LAYER-shaped clause is the one to review**: *a verdict-shaped phrase in a verdict column is a verdict, whoever wrote it — so self-narrowing must not share a column with review outcomes, because that erases law 12's distinction.* ▶ **Scoped into `_059` §0 by implication, not as a section: the reviewer reads this table to know what it owes, so if the table is wrong the round is wrong** |
 > | ⭐⭐⭐ **F129** | ⛔ **UNREVIEWED** — `_058`'s own round | ⛔ **NOTHING**, and it is the **highest-stakes unreviewed finding in the programme**: it changes what every `inside_share` figure MEANS and withdraws the label from the most-cited number. ✅ **Every load-bearing number in it was re-derived by the manager from the committed records with independent code** — the two shares, the exactly-15 over-1.0 cells, the `+33.01 %` and `c-clang`'s `−4.36 %`. ⚠ **That is verification, NOT review**: nobody has yet asked whether the CONCLUSIONS follow |
 >
 > #### ⭐⭐⭐ `F96`, PER GROUP — **SEVEN groups, not the four I wrote** (`_055` §1.1)
@@ -196,14 +210,30 @@ READ    RULE-9 · .memory-php/ · F1-F130 · items 1-134 · _058 + ADJUDICATION_
 > ✅✅ **`TASK_PHP_057` CLOSED ALL THIRTEEN PLUS `R2`/`R4`/`R5` IN ONE ROUND —
 > the largest backlog since the mining wave, cleared.** ⓘ **Backlog trend:
 > 14 → 2 → 7 → 1 → 4 → 2 → 6 → 13 → 1.**
-> ▶ **NEXT REVIEW SCOPE: `F129` FIRST, then `F127`, then `F128`.** ⭐⭐⭐ **`F129`
-> outranks both**: it redefines what every published `inside_share` figure means,
-> it withdraws the label from the programme's most-cited number, and it rests on
-> a quantity that **exceeds 1.0 on 4 % of the corpus** with no explanation.
+> ▶ **NEXT REVIEW SCOPE, AND IT IS DISPATCHED AS `TASK_PHP_059`: `F129` →
+> `F130` → `F127` → `F128`.** ⭐⭐⭐ **`F129` outranks all three**: it redefines
+> what every published `inside_share` figure means, it withdraws the label from
+> the programme's most-cited number, and it rests on a quantity that **exceeds
+> 1.0 on 4 % of the corpus** with no explanation.
 > ⚠⚠ **And it is the case law 12 is sharpest about — a finding whose numbers the
 > MANAGER verified and whose conclusions nobody has challenged.** `F127` is a
 > reviewer finding that `_058` tested directly; `F128` is a manager self-finding
-> already narrowed by its own sweep. ⚠ **Backlog is 3.**
+> narrowed by a manager sweep, which is not a review.
+> ⛔⛔ **THIS LINE SAID *"then `F127`, then `F128`"* AND *"Backlog is 3"* — WRITTEN
+> BEFORE `F130` LANDED AND NEVER EXTENDED, so the ⭐⭐⭐ finding in the queue was
+> missing from the queue's own scope line.** ▶ **NO COUNT LIVES HERE NOW. The
+> backlog is the set of rows in the table above whose verdict column opens
+> `⛔ UNREVIEWED` — read them off, do not trust a numeral** (`F121`'s law: a
+> count in prose ABOUT a structure rots exactly like one inside it).
+>
+> ⛔⛔⛔ **AND THIS PARAGRAPH ALREADY PROVED ITS OWN POINT, IN UNDER FIVE MINUTES.**
+> It first ended *"today that set is `F127`, `F128`, `F129`, `F130`"* — and then
+> `F131` was filed, four minutes later, **by the same person in the same sitting**,
+> and the enumeration was stale. ⭐⭐ **THE REPAIR IS TO DELETE THE LIST, NOT TO
+> UPDATE IT**: a list one line from the table looked safe precisely because it was
+> close, and closeness is not freshness. ▶ **The set is DERIVED, here, every time
+> it is read, and it is written down nowhere.** ⓘ `F128` only became derivable at
+> all when its verdict cell stopped scanning as a verdict — `F131` §2.
 > ⛔ **NOTHING IS OWED ON `F96` ANY MORE.** R2/R4/R5 are verdicted: R2 upheld
 > (**0 of F108's 5** things paid), R4 narrowed (*"outside both arms"* is FALSE —
 > arm 2 holds on the clang column F96 never looked at), R5's **conclusion
@@ -236,7 +266,11 @@ READ    RULE-9 · .memory-php/ · F1-F130 · items 1-134 · _058 + ADJUDICATION_
 > `_047` has now closed the cycle on all but F96. ✅ **The audit is the only reason
 > the material was labelled when the reviewer reached it.**
 >
-> ⓘ **Backlog trend: 14 → 2 → 7 → 1.**
+> ⓘ ~~**Backlog trend: 14 → 2 → 7 → 1.**~~ ⛔ **STRUCK 2026-09-15: a stale PREFIX
+> of the live series eight lines above it** (`14 → 2 → 7 → 1 → 4 → 2 → 6 → 13 → 1`).
+> ⭐ **A truncated series is worse than a wrong one — it reads as complete, and
+> a reader who scrolls to the nearest copy gets the oldest.** Same block, same
+> defect class as the six duplicated rows: **two homes for one fact.**
 
 ✅✅ **`TASK_PHP_043` CLOSED THE CYCLE ON 12 OF 14.** 1408 lines; **8 findings got
 a genuine second method** (F91 F92 F94 F95 F98 F99 F100 F101), **4 got the bounded
@@ -519,7 +553,16 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > at `1cc2c0e` the corpus already stood at 70 hits against a baseline of 69,
 > un-run and unnoticed. The bare run now enforces. Eight new hits adjudicated
 > by hand, all benign, and one of them is the line that obeys the rule BEST —
-> flagged because it writes `gcc-C` where the regex wants `c-gcc`**
+> flagged because it writes `gcc-C` where the regex wants `c-gcc`** ·
+> **F131 ⛔⛔⛔ THE TABLE THAT DECIDES WHAT MAY ENTER THE AUTHORITATIVE LAYER
+> LISTED SIX FINDINGS AS BOTH UNREVIEWED AND VERDICTED — `F120`–`F125`, each
+> twice in one table, because `_057` verdicted a BATCH and the batch was
+> APPENDED below instead of APPLIED above. Fourth instance of a class the
+> block's own preamble documents three times, and the first at scale.
+> ⭐ The table contained the sentence that diagnoses it. ⭐⭐ And the backlog
+> was not countable from the column that carries it, because one cell read
+> *"UPHELD-NARROWED BY ITS OWN SWEEP"* — which is the manager narrowing the
+> manager, and it SCANS as a verdict**
 >
 > ⚠⚠ **This index stopped at F59 while F60–F65 existed, and then AT F101 WHILE
 > F113 EXISTED — twelve behind, caught by a pre-handoff audit 2026-09-14.**
@@ -1822,6 +1865,81 @@ which pins `kernel.c:247` and `hardened:175`, one line each.
 The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
+
+### F131 — ⛔⛔⛔ **THE TABLE THAT GOVERNS THE AUTHORITATIVE LAYER LISTED SIX FINDINGS AS *BOTH* UNREVIEWED *AND* VERDICTED, AND THE BACKLOG WAS NOT COUNTABLE FROM THE COLUMN THAT CARRIES IT**
+
+⚠ **Manager, 2026-09-15, found while writing the brief for `TASK_PHP_059` — the
+review round this very table scopes. UNREVIEWED, and it is a manager self-finding
+about a manager artefact, so law 12 cuts the usual way.**
+
+`RECAP_PHP.md`'s **RULE-9 STATE** block is the index of which findings have
+survived an engineer→reviewer cycle. `PROTOCOL.md` rule 9: **nothing reaches
+`.memory-php/` until it does.** ⭐ The block exists because that state was once
+living in gitignored scratch, and its own preamble says *"`grep -c UNREVIEWED` is
+NOT an index — it cannot tell a closed cycle from an open one. **This table
+can.**"*
+
+#### ⛔⛔ (1) SIX KEYS HAD TWO ROWS
+
+**`F120`, `F121`, `F122`, `F123`, `F124` and `F125` each appeared TWICE in one
+table** — as `⛔ UNREVIEWED` in the rows that opened them (2026-09-15, manager),
+and as `✅ UPHELD` / `⚠ UPHELD-NARROWED` in the rows `TASK_PHP_057` added
+underneath. Both sets were unstruck, undated relative to each other, and
+adjacent.
+
+⭐⭐ **THE MECHANISM, AND IT IS WHY THIS KEEPS HAPPENING: `_057` verdicted a
+BATCH, and the batch was APPENDED to the bottom of the table instead of APPLIED
+to the rows at the top.** That is **item 73** exactly — *a correction appended
+instead of applied* — **in the block whose own preamble cites item 73.**
+
+⚠ **FOURTH INSTANCE OF A DOCUMENTED CLASS, AND THE FIRST AT SCALE.** The
+preamble records three: 2026-09-14 (`F110`/`F111`/`F112` listed UNREVIEWED while
+the prose below said `_053` had closed them), and 2026-09-15 twice (the `_047`
+row's *"F96 STILL UNREVIEWED"*, and `F113`). ⛔ **Each of those was ONE row and
+was repaired by STRIKING. This was SIX**, and striking six would have doubled the
+table to preserve nothing — so they are **MERGED**: one row per finding carrying
+the opening date, the verdict, and whatever the opening row asked that is **still
+live**.
+
+> ⭐⭐⭐ **THE TABLE CONTAINED THE SENTENCE THAT DIAGNOSES IT.** `F96`'s own cell
+> reads *"the table's one-cell-per-finding shape is what forced the mis-filing"*
+> — and that sentence sat in the table while **six keys had two rows.** ▶ **The
+> repair is the SHAPE, not the six rows: this is an INDEX, and an index has one
+> row per key. A verdict must REPLACE the row it verdicts, never be added below
+> it.**
+
+#### ⭐⭐ (2) AND THE BACKLOG WAS NOT COUNTABLE FROM THE COLUMN THAT CARRIES IT
+
+`F128`'s verdict cell read **"⚠ UPHELD-NARROWED BY ITS OWN SWEEP, SAME DAY"**.
+⛔ **That is the manager narrowing the manager — and it SCANS as a verdict.** A
+reader counting open cycles off the verdict column got **three**; the START HERE
+box said **four**; and eight lines below the table a closing line said
+**"Backlog is 3"**, written before `F130` landed and never extended — **so the
+⭐⭐⭐ finding in the queue was missing from the queue's own scope line.**
+
+✅ **Repaired**: `F128`'s cell now opens `⛔ UNREVIEWED` and says why in the same
+breath; **no count literal survives anywhere in the block**; the backlog is
+defined as *the rows whose verdict column opens `⛔ UNREVIEWED`*, which today
+reads off as `F127`, `F128`, `F129`, `F130`.
+
+⭐ **A verdict-shaped phrase in a verdict column is a verdict, whoever wrote it.**
+`.memory-php/04-process.md` **law 12** says a manager finding is worth less than a
+reviewer's until a reviewer has had it — ▶ **and a table that records
+self-narrowing in the same column as review outcomes erases exactly that
+distinction.**
+
+#### ⓘ (3) A THIRD, SMALLER LIMB — TWO HOMES FOR ONE FACT
+
+The block carried the backlog trend **twice**: `14 → 2 → 7 → 1 → 4 → 2 → 6 → 13 → 1`
+and, eight lines lower, `14 → 2 → 7 → 1`. ⭐ **A truncated series is worse than a
+wrong one — it reads as complete, and a reader who scrolls to the nearest copy
+gets the oldest.** Struck in place.
+
+> ⭐⭐⭐ **THE SINGLE LESSON, AND IT IS THE SAME ONE IN ALL THREE LIMBS: TWO HOMES
+> FOR ONE FACT.** Six findings with two rows; one backlog with two counts; one
+> trend with two copies. ⛔ **Every rot this document has suffered this week is
+> that shape**, and the cheap test is not *"is this true?"* but ***"is this the
+> only place that says it?"***
 
 ### F130 — ⭐⭐⭐ **A RATCHET THAT NOTHING EVER INVOKED. `cbaseline_check.py`'s ENFORCEMENT WAS GATED ON A FLAG NO CALLER PASSED, AND THE CORPUS HAD ALREADY DRIFTED PAST IT**
 

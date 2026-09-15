@@ -226,6 +226,29 @@ CLASS = {
     #    re-gated rows is exactly the kind of silent judgement `PESSIMISM` exists
     #    to be tested against.
     "058": {"ph03": 1 / 3, "ph16": 1 / 3, "ph29": 1 / 3},
+
+    # --- 2026-09-15 ---------------------------------------------------------
+    # ⭐ CLASSIFIED IN THE SAME BREATH AS BEING WRITTEN, WHICH IS THE RULE `_057`
+    #    WROTE FOR ITSELF SIX LINES UP: `task_ids()` globs the DISK, so merely
+    #    WRITING the file makes `N1` red, and a later agent sweeping the checkers
+    #    would chase a failure that has nothing to do with its work. ⓘ Unlike
+    #    `_057` this costs no rule-11 exception -- nothing is running yet, which
+    #    is the whole point of doing it before dispatch rather than after.
+    "059": "METH",             # THE review round: F129/F130/F127/F128 (the 8th),
+                               # with item 132 folded in. Corpus-wide, charged to
+                               # no row -- the same call as _043/_047/_053/_055/
+                               # _057, and the reason the per-row series cannot
+                               # see what a row OPENS.
+                               # ⚠ WHY ITEM 132 DOES NOT MAKE IT ROW-CHARGEABLE,
+                               # given `_058`'s rule that a control a row should
+                               # have shipped with is THAT ROW's debt: item 132
+                               # pins the THRESHOLD of F74's admissibility bar
+                               # over the whole corpus from committed records. It
+                               # is not any row's missing control -- it is the
+                               # rule every row is judged by. ⓘ The residue it
+                               # may expose (ph07/ph53/ph64 still have no measured
+                               # share) IS row debt, and will be charged to those
+                               # rows by whatever task measures them.
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them

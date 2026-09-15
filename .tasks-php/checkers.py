@@ -147,9 +147,20 @@ TASKS = os.path.join(ROOT, ".tasks-php")
 # ---------------------------------------------------------------------------
 REGISTRY = {
     "boxcheck.py": dict(
-        kind="checker", argv=[], expect=0, negatives="none", st_expect=None,
+        kind="checker", argv=[], expect=0, negatives="probe", st_expect=None,
+        probe="probes/rule9_mustfire.py",
         why="RECAP_PHP.md's own invariants, incl. the 20-line START HERE box. "
-            "No §H arms: every assertion IS a must-fire arm against a live file."),
+            "⭐⭐ 2026-09-15 (F131) IT GAINED THE ONE ARM IT MOST NEEDED AND THE "
+            "`negatives` FIELD MOVED `none` -> `probe`: the RULE-9 table is an "
+            "INDEX, so it must have ONE ROW PER KEY, and it had SIX keys on two "
+            "rows at once because _057 verdicted a BATCH that was APPENDED below "
+            "instead of APPLIED above. ⛔ The old `why` said *every assertion IS "
+            "a must-fire arm against a live file*, and that was the exact reason "
+            "this defect was invisible: an assertion about the live file cannot "
+            "be shown FAILING without breaking the live file. ▶ `rule9_rows()` is "
+            "now PURE over the text, and probes/rule9_mustfire.py plants the "
+            "defect in a STRING. ⭐⭐⭐ IT ALSO DERIVES THE BACKLOG -- the open "
+            "cycles are printed and written down nowhere else."),
     "citecheck.py": dict(
         kind="checker", argv=[], expect=1, negatives="flag", st_expect=1,
         why="⛔⛔ RED, AND **NOT** FOR THE REASON EVERY DOCUMENT GIVES. It exits "
@@ -300,6 +311,25 @@ REGISTRY = {
             "REFUSED to REQUIRED (F123). ⛔ NOT in the sweep: it is 30 s and it "
             "answers a per-row question, not a standing one. ⚠ Pinned to ph97's "
             "patch path; a row edits step 4."),
+    "probes/rule9_mustfire.py": dict(
+        kind="checker", argv=[], expect=0, negatives="inline", st_expect=None,
+        why="⭐⭐⭐ §H EVIDENCE FOR boxcheck.py's RULE-9 ARM, AND THE REASON THAT "
+            "ARM COULD BE WRITTEN AT ALL. F131: the table that decides what may "
+            "enter .memory-php/ listed SIX findings as BOTH UNREVIEWED and "
+            "verdicted. An assertion about a LIVE document cannot be shown "
+            "failing without breaking the live document -- so boxcheck's "
+            "`rule9_rows()` was made PURE over the text and this plants the "
+            "defect in a STRING (F52: the probe made the state it was "
+            "measuring, twice in one week). ⭐ DIFFERENTIAL, not absolute: each "
+            "arm asserts the mutation moves rule9_rows's OWN output by exactly "
+            "the planted key, relative to whatever the baseline is -- the "
+            "repair n14_mustfire.py needed after it broke the first time a real "
+            "defect went live. ⭐⭐ Arm (b) is the one that earns its keep: it "
+            "plants a duplicate key WITHOUT ADDING A LINE, so a row-count check "
+            "would pass it. ⓘ Its own first draft picked a victim row from the "
+            "`_047` DATED SNAPSHOT table and all four arms went FAIL -- kept in "
+            "the docstring, because that is a free demonstration that the "
+            "table-scoping regex holds."),
     "probes/n14_mustfire.py": dict(
         kind="checker", argv=[], expect=0, negatives="inline", st_expect=None,
         why="⭐ §H EVIDENCE, COMMITTED RATHER THAN RUN ONCE AND DISCARDED: shows "
@@ -371,9 +401,34 @@ def audit(disk, registry):
         if kind not in ("checker", "tool", "landing"):
             problems.append(f"{name}: kind {kind!r} is not one of "
                             f"checker/tool/landing")
-        if neg not in ("inline", "flag", "none"):
+        if neg not in ("inline", "flag", "none", "probe"):
             problems.append(f"{name}: negatives {neg!r} is not one of "
-                            f"inline/flag/none")
+                            f"inline/flag/none/probe")
+
+        # ⭐⭐ `probe` WAS ADDED 2026-09-15 FOR F131, AND IT IS LOAD-BEARING, NOT
+        #    A LOOPHOLE. It means: this checker's must-fire negatives live in a
+        #    SEPARATE committed file, because its assertions are about a LIVE
+        #    document and cannot be shown failing without breaking that
+        #    document. ⛔ A fourth enum value that merely PERMITTED a new shape
+        #    would be regex-tuning by another name, so the entry must NAME its
+        #    probe and the probe must itself be a registered, swept checker.
+        #    Without that, `negatives="probe"` would be a stronger `none`.
+        if neg == "probe":
+            pr = e.get("probe")
+            if not pr:
+                problems.append(f"{name}: negatives='probe' but no `probe` key "
+                                f"names the file that demonstrates the failure")
+            elif pr not in registry:
+                problems.append(f"{name}: names probe {pr!r}, which is NOT in "
+                                f"this registry -- an unregistered probe is not "
+                                f"swept, so it is evidence nobody runs")
+            elif registry[pr].get("kind") != "checker":
+                problems.append(f"{name}: probe {pr!r} is filed kind="
+                                f"{registry[pr].get('kind')!r}, so the sweep "
+                                f"never runs it")
+        elif e.get("probe"):
+            problems.append(f"{name}: carries a `probe` key but negatives is "
+                            f"{neg!r} -- say which it is")
         if not e.get("why", "").strip():
             problems.append(f"{name}: no `why` -- every entry is adjudicated BY "
                             f"HAND and an entry without a reason is not one")
@@ -648,6 +703,31 @@ def selftest():
     check("N4", not about(p, "quota.py", "FLAG-GATED"),
           "an INLINE-negatives checker with no selftest arm is NOT flagged "
           "-- quota.py runs its arms on a bare run and must stay legal")
+
+    # ⭐⭐ N4b/N4c/N4d MUST-FIRE: `negatives="probe"` was added 2026-09-15 (F131),
+    #    and a new enum value that only PERMITS a shape is regex-tuning. These
+    #    three assert it COSTS something: name a probe, have it registered, and
+    #    have it swept.
+    r = dict(REGISTRY)
+    r["boxcheck.py"] = {k: v for k, v in REGISTRY["boxcheck.py"].items()
+                        if k != "probe"}
+    p = audit(disk, r)
+    check("N4b", about(p, "boxcheck.py", "no `probe` key"),
+          "negatives='probe' with no probe named is caught -- otherwise the "
+          "value would be a stronger `none`")
+
+    r = dict(REGISTRY)
+    r["boxcheck.py"] = dict(REGISTRY["boxcheck.py"], probe="probes/nope.py")
+    p = audit(disk, r)
+    check("N4c", about(p, "boxcheck.py", "NOT in this registry"),
+          "a named probe that is not registered is caught -- an unregistered "
+          "probe is evidence nobody runs")
+
+    r = dict(REGISTRY)
+    r["quota.py"] = dict(REGISTRY["quota.py"], probe="probes/n14_mustfire.py")
+    p = audit(disk, r)
+    check("N4d", about(p, "quota.py", "carries a `probe` key"),
+          "a `probe` key on a non-probe entry is caught -- say which it is")
 
     # N5 MUST-FIRE: an adjudicated non-zero expectation with no ⛔ in its reason
     #    turns a red checker into furniture. ⭐ This is the arm that exposed
