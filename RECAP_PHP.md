@@ -47,24 +47,24 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 10 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL · ph45
         (T1)+ph53+ph52 (T3)+ph55+ph56 (T5) TYPE. 7 of 20 fam. 30 owed.
-NEXT    _054 SCREENED 13 EMPTY FAMILIES (45 ROWS, 3 AGENTS, NO KILLS). ▶ (1) ⭐ ROW
-        11 = ph97 (T6): R1h f7326d627962 IS ONE FILE, ONE LINE (VERIFIED); ph96
-        CLOSES T6. 5 ROWS, ONE OBLIGATION (I12), 5 FAILURE MODES, 3 OF THEM WITH
-        THE GUARD PRESENT+PASSING. ▶ (2) DISPATCH _055 (F96 DECOMPOSED, F113, M4).
-        ▶ (3) ⛔⛔ ITEM 105 STILL OWED TO THE USER: (a) check.py = 33-ROW RE-GATE,
-        BUYS THE SMALLER TCB; (c) LEAVE IT. ⭐ I PROCEED (c). ~81-101 TASKS LEFT.
-⚠ NEW   F116 ⭐⭐⭐ A WORKING PHP 5.0.0 CLI IS ON THIS BOX, CITED BY **NO** MANAGER
-        DOC -- CRITERION 2 CAN BE MEASURED: 36 REPRODUCERS, 14 SIGSEGV. F114 F96
-        WAS NEVER ONE FINDING: 4 REVIEWER ROUNDS, 2 VERDICTS, ATOM STAYED RED.
-        F115 3 OF 163 CACHED PATCHES DON'T BIND TO THEIR SHA. F117 citecheck RED
-        FOR A FALSE REASON -- READ THE COUNT, NEVER THE EXIT CODE.
-⚠ WRONG P2 (ROW 11 TEMPORAL) REFUTED BY MY OWN CONTROL; MY RANKING COVERED 91 OF 102
-        ROWS. I ALSO MADE+REFUTED M4: small/large.bin BOTH 9 BYTES = ONE DRAW. 117 OPEN.
-⚠ TRAPS `grep -a` ALWAYS. AN APPENDED CORRECTION LEAVES THE OLD NUMBER (73, x5). A
-        NOTIFICATION MEANS STOPPED, NOT FINISHED (118). RUN checkers.py, NOT A HAND
-        LOOP -- 5 OF 14 HIDE THEIR NEGATIVES. .web/: NEVER `git add -A`.
-READ    RULE-9 · .memory-php/ · F1-F118 · items 1-121 · _054's 3 REPORTS · CLAUDE.md
-        r6 · PROTOCOL_PHP §B1a+§C+§F6a+§H · STATISTICS_001 · checkers.py.
+NEXT    NOTHING RUNNING. _054 SCREENED 13 FAMILIES (45 ROWS, NO KILLS); _055 CLOSED
+        ITEM 117 AND VERDICTED F96 PER GROUP. ▶ (1) ⭐ BUILD ROW 11 = ph97 (T6):
+        R1h f7326d627962 IS ONE FILE, ONE LINE (VERIFIED); ph96 THEN CLOSES T6 --
+        5 ROWS, ONE OBLIGATION (I12), 5 FAILURE MODES, 3 WITH THE GUARD PRESENT +
+        PASSING. ▶ (2) REVIEW F114-F119, ALL UNREVIEWED, + F96's R2/R4/R5, THE ONLY
+        CLAUSES STILL OWED. ▶ (3) ⛔⛔ ITEM 105 STILL OWED TO THE USER: (a) check.py
+        = 33-ROW RE-GATE, BUYS THE SMALLER TCB; (c) LEAVE IT. ⭐ I PROCEED (c).
+⚠ NEW   F116 ⭐⭐⭐ A WORKING PHP 5.0.0 CLI IS ON THIS BOX, CITED BY **NO** MANAGER DOC
+        -- CRITERION 2 CAN BE MEASURED: 36 REPRODUCERS, 14 SIGSEGV. F119 ITEM 117
+        CLOSED BY _050's OWN UNREAD ARTEFACT + 3 COMMITTED GATE RUNS AT 3 envp
+        VALUES, BIT-IDENTICAL. F117 citecheck RED FOR A FALSE REASON -- READ ITS
+        COUNT. F115 3 OF 163 PATCHES DON'T BIND TO THEIR SHA. ~81-101 LEFT.
+⚠ WRONG P2 REFUTED BY MY OWN CONTROL; MY RANKING COVERED 91 OF 102 ROWS. I MADE M4,
+        REFUTED IT, AND THE REFUTATION WAS ALSO WRONG (F119). 0 OF 4 REASONS SURVIVED.
+⚠ TRAPS `grep -a` ALWAYS. AN APPENDED CORRECTION LEAVES THE OLD NUMBER (73, x7 NOW).
+        QUOTE A RE-GATEABLE READING AS AN **EVENT**, NEVER A STATE (F119/M2, x2 LIVE).
+        RUN checkers.py, NOT A HAND LOOP. .web/: NEVER `git add -A`.
+READ    RULE-9 · .memory-php/ · F1-F119 · items 1-121 · _054 x3 + _055 · CLAUDE.md r6.
 ```
 
 ---
@@ -144,21 +144,31 @@ READ    RULE-9 · .memory-php/ · F1-F118 · items 1-121 · _054's 3 REPORTS · 
 > | **F111** | ⚠ **UPHELD offline / UNTESTED on upstream history** (`_053`) | ✅ census re-ran (`problems: none`), `0x14 = offsetof(zval,type)` confirmed by probe. ⛔ **four upstream-history claims UNTESTED (network) and NOT reported as confirmations** |
 > | **F112** | ⚠ **UPHELD-NARROWED** (`_053`) | ⛔ the `rlimit` floor is **3**, not 2, so the *"`n = 2`"* coincidence is **REFUTED**; its control is **broken** (item 115). ⚠ *"the row had to buy it"* remains **UNPROVEN** |
 > | ⭐ **F113** | ⛔ **UNREVIEWED** | `_053`'s own round. ⚠⚠ **Its `§B5` correction DID land**, because it is a measurement, **and its SCOPE (1 row against 3) landed with it** after the manager first shipped it without — item **118** |
-> | **F96** | ⛔ **DECOMPOSED — see below. The single cell is RETIRED** | ⛔⛔ **ITS STATED GROUND WAS WRONG AND IS REPLACED, NOT APPENDED** (item 73). The cell read *"UNREVIEWED, FOURTH ROUND … it has NO cheap second method"*. **F114 measured that four REVIEWER rounds had F96 in scope and two produced verdicts on it** |
+> | **F96** | ✅✅ **VERDICTED PER GROUP AT `TASK_PHP_055`. NOT `UNREVIEWED`, AND NOT PERMANENTLY MARKED — EVERY GROUP HAD A CHEAP SECOND METHOD AND THE LAST ONE WAS IN THE ROW'S OWN `spec.md` ALL ALONG** | ⛔ **The *"no cheap second method"* ground was wrong TWICE OVER** — F114 found the first half, `_055` the second. ⚠ **Replaced entirely, not appended** (item 73) |
 >
-> ### ⭐⭐⭐ `F96`, PER GROUP — because it was never one finding (F114)
+> #### ⭐⭐⭐ `F96`, PER GROUP — **SEVEN groups, not the four I wrote** (`_055` §1.1)
 >
-> | group | review state |
+> | group | verdict |
 > |---|---|
-> | **(a)** the eight gate-record quotes | ✅ **cheap, and DONE 2026-09-15**: seven reproduce; ⛔ **`contract_sha256 7013be6f7c1c` is STALE by two re-gates** (`_042`, `_044`) |
-> | **(b)** the 4-prediction ledger | ⚠ **R3 reviewed by `_042` §3** — *"the prediction's MECHANISM was wrong"*, and its CONCLUSION survives on a spelling nobody had written. ⛔ **R2 / R4 / R5 UNREVIEWED** |
-> | **(c)** result 2 (A and B agree because §B1a holds) | ⚠⚠ **TWO reviewer verdicts, split along conclusion/reason**: `_050`/F110 #4 **CONFIRMS it on its own stated falsifier**; `_053`/F113 **REFUTES its stated REASON** |
-> | **(d)** results 1/3/4 + the NOVELTY claim | ✅ result 3's `A1 −1.253 %` **reproduces exactly**. ⛔⛔ **The NOVELTY claim is the ONE clause with no cheap second method** — exactly what `_047`'s reviewer checked. ▶ **`_055` must end it VERDICTED or PERMANENTLY MARKED, never `UNREVIEWED` as one word** |
+> | **(a)** the eight gate quotes | ✅ **Seven reproduce** (`forbidden_hits` **is** nested under `idiom_audit`; both `identity` rows `differ`/`differ` as pinned). ⛔ **`contract_sha256 7013be6f7c1c` is a STATE quote, two re-gates stale**: correct at `4297b1d` → `c41ffad2b795` at `bee710e` → `6924e66fde49` at `b754da4`. ▶ **Repair is the EVENT form, not deletion** |
+> | **(b)** the 4-prediction ledger | ⚠ **R3 VERDICTED by `_042` §3**, and ⛔⛔ **THIS — not the novelty claim — IS THE GROUP `_047` CHECKED.** ⛔ **R2 / R4 / R5 UNREVIEWED, and they are the ONLY clauses of F96 still owed** |
+> | **(c)** result 2 | ✅ **VERDICTED TWICE, SPLIT ALONG CONCLUSION/REASON.** `_050`/F110 #4 **confirms the conclusion on its own stated falsifier**; `_053`/F113 **refutes the stated REASON** (§B1a's O(1) precondition). ⓘ ⭐ **A verdict filed under another finding's number is STILL a verdict — the table's one-cell-per-finding shape is what forced the mis-filing** |
+> | **(d)** results 1/3/4 | ✅ **`A1 −1.253 %` reproduces exactly**, as do *"largest of the three"* and *"n = 3"*. ⛔ **The sentence owes INPUT and OPT/MODE** (`large.bin` reads `−0.494 %`; `O0` reads `−16.870 %`) and ⭐ **the C-compiler clause DOES NOT APPLY — a Rust→Rust pair, and say so rather than skip it.** ⛔ **It also strips the row's own caution** (`NOTES.md:1118-1123`) |
+> | **(d′) the NOVELTY claim** | ⛔⛔ **IT WAS NEVER THE CLAUSE WITHOUT A SECOND METHOD, AND `_047` NEVER CHECKED IT — MY CELL SAID IT DID, AND THAT WAS A FALSEHOOD IN THE BLOCK THAT GOVERNS THE LAYER.** ✅ Mechanism half **UPHELD by three routes that PRE-DATE the build** — `CATALOGUE.md:752`, `spec.md:577`'s `cwe_note`, `index.csv`'s CWE-824 — plus a measurement. ⛔ ***"first in-bounds uninitialised read"* is true only of BUILD ORDER** (T3 is *"initialised before read"* and has five rows); ⛔⛔ ***"no built row priced that"* was true at 6 rows and is FALSE at 10** — `ph52` prices one |
+> | **(e)** the bracket event | ✅ **reproduces, and it is the CONTROL for the state-vs-event rule** — `16/0` then, `22/0` now, because a bracket is quoted as an event |
+> | **(f)** the `index_mut` settlement | ✅ **reproduces in two minutes** — `~/tools/verus/vstd/std_specs/slice.rs:43-48` |
+> | **(g)** the §8 pointer | ⚠ **SUPERSEDED, not unreviewed** — `_042`/F100 searched both endpoints |
+> | **(h)** the meta-claim about falsifiers | ⛔ **NOT A MEASURABLE CLAIM** — a methodological opinion inside an evidence-gated finding. **Move it to `04-process.md` or drop it; do not verdict it** |
 >
-> ▶ **NEXT REVIEW SCOPE: `F96` (per group) · `F113` · and `F114`–`F118`, which are
-> this session's and are all UNREVIEWED.** ⚠ **`F114` and `F117` are MANAGER
-> findings from one probe each, and law 12 plus five consecutive rounds say to
-> assume them narrowable.** ⓘ **Backlog trend: 14 → 2 → 7 → 1 → 4 → 2 → 6.**
+> ▶ **STILL OWED ON `F96`: R2, R4 and R5 of the ledger. Nothing else.**
+> ▶ **MAY ENTER `.memory-php/`:** (a) in **event form**, (c) **with BOTH verdicts in
+> the same sentence**, (d) **with input + opt/mode + the row's caution**, (d′)
+> **mechanism half only, corpus half re-dated**, (e), (f). ⛔ **NOT (b)'s R2/R4/R5. NOT (h).**
+>
+> ▶ **NEXT REVIEW SCOPE: `F114`–`F119`, all of this session's and all UNREVIEWED**
+> — plus **R2/R4/R5**. ⚠ **`F114` and `F117` are MANAGER findings from one probe
+> each**; law 12 and six consecutive rounds say assume them narrowable.
+> ⓘ **Backlog trend: 14 → 2 → 7 → 1 → 4 → 2 → 6.**
 >
 > ⛔ **SEVEN THINGS `_050` §8.1 FORBIDS THE LAYER**, and they are enumerated in
 > its report. ▶ **Read that list before adding anything from `F109`, `F110`,
@@ -410,7 +420,13 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > only under `--selftest` — the third time "all checkers pass" was false** ·
 > **F118 ⭐⭐⭐ the row-11 screen: 45 candidates, 13 families, three agents, NO
 > KILLS — three different picks each with evidence, my `P2` REFUTED by my own
-> control, and SIX rows' recorded `fix_commit` is not the repair of its site**
+> control, and SIX rows' recorded `fix_commit` is not the repair of its site** ·
+> **F119 ⭐⭐⭐ ITEM 117 CLOSES, and the measurement that closes it was taken by
+> `_050`, the task that opened the item — 32 pad residues hold `−14.0` flat on
+> both inputs, and three committed gate runs at three `envp_stack_bytes` give
+> bit-identical family B. ⛔ Three of four conclusions survived and ZERO of four
+> REASONS survived as written; `F96` ends VERDICTED PER GROUP (seven groups, not
+> four), and my `M5` is refuted in both halves**
 >
 > ⚠⚠ **This index stopped at F59 while F60–F65 existed, and then AT F101 WHILE
 > F113 EXISTED — twelve behind, caught by a pre-handoff audit 2026-09-14.**
@@ -1713,6 +1729,92 @@ The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
 
+### F119 — ⭐⭐⭐ **ITEM 117 CLOSES, AND THE MEASUREMENT THAT CLOSES IT WAS TAKEN BY THE TASK THAT OPENED THE ITEM**
+
+`TASK_PHP_055`, 776 lines. ⚠ **UNREVIEWED** (rule 9). Brackets `66/0` and `22/0`,
+first and last, unmoved; nothing measured or re-gated.
+
+⛔⛔⛔ **ITEM 117's PREMISE — *"the sweep measures the whole-program slope, NOT
+`kernel_exclusive_ir`, so it cannot test an A1 figure; no tool here does"* — IS
+FALSE, AND `_050` HAD ALREADY RUN THE TOOL.** ✅ **Manager-verified from
+`.temp/php50/sw_ph53.json`, written 2026-09-14 by `_050` itself:**
+
+```
+ph53  large.bin : 32 pad residues,  (verus − unsafe) distinct values = [−14.0]
+ph53  small.bin : 32 pad residues,  (verus − unsafe) distinct values = [−14.0]
+            all EIGHT cell steps = 0.00 on both inputs
+```
+
+▶ ⭐⭐ **An alignment artefact is PAD-DEPENDENT BY DEFINITION, and sweeping 32
+residues IS sweeping the alignment state. The difference is invariant across the
+whole period, on both inputs.** ⛔ **This also defeats my own `M4R`**: I objected
+that `small.bin`/`large.bin` are both 9 bytes and so are one draw — true, but the
+**sweep deliberately varies the pad across 32 residues**, which is 32 draws per
+input. **The multi-draw experiment I said did not exist had been run and written
+to disk the day item 117 was opened.**
+
+✅✅ **AND THE STRONGEST SUPPORT IS GENUINELY COMMITTED AND NOBODY HAD READ IT** —
+manager-verified from git history, `ph53`'s gate record at its **three** re-gates:
+
+| commit | `envp_stack_bytes` | `md5(marginal_ir_per_call)` |
+|---|---|---|
+| `4297b1d` (the build) | **3686** | `79716501c531` |
+| `bee710e` (`_042`) | **3697** | `79716501c531` |
+| `b754da4` (`_044`) | **3698** | `79716501c531` |
+
+**Three independent alignment states, all 96 family-B figures BIT-IDENTICAL.**
+
+⚠⚠ **ONE CORRECTION TO THE REVIEWER, AND IT IS F51/F99's OWN CLASS: the report
+says *"the evidence has been committed since 2026-09-14"*, and
+`.temp/php50/sw_ph53.json` IS GITIGNORED AND NOT COMMITTED** (`git check-ignore`
+→ `.gitignore:3`). ✅ It is **re-derivable** — `php50_align_sweep.py` is committed
+and is its generator, which is `CLAUDE.md` rule 1's correct arrangement — **but
+the durable citation is the THREE GATE RECORDS, not the sweep JSON.** ▶ **Quote
+the gate records; cite the sweep as re-derivable.**
+
+▶ ⛔ **DO NOT BUILD THE SWEEP EXTENSION `_055` was asked to price.** It would test
+the immune column for a contaminant a **mechanism** says cannot reach it:
+`.memory/03-measurement.md` records that **100 % of the ±7 swing is inside a libc
+`memset` callee**, which `kernel_exclusive_ir` excludes **structurally**.
+
+### ⛔ AND THE ROUND'S OWN SCORE: **THREE OF FOUR CONCLUSIONS SURVIVED; ZERO OF FOUR REASONS SURVIVED AS WRITTEN**
+
+- **M1** conclusion ✅ **upheld and UNDER-STATED — seven claim-groups, not four**;
+  ⛔ **its cell (d) stated a FALSEHOOD: `_047` checked the PREDICTION LEDGER, never
+  the novelty claim, and its own text says so.** **I wrote that into the block
+  that governs the authoritative layer.**
+- **M2** ✅ upheld, ⛔ **under-counted: there are TWO stale `contract_sha256`
+  quotes, not one** — F96's `7013be6f7c1c` and **F100's `c41ffad2b795` at
+  `RECAP_PHP.md:2922`**. ⭐ **And the rule's control is inside F96's own sentence:
+  the BRACKETS aged correctly (`16/0` → `22/0`) because a bracket is quoted as an
+  EVENT, and the sha did not because it is quoted as a STATE.**
+- **M3** ✅ the number is exact; ⛔ **the sentence states 2 of the 5 things it owes.**
+- **M4R** conclusion survives, ⛔ **its reason — *"no power at all"* — is REFUTED:
+  M4 excludes the ONE-SHOT class exactly, and that is the class `_044` §8.2
+  measured on this row.** `M4S` upheld and under-stated.
+- **M5** ⛔⛔ **REFUTED IN BOTH HALVES** — the novelty claim has **three** cheap
+  second methods, **two of them written before the row was built**.
+
+✅ **P1, P2 and P3 all scored CORRECT.** ⓘ **Six consecutive rounds now.**
+
+### ⭐⭐ `F113` VERDICTED, AND ONE NEW UNIVERSAL FALLS
+
+1. ✅ **Point 1 upheld** — the 24 cell-sweeps re-derived. ⚠ **Their artefacts are
+   in gitignored `.temp/`** — F99's defect again, same class as above.
+2. ⚠ **Point 2: `§B5` IS textually an `iff` — but the `iff` argument is a
+   NON-SEQUITUR and `ph07` is not a counterexample to it.** The headline survives
+   on the measurement; **the reasoning I gave it does not.**
+3. ⭐⭐⭐ **Point 3: there is NO fifth explanation — my *"sensitivity × reach"*
+   candidate is REFUTED ARITHMETICALLY at zero cost, and the whole SEPARABLE
+   family with it**, on `_053`'s own artefacts. ⛔⛔ **And a new one falls out:
+   THE PERIOD IS ALSO `(cell, axis)`-DEPENDENT** — one series reads **period 16 /
+   window 8** against 29 series at **32/16**, contradicting a universal stated in
+   **both `§B5` and the authoritative layer.** ✅ **No published figure is at
+   risk**, but the universal is wrong as written.
+4. ⚠ **Point 4: the inherited caution is APPENDED, NOT APPLIED, in BOTH homes**
+   (item 73 again), **and item 118's scope clause landed in only one of the two.**
+   ⓘ **Un-inherited-caution rate on a declared sample: 1 of 5.**
+
 ### F118 — ⭐⭐⭐ **THE ROW-11 SCREEN: 45 CANDIDATES, 13 FAMILIES, THREE AGENTS — AND THEY PICKED THREE DIFFERENT ROWS, EACH WITH EVIDENCE. ⛔ MY `P2` IS REFUTED AND MY RANKING WAS OVER 91 OF 102 ROWS**
 
 `TASK_PHP_054`, three parallel investigators, **2 836 report lines**. Every
@@ -2919,7 +3021,7 @@ could not. ⚠ **So the next row's suite should be expected to find a fifth.**
 `TASK_PHP_042`. ✅ **Manager-verified from
 `results-php/gate/` and `controls/spellings.json`, and SAYING WHICH** (F99's
 lesson): from the **gate record** — `verdict PASS-WITH-BLOCKED-ROWS`,
-`failures []`, `complete_run true`, `contract_sha256 c41ffad2b795`,
+`failures []`, `complete_run true`, `contract_sha256 c41ffad2b795` **AS AT `bee710e`** (⚠ **an EVENT, not a state — the row re-gated again at `b754da4` and now reads `6924e66fde49`; F119/M2**),
 `controls_json {"spellings.json": "FRESH"}`, `identity` `differ`/`differ` as
 pinned; from **`controls/spellings.json`** — `problems []`,
 `r3_endpoint_degenerate false`, `r4_endpoint_degenerate false`, 20 variants.
@@ -3198,7 +3300,7 @@ the demonstration lives. → item **77**.
 PASS-WITH-BLOCKED-ROWS`, `failures []`, `complete_run true`, `verus
 {verified 27, errors 0, pinned 27}`, `identity` **`differ`/`differ` as
 pinned**, `forbidden_hits 0`, `skipped_inputs []`, `contract_sha256
-7013be6f7c1c`. **Brackets `66/0` + `14/0` → `66/0` + `16/0`, re-run by me.**
+7013be6f7c1c` **AS AT `4297b1d`** (⚠ **EVENT, not state: → `c41ffad2b795` at `bee710e` → `6924e66fde49` at `b754da4`**). **Brackets `66/0` + `14/0` → `66/0` + `16/0`, re-run by me.**
 
 ⭐ **The row's own novelty: an uninitialised read that is IN BOUNDS.** CWE-824 —
 the slot is inside the reallocated block and nothing is freed. **No built row
@@ -6875,7 +6977,7 @@ the wrong one.
 | 114 | ⛔⛔ **`quota.py` COUNTED A *DIRECTORY* AS A BUILT ROW, AND AGREED WITH THE TRUTH FOR NINE ROWS ONLY BECAUSE NO ROW HAD EVER BEEN HALF-BUILT** | Manager, 2026-09-14, found while landing `_051`. `quota.py:84-85` derived `built` from `glob.glob('patterns-php/ph*/')` — **directory presence**. ⭐ **The right definition was already written down in this file's own STATE cell** — *"count it: `ls results-php/gate/ \| grep -av ph00 \| wc -l`"* — **so the repo knew it and the tool used a different one.** ⛔ **It was latent for nine rows because every previous row went from nothing to fully gated inside ONE task; `_051` is the first to stop mid-row, and `quota.py` immediately reported `built 10` for a row with no `spec.md`, no `verus.rs` and no gate record.** ⚠⚠ **AND I QUOTED IT** — the corpus count in the START HERE box and in a report to the user both came from this tool. ✅ **REPAIRED: `built` is now derived from `results-php/gate/ph*.json`, a directory with no record is reported as `⏳ IN PROGRESS` and NOT counted, and a record with no directory is reported as `⛔ ORPHAN RECORD`.** ⭐ **Four §H negatives added INSIDE the tool** — N1 in-progress excluded (⭐ **and it prints `VACUOUS TODAY` rather than passing silently when no row is half-built**, F10's lesson), N2 every built row has a record, N3 `ph00` never counted, N4 no orphan records. ✅ **Now reads `built 9 · IN PROGRESS 1 · remaining 31 · T5 OWES 1`.** ⓘ Free — `.tasks-php/*.py` is in no digest. ⭐⭐ **THE CLASS: a checker can agree with the truth for a long time because the STATE THAT WOULD SEPARATE THEM HAS NEVER OCCURRED.** F49's shape (*a check that could not report its own blindness*), and the third measurement tool in this programme to be wrong in a way only a new kind of input could reveal |
 | 115 | ⚠⚠ **A CONTROL THAT CANNOT RUN ON ITS OWN SHIPPED FILE — AND THE GUARD MATCHES A *COMMENT*. *"A COMMENT IS NOT CODE"*, FOURTH INSTANCE** | `TASK_PHP_053` §2.5, **reproduced by the manager**. `patterns-php/ph56-fetchmode-arith/controls/rlimit_bisect.sh` refuses its own row: *"insertion matched 2x, want 1 -- verus.rs has been respelled and this script is measuring the wrong file"*. ⛔ **Its guard greps `verifier::rlimit`, and `verus.rs`'s own COMMENT about the rlimit matches**, so the count is 2 where the guard wants 1. ⚠⚠ **`ph55`'s copy is WORSE — two comments.** ⭐⭐ **FOURTH INSTANCE OF *A CHECK THAT READS PROSE AND CALLS IT CODE***: `spelling_matches`'s original lesson, `width.py`'s guard firing on the comment documenting its own defect, `contract_audit.py`'s `labels`-as-a-noun, and now this. ▶ **REPAIR: the guard must count occurrences in CODE — strip comments before matching, or match on the attribute's syntactic position.** ⓘ **`controls/*` is in `source_sha256`, so it is a RE-GATE per row and no re-measure** — batch with each row's next task. ⛔ **AND IT PRODUCED A WRONG PUBLISHED NUMBER**: F112's *"the floor bisects to 2"* came from this script; the floor is **3** |
 | 116 | ⛔ **`check.py::req-mut` DELETES PRECONDITIONS ONE AT A TIME, SO IT CANNOT SEE A JOINTLY-NECESSARY PAIR** | `TASK_PHP_053` §2.4, at `harness/check.py:6718`. **Two preconditions can each be individually removable and jointly necessary**, and a one-at-a-time stage reports both as *"NOT load-bearing"* and invites deleting both. ✅ **It does NOT bite `ph56`** — that row's **shipped** file verifies without both, which the reviewer checked rather than assumed. ⚠⚠ **A `harness/` finding: REPORTED, NOT EDITED** — `harness/check.py` is hashed into all 33 PAT gate records, so a repair is a 33-pattern re-gate (the same price as item 105's option (a)). ▶ **If item 105 is ever answered (a), BATCH THIS WITH IT** — one re-gate, two repairs. ⓘ Until then it is a caveat on any *"not load-bearing"* verdict: **it means *not individually* load-bearing** |
-| 117 | ⚠⚠ **THE ONE LOAD-BEARING UNCERTAINTY LEFT FROM `_050`: `ph53`'s A1 `unsafe→verus` IS EXACTLY `−14.000`, AND `14 = 2 × 7`** | `TASK_PHP_050` §10 #2, triaged as load-bearing by `TASK_PHP_053` §1.6 and **still open**. ⛔ **F96's headline `−1.253 %` rests on it.** ⚠ **The sweep tool measures the whole-program slope, NOT `kernel_exclusive_ir`, so it cannot test an A1 figure** — no tool here does. ⭐ **Counter-evidence that stands**: `_050`'s PAT census found **0 of 288**, and `_053` §1.4 makes an alignment explanation *less* likely for an A1 figure rather than more, since the axes demonstrably differ. ⛔⛔ **AND ON 2026-09-15 THE MANAGER MADE AND THEN REFUTED A CLAIM THAT WOULD HAVE CLOSED THIS ITEM FREE.** `M4`: the step is `−14.000 Ir/call` on BOTH inputs at different `n_iters`, so a whole-program offset `κ` must be 0. ⛔ **Wrong twice: (a) `php50_align_sweep.py`'s own docstring says every family-B figure is a SLOPE over `probe_iters` and *"the slope cancels"* the one-shot term, so the measured steps are PER-CALL and never divide by `n_iters`; (b) `small.bin` and `large.bin` are BOTH 9 BYTES, so both runs sit at the SAME alignment state — one draw reported twice, the `ph64` defect exactly.** ⚠⚠ **And the counter-evidence was already in the layer**: `03-numbers.md:234` records `ph45`'s `unsafe → verus` carrying a measured **`14.00` RANGE — the same rung pair** — and `ph55`'s clang cells needing `14` to protect their difference. **Three `14`s in alignment contexts.** ✅ **What survives is `M4S`, much weaker**: the two inputs do 2.5× different per-call work, so any contaminant is **per-call-constant, not per-window** — a constraint on the artefact's SHAPE, not evidence there is none. ▶ ⭐ **A cheaper route than a new tool may exist and `_055` must price it**: `php50_align_sweep.py` already runs the binaries under callgrind and parses the output, so reporting `kernel_exclusive_ir` per pad looks like an EXTENSION. ⛔ If it is, it lands with its must-fire negatives INSIDE it (§H). ▶ **Route: a dedicated task that sweeps `kernel_exclusive_ir`, OR an explicit decision to accept the PAT census and say so once.** ⓘ **Of `_050`'s seven uncertainties this is the only one still owed**; #1 closed (the wrong way, F113), #3/#4/#7 are neither cheap-and-important nor load-bearing, #5 is handled by scoping, and #6 is *"one `verus_run.py` invocation — a paragraph, not a task"* |
+| ~~117~~ | ✅✅ **CLOSED AT `TASK_PHP_055` (F119) — AND THE MEASUREMENT THAT CLOSES IT WAS TAKEN BY `_050`, THE TASK THAT OPENED THE ITEM.** ⛔ Its premise *"no tool here"* is **false**: `.temp/php50/sw_ph53.json`, written 2026-09-14, records `(verus − unsafe)` at a single value **`−14.0` across all 32 argv pad residues on BOTH inputs**, with **all eight cell steps `0.00`** — and an alignment artefact is **pad-dependent by definition**. ✅✅ **The durable support is COMMITTED and was unread**: `ph53`'s gate record at its three re-gates carries `envp_stack_bytes` **3686 / 3697 / 3698** with a **bit-identical** `marginal_ir_per_call` block (md5 `79716501c531`). ⛔ **DO NOT build the sweep extension** — `.memory/03-measurement.md` gives the mechanism: **100 % of the ±7 swing is inside a libc `memset` callee**, which `kernel_exclusive_ir` excludes structurally. ⚠ **And the manager's `M4R` is defeated by the same artefact**: the sweep varies the pad across 32 residues, so it is **32 draws per input**, not the one draw I said it was. **The original text:** | `TASK_PHP_050` §10 #2, triaged as load-bearing by `TASK_PHP_053` §1.6 and **still open**. ⛔ **F96's headline `−1.253 %` rests on it.** ⚠ **The sweep tool measures the whole-program slope, NOT `kernel_exclusive_ir`, so it cannot test an A1 figure** — no tool here does. ⭐ **Counter-evidence that stands**: `_050`'s PAT census found **0 of 288**, and `_053` §1.4 makes an alignment explanation *less* likely for an A1 figure rather than more, since the axes demonstrably differ. ⛔⛔ **AND ON 2026-09-15 THE MANAGER MADE AND THEN REFUTED A CLAIM THAT WOULD HAVE CLOSED THIS ITEM FREE.** `M4`: the step is `−14.000 Ir/call` on BOTH inputs at different `n_iters`, so a whole-program offset `κ` must be 0. ⛔ **Wrong twice: (a) `php50_align_sweep.py`'s own docstring says every family-B figure is a SLOPE over `probe_iters` and *"the slope cancels"* the one-shot term, so the measured steps are PER-CALL and never divide by `n_iters`; (b) `small.bin` and `large.bin` are BOTH 9 BYTES, so both runs sit at the SAME alignment state — one draw reported twice, the `ph64` defect exactly.** ⚠⚠ **And the counter-evidence was already in the layer**: `03-numbers.md:234` records `ph45`'s `unsafe → verus` carrying a measured **`14.00` RANGE — the same rung pair** — and `ph55`'s clang cells needing `14` to protect their difference. **Three `14`s in alignment contexts.** ✅ **What survives is `M4S`, much weaker**: the two inputs do 2.5× different per-call work, so any contaminant is **per-call-constant, not per-window** — a constraint on the artefact's SHAPE, not evidence there is none. ▶ ⭐ **A cheaper route than a new tool may exist and `_055` must price it**: `php50_align_sweep.py` already runs the binaries under callgrind and parses the output, so reporting `kernel_exclusive_ir` per pad looks like an EXTENSION. ⛔ If it is, it lands with its must-fire negatives INSIDE it (§H). ▶ **Route: a dedicated task that sweeps `kernel_exclusive_ir`, OR an explicit decision to accept the PAT census and say so once.** ⓘ **Of `_050`'s seven uncertainties this is the only one still owed**; #1 closed (the wrong way, F113), #3/#4/#7 are neither cheap-and-important nor load-bearing, #5 is handled by scoping, and #6 is *"one `verus_run.py` invocation — a paragraph, not a task"* |
 | 118 | ⛔⛔ **A `task-notification` MEANS *STOPPED*, NOT *FINISHED* — AND I COMMITTED A DRAFT REPORT BECAUSE OF IT** | Manager, this round. `TASK_PHP_053` notified `status=completed`; I verified the artefacts, landed the findings and committed `e0d4975`. **The agent then resumed and added 38 insertions** — the completed `ph45` `envp` sweep and, more importantly, **a scope caveat that the round's headline refutation rests on ONE ROW against THREE that agree.** ⛔⛔ **So I published F113's *"`argv` and `envp` are NOT the same knob"* as a flat general claim while the evidence was `1` disagreeing against `3` agreeing** — ⭐⭐ **which is the exact defect this programme has corrected four rounds running, committed by me IN THE COMMIT THAT LANDED THE ROUND ABOUT IT.** ✅ **Repaired in RECAP and in `.memory-php/03-numbers.md`; the refutation still stands, because one counterexample breaks an `iff` and §B5 is an `iff` — but the SCOPE now travels with the claim.** ▶▶ **THE RULE: `status=completed` is the harness saying the agent STOPPED. It may resume. ⭐ Before committing a subagent's report, DIFF IT AGAINST WHAT YOU READ** — `git diff --stat` on the report file costs one command and would have caught this. ⚠ **And rule 11's widened form already forbade it**: *do not COMMIT a file the subagent WRITES.* **I read `completed` as "the subagent is gone" when the notification's own text says it fires each time the agent stops and may fire again.** ⓘ **No research consequence beyond the scope clause** — every number in the draft survived into the final report unchanged |
 | 119 | ⛔⛔⛔ **SIX ROWS' RECORDED `fix_commit` IS NOT THE REPAIR OF THEIR CITED SITE — AND THE PRE-IMAGE SCREEN CALLS THREE OF THEM `CANDIDATE`** | `TASK_PHP_054` agents A, B and C, each on its own rows; `ph54` **re-verified by the manager**. **`ph67`** — the 2014 commit is a **pure refactor**; the destructor still runs on a linked bucket. **`ph72`** — six hunks, all about `userdata`, **none touches the cited `key`**. **`ph74`** — `NOT-THE-REPAIR`, and by 2006 the defect was already gone (`MAKE_STD_ZVAL` + `dup=1` + `zval_ptr_dtor` were in the tree). **`ph54`** — ✅ measured here: `fc96c7f7fa18` contains **0** occurrences of `get_current_data` and **does not touch `zend_execute.c` at all**; it is a performance refactor and the row's faulting deref and depth-1 guard both survive it. **`ph90`** — ⭐ agent B found the **real** repair, `0542a6f2c2a5` (2005-02-10, 1 file, 3+/1−, at `array.c:1045-1046`), and **applied it to the pinned tarball with `git apply` strict**. **`ph101`** — ⭐ the only genuine `NOT-THE-REPAIR` exclusion in C's nineteen. ⚠⚠ **THE CLASS IS F38's, MEASURED WIDER: *the `fix_commit` was a column in the corpus index, and it is not always THE fix.*** ⛔⛔ **AND IT IS A LESSON ABOUT THE SCREEN, NOT JUST THE ROWS: `preimage_screen.py` returns `CANDIDATE` for three of these six.** `NOT-THE-REPAIR` is the only one of its four outcomes that is a proof — **`CANDIDATE` and the two `INAPPLICABLE` labels say NOTHING**, and this is the first measurement of what that costs. ▶ **A row whose R1h is on this list is BLOCKED-ON-A-DECISION, not killed. None of the six fails the C-side bar** |
 | 120 | ⭐⭐ **THE ORACLE IS UNDOCUMENTED, AND `PROTOCOL_PHP.md` SHOULD SAY SO IN §A3** | F116. A working **PHP 5.0.0 CLI** sits at `…/php-in-safe-rust/.app-tests/.temp/oracle/bin/php-5.0.0-mysql-webext` and the corpus ships a **reproducer per id**, and **no manager-owned document points at either** (measured: zero mentions across `CLAUDE.md`, `PLAN_PHP.md`, `RECAP_PHP.md`, `PROTOCOL_PHP.md`, `CATALOGUE.md`, `SOURCES.md`, `.memory-php/`). ▶ **THE ACTION: `PROTOCOL_PHP.md` §A3 says *"reachability is deliverable #1, in writing, before any rung exists"* — it should say *in writing AND, where a reproducer exists, EXECUTED*, with the binary named and `LD_PRELOAD`'d `si_addr` as the cheap instrument** (no gdb on this box; memcheck refuses to start). ⚠⚠ **Two cautions that must travel with it**: the binary is **`php-in-safe-rust`'s oracle build, not a museum-default one**, so a row must say which build it measured on; and **`crashes_pristine_5_0_0 = False` is still not evidence of absence** (F3) — ⭐ **but `= True`, executed, is now evidence of PRESENCE, which the programme has never had.** ⓘ **Cost: a `PROTOCOL_PHP.md` edit, which is in no digest.** ⛔ **It does NOT retroactively validate the ten built rows** — their criterion 2 was argued, and re-running them is a separate, cheap, and probably worthwhile task |

@@ -152,7 +152,11 @@ CLASS = {
                                # corpus-wide and charged to no row.
     "055": "METH",             # THE review round: F96 DECOMPOSED, F113, and
                                # the manager's own M4 (made and refuted before
-                               # dispatch). Corpus-wide, charged to no row.
+                               # dispatch -- and the REFUTATION was wrong too).
+                               # ⭐ It CLOSED item 117 at zero measurement cost
+                               # from an artefact _050 had already written and
+                               # three committed gate runs nobody had read.
+                               # Corpus-wide, charged to no row.
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them
