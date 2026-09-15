@@ -123,6 +123,42 @@ binary, same run. The instrument is `.tasks-php/probes/segaddr.c`.
   instruction counts at the time, and a concurrent PHP compile would have
   competed for the machine. **That is the only reason. It is not evidence about
   the cost.**
+
+  ### ⭐⭐⭐ 1.2a — AND THE REAL FINDING IS THE CHAIN, NOT THE ERROR. **VERDICT THIS.**
+
+  The obligation was not overlooked. **It was proposed, demoted, skipped, and
+  then re-derived as impossible — across four documents, by two parties:**
+
+  | # | document | what it says |
+  |---|---|---|
+  | 1 | `TASK_PHP_051_REPORT.md` §8.1 — **the ENGINEER's own *"what I am unsure of"*** | *"I did not rebuild PHP 5.0.0 with the patch and re-run the six snippets … **It is the cheapest remaining check and it is not done.**"* |
+  | 2 | `TASK_PHP_052.md` §1.5 — **the MANAGER, next task** | *"Rebuild PHP with the patch and re-run the six snippets. ⭐ **Nice to have, not owed. Skip it** rather than leave §1.1–1.4 unfinished."* |
+  | 3 | `TASK_PHP_054_REPORT_E5E6E7E8.md` — **a DIFFERENT agent, two rounds later** | *"the hardened build still crashes — **NOT MEASURED. I cannot rebuild PHP 5.0.0.**"* (meaning: not within this task) |
+  | 4 | `PROTOCOL_PHP.md` §A3a — **the MANAGER, today** | the obligation is **absent**, and the reason given for its absence is **(3)** |
+
+  ⛔⛔ **SO A CHECK AN ENGINEER CALLED *"THE CHEAPEST REMAINING"* BECAME, IN FOUR
+  STEPS, A THING THE PROTOCOL TREATS AS IMPOSSIBLE — AND NO STEP WAS A LIE.**
+  ⭐⭐ **This is the programme's characteristic failure mode RUNNING BACKWARDS.**
+  The standing pattern is *a conclusion surviving while its reason dies*; here a
+  **reason decayed** (*"I didn't"* → *"not owed"* → *"I can't"* → *"one can't"*)
+  **while the conclusion hardened** into a protocol section.
+
+  ▶ **QUESTIONS THE MANAGER CANNOT ANSWER ABOUT HIS OWN MISTAKE:**
+  1. ⭐ **Is step 2 the load-bearing one?** The manager demoted it to
+     *"nice to have"* while the engineer had just called it *the cheapest
+     remaining check*. **Was that demotion justified at the time**, on `_051`'s
+     own evidence? If it was, the chain is bad luck. **If it was not, the defect
+     is a manager habit and steps 3–4 are its consequence.**
+  2. ⚠ **How many other *"cheapest remaining check"* items are sitting in a
+     `WHAT I AM UNSURE OF` section, demoted once and never revisited?** ▶ **A
+     count over the `§ WHAT I AM UNSURE OF` sections of the landed reports would
+     answer it.** ⛔ **The manager has not run it and does not want to be the one
+     who scopes it.**
+  3. ⛔ **Does this belong in `.memory-php/04-process.md` as a law?** Something
+     like *an engineer's own uncertainty may be DEFERRED but not DOWNGRADED; the
+     next task inherits its stated priority, not the manager's.* ⚠ **It is not in
+     the layer and does not go there on the manager's say-so, or yours — but it
+     is the most layer-shaped thing this round has produced.**
 - ⛔⛔ **DOES §A3a QUIETLY DOWN-RANK ROWS WITH NO CLI REPRODUCER?** Most temporal
   rows have none. §A3a says *"where a reproducer exists"* and F120 says in terms
   that a clean run is not a kill (**F3**, `CLAUDE.md` rule 6). ▶ **Is that
