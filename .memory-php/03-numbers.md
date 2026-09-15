@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F131** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F132** live in `RECAP_PHP.md`
 > (⚠ this said *F1–F41* for **forty-nine** findings, then *F1–F90* for **eleven** more — `PROTOCOL.md` rule 13, **and it has now rotted THREE TIMES.** ✅ **`.tasks-php/boxcheck.py` CHECKS THIS LINE against the actual highest finding as of 2026-09-13, so it is the last time.**
 > **Count it yourself: `grep -c '^### F' RECAP_PHP.md`.**)
 > ⭐ **And the statistic decision — which column every row publishes in — is
@@ -41,8 +41,27 @@
 ## Landed 2026-09-13 from `TASK_PHP_043` — which column, and what a figure owes
 
 - ⛔⛔⛔ **READ THIS BEFORE ANY `inside_share` FIGURE BELOW: TWO DIFFERENT
-  QUANTITIES WEAR THAT NAME IN THIS PROGRAMME, AND EVERY FIGURE IN THIS FILE IS
-  THE FIRST ONE.**
+  QUANTITIES WEAR THAT NAME IN THIS PROGRAMME, AND *THIS FILE USES BOTH*.**
+
+  > ⛔⛔⛔ **THIS LINE SAID *"AND EVERY FIGURE IN THIS FILE IS THE FIRST ONE"*.
+  > `TASK_PHP_059` MEASURED THAT AND IT IS FALSE — IN THIS FILE.** The `ph52`
+  > entry below reads *"**22.24 %** on its **C** rungs … **≈98.6 %** on its
+  > **Rust** rungs (`unsafe` A1 48,846,257 against W1 49,549,469)"*, and that
+  > parenthesis **spells out the `W` arithmetic**. Under `F74`'s definition the
+  > same row reads `0.9892`–`0.9970` and `0.2023`–`0.2269`; neither `0.2224` nor
+  > `0.986` appears anywhere in the corpus at ±0.0005.
+  >
+  > ⭐⭐⭐ **SO THE HAZARD IS WORSE THAN THIS BOX FIRST STATED, NOT SMALLER: the
+  > two quantities are not separated between documents — they are INTERLEAVED
+  > INSIDE SINGLE SENTENCES, here and in `RECAP_PHP.md`.** ⛔ **A caution box that
+  > is wrong about the file it heads is worse than none**, because it tells a
+  > reader they may stop checking. ▶ **Check the arithmetic of any figure you are
+  > about to quote; the name does not tell you which one it is.**
+  >
+  > ⭐ **`cbaseline_check.py`'s hand ledger had already written down half of
+  > this** — it files the `ph52` line with the note *"the four C cells actually
+  > span 20.23–22.69 %"*, which **is** the `F74` span. **The discrepancy was
+  > recorded and nobody read it as a definition mismatch.**
 
   | | definition | needs |
   |---|---|---|
@@ -60,16 +79,34 @@
   *name the denominator*, broken by the quantity `F88`'s neighbours are measured
   in, in the document that states `F88`.**
 
-  > ⚠ **STATUS, STATED PLAINLY: the finding behind this box (`F129`,
-  > `TASK_PHP_058`) is UNREVIEWED, and rule 9 says this layer carries what
-  > survived a full engineer→reviewer cycle.** It is admitted anyway because it
-  > **changes no figure and asserts no new result** — it labels figures already
-  > here, all of which stay correct once labelled — and because the alternative
-  > is a layer that reads as authoritative while four gated controls compute a
-  > different number under the same name. ▶ **A reviewer may overturn the
-  > wording; the two definitions are arithmetic and were re-derived by the
-  > manager from the committed records.** ⛔ **`F74`'s form exceeds `1.0` on 15
-  > of 360 corpus cells and nobody has explained why — open item 133.**
+  > ✅✅ **STATUS: REVIEWED AT `TASK_PHP_059`. The two definitions are UPHELD
+  > and UNDER-STATED; the *"every figure here is `F74`'s"* clause is REFUTED
+  > (struck above).** ⭐ **The gap between them is a MEASUREMENT, never a
+  > constant: 8.9 pp on `ph29`, 0.01 pp on `ph45`** — so a reader shown only
+  > `ph29` over-rates the risk on some rows and under-rates it on others.
+  >
+  > ⭐⭐ **THE STATUS NOTE THAT USED TO SIT HERE EARNED ITS KEEP AND IS KEPT AS A
+  > RECORD.** It admitted this box while `F129` was UNREVIEWED, on the ground
+  > that it *"changes no figure and asserts no new result — it labels figures
+  > already here, all of which stay correct once labelled."* ⛔⛔ **THAT GROUND
+  > WAS ITSELF THE REFUTED CLAIM**: the box did not merely label, it asserted a
+  > corpus fact about this file, and that assertion was false. ▶ **The lesson is
+  > not *"do not admit unreviewed material"* — admitting it was right, and rule 9
+  > worked exactly as designed because the marking is what made the reviewer
+  > attack it. The lesson is that *"it asserts no new result"* is itself a
+  > claim, and nobody checked it.**
+  >
+  > ⛔ **`F74`'s form exceeds `1.0` on 15 of 360 corpus cells** — ⚠ **13 at `O3`
+  > and 2 at `O0`**, all on `ph07` (5) and `ph16` (10). ⭐ **`_059` ran the
+  > discriminator: re-basing the denominator on an `n_iters`-scale window removes
+  > it on `ph07` (`1.0353` → `0.9569`) and MOST of it on `ph16` (`1.0241` →
+  > `1.0021`, still above 1).** ⛔⛔ **The five-window slope series on `ph16` is
+  > NON-MONOTONE with the published `[100, 200]` pin the LOWEST of five**, so it
+  > is a **draw** effect (`F88` + `F93`), not a scale effect — **the two
+  > candidates are the same phenomenon and the named discriminator cannot
+  > separate them.** ▶ **Do not quote a bare `F74` share above 1.0** — open item
+  > 133, now with a measured answer on one row and a measured *non*-answer on the
+  > other.
 
 - ⭐⭐⭐ **WHICH STATISTIC RESOLVES A CODE DIFFERENCE IS DECIDED BY
   `inside_share`, AND IT IS ALREADY COMPUTED FOR EVERY CELL IN EVERY RECORD.**

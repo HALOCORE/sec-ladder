@@ -48,23 +48,23 @@ between them read `CLAUDE.md`'s top table.
 STATE   ⭐ ROWS BUILT 11 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL · ph45
         (T1)+ph53+ph52 (T3)+ph55+ph56 (T5)+ph97 (T6) TYPE. 8 of 20 fam. 26 owed
         to floor 37 (item 121). ⛔ BACKLOG = THE RULE-9 ROWS OPENING ⛔ UNREVIEWED.
-NEXT    ▶ (1) ⭐⭐⭐ **_059 IS WRITTEN AND DISPATCHED** -- THE 8th REVIEW ROUND,
-        F129 -> F130 -> F127 -> F128, + ITEM 132 AS A **PRECONDITION** (F74's
-        BAR IS A CONJUNCTION; ONE CONJUNCT CANNOT VERDICT IT). ▶ (2) ITEM 129
-        "UNSURE OF" CENSUS -- ~289 ITEMS, **NOT** A ONE-TASK JOB.
-        ▶ (3) ITEM 134 `BASE`'s SPELLING (IN _059 §2.2). ▶ (4) ROW 12 = ph96;
-        ROW 13 TEMPORAL. ▶ (5) ⛔⛔ ITEM 105 IS THE USER'S DECISION, NOT MINE.
-⚠ NEW   F131 ⛔⛔⛔ **RULE-9 LISTED SIX FINDINGS AS *BOTH* UNREVIEWED AND
-        VERDICTED** (F120-F125): _057's BATCH WAS APPENDED BELOW, NOT APPLIED
-        ABOVE. MERGED TO ONE ROW PER KEY. ⭐ THE TABLE HELD THE SENTENCE THAT
-        DIAGNOSES IT. ⭐⭐ F128's CELL SCANNED AS A VERDICT -> BACKLOG UNCOUNTABLE.
-⭐ OPEN  **DOES F74's BAR FORBID 81% OF THE CROSS-LANGUAGE COLUMN, OR HAS IT BEEN
-        MISREAD?** MANAGER TALLY, UNVERIFIED, 198 PAIRS: x-lang 17 PASS/71 FAIL,
-        same-lang 99/11. _059 §1.3 MUST SETTLE IT -- IT CUTS BOTH WAYS.
-⚠ TRAPS ONE HOME PER FACT (F131 x3). AN ARM MAY ASSERT A DIRECTION ONLY TO DEFEND
-        A **PUBLISHED** FINDING, AND MUST PRINT THE MARGIN. `grep -a`; EVENT NOT
-        STATE; DESCRIBE A PATH, DON'T SPELL IT (x7); NEVER `git add -A`.
-READ    RULE-9 · .memory-php/ · F1-F131 · items 1-134 · _059 + _058.
+NEXT    ▶ (1) ⭐⭐⭐ ROW 12 = **ph96** (closes T6); ROW 13 **TEMPORAL** -- 15 of 26
+        owed are, and that axis has ONE built row. ▶ (2) ITEM 129 CENSUS ~289
+        ITEMS, **NOT** A ONE-TASK JOB, A REVIEWER RUNS IT. ▶ (3) F128's KIND-A
+        RULE NEEDS ITS 2 MISSING SENTENCES. ▶ (4) ITEM 127 RESIDUE = BOOKKEEPING.
+        ▶ (5) ⛔⛔ ITEM 105 IS THE USER'S DECISION, NOT MINE.
+✅ DONE  **_059: THE 8th ROUND CLEARED F127-F130 AND REFUTED FIVE OF MY CLAIMS.**
+        ⛔⛔⛔ *"INADMISSIBLE"* WITHDRAWN -- F74's BAR IS **NOT A GATE**. ⛔⛔ F129's
+        CORPUS CLAUSE **FALSE**: THE TWO inside_share QUANTITIES ARE INTERLEAVED
+        INSIDE SINGLE SENTENCES **OF THE LAYER**. ⛔⛔ F130's HEADLINE **REFUTED**
+        (A **BIRTH DEFECT**). ITEMS 132+134 CLOSED. DETAIL: THE RULE-9 TABLE.
+⚠ NEW   F131 RULE-9 LISTED **SIX** FINDINGS AS BOTH UNREVIEWED **AND** VERDICTED.
+        F132 ⛔⛔⛔ **A RATCHET'S COUNT IS NOT A MEASURE OF ITS CORPUS** -- THE UNIT
+        IS A PARAGRAPH; IT HID A REAL ARRIVAL TWICE, AND I MADE 2 OF 3 LANDING IT.
+⚠ TRAPS ONE HOME PER FACT (F131). ADJUDICATE THE **SET**, NEVER THE NUMBER
+        (F132: `cbaseline_diff.py`). A VERDICT **REPLACES** ITS ROW. `grep -a`;
+        EVENT NOT STATE; DESCRIBE A PATH; NEVER `git add -A`.
+READ    RULE-9 · .memory-php/ · F1-F132 · items 1-134 · _059 REPORT + _058.
 ```
 
 ---
@@ -79,7 +79,7 @@ READ    RULE-9 · .memory-php/ · F1-F131 · items 1-134 · _059 + _058.
 | **candidates** | **54** delivered across three axes. ⚠ **`.tasks-php/ADJUDICATION_001.md` takes that to ≈ 80**: +6 splits, −2 merges, **+17 kills reversed**, +1 dropped with no reason recorded, +4 that fell between axes. Evidence in `.tasks-php/TASK_PHP_001_MINE/` |
 | **catalogue** | ✅ **`patterns-php/CATALOGUE.md` — 102 rows, LANDED AND VERIFIED** by `TASK_PHP_023` (⚠ this line has said **91** and **93**; count it, do not trust it: `python3 .tasks-php/quota.py`). **20 mechanism families**, unchanged by the landing — spatial **42** · type **29** · temporal **31**. ✅ **Part A and Part B agree row-for-row, and every row is filed under the same axis in both** — the `ph92`/`ph93` mismatch is gone. ✅ `coverage.py` **166/166, MISSING 0**; all 8 withdrawn `C.1` kills present in place with their notes. ⚠⚠ **Two landed sentences were measured FALSE and are corrected in `CATALOGUE.md` AND in `land_019_020.py`** (F52 `ph94`'s trigger, F53 `ph32`'s *"one commit"*) — a landing script left carrying a refuted claim is a cited artefact. ⚠ **`_023` reviewed the nine admissions and would overturn NONE of `_019`'s reversals**; ~70 citations opened across 15 files, including the ones `_019` called correct. ⚠ **Parts A/B beyond the nine are still UNREVIEWED**, and `_020` measured the mechanism sentences right and the `▸ trigger` lines wrong (F46). Part A is a scannable table, Part B a ~150-word block per row, Part C the kill list with a re-derived criterion per kill |
 | **citation base** | PHP 5.0.0, pristine tarball, sha256 `5783e0c0…d6919`, 5595997 B, 3815 entries. **4.0.x ignored** (`DP-06`) |
-| ⭐ **which statistic** | ⚠⚠ **FOUR families are in use and THREE are published** — `ph03`/`ph16`/`ph29` in **A1**, `ph07` in **A3**, `ph64` in **B1**, `ph45` in **A1 + W1** labelled, ⭐ **and the SIX rows built since all publish BOTH A1 AND W1 labelled**: `ph53`, `ph52`, `ph55`, `ph56`, and **`ph97`** (row 11). ⛔⛔ **THIS LIST HAS NOW GONE STALE TWICE THE SAME WAY** — it stopped at `ph45` for FOUR ROWS (caught 2026-09-14) and then at `ph56` for `ph97` (caught 2026-09-15, the audit before compaction). ▶ **Extend it in the edit that gates the row, or it will happen a third time.** ⭐⭐ **`ph56` is the one to quote: it publishes BOTH C COLUMNS and BOTH SIGNS** (`−8.423 %` vs `c-gcc-h`, `+3.811 %` vs `c-clang-h`, W1, `large.bin`, `O3/isolated`) — **F108's rule working on the first row built after it landed.** ▶ **`.tasks-php/STATISTICS_001.md` is the whole argument and it is COMMITTED** (it was in gitignored `.temp/`). **The rule: publish BOTH, labelled, always** — `inside_share` explains a disagreement and never gates one, because `s ≡ A/B` so certifying A needs B already. ⛔ **BUT IT IS ONLY A RULE WHERE IT WAS MEASURED, AND ON **3 OF 11** ROWS IT STILL IS NOT** — `ph07`, `ph53`, `ph64` (F127 opened this at 5 of 11; `_058` measured `ph03`, `ph16`, `ph29`). ⭐⭐ **AND `F125` PRICED WHAT THE SHARE IS FOR**: on `ph97`, moving one ASCII compare from the kernel into libc leaves the checksum **identical** and makes **A1 read `−28.61 %` CHEAPER while the whole program is `+9.39 %` DEARER** (`inside_share` 98.84 % → 64.50 %). ▶ ***A1 can report the SIGN BACKWARDS across a symbol boundary***, so A1's blindness is not noise — **it is a lever an implementation choice can pull, and *“call libc”* pulls it.** ⚠⚠⚠ **THE BIGGEST OPEN THREAD IN THE PROGRAMME: A1 is the WRONG COLUMN for the CROSS-LANGUAGE comparison — 29 of 38 sign flips live there and 28 of 29 survive family C.** On `ph29/large` A says C is **+33 % dearer** than naive safe Rust while three other statistics say **~1 % cheaper**. ⛔⛔⛔ **AND THAT SENTENCE IS PUBLISHED FROM A ROW WHOSE OWN CONTROL DISCLAIMS IT** (**F127**, 2026-09-15): `ph29`'s `controls/spellings.py` says A1 *“is NOT right for this row's C-vs-Rust column (0.927 vs 0.655) and **that comparison is not made here**”* — **and this cell makes it.** ⛔⛔ **THE TWO SENTENCES ABOVE WERE TRUE WHEN WRITTEN AND FALSE BY THE TIME `_058` LANDED** — *“`ph29` has no measured `inside_share` outside that docstring, and five of eleven built rows have none at all”*. ⭐ **`ph29`, `ph03`, `ph16` and `ph97` now each ship a measured 16-cell matrix**; the residue is `ph07`, `ph53`, `ph64`. ⚠⚠ **THIRD ROT OF THIS CELL, AND THIS TIME IT CONTRADICTED ITSELF IN ADJACENT SENTENCES** — the stale claim sat immediately before the *“ITEM 127 LANDED”* line that refutes it, which is `F129`'s own defect for the third time in one day: **a correction written BESIDE a stale claim instead of REPLACING it.** ✅✅ **ITEM 127 LANDED AS `_058`, AND THE `+33 %` IS SETTLED: IT IS TRUE, REPRODUCES TO THE DIGIT, AND IS *ONE C COMPILER'S* NUMBER.** ⛔⛔⛔ **`c-clang` reads `−4.36 %` — THE OPPOSITE SIGN** — and W1 says C is cheaper on **both** columns (`−0.80 %` / `−27.54 %`); the input moves it too (`small.bin` `+39.92 %`). ▶ **NEVER QUOTE IT WITHOUT BOTH C COLUMNS** (**F129**, **F108**'s fifth thing, on the programme's most-cited number). ⛔ **And the caveat that guarded it guarded the WRONG PAIR**: `ph29`'s docstring disclaims C vs `safe_tuned` (Δshare `0.2715`) while this cell publishes C vs `safe_naive` (Δ `0.2355`) — **both fail `F74`'s `≤ 0.02` bar by more than eleven times**, so the comparison is **inadmissible on the row's own written rule**, not merely under-qualified. ⚠⚠ **AND THE WORD `inside_share` IS AMBIGUOUS IN THIS VERY SENTENCE**: two quantities wear it, every figure here is **`F74`'s**, and the only shipped control computes the other (**F129**). ✅✅ **SETTLED 2026-09-12 — THE REVIEWER WAS RIGHT AND I WAS WRONG.** `TASK_PHP_039` measured the `probe_iters` lever's gain at **`W^(−0.5)`** (F92), so item **68 ANSWERS NO** and **F90 is refuted on its operative half**; **family C (item 62) is the second column.** ⚠ **With one thing added by F91 that neither side had: test C's SENSITIVITY, not just its null** — `|B/A|` is **49.6–393.9×** in the small-Δ regime, and if C fails it too then **C is the second column CROSS-LANGUAGE and A stands alone SAME-LANGUAGE.** ⭐⭐ **THE AXIS: same-language differences are 1–2 instructions under 50–394× of callee noise, so only A resolves them; cross-language the callee work IS the effect. F85's 29-of-38 split is that axis, not just a count** (item **72**). ⚠⚠ **TWO LIVE CAVEATS ON THAT AXIS, BOTH FROM ROWS BUILT SINCE:** (a) **item 78** — on `ph53` A and B **agree** on every cross-language cell, because §B1a's O(1)-allocation precondition holds, so **the axis may be a PROXY for *does the callee work diverge*** and language merely correlates with it; (b) **item 82** — **A is NOT respelling-blind**: `ph53`'s A1 spread is `39.9`/`45.3` pp against `ph45`'s `0.000000`, so **F87 published a row fact as a statistic fact** and one clause of F91's own evidence table is withdrawn |
+| ⭐ **which statistic** | ⚠⚠ **FOUR families are in use and THREE are published** — `ph03`/`ph16`/`ph29` in **A1**, `ph07` in **A3**, `ph64` in **B1**, `ph45` in **A1 + W1** labelled, ⭐ **and the SIX rows built since all publish BOTH A1 AND W1 labelled**: `ph53`, `ph52`, `ph55`, `ph56`, and **`ph97`** (row 11). ⛔⛔ **THIS LIST HAS NOW GONE STALE TWICE THE SAME WAY** — it stopped at `ph45` for FOUR ROWS (caught 2026-09-14) and then at `ph56` for `ph97` (caught 2026-09-15, the audit before compaction). ▶ **Extend it in the edit that gates the row, or it will happen a third time.** ⭐⭐ **`ph56` is the one to quote: it publishes BOTH C COLUMNS and BOTH SIGNS** (`−8.423 %` vs `c-gcc-h`, `+3.811 %` vs `c-clang-h`, W1, `large.bin`, `O3/isolated`) — **F108's rule working on the first row built after it landed.** ▶ **`.tasks-php/STATISTICS_001.md` is the whole argument and it is COMMITTED** (it was in gitignored `.temp/`). **The rule: publish BOTH, labelled, always** — `inside_share` explains a disagreement and never gates one, because `s ≡ A/B` so certifying A needs B already. ⛔ **BUT IT IS ONLY A RULE WHERE IT WAS MEASURED, AND ON **3 OF 11** ROWS IT STILL IS NOT** — `ph07`, `ph53`, `ph64` (F127 opened this at 5 of 11; `_058` measured `ph03`, `ph16`, `ph29`). ⭐⭐ **AND `F125` PRICED WHAT THE SHARE IS FOR**: on `ph97`, moving one ASCII compare from the kernel into libc leaves the checksum **identical** and makes **A1 read `−28.61 %` CHEAPER while the whole program is `+9.39 %` DEARER** (`inside_share` 98.84 % → 64.50 %). ▶ ***A1 can report the SIGN BACKWARDS across a symbol boundary***, so A1's blindness is not noise — **it is a lever an implementation choice can pull, and *“call libc”* pulls it.** ⚠⚠⚠ **THE BIGGEST OPEN THREAD IN THE PROGRAMME: A1 is the WRONG COLUMN for the CROSS-LANGUAGE comparison — 29 of 38 sign flips live there and 28 of 29 survive family C.** On `ph29/large` A says C is **+33 % dearer** than naive safe Rust while three other statistics say **~1 % cheaper**. ⛔⛔⛔ **AND THAT SENTENCE IS PUBLISHED FROM A ROW WHOSE OWN CONTROL DISCLAIMS IT** (**F127**, 2026-09-15): `ph29`'s `controls/spellings.py` says A1 *“is NOT right for this row's C-vs-Rust column (0.927 vs 0.655) and **that comparison is not made here**”* — **and this cell makes it.** ⛔⛔ **THE TWO SENTENCES ABOVE WERE TRUE WHEN WRITTEN AND FALSE BY THE TIME `_058` LANDED** — *“`ph29` has no measured `inside_share` outside that docstring, and five of eleven built rows have none at all”*. ⭐ **`ph29`, `ph03`, `ph16` and `ph97` now each ship a measured 16-cell matrix**; the residue is `ph07`, `ph53`, `ph64`. ⚠⚠ **THIRD ROT OF THIS CELL, AND THIS TIME IT CONTRADICTED ITSELF IN ADJACENT SENTENCES** — the stale claim sat immediately before the *“ITEM 127 LANDED”* line that refutes it, which is `F129`'s own defect for the third time in one day: **a correction written BESIDE a stale claim instead of REPLACING it.** ✅✅ **ITEM 127 LANDED AS `_058`, AND THE `+33 %` IS SETTLED: IT IS TRUE, REPRODUCES TO THE DIGIT, AND IS *ONE C COMPILER'S* NUMBER.** ⛔⛔⛔ **`c-clang` reads `−4.36 %` — THE OPPOSITE SIGN** — and W1 says C is cheaper on **both** columns (`−0.80 %` / `−27.54 %`); the input moves it too (`small.bin` `+39.92 %`). ▶ **NEVER QUOTE IT WITHOUT BOTH C COLUMNS** (**F129**, **F108**'s fifth thing, on the programme's most-cited number). ⛔ **And the caveat that guarded it guarded the WRONG PAIR**: `ph29`'s docstring disclaims C vs `safe_tuned` (Δshare `0.2715`) while this cell publishes C vs `safe_naive` (Δ `0.2355`) — **both exceed `F74`'s `≤ 0.02` condition (ii) by more than eleven times.** ⛔⛔⛔ **AND THE WORD *“INADMISSIBLE”* STOOD HERE AND IS NOW WITHDRAWN — `TASK_PHP_059` REFUTED IT, AND THE REFUTATION WAS ALREADY IN THIS CELL.** Four documents say `F74`'s bar never gates; **one is `.memory-php/02-ladder.md`** (*“NO FUNCTION OF THE SHARES CAN CERTIFY A AT ANY THRESHOLD”*), and **one is the sentence FORTY WORDS ABOVE THIS ONE** — *“`inside_share` explains a disagreement and never gates one.”* ⭐⭐⭐ **TWO SENTENCES IN ONE TABLE CELL, CONTRADICTING EACH OTHER, ONE OF THEM MINE: `F131`'s own class inside the cell `F131` was filed about.** ⭐ **And the reviewer measured a counterexample rather than only citing documents**: on `ph55` `c-gcc` vs `c-gcc-h` (`large.bin`, `O3/isolated`, both C cells, **same compiler**) the two-condition bar **ADMITS** a pair where A1 reads **exactly `+0.0000 %`** against a **66.14 `Ir`/call** whole-program difference. ▶ ***A gate that passes its own documented counterexample is not a gate.*** ✅ **WHAT SURVIVES, AND IT IS THE HONEST SENTENCE**: on **71 of 88** cross-language pairs the two cells' shares differ by more than `0.02`, so A1 and the whole-program column are **in the regime where they are EXPECTED to disagree** — ▶ **a reason to publish BOTH columns labelled, which six of eleven rows already do, and NOT a reason to withhold either.** ⚠⚠ **AND THE WORD `inside_share` IS AMBIGUOUS IN THIS VERY SENTENCE**: two quantities wear it (**F129**) — ⛔⛔ **and *“every figure here is `F74`'s”* STOOD HERE AND IS FALSE: the `98.84 % → 64.50 %` pair four sentences up is the `W` one**, which under `F74`'s definition matches **no cell of `ph97`, or of any row, at ±0.0005** (`_059` §1.1). ✅✅ **SETTLED 2026-09-12 — THE REVIEWER WAS RIGHT AND I WAS WRONG.** `TASK_PHP_039` measured the `probe_iters` lever's gain at **`W^(−0.5)`** (F92), so item **68 ANSWERS NO** and **F90 is refuted on its operative half**; **family C (item 62) is the second column.** ⚠ **With one thing added by F91 that neither side had: test C's SENSITIVITY, not just its null** — `|B/A|` is **49.6–393.9×** in the small-Δ regime, and if C fails it too then **C is the second column CROSS-LANGUAGE and A stands alone SAME-LANGUAGE.** ⭐⭐ **THE AXIS: same-language differences are 1–2 instructions under 50–394× of callee noise, so only A resolves them; cross-language the callee work IS the effect. F85's 29-of-38 split is that axis, not just a count** (item **72**). ⚠⚠ **TWO LIVE CAVEATS ON THAT AXIS, BOTH FROM ROWS BUILT SINCE:** (a) **item 78** — on `ph53` A and B **agree** on every cross-language cell, because §B1a's O(1)-allocation precondition holds, so **the axis may be a PROXY for *does the callee work diverge*** and language merely correlates with it; (b) **item 82** — **A is NOT respelling-blind**: `ph53`'s A1 spread is `39.9`/`45.3` pp against `ph45`'s `0.000000`, so **F87 published a row fact as a statistic fact** and one clause of F91's own evidence table is withdrawn |
 | **rungs** | all five, R4/R5 may land as findings (`DP-02`). ⚠ **UPDATED — `DP-02` UNDERSTATES IT: the R4 endpoint MOVES on two rows now.** `ph29`'s `r4_fold_iter` is **5.63 pp cheaper** and byte-identical (F77); `ph45`'s `r4_buf_slice_inline` is **−23.47 %** with **10 unchecked-dereference sites against the shipped 12** — cheaper *and* a smaller trusted surface — **and its R3 endpoint moves too, the first row where both do, with the bound's SIGN REVERSING under search** (F87). ⭐ **So a `fixed-R4 bound` over an UNSEARCHED endpoint is a bound over a number nobody has tried to move**; `ph03` and `ph64` are still unsearched (item 58's residue) — ✅ **verified live by `task_cost.py`'s `N12`, which derives it from the filesystem and stops on its own when a search lands.** ⛔⛔ **BUT *“TWO ROWS”* IS AN UNCHECKED COUNT.** `ph53`, `ph52`, `ph55`, `ph56` and `ph97` have all had endpoint searches since this sentence was written, and **nobody has asked whether any of their R4 endpoints moved.** ⚠ **Not asserted stale and not asserted current — it is UNCHECKED, and each row's `spellings.json` uses a different schema, so the answer costs a read of five `NOTES.md` rather than a grep.** ▶ **That is the same defect this table has now shown three times** (`which statistic` stopped at `ph45`, then at `ph56`; this cell at `ph45`): **a list of rows that is extended by hand and not by the edit that gates a row.** ⓘ Batch it with item 127, which touches three of the five anyway |
 | **PAT tree** | untouched and must stay so — `harness/*.py` and `common/*.py` are hashed into all 33 gate records (`PLAN_PHP.md` §2.1) |
 
@@ -182,11 +182,12 @@ READ    RULE-9 · .memory-php/ · F1-F131 · items 1-134 · _059 + _058.
 > | **F123** | ⓘ opened ⛔ UNREVIEWED (manager, **about the manager**, 2026-09-15) → ✅✅ **UPHELD AND UNDER-STATED** (`_057`) | ⭐⭐⭐ **the check costs 30 SECONDS**, measured and reproduced. §A3a obligation 5 is now **REQUIRED**. ⛔⛔ **ITS LAYER-SHAPED CLAUSE IS STILL NOT VERDICTED AND STILL NOT IN THE LAYER**: *an engineer's own uncertainty may be DEFERRED but not DOWNGRADED; the next task inherits its stated priority, not the manager's.* ▶ **That is what item 129's census tests — a verdict on the INSTANCE is not a verdict on the RULE** |
 > | **F124** | ⓘ opened ⛔ UNREVIEWED (the row-11 round) → ⚠ **UPHELD-NARROWED / REASON REFUTED** (`_057`) | ⛔ the control priced the **TEST**, not the discriminant; *"by construction"* holds for the **size leg only**. ✅ Corrected in place. ⭐ **The opening row's instinct was right and is worth keeping as method**: *`P1` was the first prediction to survive in both halves for several rounds, which is exactly when to check it hardest* — and checking it hardest is what broke the reason |
 > | **F125** | ⓘ opened ⛔ UNREVIEWED → ⚠ **UPHELD-NARROWED / REASON REFUTED** (`_057`) | ⛔⛔ **both clauses of its disclaimer are false** — see **F127**, which is the bigger finding it produced. ⚠⚠ **THE OPENING ROW'S QUESTION WAS NEVER ANSWERED AND IS NOW BIGGER**: *does it change `F91`'s axis, or is it that claim with a number on it at last?* ▶ `F129` lands on the same axis from a third direction, so **answer it in `_059`, not later** |
-> | ⭐ **F127** | ⛔ **UNREVIEWED** — `_057`'s own round | ⛔ **NOTHING.** ⚠ **It is a reviewer finding, so law 12 cuts the other way** — but item 127 is an ENGINEER task and will test it directly, and it is dispatched as `_058` |
-> | **F128** | ⛔ **UNREVIEWED** — ⚠⚠ **self-narrowed by its own sweep the same day, which is the MANAGER ON THE MANAGER AND NOT A REVIEW.** ⛔ **This cell used to read *"UPHELD-NARROWED BY ITS OWN SWEEP"*, which scans as a verdict and made the backlog uncountable from the column that is supposed to carry it** | ✅ The `N13` defect is real and repaired; ⭐ **a THIRD instance found (`N5`)**. ⛔⛔ **But its RULE as worded is WITHDRAWN — too broad: five correct arms assert a direction legitimately.** Replaced by the Kind-A/Kind-B rule, item 130. ⚠ **Still a manager self-finding, and the sweep was the manager's too** |
-> | ⭐⭐⭐ **F130** | ⛔ **UNREVIEWED** — manager self-finding | ⛔ **NOTHING.** ✅ The un-run ratchet is measured against a worktree and the bare run is **demonstrated failing**; the eight adjudications are written out. ⚠ **What a reviewer owes it: are the eight really benign, and does `BASE` now need widening after all?** — the standing note refused that **seven** times, and the eighth instance cuts the other way |
+> | ⭐ **F127** | ⓘ opened ⛔ UNREVIEWED (`_057`'s own round) → ⚠ **UPHELD-NARROWED / REASON REFUTED** (`_059`) | ⭐⭐ **`F127` IS ITSELF A CASUALTY OF `F129`'s NAME COLLISION**: its claim is true of the **`W`** quantity and **FALSE of `F74`'s**, which is arithmetic over committed records and was therefore available for **all 360 cells all along**. ▶ *"Five rows never measured `inside_share`"* means *"five rows ship no `W` control"* — and `_058` measured **the quantity the rule is not stated in**. ⛔ Its *"the EXACT comparison"* identity claim is false (one rung off). ✅ **The CONCLUSION survives on a ground that needs no bar**: `RECAP_PHP.md` published a one-column, opt/mode-unlabelled cross-language `A1` figure — **`F108`'s fifth thing and its third.** ▶ **Re-state `F127` on `F108`, not on `F74`'s bar.** ⓘ The residue (`ph07`, `ph53`, `ph64`) is **bookkeeping**, not a precondition — reading (b) removes the argument that made it load-bearing |
+> | **F128** | ⓘ opened ⛔ UNREVIEWED, then **self**-narrowed by its own sweep (manager on manager, **not** a review — the cell that said *"UPHELD-NARROWED BY ITS OWN SWEEP"* scanned as a verdict and made the backlog uncountable, `F131` §2) → ⚠ **UPHELD / REPLACEMENT RULE NARROWED** (`_059`) | ⭐⭐ **THE KIND-A/KIND-B SPLIT IS NOT A PROPERTY OF THE ARM — it is a property of the arm's RELATION to a finding's CURRENT STATUS, and that status changes without the arm changing.** `N11` was a textbook Kind A arm until the first-in-family premium was refuted at `n = 8`, at which point it became a textbook Kind B arm **with no edit to it**. ▶ **So the rule's second half is the whole mechanism, not a nicety**: *an arm that asserts a published direction **without printing the measured margin** is a Kind B arm that has not been caught yet.* ⛔ **A second gap: the rule has no RETIREMENT condition** — the sweep noticed that on `N6` and did not generalise it. ▶ **Land the rule with BOTH sentences in it**, `width.py` `N4`/`N3b` as the model. ⚠ **And the residue stands: FIVE checkers are still unswept** (`quota`, `citecheck`, `contract_audit`, `preimage_screen`, `fixsurvey`) — `_059` swept `cbaseline_check.py` only. ⓘ Below: ✅ The `N13` defect is real and repaired; ⭐ **a THIRD instance found (`N5`)**. ⛔⛔ **But its RULE as worded is WITHDRAWN — too broad: five correct arms assert a direction legitimately.** Replaced by the Kind-A/Kind-B rule, item 130. ⚠ **Still a manager self-finding, and the sweep was the manager's too** |
+> | ⭐⭐⭐ **F130** | ⓘ opened ⛔ UNREVIEWED (manager self-finding) → ⚠ **CONCLUSION UPHELD / HEADLINE REFUTED** (`_059`) | ✅ **The DRIFT is upheld and independently reproduced** (70 vs 69 at `1cc2c0e`, by `git show`-ing the 31 scanned files rather than by worktree; 69/69 at the two commits before). ⛔⛔ **The headline *"A RATCHET THAT NOTHING EVER INVOKED"* is REFUTED — it WAS invoked, by hand, by name**: two task files instruct the flag and `TASK_PHP_051_REPORT.md:55` records the run *and its output*. ▶ **The surviving claim is *no AUTOMATED caller passed it*.** ⭐ **And it is a BIRTH DEFECT, not a regression** — the guard is in the file's first commit; the un-enforced window is ~32 hours and three commits, not the open stretch the tone implied. ✅ **The 70th hit is FOUND and BENIGN** (`RECAP_PHP.md:1812`, `F127`'s own body quoting the defect to criticise it — item 115's class, **eighth** instance), so the ratchet is honest **retrospectively** too. ✅ All eight adjudications agreed on verdict, **three corrected on their REASON**. ⛔ **Item 134's widening: REFUSED, an eighth time, as framed** |
 > | ⛔ **F131** | ⛔ **UNREVIEWED** — manager self-finding **about this very table**, 2026-09-15 | ⛔ **NOTHING**, and it may not need to enter: it is a document repair, not a research claim. ⚠ **Its one LAYER-shaped clause is the one to review**: *a verdict-shaped phrase in a verdict column is a verdict, whoever wrote it — so self-narrowing must not share a column with review outcomes, because that erases law 12's distinction.* ▶ **Scoped into `_059` §0 by implication, not as a section: the reviewer reads this table to know what it owes, so if the table is wrong the round is wrong** |
-> | ⭐⭐⭐ **F129** | ⛔ **UNREVIEWED** — `_058`'s own round | ⛔ **NOTHING**, and it is the **highest-stakes unreviewed finding in the programme**: it changes what every `inside_share` figure MEANS and withdraws the label from the most-cited number. ✅ **Every load-bearing number in it was re-derived by the manager from the committed records with independent code** — the two shares, the exactly-15 over-1.0 cells, the `+33.01 %` and `c-clang`'s `−4.36 %`. ⚠ **That is verification, NOT review**: nobody has yet asked whether the CONCLUSIONS follow |
+> | ⭐⭐⭐ **F129** | ⓘ opened ⛔ UNREVIEWED (`_058`'s own round) → ⚠⚠ **UPHELD-NARROWED, AND REFUTED IN TWO CLAUSES** (`_059`) | ✅ **The name collision is UPHELD and UNDER-STATED** — the gap is **8.9 pp on `ph29` and 0.01 pp on `ph45`**, so it is a measurement, never a constant, and `F129` picked the row where they nearly agree. ⛔⛔ **Its CORPUS clause is REFUTED in two documents** — `RECAP_PHP.md`'s `ph97` `98.84 % → 64.50 %` and `.memory-php/03-numbers.md`'s own `ph52` figures are the **`W`** one — **so the two quantities are INTERLEAVED INSIDE SINGLE SENTENCES, not separated between documents.** ⛔⛔⛔ ***"INADMISSIBLE" IS WITHDRAWN***: `F74`'s bar is **not a gate** (four documents, one of them the layer, one of them the same cell), and the conjunction **admits** `ph55` `c-gcc` vs `c-gcc-h` where A1 reads `+0.0000 %` against **66.14 `Ir`/call**. ⛔ **§2 mislabelled family B as W1.** ⛔ **§4a's *"zero of five"* is wrong in the SELF-CRITICAL direction — it is two of five.** ✅ Every arithmetic claim reproduced under a tool sharing no code with the original. ⭐ **The manager's `P2` — written against his own strongest clause, marked low confidence — is the one prediction that held** |
+> | ⛔⛔⛔ **F132** | ⛔ **UNREVIEWED** — manager, 2026-09-15, **two of its three instances made by the manager while landing `_059`** | ⛔ **NOTHING.** ⚠ **What a reviewer owes it: is *"adjudicate the set, never the number"* the right repair, or does the paragraph-unit itself need changing?** ⭐ The tool is committed with four must-fire arms and reproduces `F130`'s `1cc2c0e` baseline without a worktree. ⓘ **It is the strongest evidence on file that *"remember to check"* is not a control** — the person who wrote the warning tripped it twice within the hour |
 >
 > #### ⭐⭐⭐ `F96`, PER GROUP — **SEVEN groups, not the four I wrote** (`_055` §1.1)
 >
@@ -546,8 +547,10 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > marginal_ir_per_call`, the only shipped control computes `A1 / callgrind
 > whole-run total`, they read 0.8045 and 0.8933 on the same cell, and F74's
 > exceeds 1.0 on 15 of 360 corpus cells. AND the programme's most-cited
-> number — `ph29`'s `+33 %` — is INADMISSIBLE on the row's own written bar
-> (Δshare 0.2355 against `≤ 0.02`), not merely unlabelled** ·
+> number — `ph29`'s `+33 %` — exceeds the row's own `≤ 0.02` share condition by
+> 11×. ⛔ F129 called that INADMISSIBLE; `_059` WITHDREW the word — the bar is
+> not a gate, and F129's corpus clause (*"every published figure is F74's"*) is
+> FALSE in two documents** ·
 > **F130 ⭐⭐⭐ a RATCHET THAT NOTHING EVER INVOKED — `cbaseline_check.py`'s
 > enforcement was gated on a `--ratchet` flag no caller passed, and measured
 > at `1cc2c0e` the corpus already stood at 70 hits against a baseline of 69,
@@ -562,7 +565,15 @@ measurement anyone can re-run. `PROTOCOL.md` rule 9: none of this reaches
 > ⭐ The table contained the sentence that diagnoses it. ⭐⭐ And the backlog
 > was not countable from the column that carries it, because one cell read
 > *"UPHELD-NARROWED BY ITS OWN SWEEP"* — which is the manager narrowing the
-> manager, and it SCANS as a verdict**
+> manager, and it SCANS as a verdict** ·
+> **F132 ⛔⛔⛔ A RATCHET'S COUNT IS NOT A MEASURE OF ITS CORPUS: the unit is a
+> BLANK-LINE PARAGRAPH, so a finding TITLE gaining the literal `c-gcc`, a block
+> inserted into a blockquote, and a blank line SPLITTING a paragraph each moved
+> the number with NOTHING repaired. Twice it hid a real arrival — `_058` read a
+> departure as progress, and landing `_059` the net said +1 while THREE had
+> arrived. ⭐⭐ The manager made two of the three IN THE EDIT LANDING THE REVIEW
+> OF THE RATCHET, hours after writing the warning. ▶ Adjudicate the SET, by
+> unit text, never the number — `.tasks-php/cbaseline_diff.py`**
 >
 > ⚠⚠ **This index stopped at F59 while F60–F65 existed, and then AT F101 WHILE
 > F113 EXISTED — twelve behind, caught by a pre-handoff audit 2026-09-14.**
@@ -1866,6 +1877,56 @@ The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
 
+### F132 — ⛔⛔⛔ **A RATCHET'S COUNT IS NOT A MEASURE OF ITS CORPUS. THE UNIT IS A PARAGRAPH, SO ORDINARY PROSE MOVES THE NUMBER WITH NOTHING REPAIRED AND NOTHING BROKEN — AND IT HID A REAL ARRIVAL TWICE IN ONE DAY**
+
+⚠ **`TASK_PHP_059` found the first instance; the manager made the second and
+third within the hour, while landing the round. UNREVIEWED.**
+
+The house ratchet pattern is *adjudicate every hit BY HAND with a reason; never
+tune the regex*, and its arithmetic is a **count**. ⛔⛔ **`cbaseline_check.py`'s
+`units()` splits on BLANK LINES, so its unit is a PARAGRAPH — and the count is
+therefore a property of the corpus's PARAGRAPH BOUNDARIES as much as of its
+claims.**
+
+| # | what moved the count | and what was actually repaired |
+|---|---|---|
+| **1** | `RECAP_PHP.md`'s **Index** unit stopped hitting because **a later finding's TITLE added the literal `c-gcc` to it** | **nothing** — found by `_059` |
+| **2** | `.memory-php/02-ladder.md`'s FOURTH-FLAG **blockquote** stopped hitting because the item-132 block inserted **into the same unit** carries `c-gcc`, so `BASE` matched | **nothing** — the manager, landing `_059` |
+| **3** | `ph16`'s `NOTES.md` *"99.20–99.66 %"* unit stopped hitting because **a blank line SPLIT the unit in two** and the first half lost the bare `C` that `XLANG` was matching | **nothing** — the manager, same edit |
+
+⭐⭐⭐ **AND IN INSTANCE 1 IT HID A REAL ARRIVAL.** The `_058` landing recorded
+*"`RECAP_PHP.md` went 35 → 34, so eight arrived and one left"*, and read the
+departure as progress. **It was not a repair.** ▶ **The ratchet absorbed one new
+hit under cover of an accidental departure.** ⛔ **Instances 2 and 3 did it
+again**: the bare run read `78` against a baseline of `77`, so the net was `+1`
+— **and THREE had arrived.**
+
+> ⭐⭐⭐ **THE RULE: ADJUDICATE THE SET, BY UNIT TEXT, NEVER THE NUMBER.**
+> ⛔ **A line-keyed diff cannot do it either** — line numbers move under every
+> edit, which is why every earlier attempt was done by eye. ✅ **Tool committed:
+> `.tasks-php/cbaseline_diff.py`, read-only, optional git ref, four must-fire
+> arms that plant instances 2 and 3 in a string.** It reproduces `F130`'s
+> `70`-at-`1cc2c0e` baseline **without a worktree**.
+
+⚠⚠ **THE UNCOMFORTABLE PART, AND IT IS THE REASON THIS IS A FINDING AND NOT A
+FOOTNOTE: instances 2 and 3 were made BY THE MANAGER, IN THE EDIT THAT LANDS THE
+REVIEW OF THE RATCHET, ON THE SAME DAY THE REVIEWER NAMED THE MECHANISM.** The
+warning had been read, understood, and written into this file **before** the
+edit that tripped it twice. ▶ **So *"remember to check"* is refuted as a control
+by the strongest available evidence: the person who wrote the reminder.** ⓘ
+`F131`'s lesson one layer down — *two homes for one fact* becomes *one number
+standing in for a set*.
+
+✅ **What the bare run got right**: it **failed**, loudly, and stopped the
+manager mid-edit. ⭐ **That is `F130`'s repair working the first time it was
+tested by something real** — an opt-in ratchet would have said nothing.
+
+⛔ **THE RESIDUE, NOT REPAIRED AND DELIBERATELY NOT REGEX-TUNED:** the three
+instances all turn on `BASE`'s or `XLANG`'s **spelling** meeting a paragraph
+boundary. **Widening either is open item 134, which `_059` ruled on** — and its
+ruling is **REFUSE the widening as framed**, so this is not solved by a better
+pattern. ▶ **It is solved by diffing the set, which is now one command.**
+
 ### F131 — ⛔⛔⛔ **THE TABLE THAT GOVERNS THE AUTHORITATIVE LAYER LISTED SIX FINDINGS AS *BOTH* UNREVIEWED *AND* VERDICTED, AND THE BACKLOG WAS NOT COUNTABLE FROM THE COLUMN THAT CARRIES IT**
 
 ⚠ **Manager, 2026-09-15, found while writing the brief for `TASK_PHP_059` — the
@@ -1950,12 +2011,32 @@ name which C compiler*. Its hit count is a **ratchet** — the house pattern, an
 the one `.tasks-php/README.md` calls *"the ratchet"* in terms: **adjudicate every
 hit BY HAND with a reason; never tune the regex.**
 
-⛔⛔⛔ **Its enforcement sat behind `if '--ratchet' in argv`, and NOTHING PASSED
-IT.** `checkers.py` files the tool with `argv=[]` and a `--selftest` arm; the
-sweep runs both; **neither enforces.** ⭐ **Measured against a worktree at
-`1cc2c0e`, before this session touched anything: 70 hits against a ratchet of
-69.** The corpus had already gone past its adjudicated baseline and **no run
-anywhere would have said so.**
+⛔⛔⛔ ~~**Its enforcement sat behind `if '--ratchet' in argv`, and NOTHING PASSED
+IT.**~~ **REFUTED AT `TASK_PHP_059`. IT WAS INVOKED — BY HAND, BY NAME, AND
+THERE IS A REPORT OF THE OUTPUT.** `TASK_PHP_051.md` and `TASK_PHP_052.md` both
+instruct the flag by name, and **`TASK_PHP_051_REPORT.md:55` records the run**:
+*"`--ratchet` | rc 0 — 68 hits, ratchet 69"*, with the agent at `:60` declining
+the tool's *"lower RATCHET to 68"* advice **and giving a reason.** ⛔ **I wrote
+*"NOTHING PASSED IT"* without grepping the task files for the flag** — the
+cheapest possible check, on the load-bearing word of my own headline.
+
+✅ **THE CLAIM THAT SURVIVES IS NARROWER AND STILL WORTH HAVING:** *no
+**AUTOMATED** caller passed the flag.* `checkers.py` files the tool with
+`argv=[]` and a `--selftest` arm; the sweep runs both; **neither enforces** — so
+enforcement depended on **a task file remembering to ask**, and **after `_052` no
+task file did.** ⭐ **Measured against `1cc2c0e`, before this session touched
+anything: 70 hits against a ratchet of 69** — independently reproduced by the
+reviewer, who materialised the 31 scanned files with `git show` and ran the
+`1cc2c0e` copy of the tool against them (and got **69/69** at the two commits
+before).
+
+⭐⭐ **AND IT IS A BIRTH DEFECT, NOT A REGRESSION.** The guard is present in the
+file's **first commit** (`9313449`, `_049`, `RATCHET = 63`) and in every commit
+until `d9652b4`. **Nothing unwired it; it was never wired.** ⓘ **The un-enforced
+window is about 32 hours and three commits, not the open-ended stretch this
+finding's tone implied** — and the ratchet was raised by hand, with
+adjudications, **twice inside that window** (63 → 66 → 69). ▶ **A tone is a
+claim too.**
 
 > ⭐⭐ **A RATCHET YOU MUST OPT INTO IS NOT A RATCHET.** ▶ The **bare** run now
 > enforces; `--ratchet` survives as an accepted no-op for old callers.
@@ -1988,9 +2069,28 @@ matter:
   bare-spelling instance — and the first that cuts in this direction**, which is
   the case the standing note *"still not widening `BASE`"* never considered.
 
-⛔ **ONE of the 70 hits at `1cc2c0e` was ALREADY unadjudicated and is NOT
+⛔ ~~**ONE of the 70 hits at `1cc2c0e` was ALREADY unadjudicated and is NOT
 attributed** — it predates this session and I did not chase it. **Said rather
-than smoothed over: the ratchet is honest again from 77, not retrospectively.**
+than smoothed over: the ratchet is honest again from 77, not
+retrospectively.**~~
+
+✅✅ **CHASED AND FOUND AT `TASK_PHP_059`, AND IT IS BENIGN.** Diffing the hit
+sets by **unit text** rather than line number (`42d66e9` → `1cc2c0e`: NEW 2,
+GONE 1, net +1) — one "new" was the `RECAP_PHP.md` **Index** unit merely
+shifting. The real arrival is **`RECAP_PHP.md:1812` at `1cc2c0e`: the body of
+`F127` itself**, the paragraph that quotes the defective *"+33 % dearer"*
+sentence **in order to criticise it**. ⭐ **Adjudication: BENIGN, item 115's
+class — a quotation of a defect scoring as the defect — and it is the SAME class
+I adjudicated one hit later without noticing it was the eighth instance, not the
+seventh.** ▶ **So the ratchet is honest retrospectively too**, and the hedge
+above is withdrawn.
+
+ⓘ **One accounting note the reviewer added.** *"`RECAP_PHP.md` went 35 → 34, so
+eight arrived and one left"* is arithmetically right, but **the departure is a
+checker artefact, not a repair**: the Index unit stopped hitting because a later
+finding title added the literal `c-gcc` to it, so `BASE` now matches. ⭐ **The
+ratchet absorbed one new hit under cover of an accidental departure** — which is
+the one way a net count can hide a real arrival.
 
 ### F129 — ⭐⭐⭐ **TWO DIFFERENT QUANTITIES ARE CALLED `inside_share`, NO DOCUMENT SAID SO, AND THE PROGRAMME'S MOST-CITED NUMBER FLIPS SIGN BETWEEN THE TWO C COMPILERS**
 
@@ -2006,10 +2106,43 @@ task's own tooling was not trusted for any of them.
 | **`F74`'s** | `(kernel_exclusive_ir / n_iters) / marginal_ir_per_call` | **0.8045** |
 | **the control's `W`** | `kernel exclusive Ir / callgrind whole-run total Ir` | **0.8933** |
 
-⛔⛔ **Every `inside_share` figure in `RECAP_PHP.md`, in `.memory-php/03-numbers.md`
-and in `ph29`'s `controls/spellings.py` is `F74`'s. The only control the corpus
-shipped — `ph97`'s template, now in four rows — computes the OTHER one.** Nothing
-said so, in either direction.
+⛔⛔⛔ **THIS PARAGRAPH SAID *"EVERY `inside_share` FIGURE IN `RECAP_PHP.md`, IN
+`.memory-php/03-numbers.md` AND IN `ph29`'s `controls/spellings.py` IS `F74`'s"*,
+AND IT IS FALSE IN THE FIRST TWO. `TASK_PHP_059` REFUTED IT WITH TWO
+COUNTEREXAMPLES.**
+
+* **`RECAP_PHP.md`'s own *which statistic* cell** publishes `ph97`'s
+  *"`inside_share` 98.84 % → 64.50 %"*. Those are `inside_share_pct`
+  **98.83845934798373** and **64.50051970182074** out of that row's
+  `controls/libc_compare.json` — **the `W` quantity.** Searched at ±0.0005 over
+  **every computable cell of every built row**, both return **0 hits** under
+  `F74`'s definition.
+* ⭐⭐ **`.memory-php/03-numbers.md` itself** — the file whose preamble box says
+  *"EVERY FIGURE IN THIS FILE IS THE FIRST ONE"* — gives `ph52` at *"22.24 % on
+  its C rungs … ≈98.6 % on its Rust rungs (`unsafe` A1 48,846,257 against W1
+  49,549,469)"*, **and that parenthesis spells out the `W` arithmetic.** Under
+  `F74` the same row reads `0.9892`–`0.9970` and `0.2023`–`0.2269`.
+
+⭐⭐⭐ **SO THE FINDING GETS WORSE, NOT SMALLER: the two quantities are not
+*separated* between documents — they are INTERLEAVED INSIDE SINGLE SENTENCES of
+the authoritative layer and of this file, with no marker.** ⛔ **And the
+`⛔⛔⛔ READ THIS BEFORE ANY inside_share FIGURE BELOW` box that `F129` put at the
+head of `.memory-php/03-numbers.md` was therefore factually wrong about the file
+it heads.** ✅ Repaired there and here.
+
+⭐ **`cbaseline_check.py`'s hand ledger had already recorded half of it** — it
+files `03-numbers.md`'s `ph52` line with the note *"the four C cells actually
+span 20.23–22.69 %"*, **which is the `F74` span**. The discrepancy was written
+down and nobody read it as a definition mismatch.
+
+⚠ **The DEFINITIONAL half is upheld and UNDER-STATED**: the gap is **8.9 pp on
+`ph29`** and **0.01 pp on `ph45`** (reviewer's own `callgrind` run). ▶ **It is a
+measurement, never a constant** — which is what the layer already says about
+`inside_share` itself. ⓘ `F129` picked the one row where the two nearly agree.
+
+⛔ **FOURTH INSTANCE THIS SESSION OF A REPAIR CARRYING ITS OWN TARGET**, and this
+one is the sharpest: the false sentence ships **inside the four-row control whose
+entire purpose is to stop the two quantities being confused.**
 
 ⭐ **The tell was in the authoritative layer all along**: `.memory-php/03-numbers.md`
 says `inside_share` *"IS ALREADY COMPUTED FOR EVERY CELL IN EVERY RECORD"* — which
@@ -2032,10 +2165,18 @@ decide which statistic may publish.**
 On `ph29`/`large.bin`/`O3`/`isolated`, A1 against `safe_naive`, **manager-recomputed
 from `results-php/ph29-recvfrom-alloc.json` and the gate record**:
 
-| | A1 vs `safe_naive` | W1 (whole-program marginal) |
-|---|---|---|
-| **`c-gcc`** | **`+33.01 %`** | `−0.80 %` |
-| **`c-clang`** | **`−4.36 %`** | `−27.54 %` |
+| | A1 vs `safe_naive` | ⛔ **family B** (labelled *"W1"* here until `_059`) | ✅ the REAL W1 |
+|---|---|---|---|
+| **`c-gcc`** | **`+33.01 %`** | `−0.80 %` | **`−1.1881 %`** |
+| **`c-clang`** | **`−4.36 %`** | `−27.54 %` | **`−27.6121 %`** |
+
+> ⛔ **THE THIRD COLUMN'S HEADER WAS WRONG AND IS CORRECTED IN PLACE** (`_059`
+> §1.2). Those numbers are **family B** (`marginal_ir_per_call`), not **W1**
+> (program totals / `n_iters`). ⭐ **The verdict does not move** — every column
+> still says C is cheaper where A1 says it is `+33 %` dearer — **but a finding
+> whose whole subject is that a number owes its STATISTIC must not misname one
+> of its own.** ⓘ The real `c-clang` W1 is already published in
+> `.memory-php/02-ladder.md`; this table did not inherit it either.
 
 ⛔⛔⛔ **The published sentence is `c-gcc`'s. The other C column says C is
 CHEAPER, and the whole-program statistic says C is cheaper on BOTH.** ⚠ The input
@@ -2060,10 +2201,52 @@ reproduces to the digit. **It was never labelled.**
 >
 > ⓘ **`CLAUDE.md` names this exact shape on the PAT side** — *"`RECAP_PAT.md`
 > twice carried a figure the synthesis had corrected."* **Third instance, first
-> on the php side.** ▶ **What `F129` genuinely adds here is the ADMISSIBILITY
-> verdict (§3), not the clang number.**
+> on the php side.** ▶ ~~**What `F129` genuinely adds here is the ADMISSIBILITY
+> verdict (§3), not the clang number.**~~ ⛔⛔ **STRUCK AT `_059`: THE
+> ADMISSIBILITY VERDICT IS THE PART THAT DID NOT SURVIVE.** What `F129`
+> genuinely adds is **(1) the name collision** — upheld and under-stated — and
+> what it genuinely got wrong is **(1)'s corpus clause**, which is false.
+> ⚠ **§2 also mislabels its own second column**: the table below heads it *"W1
+> (whole-program marginal)"* and the numbers in it are **family B**. The real
+> **W1** for that cell is **`−1.1881 %` (`c-gcc`) / `−27.6121 %` (`c-clang`)** —
+> one of which `.memory-php/02-ladder.md` already publishes. ✅ **Corrected in
+> the table itself.**
 
-#### ✅ (3) `ph29`'s DISCLAIMER IS RIGHT, AND IS ABOUT A DIFFERENT PAIR THAN THE HEADLINE
+#### ⛔⛔ (3) — **THE ADMISSIBILITY VERDICT, REFUTED AT `TASK_PHP_059`**
+
+> ⛔⛔⛔ **THE WORD *"INADMISSIBLE"* IS WITHDRAWN. `F129` §3 IS UPHELD-NARROWED.**
+> The arithmetic is upheld (Δ `0.2355`, min-share `0.6911`, re-derived by an
+> independent tool that shares no code with the one that produced it). **The
+> INFERENCE is not.** `F74`'s two-condition bar is **not a gate**, and four
+> documents say so: `.tasks-php/STATISTICS_001.md` §4 (*"reported beside them as
+> the EXPLANATION, never as a gate"*), ⭐ **`.memory-php/02-ladder.md`, the
+> authoritative layer** (*"NO FUNCTION OF THE SHARES CAN CERTIFY A AT ANY
+> THRESHOLD"*), `.memory-php/03-numbers.md`'s `F109` (*"a high `inside_share` is
+> NOT a certificate"*), and ⭐⭐ **the very `RECAP_PHP.md` cell that carried the
+> *"inadmissible"* sentence** (*"explains a disagreement and never gates one"*).
+>
+> ⭐⭐⭐ **AND THE REVIEWER MEASURED A COUNTEREXAMPLE RATHER THAN ONLY CITING
+> DOCUMENTS**, which is why this is a refutation and not a disagreement: on
+> **`ph55` `c-gcc` vs `c-gcc-h`, `large.bin`, `O3`/`isolated`** — both C cells,
+> **same compiler**, so `F108`'s fifth thing does not arise — shares `0.7417` /
+> `0.7515` **pass (i) at any threshold ≤ 0.74 and (ii) at `|Δ| = 0.0098`, so the
+> conjunction ADMITS the pair** — while **A1 reads exactly `+0.0000 %`** against a
+> **`−1.2998 %` / 66.14 `Ir`/call** whole-program difference. ▶ ***A gate that
+> passes its own documented counterexample is not a gate.***
+>
+> ✅ **WHAT REPLACES IT, AND IT IS THE SENTENCE TO QUOTE:** *on 71 of 88
+> cross-language pairs the two cells' shares differ by more than `0.02`, so A1 and
+> the whole-program column are in the regime where they are **expected to
+> disagree** — a reason to publish BOTH columns labelled, and **not** a reason to
+> withhold either.* ⚠ **And the rate is CONCENTRATED, which a percentage hides**:
+> of the 17 cross-language pairs that pass (ii), **`ph16` alone supplies 8** and
+> **six of eleven rows supply ZERO**.
+>
+> ⓘ **The manager's `P2` predicted exactly this and was the one prediction of
+> five to survive as written — and it was the one marked *low confidence*,
+> written against his own finding's strongest clause.**
+
+#### ✅ (3a) `ph29`'s DISCLAIMER IS RIGHT, AND IS ABOUT A DIFFERENT PAIR THAN THE HEADLINE
 
 All four docstring numbers reproduce **exactly**, in **exactly one cell**
 (`large.bin`/`O3`/`isolated`, `c-gcc`), under **F74's** definition and **in no
@@ -2072,13 +2255,14 @@ cell** under the control's: `safe_tuned` `0.6551` · `unsafe` `0.6690` · `c-gcc
 
 `.memory-php/02-ladder.md` states `F74`'s corrected **two-condition** bar — (i)
 `min(inside_share)` HIGH **and** (ii) `|Δinside_share| ≤ 0.02`. **The disclaimed
-pair's Δ is `0.2715`, 13× the bar.** ▶ **The disclaimer must NOT be narrowed.**
+pair's Δ is `0.2715`, 13× condition (ii).** ▶ **The disclaimer must NOT be
+narrowed.** ⚠ **But the disclaimer stands on `F108`, not on the bar** — see (3).
 
 ⛔ **AND `RECAP_PHP.md` PUBLISHES A PAIR THE DISCLAIMER DOES NOT COVER**: the
 docstring disclaims C vs **`safe_tuned`**; the headline compares C vs
 **`safe_naive`** (Δ `0.2355`). ⭐ **One rung off — so for as long as the caveat
 has been quoted, it has been guarding the wrong comparison, and the one actually
-published fails the same bar.**
+published exceeds the same condition.**
 
 #### ⛔ (4) MY OWN PREDICTION `P5` WAS REFUTED, AND BY THE AUTHORITATIVE LAYER
 
@@ -2091,7 +2275,21 @@ into a task file without grepping the layer that outranks me**, which is
 tuned and six rows cannot pin it"* — **there are eleven rows now**, so the sweep
 that could pin it is cheap and owed (item 132).
 
-#### ⛔ (4a) THE PREDICTION SCORE: **ZERO OF FIVE SURVIVED AS WRITTEN**
+#### ⛔ (4a) THE PREDICTION SCORE: ~~**ZERO OF FIVE SURVIVED AS WRITTEN**~~ → **TWO OF FIVE** (`_059`)
+
+> ⛔⛔ **RE-SCORED BY THE REVIEWER, AND THE CORRECTION GOES AGAINST ME IN THE
+> FLATTERING DIRECTION — WHICH IS WHY IT IS WORTH RECORDING.** *"Zero of five"*
+> was **too harsh**, and it was too harsh for two specific, avoidable reasons:
+> **(a)** two of the scorings crossed the `F74`/`W` **spellings** the finding was
+> about, and **(b)** one prediction was scored against the **admissibility
+> clause published in the same task** — which `_059` then withdrew.
+> ▶ ⭐⭐ **THE METHOD RULE OUT OF IT: do not score a prediction against a finding
+> published in the same task. The finding is not evidence yet; it is the thing
+> under review, and scoring against it makes the task its own referee.**
+> ⓘ **A self-flagellating score is still a wrong score**, and a round whose
+> headline number is wrong in the self-critical direction is not more honest than
+> one wrong the other way — it is differently wrong, and it invites exactly the
+> over-correction the next reader makes.
 
 **Three split, one refuted, one upheld-narrowed.** ⭐ **And the splits are the
 informative ones, because in each the conclusion and the reason came apart in
@@ -2206,11 +2404,19 @@ programme's largest open thread.
 > AND THE TRUTH IS WORSE.** The docstring disclaims C vs **`safe_tuned`**
 > (Δshare `0.2715`); the cell publishes C vs **`safe_naive`** (Δ `0.2355`).
 > ⛔ **So the caveat everyone has been quoting was guarding a DIFFERENT PAIR than
-> the one published** — and the published pair **fails `F74`'s written
-> `≤ 0.02` bar by more than eleven times too**, so it is **inadmissible on the
-> row's own rule**, not merely disclaimed. ⭐ **The conclusion survives and
+> the one published** — and the published pair **exceeds `F74`'s `≤ 0.02`
+> condition (ii) by more than eleven times too.** ⭐ **The conclusion survives and
 > strengthens; the identity claim in its reason does not.** ⓘ Seventh round in
 > a row in which a conclusion outlived its stated reason.
+>
+> > ⛔⛔ **AND THIS BOX SAID *"SO IT IS INADMISSIBLE ON THE ROW'S OWN RULE"*.
+> > WITHDRAWN AT `TASK_PHP_059`.** `F74`'s bar is **not a gate** — four documents
+> > say so, including `.memory-php/02-ladder.md` and the `RECAP_PHP.md` cell this
+> > box is about. ▶ **What is left is `F108`, and it is enough**: the sentence
+> > names one C compiler of a pair whose columns have **opposite signs**.
+> > ⭐ **`F127` should be re-stated on `F108`, not on `F74`'s bar** — its
+> > conclusion needs no bar at all (`_059` §3). ⓘ **A correction written into a
+> > correction box, two rounds running, and the second one withdrew the first.**
 
 ▶ ✅ **ACTIONED: `TASK_PHP_058` measured `ph03`, `ph16` and `ph29` and rewrote
 `ph97`'s template; four rows re-gated PASS. ⛔ It did NOT close item 127 —
@@ -5278,10 +5484,15 @@ the published `[100,200]` one is an OUTLIER and every other sits within
 0.17–0.22 pp of C, so 90–93 % of that gap is the DRAW.** ✅ Signs stable, so no
 flip verdict moves.
 
-⚠⚠ **`ph29/large c-gcc vs safe_naive` is the sentence this is about:** A says C
-is **33 % dearer** than naive safe Rust; three other statistics say **~1 %
-cheaper**. **That is the difference between *"safe Rust is a third cheaper than
-C here"* and *"they are the same"* — and it is this project's central claim.**
+⚠⚠ **`ph29/large` `O3`/`isolated` vs `safe_naive` is the sentence this is
+about — AND IT OWES BOTH C COLUMNS** (`F108`'s fifth thing; this sentence named
+only `c-gcc` until `TASK_PHP_059` found it): **A says `c-gcc` is `+33.01 %`
+DEARER than naive safe Rust, while `c-clang` is `−4.36 %` CHEAPER** — and on
+`c-gcc` three other statistics say **~1 % cheaper**. ⛔⛔ **So the disagreement
+this project is about is not only between STATISTICS; it is between the two C
+COMPILERS, and the one-column form hid that.** **The `c-gcc` gap is the
+difference between *"safe Rust is a third cheaper than C here"* and *"they are
+the same"* — and it is this project's central claim.**
 
 ⭐ **This GENERALISES open item 54 rather than repeating it.** Item 54 says
 `ph64`'s C rung allocates `2n+2` per call with 60 % of its instructions in libc,
@@ -7933,8 +8144,8 @@ the wrong one.
 | 127 | ⭐⭐⭐ **FIVE BUILT ROWS NEVER MEASURED `inside_share`, AND THREE OF THEM PUBLISH AN `A1` HEADLINE — MEASURE `ph03`, `ph16`, `ph29`** | **F127**, and **`TASK_PHP_057`'s BINDING resume priority**: *"more important than any finding in this round, including the one it came out of."* ✅ **Manager-verified across all eleven rows**: only `ph97` has a dedicated control; `ph29`/`ph45`/`ph52`/`ph55`/`ph56` carry a value somewhere; **`ph03`, `ph07`, `ph16`, `ph53`, `ph64` have NONE.** ⛔⛔ **`ph29` is worse than missing**: its only figures live in a **docstring in `controls/spellings.py`** which says in terms that **A1 is not right for this row's C-vs-Rust column and *"that comparison is not made here"*** — while this file's *which statistic* cell publishes exactly that comparison (*"A says C is +33 % dearer"*) from this row, **the row at the centre of the programme's largest open thread.** ⚠ **CORRECTED by `F129`: *"exactly that comparison"* is ONE RUNG OFF** — the docstring disclaims C vs `safe_tuned`, the cell publishes C vs `safe_naive`. **Both fail the written bar by >11×, so the point stands and gets stronger.** ✅✅ **LANDED AS `TASK_PHP_058` — AND IT DID NOT CLOSE THIS ITEM.** ⭐ Three of the five rows now have a measured matrix (`ph03`, `ph16`, `ph29`), plus `ph97`'s template rewritten byte-identical across all four and re-gated. ⛔ **`ph07`, `ph53` and `ph64` STILL HAVE NONE** — the scoping was correct (the reviewer named the three rows that publish an `A1` headline) but **the item must not be ticked at 3 of 5**, which is `PROTOCOL.md` rule 13's trap. ▶ **RESIDUE: `ph07`, `ph53`, `ph64`, cost measured by `_058` and carried in its §8.** ⭐⭐ **What it bought is bigger than the gap it closed: `F129` — two quantities wear the name `inside_share`, and the `+33 %` flips sign between the two C compilers.** <br><br>⛔⛔ **AND THIS CELL SAID *"ENGINEER TASK, ~20 min + 3 re-gates"* BEFORE ANY OF IT WAS MEASURED — which is `F123`'s own defect, committed in the item that exists because of `F123`.** ✅ **Measured at `6bff271` before dispatch**: one re-gate **2 m 29 s** (`ph03`, `check.py: PASS`); one callgrind run **6.6 s** on the heaviest cell (`ph03/safe_naive-O3-isolated`, `large.bin`, 1.44 G Ir), so the 16-run matrix is **~2 min**; the `kernel` symbol **survives** at `O3/isolated` (95.03 % on that cell). ⛔ **And it is FOUR re-gates, not three** — `ph97`'s template hardcodes `n_iters` where `slb.read` derives it, and fixing the template in the same edit is what stops the *"fixed one limb"* class recurring. ⭐ **The estimate was roughly right. Being right by luck is not being right, and that is exactly what `F123` says.** ⚠ **`.memory-php/03-numbers.md` treats `inside_share` as a live per-cell discipline; on 5 of 11 rows it was aspirational when this item opened — **3 of 11 now** (`ph07`, `ph53`, `ph64`), and the layer gained the two-definition caution `F129` forced.** ⛔ **The manager's own task file asserted *"`inside_share` is in every row's `controls/` already"* — a rule-14 premise, false, and the reviewer checked it instead of believing it** |
 | 128 | ⚠ **`F119` MUST BE RE-STATED ON ITS REAL EVIDENCE, AND THE REAL ONE IS STRONGER** | **F127** / `_057` §3.3. `F119`'s conclusion is UPHELD and UNDER-STATED — **96 cells (48 `isolated` + 48 `whole`), three `envp_stack_bytes` draws, bit-identical, md5 reproduced by an independently chosen recipe.** ⛔ **Its REASON is a category error**: *"100 % of the ±7 swing is inside a libc `memset` callee, which `kernel_exclusive_ir` excludes structurally"* is a claim about **A1**, yet **half the evidence is the `whole` column, which that immunity cannot protect** — the finding explains the stability of column Y with the immunity of column X. ⛔⛔ **And the `memset` fact is another pattern's**: `ph53`'s own `NOTES.md` §8b says its `memset` (`8·n_decl ≤ 128` B) is **inlined to `xmm` stores, inside `kernel`, not a libc callee**; `__memset_avx2_unaligned_erms` is a **`p03`/PAT-side** measurement. ⚠ **The record's own `domain` field forbids the comparison F119 makes** (*"comparable ONLY against a record with the same `envp_stack_bytes`"*). ▶ ⭐ **THE STRONGER STATEMENT: the ±7 term did not fire on this row at all, on three draws, INCLUDING in the vulnerable column — so the `domain` guard is more conservative than this row needs.** ⓘ Item 117 stays CLOSED either way. <br><br>⭐⭐ **NEW, AND IT IS A SECOND ROW ON AN *ACCIDENTAL* DRAW.** Quoted as an EVENT: I re-ran `python3 harness-php/gate.py ph03-uudecode-bound` at `6bff271` with **no source change**, purely to time it, and diffed the record against the committed one. **`envp_stack_bytes` moved `3695 → 3698`** (`bytes` `3303 → 3306`, `nvars` 49 both times) — so the record's own `domain` field declares the two runs **incomparable** — and **all 96 `marginal_ir_per_call` cells came back byte-identical, including the `whole` column that `A1`'s structural immunity cannot protect.** The only lines that moved were **4 ASan PIDs/ASLR addresses and 2 wall-clock timings**; `check.py: PASS`. ⛔ **This does NOT show the ±7 term is absent** — `TASK_114` measured it firing — and a **+3-byte** draw may land in the same stack-alignment bucket, **which nobody has tested.** ▶ **Two rows now, one deliberate and one accidental, both saying the guard is more conservative than the row needs.** ⓘ The run was reverted: its measured content was identical, so committing it would have added PID churn and no evidence |
 | 129 | ⭐⭐ **THE `WHAT I AM UNSURE OF` CENSUS — AND THE REVIEWER SAYS TO SCOPE IT ANYWAY** | **F123**/**F127**, item 125's successor with a ruling. The manager wrote that he *"deliberately is not the one who scopes it"* because the finding is about his own demotions. ⛔ **`TASK_PHP_057` §9 item 4 overrules that: *"Scope it anyway — F123 is one instance and the whole finding is that the RATE matters, not the instance."*** ⭐ **That reviewer priority BINDS** (the task file said so, and F123 is the record of what happens when a stated priority is re-ranked). ▶ **THE TASK: every landed `_REPORT.md` has a `WHAT I AM UNSURE OF` section by DoD; count the items, and for each ask whether the NEXT task inherited it, demoted it, or dropped it silently.** ⭐ **The law it would test, in `_057`'s strengthened wording**: *an engineer's own estimate of a check's COST is evidence, and demoting a check on cost grounds without measuring the cost is `PROTOCOL.md` rule 14.* <br><br>⛔⛔ **SCOPED 2026-09-15, AND THIS ITEM'S OWN PREMISE IS FALSE.** *"Every landed `_REPORT.md` has one by DoD"* — **measured: 27 of 61 do; 34 do NOT.** The first is `_020`, the last without is `_040`, and it is **universal only from `_041`**. ⭐ **The 13 reports that skipped it AFTER the convention started (`_021`–`_028`, `_032`, `_036`, `_038`, `_039`, `_040`) are the census's FIRST RESULT, not an exclusion**: a report stating no uncertainty cannot have one demoted — **it skipped the step, and nothing noticed for twenty tasks.** ⛔ **Two of the 27 are false positives of the keyword search, in different ways**: `_057` merely DISCUSSES such sections (⚠ **any census keyed on the phrase matches every document about the census**), and `_048`'s match is a DoD row pointing at the section in the ROW's `NOTES.md`. ▶ **So the denominator is ≈ 289 items over 27 sections — 261 in 25 reports plus 28 in two rows' `NOTES.md` (`ph55` 21, `ph52` 7)**; median 10, largest `_044` at 19. ✅ **The counter is validated**: it reads `ph55` as 21 and `_048`'s independently-written DoD row also says 21. ⛔⛔ **~289 judgements, each needing a search of every later document, IS NOT A ONE-TASK JOB, and this item reads as if it were.** ▶ **The task file must pick a shape and SAY WHY** — full census · ⭐ mechanical pass + hand adjudication of the residue (the house ratchet, **but *mentioned later* must NOT be scored as *inherited*: the mechanical pass finds the DROPPED, only reading finds the DEMOTED, and demotion is the finding**) · or a stated sample. ⚠⚠ **Choosing a cheaper shape is fine; choosing it without saying so is the exact defect under audit.** ⚠ **`_057` overruled the manager on SCOPING it, not on EXECUTING it — a REVIEWER runs the census.** ⛔ **Not in `.memory-php/` and not going there unreviewed** |
-| 130 | ⭐⭐ **DO ANY OF THE OTHER ARMS ASSERT AN EFFECT'S *DIRECTION*? THE SWEEP `F128` OWES AND DID NOT RUN** | **F128**. Two arms are now known to have asserted a sign and so reported the DATA as the failure: **`N11`** (the first-in-family premium, `F126`, refuted at n = 8 after standing on n = 1) and **`N13`** (*"an unsearched row can only make the all-rows figure LOOK cheaper"* — refuted the day it was written, by a task charged to an unsearched row). ⛔⛔ **`F126`'s repair fixed `N11` and never asked the question about any other arm** — the *"fixed one limb"* class (`F122`, `F127`) for the **third** time, this time inside the repair of a finding about incomplete repairs. ▶ **THE SWEEP: read every arm's predicate in `.tasks-php/*.py` — count them with the tools, never from this sentence for a comparison whose direction is an EMPIRICAL claim rather than a definition, and for the cheaper tell — ⭐ *a predicate asserting more conditions than its own comment justifies*, which is how `N13` was found without any refuting datum.** ⚠ **The tell is a hypothesis from n = 1; the sweep is what would make it n > 1 or kill it.** <br><br>✅✅ **SWEPT 2026-09-15 — manager, read-only, 59 arms across 4 files, AND THE SWEEP NARROWED ITS OWN RULE.** ⓘ Its full write-up is folded into this cell rather than cited from scratch: a committed doc pointing at deletable `.temp/` is `CLAUDE.md` rule 1's own trap, and the first draft of this cell did it. ⛔ **`F128` as worded (*"an arm must not assert a sign"*) IS WITHDRAWN: applied literally it damages FIVE CORRECT ARMS.** ⭐⭐ **The arms split in two and only one kind is defective: (A) a REPRODUCTION arm re-asserts a PUBLISHED finding so the tool speaks when it stops reproducing — `width.py` `N4`/`N3b`, `php_null.py` `N8`/`N9`/`N7b`; firing is the POINT. ⭐ Two of them are the model to copy because they assert a FLOOR and PRINT THE MEASURED MARGIN BESIDE IT, so the margin is visible shrinking. (B) a PROJECTION arm asserts the direction of something still being ESTIMATED, where the opposite outcome is a legitimate RESULT — `N11`, `N13`, and ⛔⛔ `task_cost.py` `N5`, THE THIRD INSTANCE, STILL UNREPAIRED.** `N5`'s `not rising` enforces the flat-trend conclusion **that this same file PRODUCES**, so it can only report a changed conclusion as a tool failure; its other conjunct (a variation floor) is legitimate. ▶ **REPAIR OWED: demote `not rising` to an `ⓘ` report.** ⚠ **`N6` (`dear == "ph07"`) is NOT a defect today but has NO RETIREMENT CONDITION** — a registered prediction with no expiry becomes a pin. ✅ **Cleared on inspection**: `N3`/`N4`/`N7` only LOOK directional — `marg <= pub` holds **by construction** (`spread` excludes ONCE/METH/PENDING; `PESSIMISM` only moves tasks INTO rows), so their empirical content is the constant alone. ⛔ **SIX CHECKERS UNSWEPT** — `cbaseline_check.py`, `quota.py`, `citecheck.py`, `contract_audit.py`, `preimage_screen.py`, `fixsurvey.py` use a different arm spelling and were not read. ⓘ **The sweep's own census miscounted first** (60/17 from a `grep` that read a `check("N15b"…` quoted INSIDE a comment; recounted 59/16 and cross-checked against what the tools PRINT — **item 115's class, inside the sweep hunting item 115's class**). ⛔ **Not in `.memory-php/` and not going there unreviewed** |
+| 130 | ⭐⭐ **DO ANY OF THE OTHER ARMS ASSERT AN EFFECT'S *DIRECTION*? THE SWEEP `F128` OWES AND DID NOT RUN** | **F128**. Two arms are now known to have asserted a sign and so reported the DATA as the failure: **`N11`** (the first-in-family premium, `F126`, refuted at n = 8 after standing on n = 1) and **`N13`** (*"an unsearched row can only make the all-rows figure LOOK cheaper"* — refuted the day it was written, by a task charged to an unsearched row). ⛔⛔ **`F126`'s repair fixed `N11` and never asked the question about any other arm** — the *"fixed one limb"* class (`F122`, `F127`) for the **third** time, this time inside the repair of a finding about incomplete repairs. ▶ **THE SWEEP: read every arm's predicate in `.tasks-php/*.py` — count them with the tools, never from this sentence for a comparison whose direction is an EMPIRICAL claim rather than a definition, and for the cheaper tell — ⭐ *a predicate asserting more conditions than its own comment justifies*, which is how `N13` was found without any refuting datum.** ⚠ **The tell is a hypothesis from n = 1; the sweep is what would make it n > 1 or kill it.** <br><br>✅✅ **SWEPT 2026-09-15 — manager, read-only, 59 arms across 4 files, AND THE SWEEP NARROWED ITS OWN RULE.** ⓘ Its full write-up is folded into this cell rather than cited from scratch: a committed doc pointing at deletable `.temp/` is `CLAUDE.md` rule 1's own trap, and the first draft of this cell did it. ⛔ **`F128` as worded (*"an arm must not assert a sign"*) IS WITHDRAWN: applied literally it damages FIVE CORRECT ARMS.** ⭐⭐ **The arms split in two and only one kind is defective: (A) a REPRODUCTION arm re-asserts a PUBLISHED finding so the tool speaks when it stops reproducing — `width.py` `N4`/`N3b`, `php_null.py` `N8`/`N9`/`N7b`; firing is the POINT. ⭐ Two of them are the model to copy because they assert a FLOOR and PRINT THE MEASURED MARGIN BESIDE IT, so the margin is visible shrinking. (B) a PROJECTION arm asserts the direction of something still being ESTIMATED, where the opposite outcome is a legitimate RESULT — `N11`, `N13`, and ⛔⛔ `task_cost.py` `N5`, THE THIRD INSTANCE** — ⛔⛔ **and this cell said *"STILL UNREPAIRED"*, which was a LIVE FALSE CLAIM caught by `TASK_PHP_059` §4. The repair landed at `d9652b4`, ONE COMMIT after this cell was written, and survived two later commits INCLUDING A PRE-COMPACT AUDIT that was looking for exactly this.** ⭐⭐ **The mechanism is the cell's own subject: I wrote the item, did the repair in the next commit, and never came back to the sentence that said it was owed — *two homes for one fact* (`F131`), in the item about arms that report a changed conclusion as a failure.** ✅ `N5`'s `not rising` **IS** demoted to an `ⓘ` report; its variation-floor conjunct stays. ⚠ **`N6` (`dear == "ph07"`) is NOT a defect today and NOW HAS A RETIREMENT CONDITION and a printed margin** (also `d9652b4`) — a registered prediction with no expiry becomes a pin. ✅ **Cleared on inspection**: `N3`/`N4`/`N7` only LOOK directional — `marg <= pub` holds **by construction** (`spread` excludes ONCE/METH/PENDING; `PESSIMISM` only moves tasks INTO rows), so their empirical content is the constant alone. ⛔ **SIX CHECKERS UNSWEPT** — `cbaseline_check.py`, `quota.py`, `citecheck.py`, `contract_audit.py`, `preimage_screen.py`, `fixsurvey.py` use a different arm spelling and were not read. ⓘ **The sweep's own census miscounted first** (60/17 from a `grep` that read a `check("N15b"…` quoted INSIDE a comment; recounted 59/16 and cross-checked against what the tools PRINT — **item 115's class, inside the sweep hunting item 115's class**). ⛔ **Not in `.memory-php/` and not going there unreviewed** |
 | 131 | ⚠ **`N12` CANNOT READ THE ARM DIALECT THREE NEW TOOLS SPEAK, SO IT COULD NOT TELL IF THEY WENT SILENT** | **F129**/`_058`. `N12` derives every *"&lt;n&gt; arms"* claim from what a checker PRINTS, matching `PASS`/`FAIL`/`OK` beside an `N&lt;digits&gt;` name. ⛔ **`controls/inside_share.py`, `php58_mutate_arms.py` and `php58_record_share.py` all print `ok &lt;n&gt; &lt;name&gt;` — lowercase, numeric, no `N`** — so `N12` scores them **0 arms** while they run 7, 6 and 7. ⓘ **It fired correctly in form**: it refused a registry entry of mine claiming 7. ▶ **The count was REMOVED from the `why` rather than the regex widened** (the registry's own rule, and *"the fix is no number, not a better one"*). ⛔ **The residual is real: `N12`'s silent-checker guard does not cover these three.** ▶ **Normalising the dialect would cost FOUR RE-GATES** (`inside_share.py` is hashed into four rows' `source_sha256`), which is why it is an item and not a same-day fix |
-| 132 | ⭐⭐ **`F74`'s CONDITION (i) HAS NO THRESHOLD, AND AT ELEVEN ROWS IT IS NOW CHEAP TO PIN** | **F129**/`_058` §9.4. `.memory-php/02-ladder.md`: the bar is **(i)** `min(inside_share)` HIGH **and (ii)** `|Δinside_share| ≤ 0.02`, and *"the threshold in (i) is **not tuned and six rows cannot pin it**"* — `>0.3`, `>0.5`, `>0.6` all give 0 flips. ⭐ **There are ELEVEN rows now and 360 evaluable cells.** ▶ **The sweep reads committed records and builds nothing** — `.tasks-php/php58_record_share.py --pairs`. ⚠⚠ **Do it in `F74`'s spelling, not the control's — they are different quantities (F129), and pinning the threshold of the wrong one would be worse than leaving it open** |
+| 132 | ⭐⭐ **`F74`'s CONDITION (i) HAS NO THRESHOLD, AND AT ELEVEN ROWS IT IS NOW CHEAP TO PIN** | **F129**/`_058` §9.4. `.memory-php/02-ladder.md`: the bar is **(i)** `min(inside_share)` HIGH **and (ii)** `|Δinside_share| ≤ 0.02`, and *"the threshold in (i) is **not tuned and six rows cannot pin it**"* — `>0.3`, `>0.5`, `>0.6` all give 0 flips. ⭐ **There are ELEVEN rows now and 360 evaluable cells.** ▶ **The sweep reads committed records and builds nothing** — `.tasks-php/php58_record_share.py --pairs`. ⚠⚠ **Do it in `F74`'s spelling, not the control's — they are different quantities (F129), and pinning the threshold of the wrong one would be worse than leaving it open** <br><br>✅✅ **CLOSED 2026-09-15 BY `TASK_PHP_059` §1.3a, AND THE ANSWER IS *DO NOT FIT IT*.** Swept in `F74`'s spelling as instructed, eleven rows, `O3`/`isolated`, both inputs, with `.tasks-php/php59_share.py sweep`. **(i) is VACUOUS on the cross-language column at every `t` in `[0.00, 0.90]`** — 0 of the 17 (ii)-survivors are killed. ⛔ **And the manager's `P3` REASON is refuted**: it is *not* that (ii) already failed on the rest. **All 17 survivors sit at min-share ≥ 0.9019**, because (ii) forces the two shares together and the close-shared cross-language pairs in this corpus are all high-share pairs. ⛔⛔ **SIX OF THE SEVENTEEN ARE ADMITTED ON A MIN-SHARE ABOVE `1.0`** — the item-133 pathology **inside the bar's own verdict**. ⭐ **Same-language (i) IS load-bearing** (10 kills at `t = 0.10`, 18 at `0.50`, 37 at `0.90`) — **but the population that would pin it, same-language flips passing (ii), is `ph45` ALONE, `n = 1` row.** ▶ ***A threshold fitted on one row's pathology is not a threshold.*** **So eleven rows still cannot pin (i), and the reason is now SPECIFIC rather than *"not enough rows"*.** ✅ **Landed in `.memory-php/02-ladder.md` beside `F74`'s rule** — it is reviewer work, so rule 9 permits it. ⓘ **The sweep also settled something the item did not ask: the bar is not a gate at all** (`F129` §3, withdrawn) |
 | 133 | ⛔⛔ **`F74`'s SHARE EXCEEDS `1.0` ON 15 OF 360 CELLS, AND A SHARE OF THE WHOLE CANNOT** | **F129**/`_058`. ✅ **Manager-reproduced independently: exactly 15**, largest `ph07` `c-gcc`/`large` at **`1.0353`**, concentrated in `ph07` and `ph16` at `O3/isolated`. ⚠ **The proposed mechanism — numerator over `n_iters` calls, denominator a SLOPE at `collapse.probe_iters` — is consistent with the arithmetic and was NOT isolated**; it could equally be a start-of-run transient (`F93`'s shape). ⛔ **Do not quote the mechanism as measured; the engineer said so unprompted.** ▶ **The cheap discriminator: recompute the marginal at `n_iters` on one offending cell.** ⭐⭐ **THE STAKES: this quantity DECIDES WHICH STATISTIC MAY PUBLISH (`F74`'s two-condition bar), and it is out of range on 4 % of the corpus.** <br><br>⭐⭐ **THE SHARPEST SINGLE DATUM, manager-verified**: `ph16` `c-gcc`/`isolated`/`small.bin` — **the same row, cell and input** — reads **`0.0418` at `O0`** and **`1.0241` at `O3`**. `A1` is `476.48` vs a marginal of `11401.39` at `O0`, and `3683.26` vs `3596.61` at `O3`. ▶ **A 24× swing, from *A1 sees almost nothing* to *A1 sees more than the whole*, moved by the optimisation level alone.** ⛔ **I am deliberately NOT proposing a mechanism** — that is this item's whole point, and the engineer declined to as well |
-| 134 | ⚠⚠ **`cbaseline_check.py` ENFORCES FOUR-FIFTHS OF THE RULE IT EXISTS FOR: ONE C COLUMN PASSES IT** | **F129**/item 130's sweep. `.memory-php/03-numbers.md` states the fifth thing as *"WHICH COMPILER — **with both columns, or an explicit statement that only one was measured.** ⛔ One column is not a number with error bars on it; it is a DIFFERENT SIGN."* ⛔ **But `scores()` is `MAG and XLANG and not BASE`, where `BASE` matches `c-gcc` OR `c-clang`** — so a sentence naming EITHER is deemed labelled. ⭐⭐ **And its `N2` arm, the exemplar it holds up as *"a correctly labelled claim"*, is `` `ph29/large`, `c-gcc` vs `safe_naive`: A says C is +33.01 % DEARER `` — ONE column, of the very pair whose columns have OPPOSITE SIGNS.** ⓘ **The enforcer's model of compliance is itself one item short of the rule.** <br><br>✅ **SCOPE MEASURED BEFORE OPENING THIS, and it is small: of the scanned corpus, 5 lines name BOTH C columns and 2 name exactly one** — and ⭐ **on inspection BOTH of those two are FINE**: `.memory-php/02-ladder.md` gives the `c-clang` swap in full two lines later, and the `RECAP_PHP.md` hit sits inside `F108`'s own discussion. ⛔ **So there is NO live violation — the finding is that nothing would have caught one**, plus the artefact that a **line-based** scan cannot see a claim whose two columns are one sentence apart. ▶ **The repair is cheap and is NOT a corpus job**: make `BASE` demand both spellings (or an explicit *"only one measured"*), re-adjudicate the handful of hits BY HAND, and fix the `N2` exemplar. ⚠ **It WILL move the `RATCHET` count — that is the point of a ratchet, and every new hit is adjudicated, never regex-tuned** |
+| 134 | ⚠⚠ **`cbaseline_check.py` ENFORCES FOUR-FIFTHS OF THE RULE IT EXISTS FOR: ONE C COLUMN PASSES IT** | **F129**/item 130's sweep. `.memory-php/03-numbers.md` states the fifth thing as *"WHICH COMPILER — **with both columns, or an explicit statement that only one was measured.** ⛔ One column is not a number with error bars on it; it is a DIFFERENT SIGN."* ⛔ **But `scores()` is `MAG and XLANG and not BASE`, where `BASE` matches `c-gcc` OR `c-clang`** — so a sentence naming EITHER is deemed labelled. ⭐⭐ **And its `N2` arm, the exemplar it holds up as *"a correctly labelled claim"*, is `` `ph29/large`, `c-gcc` vs `safe_naive`: A says C is +33.01 % DEARER `` — ONE column, of the very pair whose columns have OPPOSITE SIGNS.** ⓘ **The enforcer's model of compliance is itself one item short of the rule.** <br><br>✅ **SCOPE MEASURED BEFORE OPENING THIS, and it is small: of the scanned corpus, 5 lines name BOTH C columns and 2 name exactly one** — and ⭐ **on inspection BOTH of those two are FINE**: `.memory-php/02-ladder.md` gives the `c-clang` swap in full two lines later, and the `RECAP_PHP.md` hit sits inside `F108`'s own discussion. ⛔ **So there is NO live violation — the finding is that nothing would have caught one**, plus the artefact that a **line-based** scan cannot see a claim whose two columns are one sentence apart. ▶ **The repair is cheap and is NOT a corpus job**: make `BASE` demand both spellings (or an explicit *"only one measured"*), re-adjudicate the handful of hits BY HAND, and fix the `N2` exemplar. ⚠ **It WILL move the `RATCHET` count — that is the point of a ratchet, and every new hit is adjudicated, never regex-tuned** <br><br>✅✅ **RULED AND CLOSED 2026-09-15 BY `TASK_PHP_059` §2.2 — AND THE RULING IS *REFUSE THE WIDENING AS FRAMED*, AN EIGHTH REFUSAL.** ⛔ **My *"the eighth instance cuts the other way"* is true of the EVIDENCE and FALSE of the REPAIR**: the two hits pull in **opposite directions** and are not one repair. `ph29` 1157 wants `BASE` to recognise **more** spellings; the `N2` exemplar wants it to demand **both** columns — and demanding both does nothing for `ph29` 1157 except make it a hit for a **second, independent** reason. ⛔⛔ **And the rule is a DISJUNCTION whose second branch is not regex-decidable**: *"both columns, **or an explicit statement that only one was measured**"*. A `BASE` that demands both would flag every legitimately single-column unit — of which there are at least four. **Spelling *"only one was measured"* for a regex is `F10` one level up.** ⛔ **My scope figure was also ~4× low and measured the wrong population**: *"5 both / 2 one"* was counted on LINES; **the checker scans UNITS, where it is 22 both / 10 one.** ⛔⛔ **And *"there is NO live violation"* was FALSE** — two, and they are the same sentence: `RECAP_PHP.md` and `.tasks-php/STATISTICS_001.md`, both publishing the `+33 %` with only `c-gcc` named. ✅ **DONE, all four parts:** **(a)** `BASE` LOOSENED to accept `gcc-C`/`clang-C` — a pure false-positive removal, verified **as a set** to retire exactly `ph29` 1157, ratchet 78 → 77; **(b)** `N2`'s exemplar is now a **both-columns** sentence, plus `N2b`/`N2c` (`N2c` asserts the loosened `BASE` still flags a claim naming **no** compiler, so the teeth are checked rather than assumed); **(c)** an **`ⓘ` ONE-COLUMN REPORT that carries no verdict** — it prints the population and leaves the disjunction's second branch to a reader, which is `quota.py`'s discipline and `F128`'s Kind-A/Kind-B rule at once; **(d)** both live sentences now carry `c-clang`'s `−4.36 %`, and the report fell 14 → 12. ⭐⭐ **What (d) revealed is bigger than the labelling defect: the disagreement this programme is about runs BETWEEN THE TWO C COMPILERS as well as between the statistics, and the one-column form hid the larger half** |

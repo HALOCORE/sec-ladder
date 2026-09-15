@@ -195,7 +195,20 @@ REGISTRY = {
     "cbaseline_check.py": dict(
         kind="checker", argv=[], expect=0, negatives="flag", st_expect=0,
         why="F108: every cross-language percentage must name WHICH C COMPILER. "
-            "10 arms over a hand-adjudicated hit ratchet. ⛔⛔ THIS ENTRY SAID "
+            "12 arms over a hand-adjudicated hit ratchet, PLUS an `ⓘ` ONE-COLUMN "
+            "REPORT that deliberately carries no verdict. ⭐⭐ N2b/N2c ARE NEW AT "
+            "TASK_PHP_059 (item 134): BASE was LOOSENED to accept the `gcc-C` / "
+            "`clang-C` word order, because it was flagging `ph29` NOTES 1157 -- "
+            "the best-labelled sentence in the corpus -- on a spelling. N2c is "
+            "the arm that keeps that honest, asserting the loosened BASE still "
+            "flags a claim naming NO compiler. ⛔ The OTHER half of item 134, "
+            "making BASE DEMAND both columns, was REFUSED an eighth time: the "
+            "rule is a DISJUNCTION (`both columns, OR an explicit statement that "
+            "only one was measured`) and the second branch is not "
+            "regex-decidable -- so it is the REPORT arm instead. ⛔ N2's own "
+            "exemplar used to be a ONE-COLUMN sentence held up as correctly "
+            "labelled; the enforcer's model of compliance was itself one item "
+            "short of the rule. ⛔⛔ THIS ENTRY SAID "
             "`A bare run REPORTS and does not check -- the sweep must run the "
             "flag arm too`, AND THE FLAG IT MEANT WAS THE WRONG ONE: the ratchet "
             "was gated on `--ratchet`, which NOTHING passed -- not this registry, "
@@ -311,6 +324,68 @@ REGISTRY = {
             "REFUSED to REQUIRED (F123). ⛔ NOT in the sweep: it is 30 s and it "
             "answers a per-row question, not a standing one. ⚠ Pinned to ph97's "
             "patch path; a row edits step 4."),
+    "cbaseline_diff.py": dict(
+        kind="checker", argv=["--selftest"], expect=0, negatives="flag",
+        st_expect=0,
+        why="⛔⛔⛔ THE RATCHET COUNT IS NOT A MEASURE OF CORPUS HEALTH, AND THIS "
+            "IS THE TOOL THAT SHOWS IT. `cbaseline_check.units()` splits on "
+            "BLANK LINES, so a unit is a PARAGRAPH -- and an ordinary prose edit "
+            "near a hit can move the count with nothing repaired and nothing "
+            "broken. THREE MEASURED INSTANCES (F132): the Index unit silenced by "
+            "a finding TITLE gaining the literal `c-gcc`; `02-ladder.md`'s "
+            "FOURTH-FLAG blockquote silenced by an inserted block carrying "
+            "`c-gcc`; and `ph16`'s NOTES unit SPLIT by an added blank line so "
+            "the first half lost the bare `C`. ⭐⭐ In the last two the manager "
+            "was editing the very finding about the ratchet, and the net read "
+            "+1 while THREE had arrived. ▶ ADJUDICATE THE SET, BY UNIT TEXT, "
+            "NEVER THE NUMBER -- a line-keyed diff cannot do it either, because "
+            "line numbers move under every edit. ⓘ Takes an optional git ref "
+            "(default HEAD); it reproduces the 70-at-`1cc2c0e` baseline F130 "
+            "rests on, without a worktree. READ-ONLY: writes nothing, builds "
+            "nothing."),
+
+    # --- TASK_PHP_059, the reviewer's own generators, RESCUED FROM `.temp/` ---
+    # ⛔⛔ THEY WERE WRITTEN INTO GITIGNORED `.temp/rev059/` AND THE REVIEWER
+    #    FLAGGED IT RATHER THAN HIDING IT: *"every number in this report that is
+    #    not a `git show` or a quotation comes from one of them, and if `.temp/`
+    #    is cleared they are not re-derivable."* That is F51/F99/F116's defect --
+    #    the committed claim layer resting on deletable scratch -- and F116 was
+    #    UPHELD-with-its-REASON-REFUTED at `_057` for exactly this. A reviewer
+    #    may not `git add`, so rescuing them is the manager's job and it is the
+    #    FIRST thing done with the report.
+    "php59_share.py": dict(
+        kind="checker", argv=["--selftest"], expect=0, negatives="flag",
+        st_expect=0,
+        why="⭐⭐⭐ THE REVIEWER's INDEPENDENT re-derivation of F74's share, and "
+            "it SHARES NO CODE with php58_record_share.py by construction: "
+            "n_iters parsed from the .bin header with `struct` instead of via "
+            "common-php/slb.py, the record walk written from the schema, and "
+            "the pair enumeration is ALL unordered cell pairs instead of a "
+            "hand-written list of nine -- so it cannot inherit the manager's "
+            "choice of which pairs count. ⭐ It REPRODUCED the manager's tally "
+            "exactly (x-lang 17/71, same-lang 99/11) and then showed the shape "
+            "survives the wider population (65/287, 203/61), which is what made "
+            "`19.3 %` safe to keep and the SENTENCE built on it unsafe. "
+            "⭐⭐ Subcommands beyond the arms: `pairs`, `sweep` (condition (i) "
+            "thresholds -- this is what CLOSED item 132), `over1`, `flip`, "
+            "`named`, `cells`. ⚠ Two independent tools computing one quantity "
+            "is not duplication here, it is the second method rule 9 asks for."),
+    "php59_marginal_at_n.py": dict(
+        kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
+        why="⭐⭐ §1.4's CHEAP DISCRIMINATOR: recomputes marginal_ir_per_call at "
+            "an n_iters-scale probe window instead of collapse.probe_iters "
+            "[100,200], to test whether F74's share exceeding 1.0 is a slope "
+            "artefact. It SETTLED ph07 (1.0353 -> 0.9569) and did NOT settle "
+            "ph16, where the five-window series is NON-MONOTONE with [100,200] "
+            "the lowest -- so there the slope and transient candidates are the "
+            "SAME phenomenon and the discriminator cannot discriminate. "
+            "⛔⛔ NOT A CHECKER AND MUST NOT BECOME ONE WITHOUT ARMS -- the "
+            "reviewer said so unprompted: it takes positional args, runs "
+            "valgrind, and its kernel-exclusive column is KNOWN BAD (returned 0 "
+            "on ph07, over-counted on ph45; the reviewer discarded it and used "
+            "callgrind_annotate for every W figure). Its whole-program totals "
+            "ARE sound -- they reproduce two committed marginals to the digit. "
+            "▶ Use the summary column, never the kernel one."),
     "probes/rule9_mustfire.py": dict(
         kind="checker", argv=[], expect=0, negatives="inline", st_expect=None,
         why="⭐⭐⭐ §H EVIDENCE FOR boxcheck.py's RULE-9 ARM, AND THE REASON THAT "

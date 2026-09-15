@@ -921,8 +921,24 @@ committed records. **Say which you mean.**
 ⭐ **EVERY CELL IS 99.20–99.66 %, A SPREAD OF 0.46 pp — the tightest in the
 corpus** on this definition, against `ph29`'s 66.9–95.0 %. This kernel does
 essentially all of its own work inside its own symbol, on both languages and
-both compilers. ⚠ `ph45`'s much-quoted 0.055–0.094 is the OTHER definition and
-is not comparable with the column above.
+both compilers. ⚠ ~~`ph45`'s much-quoted 0.055–0.094 is the OTHER definition and
+is not comparable with the column above.~~
+
+> ⛔⛔ **WITHDRAWN AT `TASK_PHP_059`: THAT SENTENCE ASSERTED A DEFINITION IT HAD
+> NO WAY TO KNOW, in the section whose entire purpose is labelling.** The
+> evidence points the other way if anywhere: `.memory-php/02-ladder.md`
+> introduces `0.055–0.094` **inside the paragraph stating `F74`'s own corrected
+> rule**, and under `F74` `ph45`'s `large.bin`/`O3`/`isolated` cells run
+> **0.0506–0.0942**, with `c-gcc` at **0.0551** and `safe_tuned` at **0.0942** —
+> the quoted endpoints exactly.
+>
+> ⭐⭐ **BUT THE REVIEWER COULD NOT REFUTE IT NUMERICALLY AND SAID SO, WHICH IS
+> THE POINT WORTH KEEPING**: an independent `callgrind` run gives the **`W`**
+> values for those same two cells as **5.52 %** and **9.44 %**. ▶ ***On this row
+> the two definitions agree to 0.02 pp, so the NUMBER CANNOT IDENTIFY ITS OWN
+> DEFINITION.*** ⓘ On `ph29` the same two definitions are **8.9 pp** apart. **The
+> gap is a measurement, never a constant** — so *"which definition is this?"* is
+> a question about provenance, never about the value.
 ⚠ **EIGHT INDEPENDENT PER-CELL RATIOS, NOT A COMPARISON.** Both C columns are
 present so that no reader takes it for one.
 ⚠ `whole` cells are absent because the ratio is **undefined** there, not 100 %:
@@ -937,7 +953,26 @@ What decides a statistic is whether **the DIFFERENCE** lands inside the symbol.
 (ii) `|Δinside_share| ≤ 0.02`), at `O3/isolated`, both inputs, **every pair this
 row publishes PASSES, and so does every pair it does not**:
 
-| pair | `small.bin` Δshare | `large.bin` Δshare | rule (ii) |
+> ⛔⛔ **READ THE QUANTITY BEFORE THE NUMBERS — THIS TABLE AND THE MATRIX ABOVE
+> IT ARE DIFFERENT DEFINITIONS, AND `TASK_PHP_059` FLAGGED THE SECTION FOR IT.**
+> The **LEVEL matrix above is `W`** (kernel `Ir` / callgrind whole-run total;
+> 99.20–99.66 %). **This Δ table is `F74`'s** ((`kernel_exclusive_ir`/`n_iters`)
+> / `marginal_ir_per_call`). They are **19× apart on one entry**: `c-gcc` vs
+> `safe_naive`/`small.bin` reads **0.0038** here, and `W` gives **0.0002**.
+> ✅ **`F74`'s IS THE CORRECT ONE FOR THIS TABLE** — it is the quantity the rule
+> is stated in. ⚠ **The section did say so, but two paragraphs BELOW the table
+> and obliquely** (*"a difference of two such ratios"*). ▶ **A label after the
+> table is not a label.**
+>
+> ⛔ **AND *"PASSES"* IS NOT *"IS LICENSED"*.** `TASK_PHP_059` withdrew the
+> reading of this rule as a **gate**: `.memory-php/02-ladder.md` says *"NO
+> FUNCTION OF THE SHARES CAN CERTIFY A AT ANY THRESHOLD"*, and the conjunction
+> **admits** `ph55` `c-gcc` vs `c-gcc-h` — where A1 reads exactly `+0.0000 %`
+> against **66.14 `Ir`/call**. ▶ **Read the column below as *"A1 and the
+> whole-program column are in the regime where they are expected to AGREE"*,
+> never as permission to publish one of them alone.**
+
+| pair | `small.bin` Δshare (**`F74`'s**) | `large.bin` Δshare (**`F74`'s**) | rule (ii) |
 |---|---:|---:|---|
 | §8a's headline, `c-gcc` vs `c-gcc-h` | 0.0037 | 0.0017 | **PASS** |
 | `c-clang` vs `c-clang-h` | 0.0024 | 0.0014 | **PASS** |
@@ -951,10 +986,15 @@ row publishes PASSES, and so does every pair it does not**:
 
 ⭐⭐ **THE MAXIMUM IS `0.0047`, A QUARTER OF THE BAR, AND THE CROSS-LANGUAGE
 PAIRS ARE AMONG THE TIGHTEST.** ▶ **So §8b's *"R3 is faster than C"* is a
-cross-language `A1` claim that the rule ADMITS** — which `ph29`'s same claim is
-not (`Δ` 0.2355 there). ⚠ **That is a fact about these two rows and not about
-the axis**: `RECAP_PHP.md` F108's requirement to carry **both** C columns is
-unaffected, and both are above.
+cross-language `A1` claim whose two cells' shares are close** — where `ph29`'s
+same claim has `Δ` 0.2355. ⚠ ***"Close" is not "admitted"***: `TASK_PHP_059`
+withdrew the gate reading (see the box above the table), so what this buys is
+*A1 and the whole-program column are expected to agree here*, **not** a licence.
+⚠ **It is a fact about these two rows and not about the axis**: `RECAP_PHP.md`
+F108's requirement to carry **both** C columns is unaffected, and both are above.
+⭐ **Corpus context measured at `_059`: of 88 cross-language pairs across eleven
+rows only 17 have `|Δ| ≤ 0.02`, and THIS ROW SUPPLIES 8 OF THEM** — six rows
+supply none. **This row is the outlier, not the norm.**
 
 ⚠⚠ **ONE CAUTION THE MATRIX ABOVE CANNOT CARRY, BECAUSE IT IS ABOUT THE OTHER
 DEFINITION.** Ten of this row's `small.bin` F74-shares read **above 1.0**
@@ -965,6 +1005,25 @@ above is unaffected — it is a difference of two such ratios, and both are
 inflated together — but do not quote a bare F74-share from this row's
 `small.bin` cells as a percentage of anything.** (`TASK_PHP_058`;
 `.tasks-php/php58_record_share.py` prints the tally.)
+
+> ⛔⛔ **AND THE MECHANISM IN THAT PARAGRAPH IS NOT ESTABLISHED ON THIS ROW.
+> `TASK_PHP_059` RAN THE DISCRIMINATOR AND THIS ROW IS THE ONE THAT DID NOT
+> SETTLE.** Re-basing the denominator on an `n_iters`-scale window
+> (`[24000, 25000]`) moves `c-gcc`/`small.bin` from `1.0241` to **`0.9983`**
+> against the record's numerator — but to **`1.0021`, still above 1**, against
+> the reviewer's own same-run numerator, and the two numerators differ by
+> **14.0 `Ir`/call**, squarely inside the documented ±14–28 band. **The sign of
+> the residue is not resolvable this way.**
+>
+> ⛔⛔⛔ **WORSE FOR THE STATED MECHANISM: THE SLOPE SERIES IS NON-MONOTONE AND
+> THE PUBLISHED `[100, 200]` PIN IS THE LOWEST OF FIVE** — `3596.61` ·
+> `3706.31` · `3701.74` · `3641.34` · `3689.59`, a spread of **3.0 %**. ▶ **So
+> this is a DRAW effect (`F88`'s heterogeneous per-window work, `F93`'s
+> start-of-run pin), not a systematic *"mean over `n_iters` vs slope at
+> `probe_iters`"* scale effect — and on this row the two candidates are the SAME
+> phenomenon, so the named discriminator cannot separate them.**
+> ⓘ On `ph07` it DOES settle: `1.0353` → `0.9569`. **One row answered, one row
+> not, and saying which is which is the finding.** (`RECAP_PHP.md` item 133.)
 
 ## Trusted-item arguments
 

@@ -89,10 +89,24 @@ shipped the failure rather than the test.
 **all 29** against family C: `ph03` 6/6, `ph07` 6/6, `ph29` 16/16 **survive**,
 `ph00` 0/1 **refuted**. ▶ **28 of 29 survive.**
 
-⚠⚠⚠ **THE SENTENCE THIS IS ABOUT.** `ph29/large`, `c-gcc` vs `safe_naive`: **A
-says C is `+33.01 %` DEARER than naive safe Rust; B, C and W1 all say ≈ `1 %`
-CHEAPER.** That is the difference between *"safe Rust is a third cheaper than C
-here"* and *"they are the same"* — **and it is this project's central claim.**
+⚠⚠⚠ **THE SENTENCE THIS IS ABOUT, AND IT OWES BOTH C COLUMNS.** `ph29/large`,
+`O3`/`isolated`, vs `safe_naive`: **A says `c-gcc` is `+33.01 %` DEARER than
+naive safe Rust, while `c-clang` is `−4.36 %` CHEAPER** — and on the `c-gcc`
+column B, C and W1 all say ≈ `1 %` **CHEAPER**. That is the difference between
+*"safe Rust is a third cheaper than C here"* and *"they are the same"* — **and
+it is this project's central claim.**
+
+> ⛔⛔ **THIS SENTENCE NAMED ONLY `c-gcc` UNTIL `TASK_PHP_059`, IN THE DOCUMENT
+> THAT ARGUES FOR LABELLING.** It was one of exactly **two live violations** of
+> `F108`'s fifth thing that the reviewer found, and the other was
+> `RECAP_PHP.md`'s copy of the same sentence. ⭐⭐ **The disagreement this
+> document is about turns out to run between the two C COMPILERS as well as
+> between the statistics — and the one-column form hid the larger half.**
+> ⓘ Both were found by a **report** arm, not a verdict arm: the rule is a
+> disjunction (*"both columns, **or** an explicit statement that only one was
+> measured"*) and no regex can decide the second branch, so
+> `cbaseline_check.py` now PRINTS the one-column population and leaves the
+> judgement to a reader (open item 134, ruled).
 ⭐ It **generalises** open item 54 rather than repeating it: not one row.
 
 ⚠ **RULED (`_038` §1.5): cross-language callee work IS rung-attributable**, so A

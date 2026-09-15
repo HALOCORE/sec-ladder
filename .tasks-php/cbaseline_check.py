@@ -61,7 +61,19 @@ MAG = re.compile(r'[-+−]?\d[\d,]*\.?\d*\s*(?:%|pp\b|`?Ir`?\b)')
 # name or a code token); an unbacktick-ed capital C bounded by non-letters is.
 XLANG = re.compile(r'(?<![A-Za-z0-9_`/.\-])C(?![A-Za-z0-9_`\-])'
                    r'|C-vs-Rust|C vs Rust|C rung|than C\b|C baseline|"C"|“C”')
-BASE = re.compile(r'c-(?:gcc|clang)(?:-h)?')
+# ⭐⭐ LOOSENED 2026-09-15 ON TASK_PHP_059's RULING (item 134, part (a)).
+#    It matched only `c-gcc`/`c-clang`, so `ph29` NOTES 1157 -- the line in the
+#    corpus that obeys the rule BEST, naming BOTH columns -- was flagged because
+#    it writes them `gcc-C` / `clang-C`.  F10: a grep has a spelling, and this
+#    was the EIGHTH bare-spelling instance, the first cutting in this direction.
+# ⛔ THIS IS A LOOSENING, NOT A TUNING, AND THE DISTINCTION IS THE WHOLE POINT:
+#    it removes a FALSE POSITIVE (a unit that names its compiler in another
+#    word order), and it does NOT weaken what the rule demands.  The reviewer
+#    REFUSED the other half of item 134 -- making BASE demand BOTH columns --
+#    for an eighth time, because the rule is a DISJUNCTION ("both columns, OR an
+#    explicit statement that only one was measured") and the second disjunct is
+#    not regex-decidable.  That half is an `ⓘ` REPORT arm instead; see `main`.
+BASE = re.compile(r'c-(?:gcc|clang)(?:-h)?|(?:gcc|clang)-C\b')
 
 # ⭐ THE RATCHET. Raise ONLY with a hand adjudication beside it. TASK_PHP_049
 # set it at the MEASURED count; the per-file split is what makes a regression
@@ -232,6 +244,67 @@ BASE = re.compile(r'c-(?:gcc|clang)(?:-h)?')
 # ⓘ RECAP_PHP.md went 35 -> 34 over the same window, so 8 arrived and 1 left.
 # ⛔ ONE hit of the 70 at `1cc2c0e` was ALREADY unadjudicated and is NOT
 #    attributed here: it predates this session and I did not chase it.
+#
+# ✅✅ TASK_PHP_059 CORRECTED THREE OF THE ADJUDICATIONS ABOVE AND FOUND THE
+#    70th.  Left in place rather than rewritten, because a wrong REASON with a
+#    right verdict is the record this ledger exists to keep:
+#      ph03 1317  NOT a line-boundary artefact.  The unit is a BLANK-LINE
+#                 PARAGRAPH, not a line, and `BASE` is searched over the whole
+#                 unit.  It is flagged because the unit says "Both C columns are
+#                 present" and never spells `c-gcc`/`c-clang` -- the BARE-
+#                 SPELLING class, same as ph29 1157.  Benign either way.
+#      ph03 1352  incomplete: the unit DOES carry a cross-language sentence, but
+#                 carries no cross-language MAGNITUDE.  Benign on that ground.
+#      ph97 115   not a normaliser artefact: a real unit.  MAG matches
+#                 "+0.0000 Ir" and XLANG two bare C's.  Benign -- the Ir figure
+#                 is a Rust-vs-Rust control's.
+#      THE 70th  `RECAP_PHP.md:1812` at 1cc2c0e -- the body of F127 ITSELF,
+#                 quoting the defective sentence in order to criticise it.
+#                 BENIGN, item 115's class, and it makes that class the EIGHTH
+#                 instance, not the seventh.  ▶ The ratchet is honest
+#                 RETROSPECTIVELY too; the hedge above is withdrawn.
+#
+# ⛔⛔⛔ RAISED 77 -> 78 ON 2026-09-15, LANDING TASK_PHP_059.  THE BARE RUN
+#    CAUGHT THIS -- the first drift the repaired ratchet has stopped, and it
+#    stopped the MANAGER, mid-edit, in the session that repaired it.
+#    THREE ARRIVED AND TWO LEFT, AND ⛔ NEITHER DEPARTURE IS A REPAIR:
+#      NEW  03-numbers.md  the new caution box, quoting ph52's "22.24 % on its C
+#                 rungs ... ~98.6 % on its Rust rungs" IN ORDER TO SHOW IT IS
+#                 THE WRONG DEFINITION.  Share LEVELS, not a cross-language
+#                 magnitude.  BENIGN -- item 115's class, NINTH instance.
+#      NEW  RECAP_PHP.md  the F129 counterexample bullet, quoting ph97's
+#                 "98.84 % -> 64.50 %" to show it is the W quantity.  Share
+#                 levels, quoted to criticise.  BENIGN, item 115's class.
+#      NEW  RECAP_PHP.md  ⭐⭐ THE INFORMATIVE ONE: a sentence quoting THIS
+#                 FILE'S OWN ADJUDICATION LEDGER ("the four C cells actually
+#                 span 20.23-22.69 %").  The checker flags a quotation of
+#                 itself.  BENIGN, and a new sub-class of item 115's.
+#      GONE 02-ladder.md  the FOURTH-FLAG blockquote stopped hitting because
+#                 the item-132 block inserted into the SAME blockquote unit
+#                 contains `c-gcc`, so BASE now matches.  ⛔ AN ACCIDENTAL
+#                 BASE MATCH, NOT A REPAIR.
+#      GONE ph16 NOTES 921  the "99.20-99.66 %" unit stopped hitting because a
+#                 blank line I added SPLIT the unit in two; the first half lost
+#                 its bare `C` and XLANG no longer matches.  ⛔ A UNIT-BOUNDARY
+#                 ARTEFACT, NOT A REPAIR.
+# ⭐⭐⭐ SO THE NET IS +1 AND THE TRUTH IS "+3 ARRIVED".  The reviewer named this
+#    mechanism once (the Index unit gaining a literal `c-gcc` from a finding
+#    title); these are instances TWO and THREE, both caused by ordinary prose
+#    edits near a hit.  ▶ THE UNIT IS A BLANK-LINE PARAGRAPH, so ANY edit near a
+#    hit can move the count with nothing repaired and nothing broken.  A NET
+#    COUNT IS NOT A MEASURE OF CORPUS HEALTH -- adjudicate the SET, by unit
+#    text, never the number.  RECAP_PHP.md F132.
+#
+# ✅ LOWERED 78 -> 77 IN THE SAME SITTING, ON TASK_PHP_059's ITEM-134 RULING.
+#    Loosening BASE to accept the `gcc-C` / `clang-C` word order (see BASE)
+#    retires exactly ONE hit: `ph29` NOTES 1157, which went 3 -> 2 for that file
+#    while every other file's set is unchanged.  ⭐ VERIFIED AS A SET, NOT AS A
+#    COUNT -- which is F132's own rule, applied in the edit that files F132.
+#    That line names BOTH columns and was the best-labelled sentence in the
+#    corpus; it should never have been a hit.
+# ⛔ A LOWERING IS NOT A WEAKENING HERE: N2c is a must-fire arm asserting that
+#    the loosened BASE still flags a claim naming NO compiler, so the rule's
+#    teeth are checked rather than assumed.
 RATCHET = 77
 def units(path):
     with open(path, encoding='utf-8', errors='replace') as fh:
@@ -280,11 +353,52 @@ def main(argv):
             print('%s:%d' % (f, n))
             print(u[:600])
     # ⛔⛔ THE BARE RUN ENFORCES, AS OF 2026-09-15. This block used to be gated
-    #    on `--ratchet`, and NOTHING EVER PASSED THAT FLAG -- `checkers.py` files
-    #    this tool with `argv=[]` and a `--selftest` arm, so the ratchet sat
-    #    un-run while the corpus drifted 69 -> 70 unnoticed (see RATCHET above).
+    #    on `--ratchet`, and NO **AUTOMATED** CALLER EVER PASSED THAT FLAG --
+    #    `checkers.py` files this tool with `argv=[]` and a `--selftest` arm, so
+    #    enforcement depended on a TASK FILE remembering to ask for it, and
+    #    after `_052` no task file did. The corpus drifted 69 -> 70 unnoticed.
+    # ⛔ THIS COMMENT SAID "NOTHING EVER PASSED THAT FLAG" AND TASK_PHP_059
+    #    REFUTED IT: `TASK_PHP_051.md` and `TASK_PHP_052.md` both instruct the
+    #    flag by name, and TASK_PHP_051_REPORT.md:55 RECORDS THE RUN -- "rc 0 --
+    #    68 hits, ratchet 69" -- with the agent declining the tool's "lower
+    #    RATCHET" advice and giving a reason. Corrected in place, here and in
+    #    RECAP_PHP.md's F130.
+    # ⭐ It is a BIRTH DEFECT, not a regression: the guard is in this file's
+    #    FIRST commit (9313449, RATCHET = 63). Nothing unwired it; it was never
+    #    wired. The un-enforced window is ~32 hours and three commits.
     # ⭐ A ratchet you must opt into is not a ratchet. `--ratchet` is still
     #    ACCEPTED so older callers keep working; it simply no longer decides.
+    # ⓘ ONE-COLUMN REPORT -- A REPORT, NEVER A VERDICT (TASK_PHP_059, item 134
+    #   part (c)).  `.memory-php/03-numbers.md`'s fifth thing is a DISJUNCTION:
+    #   "with both columns, OR an explicit statement that only one was
+    #   measured."  A regex can decide the first branch and CANNOT decide the
+    #   second -- spelling "only one was measured" for a grep is F10 one level
+    #   up -- so demanding both columns would flag every legitimately
+    #   single-column unit, of which there are at least four today.
+    # ▶ So this PRINTS the population and leaves the judgement to a human.  It
+    #   is `quota.py`'s discipline (report the state, do not invent a verdict)
+    #   and F128's Kind-A/Kind-B rule at once: an arm may not assert a direction
+    #   that is still being estimated.
+    one_col = []
+    for p in SCAN:
+        if not os.path.exists(p):
+            continue
+        for lineno, u in units(p):
+            if not (MAG.search(u) and XLANG.search(u)):
+                continue
+            named = {m.group(0) for m in BASE.finditer(u)}
+            fams = {('clang' if 'clang' in n else 'gcc') for n in named}
+            if len(fams) == 1:
+                one_col.append((os.path.relpath(p, ROOT), lineno, fams.pop()))
+    print('\nⓘ  ONE-COLUMN REPORT (no verdict): %d unit(s) carry a '
+          'cross-language magnitude and name exactly ONE C compiler.' %
+          len(one_col))
+    print('   ⛔ THAT IS NOT AUTOMATICALLY A DEFECT -- the rule also permits an '
+          'explicit "only one was measured", which no regex can see.')
+    print('   ▶ Read them; do not count them.')
+    for f, n, fam in one_col:
+        print('     %-58s %5d  %s only' % (f, n, fam))
+
     if len(h) > RATCHET:
         print('\nRATCHET FAIL: %d hits > %d. Adjudicate each new one BY HAND, '
               'then raise RATCHET with the adjudication beside it.'
@@ -347,10 +461,32 @@ def selftest():
     if not scores('A says C is +33 % dearer than naive safe Rust.'):
         fails.append('N1 the target defect does NOT score as a hit')
 
-    # N2 THE LABELLED FORM MUST NOT. The real sentence, STATISTICS_001.md:92.
+    # N2 THE LABELLED FORM MUST NOT.
+    # ⛔⛔ THIS ARM'S EXEMPLAR USED TO BE THE ONE-COLUMN SENTENCE
+    #    "`ph29/large`, `c-gcc` vs `safe_naive`: A says C is +33.01 % DEARER."
+    #    -- held up as "a correctly labelled claim" while naming ONE column of
+    #    the very pair whose columns have OPPOSITE SIGNS (`c-clang` reads
+    #    -4.36 %).  The enforcer's model of compliance was itself one item short
+    #    of the rule it enforces (TASK_PHP_059, item 134 part (b)).
+    # ▶ The exemplar is now a BOTH-COLUMNS sentence, which is what
+    #   `.memory-php/03-numbers.md`'s fifth thing actually asks for.
     arm('N2')
-    if scores('`ph29/large`, `c-gcc` vs `safe_naive`: A says C is +33.01 % DEARER.'):
+    if scores('`ph29/large`: A says `c-gcc` is +33.01 % DEARER than '
+              '`safe_naive` while `c-clang` is -4.36 % CHEAPER.'):
         fails.append('N2 a correctly labelled claim scored as a hit')
+
+    # N2b MUST-NOT-FIRE: the OTHER WORD ORDER is equally labelled.  `ph29`
+    #     NOTES 1157 writes `gcc-C` / `clang-C`; before the 2026-09-15 loosening
+    #     BASE saw neither and flagged the best-labelled line in the corpus.
+    arm('N2b')
+    if scores('gcc-C is 33 % dearer than safe_naive; clang-C is 4.4 % cheaper.'):
+        fails.append('N2b a both-columns claim in the `gcc-C` spelling scored')
+
+    # N2c ⭐ MUST-FIRE, AND IT IS THE ARM THAT KEEPS (a) HONEST: loosening BASE
+    #     must not silence a unit that names NO compiler at all.
+    arm('N2c')
+    if not scores('A says C is +33.01 % dearer than `safe_naive` on large.bin.'):
+        fails.append('N2c the loosened BASE silenced an UNLABELLED claim')
 
     # N3 A MAGNITUDE IS REQUIRED. Prose about C with no number is not a figure.
     arm('N3')

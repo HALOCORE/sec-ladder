@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F131** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F132** live in `RECAP_PHP.md`
 > ⭐ **and the statistic decision is `.tasks-php/STATISTICS_001.md`, committed**
 > (⚠ this said *F1–F41* for seven findings, then *F1–F48* for forty-two
 > more, then *F1–F90* for eleven more — `PROTOCOL.md` rule 13, **and it
@@ -403,6 +403,38 @@ pattern `CLAUDE.md` records, one level deeper: here the row beats `.memory-php/`
   > SEE both — AND (ii) `|Δinside_share| ≤ 0.02`.** ⚠ The threshold in (i) is
   > **not tuned and six rows cannot pin it** (`>0.3`, `>0.5`, `>0.6` all give 0
   > flips). ⚠ **Do not quote F74's one-condition form.**
+  >
+  > ⛔⛔⛔ **AND THIS IS NOT A GATE. IT NEVER WAS, AND IT WAS READ AS ONE.**
+  > `TASK_PHP_058` inferred from these two conditions that a published
+  > comparison was *"INADMISSIBLE"*; **`TASK_PHP_059` withdrew the word.** This
+  > very file says, 230 lines down, *"NO FUNCTION OF THE SHARES CAN CERTIFY A AT
+  > ANY THRESHOLD."* ▶ **The conditions describe when A1 and the whole-program
+  > column are EXPECTED TO AGREE. They never license withholding a column.**
+  > ⭐ **Measured counterexample, which is why this is settled and not argued:**
+  > on **`ph55` `c-gcc` vs `c-gcc-h`, `large.bin`, `O3`/`isolated`** — both C
+  > cells, same compiler — shares `0.7417`/`0.7515` **satisfy BOTH conditions**
+  > (`|Δ| = 0.0098`), while **A1 reads exactly `+0.0000 %`** against a
+  > **66.14 `Ir`/call** whole-program difference. ***A gate that passes its own
+  > documented counterexample is not a gate.***
+  >
+  > ✅✅ **CONDITION (i) IS NOW SWEPT ON ELEVEN ROWS AND 360 CELLS
+  > (`TASK_PHP_059` §1.3a, `.tasks-php/php59_share.py sweep`), AND THE ANSWER IS
+  > *DO NOT FIT IT*:**
+  > * **Cross-language it is VACUOUS at every `t` in `[0.00, 0.90]`** — 0 of the
+  >   17 (ii)-survivors are killed. ⚠ **Not because (ii) already failed on the
+  >   rest**: all 17 survivors sit at **min-share ≥ 0.9019**, because (ii) forces
+  >   the two shares together and the close-shared cross-language pairs in this
+  >   corpus are all high-share pairs.
+  > * ⛔⛔ **SIX OF THOSE SEVENTEEN ARE ADMITTED ON A MIN-SHARE ABOVE `1.0`**
+  >   (`ph07` at `1.0162`, four `ph16` pairs at `1.0232`–`1.0241`) — **the
+  >   over-1.0 pathology inside the bar's own verdict.**
+  > * **Same-language it IS load-bearing** (10 kills at `t = 0.10`, 18 at
+  >   `t = 0.50`, 37 at `t = 0.90`) — ⛔ **but the population that would pin it,
+  >   same-language flips passing (ii), is `ph45` ALONE, `n = 1` row.**
+  >   ⭐ ***A threshold fitted on one row's pathology is not a threshold.***
+  > ▶ **So eleven rows still cannot pin (i) — and the reason is now SPECIFIC
+  > rather than *"not enough rows"*.** ⓘ `RECAP_PHP.md` open item 132, CLOSED on
+  > this result.
   >
   > ⚠ `ph45` publishes **both** families, labelled: A1 **+0.37 %**,
   > whole-program **−3.06 %**. ⚠ **The upstream fix is 68,613 `Ir` CHEAPER than

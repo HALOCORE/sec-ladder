@@ -188,7 +188,7 @@
     "harness/measure.py": "0b6c5cfd3620ee6b379512acdf4d199f75173ae00a3351c42627f21cb1849252",
     "harness/report.py": "ddcadc8e95b7e54105aaf7d94326e130c2653dc04dd2501687b3f7b3757258a6",
     "harness/vparse.py": "276191cf6a6d9177f8363fd845a09777246c2302a9c861e1a5b6354f27506e29",
-    "patterns/ph16-fdset-index/NOTES.md": "d7559e7409f3b45644c636aae15a0dedb1d593a56294248939355144369745a8",
+    "patterns/ph16-fdset-index/NOTES.md": "58a45dfd8a12e188737f3b17e87864c173987968594f3b205374440e7d718e07",
     "patterns/ph16-fdset-index/README.md": "7073667af4289c9761ad295de64472d0c887783af302b9c412d543cfbff44248",
     "patterns/ph16-fdset-index/c/emalloc_shim.h": "aa9abf48535e8df93c9398e96c044697a784d73c40d7a7ccc830b5ee308c378f",
     "patterns/ph16-fdset-index/c/kernel.c": "ff22c491a032f45a6a6424184076685f9e28ef9355c82dac8bfbaea9de9b7fd7",
@@ -201,7 +201,7 @@
     "patterns/ph16-fdset-index/controls/fortify.py": "a0b25510f299d11bbc4045b45c5ef481e2056f67aa6ed062e89b4761cc48b00c",
     "patterns/ph16-fdset-index/controls/guard_equiv.c": "f8155ba4dabad389c09141d85ffdf645987d4186295af2055c65ce72b58e2f87",
     "patterns/ph16-fdset-index/controls/guard_equiv.py": "9f500001822365a9d55a28594946562403ee38dbf086894f067bbc9f6e8e7842",
-    "patterns/ph16-fdset-index/controls/inside_share.py": "10666ce0cb6e542159e3ff323843e86c88ada6b7253826ebf45792aa80cc484c",
+    "patterns/ph16-fdset-index/controls/inside_share.py": "98f0c038f68cd27f68e724cc41147b3e5a16cc1eab63447f3eddbd207fd60289",
     "patterns/ph16-fdset-index/controls/miri_vs_asan.py": "7bfa89cb5720818f713a662f253a2649b743349e3e3bc4dea7201acc288430ce",
     "patterns/ph16-fdset-index/controls/negatives.py": "f80bbca9190d2a533b64a2e56b8a2d6228fb7ba1f6428fc1fb5e7beb45a3bb1c",
     "patterns/ph16-fdset-index/controls/oracle.py": "6fcbb454682be49b361ecfe9c3525855e64279e3159e05e61c1847efdd957508",
@@ -1076,7 +1076,7 @@
     "adversarial-silent.bin/c-clang": [
       {
         "exit": -6,
-        "stdout": "16034764331086482868",
+        "stdout": "15458303578783059380",
         "stderr": "munmap_chunk(): invalid pointer",
         "signal": 6,
         "cells": [
@@ -1397,7 +1397,7 @@
       "expected_exit": 0,
       "expect": "fires",
       "fired": true,
-      "diagnostic": "================================================================= ==45817==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f0fef1000c0 at pc 0x5556441a6845 bp 0x7ffd1b02b1d0 sp 0x7ffd1b02b1c0 READ of size 8 at 0x7f0fef1000c0 thread T0 #0 0x5556441a6844 in ph16_stream_array_to_fd_set /ho",
+      "diagnostic": "================================================================= ==297333==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f28c73000c0 at pc 0x560f7de76845 bp 0x7ffeb96efb50 sp 0x7ffeb96efb40 READ of size 8 at 0x7f28c73000c0 thread T0 #0 0x560f7de76844 in ph16_stream_array_to_fd_set /h",
       "declared_hang": false,
       "hung": false,
       "stdout": "",

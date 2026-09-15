@@ -48,9 +48,35 @@ allocator call, because those are work the program really does.
 -- A1 per call over the **whole-program MARGINAL** per call, both read out of
 the committed records. Its denominator excludes every fixed cost by
 construction, and it is measured at `collapse.probe_iters` rather than at
-`n_iters`. **Every `inside_share` figure in `RECAP_PHP.md`, in
-`.memory-php/03-numbers.md` and in `ph29`'s `controls/spellings.py` docstring is
-that one.** On `ph29`'s `c-gcc`/`small.bin` cell, **LABELLED**:
+`n_iters`.
+
+⛔⛔⛔ **THIS DOCSTRING SAID *"EVERY `inside_share` FIGURE IN `RECAP_PHP.md`, IN
+`.memory-php/03-numbers.md` AND IN `ph29`'s `controls/spellings.py` DOCSTRING IS
+THAT ONE"*. TASK_PHP_059 MEASURED IT AND IT IS FALSE IN THE FIRST TWO.**
+
+  * `RECAP_PHP.md` publishes `ph97`'s "inside_share 98.84 % -> 64.50 %", which is
+    `inside_share_pct` out of THIS ROW's `controls/libc_compare.json` -- the `W`
+    one. Under F74's definition those two values match NO cell of ANY built row
+    at +-0.0005.
+  * `.memory-php/03-numbers.md` gives `ph52` at "22.24 % on its C rungs ...
+    ~98.6 % on its Rust rungs (`unsafe` A1 48,846,257 against W1 49,549,469)" --
+    and that parenthesis spells out the `W` arithmetic. Under F74 the same row
+    reads 0.9892-0.9970 and 0.2023-0.2269.
+
+▶ **SO THE HAZARD IS WORSE THAN THIS FILE FIRST STATED: the two quantities are
+not SEPARATED between documents, they are INTERLEAVED INSIDE SINGLE SENTENCES,
+with no marker. Check the arithmetic of any figure you are about to quote; the
+name does not tell you which one it is.**
+
+⛔⛔ **AND THIS IS THE SECOND FALSE SENTENCE THIS DOCSTRING HAS SHIPPED, IN THE
+SAME PARAGRAPH, IN TWO CONSECUTIVE TASKS** -- see the labelling note below. A
+file whose purpose is to stop two quantities being confused has now twice
+asserted something about them that nobody checked. ⭐ **The pattern is not
+carelessness about the NUMBERS -- both times the numbers were right. It is that
+a CORPUS-WIDE claim ("every figure in three documents") reads like a definition
+and is actually an empirical claim over hundreds of sentences.**
+
+On `ph29`'s `c-gcc`/`small.bin` cell, **LABELLED**:
 
     F74's share      0.8045   (A1/call over the whole-program marginal/call)
     THIS file's `W`  0.8933   (kernel Ir over the callgrind whole-run total)
