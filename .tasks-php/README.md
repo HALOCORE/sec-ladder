@@ -9,8 +9,10 @@ provenance · §E the six-command sequence · §F what a php row owes · §G
 duplication · §H validators land with their negatives.
 
 > ⛔ **THIS PARAGRAPH SAID `PROTOCOL_PHP.md` WAS *"a Phase 0 deliverable, not yet
-> written"* UNTIL 2026-09-15.** It is 1243 lines and is the most-cited document
-> in the programme. **Stale since Phase 0, in the README of the directory it
+> written"* UNTIL 2026-09-15.** It is the longest and most-cited document in the
+> programme — `wc -l` it; ⛔ **this sentence said *"1243 lines"* and was stale at
+> 1373 within the day, which is the NINTH count-in-prose to rot in this
+> directory. The fix is no number, not a better one.** **Stale since Phase 0, in the README of the directory it
 > lives in** — `PROTOCOL.md` rule 13, and the same class as the RECAP cells that
 > warn about themselves.
 
@@ -110,8 +112,10 @@ silently and this README went on describing it.
 ▶ **It is recorded as lapsed rather than deleted, and NOT revived**, because the
 thing it was a proxy for is now measured directly and far better: the **RULE-9
 table in `RECAP_PHP.md`** verdicts every finding, and the programme's standing
-record — *SIX consecutive review rounds refuted manager or engineer claims; in
-`_053` not one finding survived as written, and in `_055` three of four
-conclusions survived while ZERO of four REASONS did* — is a stronger rigour
-signal than a counter nobody incremented. ⚠ **A lapsed convention left described
+record — *SEVEN consecutive review rounds refuted manager or engineer claims; in
+`_053` not one finding survived as written, in `_055` three of four conclusions
+survived while ZERO of four REASONS did, and in `_057` only THREE of sixteen
+entries had both conclusion and reason upheld* — is a stronger rigour signal
+than a counter nobody incremented. ⚠ **Count it from `RECAP_PHP.md`'s RULE-9
+table, which is the index; this sentence is a summary and will go stale.** ⚠ **A lapsed convention left described
 as live is worse than no convention**: it makes a reader think the signal exists.
