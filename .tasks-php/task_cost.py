@@ -118,7 +118,18 @@ CLASS = {
     #    neither `ONCE` nor the numerator, because the numerator is row cost
     #    over BUILT rows. ⭐ But it must be REPORTED, not hidden: a growing
     #    PENDING pile makes the marginal figure understate. `N8` bounds it.
-    "040": "PENDING",          # R1h hunt + build brief for row 7 (ph52/ph53)
+    # ⛔⛔⛔ `"040"` SAT HERE AS A BARE `"PENDING"` FROM ROW 7's BRIEF UNTIL
+    #    2026-09-16, AND BOTH ITS ROWS HAD BEEN BUILT SINCE `_041`/`_042`.
+    #    It was the R1h hunt for ph52 AND ph53 plus row 7's build brief; ph52
+    #    and ph53 are both gated. ▶ So real row cost sat in the pile for ~20
+    #    tasks and the MARGINAL figure -- the published one -- understated by
+    #    exactly the amount the PENDING block above warns about, in the entry
+    #    that set the PENDING precedent.
+    #    ⭐⭐ THE REPAIR IS NOT THIS LINE, IT IS `N8b`: a PENDING entry now
+    #    NAMES ITS ROWS and the arm FAILS once they are built, so the flip
+    #    cannot be forgotten again. A convention whose only enforcement is
+    #    somebody remembering is the convention that produced this.
+    "040": {"ph52": 0.5, "ph53": 0.5},
     "041": {"ph53": 1.0},      # BUILD row 7 = ph53 -- row LANDED, so charged
     "042": {"ph53": 1.0},      # search ph53's endpoints + its batched debt (DONE)
     # ⭐ THE REVIEW ROUNDS ARE `METH` AND THAT IS THE WHOLE POINT OF THE
@@ -307,6 +318,20 @@ CLASS = {
                                # Reviewing whether a finding generalises is
                                # methodology; building the control that settles
                                # it is the row's.
+    "062": "PENDING:ph66",     # BUILD row 13 = ph66 (E2, TEMPORAL). ⚠ PENDING,
+                               # not {"ph66": 1.0}, for the reason the PENDING
+                               # block above gives: the numerator is row cost
+                               # over BUILT rows, and ph66 is not built. ▶ FLIP
+                               # IT to {"ph66": 1.0} the moment the row gates --
+                               # `N8` bounds the pile and `N14` fires if ROWS
+                               # and the gated corpus disagree, so neither half
+                               # of the flip can be forgotten silently.
+                               # ⓘ The scoping that preceded it (ROW13_001.md,
+                               # the two ph66 probes, the rebuild generalisation)
+                               # was done by the MANAGER inside _061's own
+                               # session and is charged NOWHERE -- which is a
+                               # real understatement of this row's cost and is
+                               # said here rather than discovered later.
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them
@@ -357,7 +382,7 @@ def spread(extra_rows):
             once += 1
         elif c == "METH":
             meth += 1
-        elif c == "PENDING":
+        elif isinstance(c, str) and c.startswith("PENDING"):
             pend += 1
         else:
             for r, w in c.items():
@@ -399,7 +424,14 @@ def report():
     print(f"  task files                          {tot}")
     print(f"  ONCE  (infrastructure + corpus)     {once:.0f}")
     print(f"  METH  (the statistic thread)        {meth:.0f}")
-    print(f"  ⚠ PEND (row 7, NOT YET BUILT)        {pend:.0f}")
+    # ⛔ This label used to read "(row 7, NOT YET BUILT)" -- a hardcoded row
+    #   number, in the line reporting the pile whose whole hazard is a row
+    #   LANDING. Row 7 landed at `_041`; the label outlived it. ▶ Derive it.
+    _pending_rows = sorted({r for c in CLASS.values()
+                            if isinstance(c, str) and c.startswith("PENDING")
+                            for r in c.partition(":")[2].split(",") if r})
+    print(f"  ⚠ PEND (NOT YET BUILT: {','.join(_pending_rows) or 'none'})"
+          f"{'':<{max(0, 13 - len(','.join(_pending_rows)))}} {pend:.0f}")
     print(f"  ROW   (attributable)                {rowsum:.0f}")
     print(f"  built rows                          {len(ROWS)}")
     print()
@@ -890,6 +922,61 @@ def selftest():
           f"PENDING={pend:.0f} is at most a quarter of ROW={rowsum:.0f} — past "
           f"that, the marginal figure understates and must be restated rather "
           f"than quoted")
+
+    # ⛔⛔⛔ N8b MUST FIRE WHEN A PENDING TASK'S ROW HAS LANDED, and it exists
+    #    because THAT ALREADY HAPPENED AND NOTHING NOTICED. `"040"` -- the R1h
+    #    hunt for ph52 AND ph53 plus row 7's build brief, and the entry the
+    #    PENDING block cites as setting the precedent -- stayed `"PENDING"` for
+    #    ~20 tasks after BOTH its rows gated. N8 could not see it: the pile was
+    #    small, which is exactly what N8 checks. ⭐ The size of the pile is not
+    #    the property that matters; whether its members are still PENDING is.
+    #    ▶ So a PENDING entry now NAMES ITS ROWS -- `"PENDING:ph66"` -- and this
+    #    arm re-derives the answer from the gated corpus every run. A convention
+    #    enforced only by memory is the convention that produced the defect.
+    landed = []
+    for tid, c in CLASS.items():
+        if not (isinstance(c, str) and c.startswith("PENDING")):
+            continue
+        for r in [x for x in c.partition(":")[2].split(",") if x]:
+            if r in ROWS:
+                landed.append(f"{tid}->{r}")
+    check("N8b", not landed,
+          f"no PENDING task names a row that is already built — got "
+          f"{landed or 'none'}. ⛔ If this fires, FLIP the entry to "
+          f"{{row: 1.0}}; the cost is real and the marginal figure is "
+          f"understating it until you do")
+
+    # ⚠ N8c: the naming convention only works if it is USED. A bare "PENDING"
+    #   carries no rows, so N8b is VACUOUS on it -- silently, which is F135's
+    #   class. This arm refuses the bare spelling outright.
+    bare = [t for t, c in CLASS.items() if c == "PENDING"]
+    check("N8c", not bare,
+          f"every PENDING entry names its row(s) as `PENDING:rowA,rowB` so N8b "
+          f"can see it — bare 'PENDING' found: {bare or 'none'}")
+
+    # ⛔ N8d NON-VACUITY. N8b passes when nothing is wrong AND when the parsing
+    #   is broken, and those look identical from the outside — F135's class, and
+    #   the exact failure mode F140's own repair arm was written with. So run
+    #   the same predicate over a SYNTHETIC ledger where the answer is known.
+    def _landed(cls):
+        out = []
+        for tid, c in cls.items():
+            if not (isinstance(c, str) and c.startswith("PENDING")):
+                continue
+            out += [f"{tid}->{r}" for r in c.partition(":")[2].split(",")
+                    if r and r in ROWS]
+        return out
+    built, unbuilt = ROWS[0], "ph66"
+    syn_hit = _landed({"901": f"PENDING:{built}"})
+    syn_miss = _landed({"902": f"PENDING:{unbuilt}"})
+    syn_multi = _landed({"903": f"PENDING:{unbuilt},{built}"})
+    check("N8d",
+          syn_hit == [f"901->{built}"] and syn_miss == []
+          and syn_multi == [f"903->{built}"],
+          f"on a synthetic ledger the arm FIRES for a built row "
+          f"({syn_hit}), stays silent for an unbuilt one ({syn_miss}), and "
+          f"picks the built row out of a MIXED entry ({syn_multi}) — so N8b's "
+          f"silence above means 'nothing is wrong', not 'nothing was read'")
 
     # ⛔⛔ N14 MUST FIRE IF `ROWS` GOES STALE AGAINST THE BUILT CORPUS, and it
     #    exists because `ROWS` ALREADY DID: it sat at 8 while `ph55` and `ph56`

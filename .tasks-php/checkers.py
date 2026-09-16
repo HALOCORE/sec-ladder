@@ -257,7 +257,20 @@ REGISTRY = {
         kind="checker", argv=[], expect=0, negatives="flag", st_expect=0,
         why="⛔ THE LIVE INSTANCE THAT PROVES THIS FILE'S POINT: on 2026-09-15 a "
             "bare run exited 0 while --selftest exited 1 on N1 (two new task "
-            "files unclassified). 16 arms; N1 also caught ROWS stale at 8 the "
+            "files unclassified). 19 arms; N1 also caught ROWS stale at 8 the "
+            "moment it was first run, and N1 caught row 13's task file within "
+            "a minute of my writing it. ⭐⭐⭐ N8b/N8c/N8d (2026-09-16) EXIST "
+            "BECAUSE N8 WAS WATCHING THE WRONG PROPERTY: it bounds the SIZE of "
+            "the PENDING pile, and `\"040\"` -- the R1h hunt for ph52 AND ph53, "
+            "the entry the PENDING block cites as setting the precedent -- sat "
+            "there for ~20 tasks after BOTH its rows gated, understating the "
+            "PUBLISHED projection (~61..~77 -> ~63..~79, marginal 2.42 -> "
+            "2.50). ▶ A PENDING entry now NAMES its rows and N8b re-derives the "
+            "answer from the gated corpus; N8c refuses the bare spelling that "
+            "would make N8b vacuous; N8d proves N8b's silence means 'nothing "
+            "is wrong' and not 'nothing was read'. ⭐ F132's class one level "
+            "up: a cardinality was checked where the property was about "
+            "MEMBERS. "
             "moment it was first run. ⭐ N14 (2026-09-15) makes ROWS itself "
             "derived-and-checked against results-php/gate/, which is the one "
             "staleness N1 cannot see; its must-fire evidence is the committed "
@@ -353,8 +366,17 @@ REGISTRY = {
             "Measured 30 s cold / 683 ms incremental / 60 MB, no sudo, no "
             "network -- the number that turned §A3a's fifth obligation from "
             "REFUSED to REQUIRED (F123). ⛔ NOT in the sweep: it is 30 s and it "
-            "answers a per-row question, not a standing one. ⚠ Pinned to ph97's "
-            "patch path; a row edits step 4."),
+            "answers a per-row question, not a standing one. "
+            "✅ GENERALISED 2026-09-16 (row 13): `--patch/--trigger/--label/"
+            "--workdir`, ph97's values still the defaults. ⭐⭐ AND THE "
+            "GENERALISATION FOUND A GAP -- steps 3/5 asserted `rc=139` then "
+            "`rc=0` and discarded stdout, which is unreadable for a row whose "
+            "target error is a WRONG ANSWER at rc=0. It now prints rc AND "
+            "stdout for both images and adjudicates nothing (F141). "
+            "ⓘ st_expect=None is HONEST here, not unfiled (item 140): "
+            "`--dry-run` prints the resolved settings so the "
+            "defaults-unchanged claim is checkable in a second, but it "
+            "ASSERTS nothing, so it is not a self-test."),
     "probes/ph96_arrayaccess_matrix.sh": dict(
         kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
         why="⭐⭐⭐ ROW 12's criterion-2 instrument, and the row's whole research "
@@ -375,6 +397,28 @@ REGISTRY = {
             "-- same call as `probes/rebuild_hardened_php.sh`. ▶ Run it by "
             "hand; it exits non-zero if any cell deviates, and a deviation is "
             "a RESULT to report, never an expectation to edit (F43/F47)."),
+    "probes/ph66_key_identity.sh": dict(
+        kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
+        why="⭐⭐⭐ ROW 13's criterion-2 instrument, and THE ROW IN THE CORPUS "
+            "WHERE EVERY CELL EXITS 0 ON PURPOSE. `zend_hash.c:464` settles a "
+            "bucket's key KIND with a DISJUNCT, so for a numeric bucket the "
+            "key is never compared; the collision needs no preimage because a "
+            "numeric bucket stores the raw index (run DJBX33A FORWARDS -- "
+            "`probes/ph66_djbx33a_collide.py`). 5 cells, each printing its "
+            "SURVIVOR LIST because the target error is a wrong ANSWER, not a "
+            "signal. ⭐ Cell D is the headline: `unset($a['abc'])` leaves "
+            "'abc' IN the array and destroys the unrelated live element -- "
+            "both halves wrong at once. ⛔⛔ CELLS A-C REFUTE `ROW13_001.md` "
+            "§4's 'the harm is selectable between silent and ASan-visible': "
+            "all three are silent, because `pDestructor` frees only at count 0 "
+            "and the bucket's one external alias (`pInternalPointer`) is "
+            "repaired four lines above the free. The catalogue's own risk note "
+            "had it right and §4 was a second, disagreeing home (F131). "
+            "⛔ NOT IN THE SWEEP, same call as `ph96_arrayaccess_matrix.sh`: "
+            "it needs the 5.0.0 oracle binary, which lives in ANOTHER "
+            "project's gitignored scratch, and a checker that reddens when a "
+            "sibling repo is cleaned is reporting on that repo. Exits non-zero "
+            "on any deviation, and a deviation is a RESULT (F43/F47)."),
     "cbaseline_diff.py": dict(
         kind="checker", argv=["--selftest"], expect=0, negatives="flag",
         st_expect=0,
