@@ -138,9 +138,21 @@ def main():
     #    leave the judgement to a reader.
     # ▶ THIS IS `_061` SS5.0's RULING APPLIED TO ITS OWN NEXT INSTANCE: four
     #   homes for a trap all failed, and the durable home is an arm that PRINTS.
+    # ⛔⛔⛔ WIDENED 2026-09-16 BECAUSE ITS AUTHOR EVADED IT FOUR TIMES IN ONE
+    #    TURN. Items 144-147 were registered saying "▶ A REVIEWER's, and it goes
+    #    to `_063`" and "▶ `_063`" -- and the arm matched NONE of them, because
+    #    it keyed on the spellings F140 happened to use ("is a REVIEWER",
+    #    "belongs in the round"). ⭐ NAMING A ROUND THAT DOES NOT EXIST YET IS
+    #    THE SAME ACT AS NAMING "the round the backlog already owes": a round is
+    #    a PROCESS and a process has no inbox. ▶ So `_0NN` is now a routing
+    #    spelling in its own right. ⚠ THE LESSON IS NOT THE REGEX -- it is that
+    #    an arm keyed to the phrasing of the instance that produced it catches
+    #    that instance and nothing else (F43/F47's shape, one level up).
     route = re.compile(r"(▶|and it)[^|]{0,80}?"
                        r"(is a REVIEWER|Give it to a reviewer|a reviewer can rule"
-                       r"|belongs in the round|THE REVIEWER SAYS)", re.I)
+                       r"|belongs in the round|THE REVIEWER SAYS"
+                       r"|a REVIEWER'?s\b|goes to `_0[0-9]+`|\*\*`_0[0-9]+`\*\*"
+                       r"|scope (it|them) into|_0[0-9]+ beside)", re.I)
     sec = s[s.index('## Open items'):] if '## Open items' in s else ''
     items = re.findall(r'^\| (~~)?([0-9]+)(~~)? \|(.*)$', sec, re.M)
     routed = [n for struck, n, _, t in items if not struck and route.search(t)]

@@ -125,15 +125,34 @@ _SYNTH = """## Open items
 | 901 | a title | the manager says ▶ **It is a REVIEWER's, and it belongs in the round the backlog already owes** |
 | ~~902~~ | retired | ▶ **Give it to a reviewer.** but this row is RETIRED |
 | 903 | a title | narration: the reviewer found X last round, which is not a route |
+| 904 | a title | the answer is settled here. ▶ **It is a REVIEWER's, and it goes to `_063`** |
+| 905 | a title | a question with no addressee at all, registered and left to drift |
 """
 _items = _re.findall(r'^\| (~~)?([0-9]+)(~~)? \|(.*)$', _SYNTH, _re.M)
 _routed = [n for st, n, _, t in _items if not st and _ROUTE.search(t)]
 
 checks += [
-    ("F140 report: finds the routed LIVE item (901)", _routed == ["901"]),
+    # ⚠ ASSERTED AS A SET, NOT AS A SINGLETON. This read `_routed == ["901"]`
+    #   and broke the moment 904 was added -- the arm was pinned to the
+    #   POPULATION rather than to the property (F132's shape, in a must-fire).
+    ("F140 report: finds BOTH routed LIVE items (901, 904) and only those",
+     _routed == ["901", "904"]),
     ("F140 report: does NOT count a RETIRED row (902)", "902" not in _routed),
     ("F140 report: does NOT count narration about a reviewer (903)",
      "903" not in _routed),
+    # ⛔⛔⛔ 904/905 EXIST BECAUSE THE ARM'S AUTHOR EVADED IT FOUR TIMES IN
+    #   ONE TURN (items 144-147). The first regex keyed on the spellings F140
+    #   happened to use, so "▶ A REVIEWER's, and it goes to `_063`" matched
+    #   NOTHING. ⭐ Naming a round that does not exist yet is the SAME act as
+    #   naming "the round the backlog already owes" -- a round is a process and
+    #   a process has no inbox.
+    ("F140 report: counts a route that names a ROUND (904)", "904" in _routed),
+    # ⚠ 905 is the residual hole, stated rather than hidden: an item with NO
+    #   addressee cannot be detected by a router, and registering one is the
+    #   same failure wearing no clothes at all. The arm CANNOT catch it.
+    ("F140 report: an item with NO addressee is invisible to the router (905) "
+     "-- a KNOWN HOLE, asserted so it is not mistaken for coverage",
+     "905" not in _routed),
     # ⭐ and it must be non-vacuous against the REAL corpus, or it is measuring
     #   a string literal and nothing else.
     ("F140 report: the pattern is non-vacuous on the live items table",
