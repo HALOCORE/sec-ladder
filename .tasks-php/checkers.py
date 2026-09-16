@@ -456,6 +456,23 @@ REGISTRY = {
             "`_047` DATED SNAPSHOT table and all four arms went FAIL -- kept in "
             "the docstring, because that is a free demonstration that the "
             "table-scoping regex holds."),
+    "probes/ph66_djbx33a_collide.py": dict(
+        kind="checker", argv=["--selftest"], expect=0, negatives="inline",
+        st_expect=0,
+        why="ROW-13 SCOPING for ph66. ⭐ CATALOGUE.md's ph66 block says *the "
+            "DJBX33A preimage the fixture needs was never computed; compute it "
+            "before building* -- ⛔⛔ AND THAT NAMES THE WRONG DIRECTION. A "
+            "preimage is a 64-bit zend_ulong target and every 33^k is a UNIT "
+            "mod 2^64, so there is no digit structure to lift and 2^64 is not "
+            "searchable. ⭐ But no preimage is needed: a NUMERIC bucket's `h` "
+            "IS the user-chosen index, so run the hash FORWARDS and use the "
+            "result as the index. Five arms; N2 and N4 are MUST-FIRE (the NUL "
+            "is load-bearing; 33 is a unit) so the docstring's argument is "
+            "CHECKED rather than asserted. ⚠ C-side scoping only -- it is NOT "
+            "an admission argument and may never refuse a candidate "
+            "(CLAUDE.md rule 6). ⓘ Promoted out of gitignored .temp/ the same "
+            "day it was written, because the START HERE box cited it and a "
+            "committed doc pointing at deletable scratch is F51/F99."),
     "probes/n14_mustfire.py": dict(
         kind="checker", argv=[], expect=0, negatives="inline", st_expect=None,
         why="⭐ §H EVIDENCE, COMMITTED RATHER THAN RUN ONCE AND DISCARDED: shows "
