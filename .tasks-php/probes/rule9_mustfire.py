@@ -105,6 +105,42 @@ checks = [
     ("open-cycle set is derived and non-empty at baseline",
      bool(base_oc)),
 ]
+# =============================================================================
+# ⭐⭐ F140's REPORT, MADE TO FIRE -- boxcheck's `items -> a reviewer` line.
+# =============================================================================
+# ⛔ THE FAILURE MODE IS SILENCE, NOT NOISE. That report is an ⓘ that cannot
+#    fail a run, so if its regex stops matching the corpus it prints `none`
+#    and reads exactly like success -- which is ITEM 131's shape (`N12` scored
+#    three tools 0 arms because they spoke a different dialect). ▶ So the arm
+#    below plants routing language in a synthetic items table and asserts the
+#    pattern FINDS it, and plants a struck row and asserts it does NOT.
+import re as _re
+
+_ROUTE = _re.compile(r"(▶|and it)[^|]{0,80}?"
+                     r"(is a REVIEWER|Give it to a reviewer|a reviewer can rule"
+                     r"|belongs in the round|THE REVIEWER SAYS)", _re.I)
+
+_SYNTH = """## Open items
+| 900 | a title | plain prose, nobody is asked anything |
+| 901 | a title | the manager says ▶ **It is a REVIEWER's, and it belongs in the round the backlog already owes** |
+| ~~902~~ | retired | ▶ **Give it to a reviewer.** but this row is RETIRED |
+| 903 | a title | narration: the reviewer found X last round, which is not a route |
+"""
+_items = _re.findall(r'^\| (~~)?([0-9]+)(~~)? \|(.*)$', _SYNTH, _re.M)
+_routed = [n for st, n, _, t in _items if not st and _ROUTE.search(t)]
+
+checks += [
+    ("F140 report: finds the routed LIVE item (901)", _routed == ["901"]),
+    ("F140 report: does NOT count a RETIRED row (902)", "902" not in _routed),
+    ("F140 report: does NOT count narration about a reviewer (903)",
+     "903" not in _routed),
+    # ⭐ and it must be non-vacuous against the REAL corpus, or it is measuring
+    #   a string literal and nothing else.
+    ("F140 report: the pattern is non-vacuous on the live items table",
+     bool(_ROUTE.search(open('RECAP_PHP.md', encoding='utf-8',
+                             errors='replace').read()))),
+]
+
 for label, ok in checks:
     print(f"  {'PASS' if ok else 'FAIL'}  {label}")
 

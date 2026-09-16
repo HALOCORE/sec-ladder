@@ -124,6 +124,29 @@ def main():
     for mf, why in mem_bad:
         fail.append(f'{mf}: {why}')
 
+    # ⓘ REPORT, NEVER A GATE (F140). Four LIVE open items handed a question to
+    # "a reviewer", and `TASK_PHP_061` -- the round that ran the day they were
+    # measured -- scoped NONE of them. The cause is structural, not forgetful:
+    # a round's scope is DERIVED from the RULE-9 table, and NOTHING is derived
+    # from the items table, so an item saying "this is a reviewer's" is
+    # invisible to the process that scopes rounds. Rounds have folded items in
+    # before (_057: 2, _059: 4, _061: 1) -- by the manager REMEMBERING, which
+    # is the variance.
+    # ⛔ IT MUST NOT FAIL A RUN. An item may legitimately wait several rounds;
+    #    what it may not do is wait INVISIBLY. Same discipline as quota.py's
+    #    one-column report and F128's Kind-A/Kind-B rule: print the population,
+    #    leave the judgement to a reader.
+    # ▶ THIS IS `_061` SS5.0's RULING APPLIED TO ITS OWN NEXT INSTANCE: four
+    #   homes for a trap all failed, and the durable home is an arm that PRINTS.
+    route = re.compile(r"(▶|and it)[^|]{0,80}?"
+                       r"(is a REVIEWER|Give it to a reviewer|a reviewer can rule"
+                       r"|belongs in the round|THE REVIEWER SAYS)", re.I)
+    sec = s[s.index('## Open items'):] if '## Open items' in s else ''
+    items = re.findall(r'^\| (~~)?([0-9]+)(~~)? \|(.*)$', sec, re.M)
+    routed = [n for struck, n, _, t in items if not struck and route.search(t)]
+    print(f'{"items -> a reviewer":18} {len(routed):4}  '
+          f'LIVE, unscheduled: {" ".join(routed) if routed else "none"}')
+
     for f in fail: print('FAIL:', f)
     return 1 if fail else 0
 
