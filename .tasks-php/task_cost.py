@@ -347,6 +347,33 @@ CLASS = {
                                # levels rather than ph96's one. Under `_058`'s
                                # rule a control a row should have shipped with
                                # is that row's debt, so the 1.00 is WITH them.
+    "063": "METH",             # THE review round (the 10th): the backlog 8
+                               # (F139-F146) PLUS the 9 items `boxcheck.py`'s
+                               # router prints. Corpus-wide, charged to no row:
+                               # the same call as _043/_047/_053/_055/_057/
+                               # _059/_061.
+                               # ⭐ AND IT IS THE FIRST ROUND WHOSE SCOPE WAS
+                               # DERIVED BY A TOOL rather than remembered --
+                               # which is F140's repair, and §6.2 of the brief
+                               # asks the reviewer to rule on whether that is a
+                               # repair or theatre.
+                               # ⚠ WHY NOT ROW-CHARGEABLE, given that §3 is
+                               # five objects about ONE row's statistic matrix:
+                               # the same split `_061`'s entry draws. Ruling on
+                               # whether `ph66`'s `O0` half is publishable is
+                               # METHODOLOGY; if a later task RUNS the
+                               # `O0/large` callgrind and ships it as a ph66
+                               # control, THAT is ph66 row debt and belongs to
+                               # whatever task ships it -- not here.
+                               # ⛔ ITEM 144 IS IN THIS ROUND AND IT IS ABOUT
+                               # THIS FILE: scoping is charged for some rows
+                               # (`_040`, 0.5/0.5) and invisible for others
+                               # (row 13's, done in-session). The round may
+                               # return a verdict that changes entries above.
+                               # ▶ If it does, apply it HERE and re-run; do not
+                               # write the corrected figure into RECAP_PHP.md
+                               # without re-running (that cell has gone stale
+                               # inside a single session twice).
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them
