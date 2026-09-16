@@ -268,29 +268,45 @@ CLASS = {
                                # failure it catches.
                                # ⓘ It carries two extras the row did not
                                # strictly owe -- the second repair strategy
-                               # priced (§2.6) and the `:427-429` limb measured
-                               # (§2.5) -- still this row's cost under `_058`'s
-                               # rule, and the 1.00 is with them included.
-                               # ⛔⛔ I FIRST WROTE `{"ph96": 1.0}` AND `N14`
-                               # REFUSED IT -- correctly, and the crash was the
-                               # cheapest possible way to be told: `ph96` is not
-                               # in `ROWS` because it has no GATE RECORD, and
-                               # "a row in ROWS that is NOT gated charges cost
-                               # to something that does not exist". ⭐ `_040`
-                               # set the precedent: a build brief for an unbuilt
-                               # row is PENDING, not row cost.
-                               # ▶ WHEN THE ROW GATES, do BOTH in one edit:
-                               # append "ph96" to `ROWS` and reclassify this to
-                               # {"ph96": 1.0}. Doing one without the other is
-                               # what N14 exists to catch.
-                               # ⓘ It will then carry two extras the row did not
-                               # strictly owe -- the second repair strategy
                                # priced as a control (§2.6) and the `:427-429`
                                # limb recorded (§2.5) -- and they are still THIS
                                # row's cost under `_058`'s rule: a control a row
                                # should have shipped with is that row's debt.
-                               # ph97 came in at 1.00; that is the comparison to
-                               # watch, same family and same shape.
+                               # The 1.00 is WITH them included.
+                               # ⛔⛔ THIS ENTRY CARRIED TWO GENERATIONS OF ITS
+                               # OWN COMMENT UNTIL 2026-09-16: the landed text
+                               # above, and below it the PENDING-era draft in
+                               # the FUTURE tense ("WHEN THE ROW GATES, do BOTH
+                               # in one edit", "It WILL then carry two extras").
+                               # The row had gated; the draft was stale; it sat
+                               # BELOW the live text where a reader scrolling to
+                               # the nearest copy gets the oldest. ▶ Item 73's
+                               # shape -- a correction APPENDED instead of
+                               # APPLIED -- made by the manager in the edit that
+                               # LANDED the row, i.e. `F131`'s class inside the
+                               # ledger. ⭐ REPLACED, not struck: the surviving
+                               # text keeps the one clause the draft said better
+                               # (the `_058` rule, named) and drops the rest.
+                               # ⓘ The draft's closing question -- "ph97 came in
+                               # at 1.00; that is the comparison to watch" -- is
+                               # ANSWERED, which is why it could not stay: both
+                               # T6 rows cost 1.00.
+    "061": "METH",             # THE review round: F137/F136/F133/F135, with
+                               # F134/F132/F131 batched behind one question (the
+                               # 9th round, and the second-largest backlog the
+                               # programme has carried -- 7, peak 9). Corpus-
+                               # wide, charged to no row: the same call as
+                               # _043/_047/_053/_055/_057/_059.
+                               # ⚠ WHY NOT ROW-CHARGEABLE, given `_058`'s rule
+                               # that a control a row should have shipped with
+                               # is THAT ROW's debt: §1 may well ask for an
+                               # optimisation sweep `ph97` does not have. If a
+                               # task ends up RUNNING that sweep and shipping it
+                               # as a ph97 control, THAT is ph97 row debt and
+                               # belongs to whatever task ships it -- not here.
+                               # Reviewing whether a finding generalises is
+                               # methodology; building the control that settles
+                               # it is the row's.
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them

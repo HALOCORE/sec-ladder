@@ -47,24 +47,24 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 12 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL · ph45
         (T1)+ph53+ph52 (T3)+ph55+ph56 (T5)+ph97+ph96 (T6 ✅QUOTA MET) TYPE. 8/20
-        fam, 25 owed to floor 37. ⛔ BACKLOG 7 = THE RULE-9 ⛔ UNREVIEWED ROWS.
-NEXT    ▶ (1) ⭐⭐ REVIEW ROUND **OWED**: BACKLOG 2->4->7 AND RISING (PEAK 9).
-        **F137 IS THE ONE TO ATTACK HARDEST**; 5 OF THE 7 ARE MINE.
-        ▶ (2) ⭐⭐⭐ ROW 13 = **TEMPORAL** -- 15 of 25 OWED ARE, THE AXIS HAS **1**
+        fam, 25 owed to floor 37. ⛔ BACKLOG 8 = THE RULE-9 ⛔ UNREVIEWED ROWS.
+▶FLIGHT **_061 DISPATCHED = THE 9th REVIEW ROUND, ALL 8**: F137>F136>F133>F135,
+        THEN F134+F132+F131+F138 BATCHED BEHIND ONE QUESTION (*where does a trap
+        live?*). ⛔ WHILE IT RUNS: **NO EDIT, NO COMMIT** TO WHAT IT READS.
+NEXT    ▶ (1) ⭐⭐⭐ ROW 13 = **TEMPORAL** -- 15 of 25 OWED ARE, THE AXIS HAS **1**
         BUILT, THE DEFERRAL GROUND IS REFUTED, AND EXPECT **NO** ORACLE DISCOUNT
         (38.7% vs TYPE 78.6%): PLAN FOR ASan/Miri, NOT A CLI REPRODUCER.
-        ▶ (3) ITEM 129 ~289 ITEMS, NOT 1 TASK. ▶ (4) 4 CHECKERS UNSWEPT.
-        ▶ (5) ⛔⛔ ITEM 105 = **THE USER'S CALL**, NOT MINE.
-✅ DONE  **_060: ROW 12 `PASS`, T6 QUOTA MET, 1.00 TASKS.** ⭐⭐⭐ F136: THE
-        UNMISUSABLE CONTRACT IS **FREE** -- +0.0000 Ir/call, c-gcc AND c-clang,
-        BOTH INPUTS; SAME PROGRAM UNDER c-clang. P1 + BOTH MY HEADLINES REFUTED.
-        ⭐⭐⭐ F137: C **AND** UNSAFE RUST GO SILENT HIGH; SAFE RUST ALONE DOESN'T.
-⚠ RULED  2nd LIMB (`:427`) STAYS OUT OF `inputs/` -- GROUND: IT HAS **NO R1h**,
-        SO IT CANNOT SHARE AN R1h COLUMN. ⛔ §2.5 WAS **MY** DEFECT.
-⚠ TRAPS ONE HOME PER FACT (F131). ADJUDICATE THE **SET** (F132). DIFF **BODIES**,
-        NOT `@@` LABELS (F134). **COUNT IT, DON'T ASSERT IT** -- 4 CLAIMS FELL TO
-        THAT THIS SESSION. `grep -a`; EVENT NOT STATE; NEVER `git add -A`.
-READ    RULE-9 · .memory-php/ · F1-F137 · items 1-137 · _060 REPORT + _059.
+        ▶ (2) ITEM 129 ~289 ITEMS, NOT 1 TASK. ▶ (3) 4 CHECKERS UNSWEPT.
+        ▶ (4) ⛔⛔ ITEM 105 = **THE USER'S CALL**, NOT MINE.
+⛔ F138  **"PEAK 9" WAS 6 ROWS OF DOUBLE-COUNTING** (F120-F125, ALREADY VERDICTED,
+        LISTED TWICE = F131's OWN DEFECT). DEDUPED MAX **7 = TODAY**. ⭐ I *RAN*
+        THE TOOL AND TOOK `len()` OF A SET I NEVER PRINTED.
+⚠ _061  §0.1 CORRECTS **F137's OWN FALSIFIER**: ph97's null-sentinel input is
+        `absent`, NOT the one NAMED `nullvalue`; its RUST half is ALREADY ON DISK.
+⚠ TRAPS ADJUDICATE THE **SET**; `len()` IS NOT ADJUDICATING (F132/F138). ONE HOME
+        PER FACT (F131). **BODIES** NOT `@@` (F134). `grep -a`; EVENT NOT STATE;
+        NEVER `git add -A`.
+READ    RULE-9 · .memory-php/ · F1-F138 · items 1-138 · _061 BRIEF · _060 REPORT.
 ```
 
 ---
@@ -192,6 +192,7 @@ READ    RULE-9 · .memory-php/ · F1-F137 · items 1-137 · _060 REPORT + _059.
 > | ⭐⭐⭐ **F137** | ⛔ **UNREVIEWED** — `_060`, measured, **predicted by nobody** | ⭐⭐⭐ **THE BIGGEST ONE IN THIS BATCH, AND THE ONE TO ATTACK HARDEST**: it states safe Rust's advantage in a currency the ladder's cost columns cannot express — *detection that survives the optimiser* — and it is drawn from **ONE row, ONE defect shape, TWO compilers, ONE box.** ▶ **The cheap falsifier is another row with a null-sentinel adversarial input; `ph97` is the obvious candidate and was NOT swept.** ⚠ **Do not let it be quoted as *"clang miscompiles"*** — the C is UB, so clang is within its rights; the finding is about **detection**, not correctness. ⓘ Its `F3` half (a clean `-O3` run would have read as *defect not reachable*) is the strongest live instance of `F3` on file |
 > | ⭐⭐⭐ **F136** | ⛔ **UNREVIEWED** — `_060`, measured; **refutes the manager's `P1` 4 cells of 4 AND both headlines he offered** | ⭐⭐ **The CONCLUSION is arithmetic over committed records and will survive; the clause to attack is the MECHANISM** — *"the test was already written once in the callee for all seven no-output call sites"* — which is a claim about **why** the price is zero, not that it is. ⚠ **`identity_level=exact` under `c-clang` is the strong evidence and `counts` under `c-gcc` is weaker**; a reviewer should ask whether *counts* hides a real difference `exact` would not. ⭐ **The manager's method lesson is his own and is registered**: *registering both poles of a disjunction does not make the disjunction exhaustive* — he offered "cheaper" and "dearer" as a matched pair and the answer was **neither** |
 > | ⛔⛔⛔ **F135** | ⛔ **UNREVIEWED** — manager **about the manager's own tooling**, 2026-09-15 | ⛔ **NOTHING yet.** ⚠ **What a reviewer owes it: is `st_expect` DERIVED FROM INTENT anywhere else, or is this the only one that was captured from observation?** The registry has exactly one other non-zero expectation (`citecheck`'s BARE `expect=1`) and it is adjudicated — **but nobody has asked the question of the `expect` column as a whole.** ⭐⭐ **Its layer-shaped clause is the one to verdict**: *a ratchet silenced by editing its EXPECTATION is silenced exactly as surely as one silenced by editing its INPUT, and only the second is forbidden in writing.* ⓘ Found by a sweep looking for something else, which is an argument for the sweeps the `F128` residue still owes |
+> | ⛔⛔⛔ **F138** | ⛔ **UNREVIEWED** — manager **about the manager**, 2026-09-16, caught while writing the brief for the round that reviews `F131` and `F132` | ⛔ **NOTHING yet.** ⚠ **What a reviewer owes it, and it is NOT the arithmetic** — the six duplicated keys are checkable in one command. ▶ **Is it a DISTINCT finding from `F132`, or `F132` restated on a second corpus?** ⭐⭐ **The manager's claim that it is distinct rests on one clause**: `F132` is about a ratchet whose count moves for reasons unrelated to its claims, whereas here **the tool was correct and the CALLER discarded the information** — *"I used the tool" is not the defence it sounds like.* ⛔ **If that clause does not hold, `F138` should be MERGED INTO `F132` and not carried separately**, which would be the right outcome and the manager says so in advance. ⓘ Its measured half — raw 9 vs de-duplicated 3 at `f98e716`, corrected max **7 at `1db52a3`, today's number** — is arithmetic over committed records |
 > | ⛔⛔⛔ **F134** | ⛔ **UNREVIEWED** — manager **about the manager**, 2026-09-15, caught in-flight | ⛔ **NOTHING yet, and the manager deliberately did NOT decide its home.** ⚠ **What a reviewer owes it: is a task file's `§3 TRAPS` the right place for a trap a TOOL already guards, or does it belong in `.memory-php/04-process.md` as a law?** ⭐⭐ **It is the sharpest instance on file of a class `F123`'s unverdicted clause also names** — knowledge stored where the CODE meets it is not stored where the PERSON meets it — and **item 129's census is the instrument that would size it.** ⛔ **Do NOT let it be quoted as moving `same_function`'s measured *"1 of 170"*; the manager states in the body that he did not measure that** |
 >
 > #### ⭐⭐⭐ `F96`, PER GROUP — **SEVEN groups, not the four I wrote** (`_055` §1.1)
@@ -214,10 +215,24 @@ READ    RULE-9 · .memory-php/ · F1-F137 · items 1-137 · _060 REPORT + _059.
 > **mechanism half only, corpus half re-dated**, (e), (f). ⛔ **NOT (b)'s R2/R4/R5. NOT (h).**
 >
 > ✅✅ **`TASK_PHP_057` CLOSED ALL THIRTEEN PLUS `R2`/`R4`/`R5` IN ONE ROUND —
-> the largest backlog since the mining wave, cleared.** ⓘ **Backlog trend:
-> 14 → 2 → 7 → 1 → 4 → 2 → 6 → 13 → 1.**
-> ▶ **NEXT REVIEW SCOPE, AND IT IS DISPATCHED AS `TASK_PHP_059`: `F129` →
-> `F130` → `F127` → `F128`.** ⭐⭐⭐ **`F129` outranks all three**: it redefines
+> the largest backlog since the mining wave, cleared.** ⛔⛔ **AND *"ALL
+> THIRTEEN"* IS WHY THE HISTORICAL TREND NUMBERS CANNOT BE READ OFF THIS TABLE:
+> `_057`'s verdicts were APPENDED rather than APPLIED, so `F120`–`F125` stayed
+> countable as open for six commits afterwards** (`F131`, and **`F138`** for what
+> that did to the measurement). ▶ **Any backlog series over commits before
+> `c868e60` must be DE-DUPLICATED or labelled unknown; the raw row count there is
+> inflated by six.** ⓘ The old *"trend: 14 → 2 → 7 → 1 → 4 → 2 → 6 → 13 → 1"*
+> line is **struck**: its later terms are exactly the raw counts `F138`
+> refutes, and a series is the one shape where a single bad term poisons the
+> reading of every other.
+>
+> ⛔ ~~**NEXT REVIEW SCOPE, AND IT IS DISPATCHED AS `TASK_PHP_059`: `F129` →
+> `F130` → `F127` → `F128`.**~~ **STRUCK 2026-09-16 — `_059` RAN AND LANDED; a
+> line that opens *"NEXT REVIEW SCOPE"* scans as live however old it is.**
+> ▶ **The scope of the round in flight lives in the START HERE box and nowhere
+> else** (`F131`'s rule: one home per fact). ⭐ **The reasoning below is kept as
+> a dated example of how a scope is argued, not as an instruction** —
+> ⭐⭐⭐ **`F129` outranked all three**: it redefines
 > what every published `inside_share` figure means, it withdraws the label from
 > the programme's most-cited number, and it rests on a quantity that **exceeds
 > 1.0 on 4 % of the corpus** with no explanation.
@@ -1919,6 +1934,57 @@ which pins `kernel.c:247` and `hardened:175`, one line each.
 The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
+
+### F138 — ⛔⛔⛔ **I RAN THE TOOL AND STILL PUBLISHED A FALSE SUPERLATIVE, BECAUSE I CONSUMED ITS CARDINALITY AND NEVER PRINTED ITS MEMBERS: THE BACKLOG "PEAK 9" IS SIX ROWS OF DOUBLE-COUNTING, AND THE DOUBLE-COUNTING IS `F131`'s OWN DEFECT**
+
+⚠ **Manager about the manager, 2026-09-16, caught while scoping `_061` —
+i.e. while writing the brief for the round that reviews `F131` and `F132`.
+UNREVIEWED.**
+
+The 2026-09-16 pre-compact audit replaced the START HERE box's unchecked
+superlative *"BACKLOG 7, LARGEST EVER"* with what looked like the disciplined
+repair: a **measured** series and a **measured** peak, `2 → 4 → 7 (PEAK 9)`,
+derived by running `boxcheck.rule9_rows` over 40 `RECAP_PHP.md` commits.
+⛔ **The replacement is also false.**
+
+| commit | raw open rows | de-duplicated | what inflates it |
+|---|---|---|---|
+| `1cc2c0e`, `6bff271` | **7** | **1** | `F120`–`F125` |
+| `7c9f1eb`, `cddd82b` | **8** | **2** | `F120`–`F125` |
+| `d9652b4`, `f98e716` | **9** | **3** | `F120`–`F125` |
+
+⭐⭐⭐ **`F120`–`F125` HAD ALREADY BEEN VERDICTED BY `_057`.** They scored as open
+because each key had **two rows** — the opening `⛔ UNREVIEWED` row and the
+verdicted row `_057` appended beneath it. ▶ ***That is exactly the defect `F131`
+was filed about***, so the "peak" is a measurement of `F131`'s damage rather
+than of any backlog. ⛔ **The corrected maximum in the window is `7`, at
+`1db52a3` — which is TODAY's number**, so *"the second-largest ever"* is wrong
+in the other direction too: **today ties the record.**
+
+⚠⚠ **THE PART THAT MAKES THIS A FINDING AND NOT AN ERRATUM: I DID RUN THE
+TOOL.** `rule9_rows` returns the **set**; I took `len()` of it and never looked
+at the members. **One `print` of the set at `f98e716` would have shown
+`F120 … F125` sitting in it and ended the question in a second.**
+
+> ⭐⭐⭐ **THE RULE, AND IT IS `F132`'s ONE LEVEL UP: *ADJUDICATE THE SET, NEVER
+> THE NUMBER* APPLIES TO THE RULE-9 INDEX TOO — AND "I USED THE TOOL" IS NOT
+> THE DEFENCE IT SOUNDS LIKE.** A tool that returns a set and is consumed for
+> its cardinality has been **converted back into an unchecked number** by its
+> caller. ⛔ **`F132` was written by the manager, about the manager, eight days
+> earlier; this instance was made WHILE WRITING THE BRIEF THAT ASKS A REVIEWER
+> WHERE `F132`'s LESSON SHOULD LIVE.**
+
+⛔⛔ **AND IT PROPAGATED INTO A TASK FILE BEFORE IT WAS CAUGHT** —
+`TASK_PHP_061.md` §0 carried *"a measured peak of 9"* as a premise.
+`PROTOCOL.md` **rule 14**'s own class: *a premise in a task file is one an
+engineer has no reason to doubt.* ✅ **Corrected in place and deliberately left
+visible in the brief**, because a reviewer asked to rule on where a trap lives
+should be handed a live instance rather than a description of one.
+
+ⓘ **A methodological residue, recorded so nobody re-reads it as zero:** twelve
+of the forty commits in the window return **no parse** — the RULE-9 block did
+not yet have its current shape. ⛔ **They are UNKNOWN, not 0**, and any series
+over this window must say so.
 
 ### F137 — ⭐⭐⭐ **C's DETECTION AND UNSAFE RUST'S ARE BOTH BUILD-DEPENDENT AND FAIL THE SAME WAY — DETECTED LOW, SILENT HIGH. SAFE RUST'S IS THE ONLY ONE THAT DOES NOT MOVE.**
 
@@ -8320,9 +8386,16 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 ## Open items — carried, not closed
 
 ⚠ **THE NUMBERS HAVE GAPS AND THAT IS CORRECT — DO NOT "REPAIR" THEM.**
-**130 rows present, numbered 1 → 134, with 45–47 and 106 ABSENT** and a
+**134 rows present, numbered 1 → 138, with 45–47 and 106 ABSENT** and a
 growing set retired IN PLACE as `~~N~~`; no number is ever reused.
-⚠ **Verified 2026-09-15 by the check below**, not by trusting this line — the
+⛔⛔ **THIS LINE READ *"130 rows, 1 → 134"* UNTIL 2026-09-16 while the check
+below printed `133 rows, max 137`** — items **135, 136 and 137 were appended in
+the previous session and this header was not.** ▶ **The same defect the
+`which statistic` cell has had five times and `task_cost.py`'s `060` entry had
+once: APPEND TO A LIST WITHOUT CHECKING THE LIST'S OWN HEADER.** ⚠ **And it
+survived a pre-compact audit that was hunting exactly this class** — the audit
+checked the cells it had edited, not the ones it had appended to.
+⚠ **Re-derived 2026-09-16 by the check below**, not by trusting this line — the
 count, the maximum and the gap set are all re-derived, and this sentence exists
 only so a reader knows what output to expect.
 
@@ -8523,3 +8596,4 @@ the wrong one.
 | 135 | ⚠ **THE `_INDEP` RATCHET'S LARGEST ENTRY CLASS IS FOUR FALSE POSITIVES AND EVERY ONE OF THEM IS AN ADJECTIVE** | `TASK_PHP_060` §15, routed by the engineer and registered here so it has a home — ⭐ **a question routed to nobody in particular is one nobody answers** (`F123`; and `_059` found a routed ruling buried in a row's `NOTES.md` that the manager then contradicted in print). **The four:** `ph29:23` *(`independently cached`)*, `emalloc_shim.h:640` *(`order-independent`)*, `ph97` `kernel.c:323` / `kernel_hardened.c:356` *(`TWO INDEPENDENT BYTES`)* and now `ph96` `kernel.h:112` *(`a third independent byte`)*. ⭐⭐ **`_INDEP` exists to catch a CORROBORATION BETWEEN TWO ARTEFACTS; all four hits are the word used as an ADJECTIVE DESCRIBING DATA, checkable from the file that says it.** `_056` called the class RECURRING at three; at four it is the single largest entry class in that ratchet. ▶ **THE QUESTION, AND IT IS A REVIEWER'S: is a ratchet whose biggest class is a known, structural false-positive shape in its intended steady state, or is the class evidence the predicate is aimed one concept off?** ⛔⛔ **NO REGEX CHANGE IS PROPOSED AND NONE SHOULD BE MADE ON THIS ITEM ALONE** — §F6a and the ratchet rule both forbid tuning a regex to its hits, and the false-positive direction is the safe one. ⚠ **Nor should the PROSE be reworded to dodge the grep**: the engineer declined that deliberately, and on `ph96` it would also cost a 32-cell re-measure. ⓘ **Cheap and not yet done: ask whether any TRUE positive has ever been filed in this class.** If none has, that is the answer and it cost one grep |
 | 136 | ⛔⛔ **`quota.py`'s `CLOSED` LABEL WAS UNREACHABLE FROM THE DAY IT WAS WRITTEN, AND FOUR FAMILIES HAVE BEEN PRINTING THE OPPOSITE OF WHAT THEY MEAN** | Manager, 2026-09-15, found while landing row 12. The line read `if need == 0: st = 'open' if nb >= target else 'CLOSED'` — and `need` is `max(0, target - nb)`, so **`need == 0` IS `nb >= target`**: the guard and the ternary tested the same condition, the ternary was a constant, and **`CLOSED` could never print.** ⭐⭐ **HOW IT WAS CAUGHT, AND IT IS THE ONLY REASON IT WAS**: the manager wrote *“T6 ✅CLOSED”* into the START HERE box and checked it against the tool, which said `open`. ▶ ***A tool and a document disagreeing is the cheapest defect detector this programme has, and it only works if the document is checked against the tool rather than written from memory*** — ⛔ **the THIRD time in this one session that a tool's output and the manager's prose disagreed** (`F134`'s hunk label, `F135`'s expected exit code, this). ✅ **REPAIRED, with the intent stated as INFERRED**: once quota is met, `open` = the family can take more catalogued rows, `CLOSED` = all of them are built. **That is the only reading under which `CLOSED` is reachable.** ⓘ **It changes no label today** — no family is exhausted, so the defect was **vacuous now and would have mislabelled the FIRST exhausted family**. ⭐ §H honoured: `family_status` extracted PURE so the new `N6` drives the real code and not a copy (5 cases, both labels, both singleton shapes), plus `N6b` which tests reachability **from the live catalogue** and **declares itself vacuous** rather than passing silently. ⚠⚠ **THE CLASS, AND IT IS THE POINT: a dead branch and a correct branch are indistinguishable from outside.** Every quota-met family printed `open`, which is what a reader expected for most of them, so the wrong label never showed. ⓘ Same shape as `F135` — a check that could not do its job, passing quietly — and the second instance today |
 | 137 | ⭐⭐ **THE RULE IS *“PUBLISH BOTH, LABELLED, ALWAYS”* AND SEVEN OF TWELVE ROWS DO NOT — INCLUDING ONE THAT DECLINED DELIBERATELY AND JUSTIFIED IT. IS THE RULE NARROWER THAN ITS OWN WORDING?** | Manager, 2026-09-16, exposed by the pre-compact audit that corrected the `which statistic` cell. **Measured across all 12 rows**: `W1` appears in `NOTES.md` for `ph45`, `ph52`, `ph53`, `ph55`, `ph56` — **five**. It appears **zero** times for `ph03`, `ph07`, `ph16`, `ph64`, `ph96`, `ph97` and once for `ph29`. ⭐⭐ **`ph96` IS THE INTERESTING ONE BECAUSE IT DECLINED ON PURPOSE AND SHOWED ITS WORKING**: `_060` §8 computed the 16-cell share matrix FIRST, found the two differences the row leans on hardest are **exactly zero** (which `A1` resolves trivially) and the rest between cells at 91–97 % `W`, and concluded *“`A1` is the resolving statistic for this row and every figure here is published in it.”* ▶ **That is either (a) a violation of a rule that says ALWAYS, or (b) evidence the rule's real content is *measure both, publish the one that RESOLVES, and show the matrix that proves which* — which is what `F108`/`STATISTICS_001.md` argue for and NOT what the cell's wording says.** ⚠⚠ **THE MANAGER DOES NOT RULE THIS AND SHOULD NOT**: the wording is in the `which statistic` cell, the argument is in `STATISTICS_001.md`, and deciding between them by fiat would settle a measurement question with a preference. ▶ **It is a REVIEWER's, and it belongs in the round the backlog already owes.** ⓘ **If (b) wins, the residue framing changes too**: the thing a row owes is the MATRIX, not the second column — and `ph07`, `ph53`, `ph64` ship neither, which is why they stay the residue under either reading. ⓘ **Registered rather than fixed, because a question routed to nobody is one nobody answers** (`F123`; `_059` found one buried in a row's `NOTES.md` that the manager then contradicted in print) |
+| 138 | ⛔⛔ **`task_cost.py`'s `060` ENTRY CARRIED TWO GENERATIONS OF ITS OWN COMMENT — THE LANDED TEXT, AND THE PENDING-ERA DRAFT IN THE FUTURE TENSE BELOW IT** | Manager, 2026-09-16, found while registering `_061` in the same ledger. The stale half read *“▶ WHEN THE ROW GATES, do BOTH in one edit”* and *“It WILL then carry two extras”* — **written before `ph96` gated, and left in place under the landed text when it did.** ⭐⭐ **IT SAT BELOW THE LIVE VERSION, WHICH IS THE WORST PLACE FOR IT**: a reader scrolling to the nearest copy gets the oldest, which is the reason the *“backlog trend”* prefix in the RULE-9 block was struck for the same shape. ▶ **Item 73 — a correction APPENDED instead of APPLIED — made by the manager IN THE EDIT THAT LANDED THE ROW**, i.e. `F131`'s class inside the cost ledger. ✅ **REPAIRED BY REPLACEMENT, not striking**: the surviving text keeps the one clause the stale draft said better (`_058`'s rule *a control a row should have shipped with is that row's debt*, named rather than alluded to) and drops the rest. ⓘ **The draft's closing question is ANSWERED, which is why it could not stay** — *“ph97 came in at 1.00; that is the comparison to watch”* — both `T6` rows cost 1.00. ⚠⚠ **NOT A NUMBERS DEFECT: every figure `task_cost.py` prints was and is correct** (`--selftest` PASS across the edit, `N14` gated rows = `ROWS` = 12). **The defect is entirely in the prose a future reader would have consumed as the rationale**, which is why no re-run caught it and why it needed an item |
