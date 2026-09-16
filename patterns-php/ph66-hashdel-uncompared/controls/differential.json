@@ -1,0 +1,16 @@
+{
+ "windows": 94,
+ "selftest_rc": 0,
+ "arms": 6,
+ "problems": [],
+ "derived_from_sha256": {
+  "patterns/ph66-hashdel-uncompared/c/kernel.c": "f50a4c0f431728458069d58c8eca50e089061fb4df6d49b6d65abd39d6ec94e9",
+  "patterns/ph66-hashdel-uncompared/c/kernel_hardened.c": "d5e462370fcd7922959563bee0f2601bd17f98bb899889df23df4d978eb3c1b3",
+  "patterns/ph66-hashdel-uncompared/c/kernel.h": "ea9775e84ced6e9048b071e3d7043bb3c24f1c0d939d836ea62ad45670036414",
+  "patterns/ph66-hashdel-uncompared/model.py": "ae66e9763103ce12812c20aa713fd1d76a5ead29e8061e7dc92cc52a0a20886c"
+ },
+ "pin": {
+  "regenerate": "python3 controls/differential.py --selftest",
+  "note": "builds two C binaries and drives them over 94 off-corpus windows; seconds"
+ }
+}

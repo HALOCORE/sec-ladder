@@ -216,7 +216,19 @@ Premises G–I, run end to end:
 
 | | pre-image (pristine 5.0.0) | post-image (R1h `b73349dbe4e9`) |
 |---|---|---|
-| adversarial (cell D's script) | `count=1`, victim destroyed | `count=2`, **victim survives** |
+| adversarial (**cell A's** shape — numeric live, string key ABSENT) | `count=1`, victim destroyed | `count=2`, **victim survives** |
+
+> ⛔⛔⛔ **THIS ROW SAID *"cell D's script"* AND THAT WAS WRONG — CORRECTED
+> FROM `_062`'s OWN REPORT §3.1.** On **cell D** the count is **1 on BOTH
+> sides**; two elements, one delete, and what the repair changes is *which*
+> survives. The `count=1 → count=2` reading belongs to **cell A**, where the
+> named key is absent so the repaired delete removes nothing.
+> ⭐⭐ **AND THIS IS THE ROW'S OWN HAZARD ONE LEVEL UP.** A row quoting `count`
+> alone on cell D would report *"no change across the repair"* about a run
+> that flips the answer completely — **precisely** what
+> `rebuild_hardened_php.sh`'s header warns about for `rc`. ▶ **The script was
+> repaired for `rc`; this table then repeated the same mistake one column
+> over, with `count`. THE OBSERVABLE ON THIS ROW IS THE SURVIVOR LIST.**
 | benign | correct | **identical** |
 | **exit status** | **`rc=0`** | **`rc=0`** |
 
@@ -362,8 +374,11 @@ fell. That is the expected yield — score these honestly, either way.**
 5. ⛔⛔ **§H: a validator lands with its must-fire negatives INSIDE it**, feeding
    `problems` so stage 9b sees them. ⚠ **Never in gitignored `.temp/`.**
    ⭐ **If a checker is a grep, ADJUDICATE hits by hand and RATCHET.**
-   ⓘ `.tasks-php/checkers.py` is at **31 filed / 31 on disk**; **if you add a
-   `.py` or `.sh` under `.tasks-php/`, FILE IT** — it globs both.
+   ⓘ `.tasks-php/checkers.py` was at **31 filed / 31 on disk** when this brief
+   was dispatched and is at **32** since `probes/item139_sibling_census.py`
+   landed; **if you add a `.py` or `.sh` under `.tasks-php/`, FILE IT** — it
+   globs both, and the registry carries no count literal, so the figure here
+   is a courtesy and the registry is the ratchet.
 6. ⚠⚠ **A `c/*` COMMENT MAY POINT AT AN ARGUMENT; IT MAY NOT STATE THAT
    ARGUMENT'S VERDICT** (§F6a). ▶ **§2.3's refutation, §2.4's split and §2.6's
    invariant note go in `NOTES.md`, which is gate-only. `c/*` is the MEASUREMENT

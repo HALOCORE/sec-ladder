@@ -1,0 +1,38 @@
+{
+ "arms": {
+  "N1": {
+   "predicate": "hardened",
+   "obligation": "key-identity",
+   "verifies": true,
+   "postcondition_failure": false,
+   "want_verifies": true,
+   "ok": true
+  },
+  "N2": {
+   "predicate": "shipped",
+   "obligation": "key-identity",
+   "verifies": false,
+   "postcondition_failure": true,
+   "want_verifies": false,
+   "ok": true
+  },
+  "N3": {
+   "predicate": "shipped",
+   "obligation": "vacuous",
+   "verifies": true,
+   "postcondition_failure": false,
+   "want_verifies": true,
+   "ok": true
+  }
+ },
+ "problems": [],
+ "derived_from_sha256": {
+  "patterns/ph66-hashdel-uncompared/c/kernel.c": "f50a4c0f431728458069d58c8eca50e089061fb4df6d49b6d65abd39d6ec94e9",
+  "patterns/ph66-hashdel-uncompared/c/kernel_hardened.c": "d5e462370fcd7922959563bee0f2601bd17f98bb899889df23df4d978eb3c1b3",
+  "patterns/ph66-hashdel-uncompared/verus.rs": "92be2c4288db96812395b044ab318d599d221cf301bf6703b2992f9374f8b7b2"
+ },
+ "pin": {
+  "regenerate": "python3 controls/key_identity.py",
+  "note": "three Verus runs; about a minute"
+ }
+}

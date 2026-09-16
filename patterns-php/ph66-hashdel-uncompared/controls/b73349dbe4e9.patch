@@ -1,0 +1,27 @@
+From b73349dbe4e99e837703552ba18c91bbe95f6e99 Mon Sep 17 00:00:00 2001
+From: Zeev Suraski <zeev@php.net>
+Date: Wed, 1 Feb 2006 01:01:05 +0000
+Subject: [PATCH] Fix possibility of a wrong element being deleted by
+ zend_hash_del() Thanks Stefan!
+
+---
+ Zend/zend_hash.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/Zend/zend_hash.c b/Zend/zend_hash.c
+index 8435bc42bf06..d2ec5b6592c3 100644
+--- a/Zend/zend_hash.c
++++ b/Zend/zend_hash.c
+@@ -461,8 +461,10 @@ ZEND_API int zend_hash_del_key_or_index(HashTable *ht, char *arKey, uint nKeyLen
+ 
+ 	p = ht->arBuckets[nIndex];
+ 	while (p != NULL) {
+-		if ((p->h == h) && ((p->nKeyLength == 0) || /* Numeric index */
+-			((p->nKeyLength == nKeyLength) && (!memcmp(p->arKey, arKey, nKeyLength))))) {
++		if ((p->h == h) 
++			 && (p->nKeyLength == nKeyLength)
++			 && ((p->nKeyLength == 0) /* Numeric index (short circuits the memcmp() check) */
++				 || !memcmp(p->arKey, arKey, nKeyLength))) { /* String index */
+ 			HANDLE_BLOCK_INTERRUPTIONS();
+ 			if (p == ht->arBuckets[nIndex]) {
+ 				ht->arBuckets[nIndex] = p->pNext;

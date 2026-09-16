@@ -1,0 +1,109 @@
+{
+ "opt": "O3",
+ "mode": "isolated",
+ "table": {
+  "adversarial-cella.bin": {
+   "c-gcc": "5553442908994609152",
+   "c-clang": "5553442908994609152",
+   "safe_naive": "5553442908994609152",
+   "safe_tuned": "5553442908994609152",
+   "unsafe": "5553442908994609152",
+   "verus": "5553442908994609152",
+   "c-gcc-h": "16310587633836665856",
+   "c-clang-h": "16310587633836665856"
+  },
+  "adversarial-celld.bin": {
+   "c-gcc": "3677079714565854208",
+   "c-clang": "3677079714565854208",
+   "safe_naive": "3677079714565854208",
+   "safe_tuned": "3677079714565854208",
+   "unsafe": "3677079714565854208",
+   "verus": "3677079714565854208",
+   "c-gcc-h": "10574059460825272320",
+   "c-clang-h": "10574059460825272320"
+  },
+  "adversarial-deep.bin": {
+   "c-gcc": "14964600241287891968",
+   "c-clang": "14964600241287891968",
+   "safe_naive": "14964600241287891968",
+   "safe_tuned": "14964600241287891968",
+   "unsafe": "14964600241287891968",
+   "verus": "14964600241287891968",
+   "c-gcc-h": "17954956657160630272",
+   "c-clang-h": "17954956657160630272"
+  },
+  "adversarial-many.bin": {
+   "c-gcc": "930842079897528320",
+   "c-clang": "930842079897528320",
+   "safe_naive": "930842079897528320",
+   "safe_tuned": "930842079897528320",
+   "unsafe": "930842079897528320",
+   "verus": "930842079897528320",
+   "c-gcc-h": "4226173720395463680",
+   "c-clang-h": "4226173720395463680"
+  },
+  "adversarial-nowin.bin": {
+   "c-gcc": "0",
+   "c-clang": "0",
+   "safe_naive": "0",
+   "safe_tuned": "0",
+   "unsafe": "0",
+   "verus": "0",
+   "c-gcc-h": "0",
+   "c-clang-h": "0"
+  },
+  "adversarial-orderctl.bin": {
+   "c-gcc": "10574059460825272320",
+   "c-clang": "10574059460825272320",
+   "safe_naive": "10574059460825272320",
+   "safe_tuned": "10574059460825272320",
+   "unsafe": "10574059460825272320",
+   "verus": "10574059460825272320",
+   "c-gcc-h": "10574059460825272320",
+   "c-clang-h": "10574059460825272320"
+  },
+  "large.bin": {
+   "c-gcc": "11734148439434793093",
+   "c-clang": "11734148439434793093",
+   "safe_naive": "11734148439434793093",
+   "safe_tuned": "11734148439434793093",
+   "unsafe": "11734148439434793093",
+   "verus": "11734148439434793093",
+   "c-gcc-h": "11734148439434793093",
+   "c-clang-h": "11734148439434793093"
+  },
+  "small.bin": {
+   "c-gcc": "7365650064901814160",
+   "c-clang": "7365650064901814160",
+   "safe_naive": "7365650064901814160",
+   "safe_tuned": "7365650064901814160",
+   "unsafe": "7365650064901814160",
+   "verus": "7365650064901814160",
+   "c-gcc-h": "7365650064901814160",
+   "c-clang-h": "7365650064901814160"
+  }
+ },
+ "defective_rungs_agree_on": 8,
+ "inputs": 8,
+ "adversarial_separating": [
+  "adversarial-cella.bin",
+  "adversarial-celld.bin",
+  "adversarial-deep.bin",
+  "adversarial-many.bin"
+ ],
+ "problems": [],
+ "derived_from_sha256": {
+  "patterns/ph66-hashdel-uncompared/spec.md": "8a6d6016fd14283c778c9c763924711fca1b10d1904ed362c44070bbe7a3de2e",
+  "patterns/ph66-hashdel-uncompared/c/kernel.c": "f50a4c0f431728458069d58c8eca50e089061fb4df6d49b6d65abd39d6ec94e9",
+  "patterns/ph66-hashdel-uncompared/c/kernel_hardened.c": "d5e462370fcd7922959563bee0f2601bd17f98bb899889df23df4d978eb3c1b3",
+  "patterns/ph66-hashdel-uncompared/safe_naive.rs": "b7639bc4d3fe165676cfc09e6f8a624e87bec53db2dbc9d569650cbaa8da424e",
+  "patterns/ph66-hashdel-uncompared/safe_tuned.rs": "1d10771b75e39cb1c819bcb8b5c0d5372214e86828007f17abdd884f37f5b65f",
+  "patterns/ph66-hashdel-uncompared/unsafe.rs": "fada9f54e4a28d500f017965fe597167c7137ebf73e666876ae0acf7c00efc4b",
+  "patterns/ph66-hashdel-uncompared/verus.rs": "92be2c4288db96812395b044ab318d599d221cf301bf6703b2992f9374f8b7b2",
+  "patterns/ph66-hashdel-uncompared/model.py": "ae66e9763103ce12812c20aa713fd1d76a5ead29e8061e7dc92cc52a0a20886c"
+ },
+ "pin": {
+  "regenerate": "python3 controls/ladder.py --selftest",
+  "note": "needs `gate.py --tool build <row> --all` first; seconds"
+ }
+}

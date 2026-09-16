@@ -1,0 +1,14 @@
+{
+ "arms_failed": [],
+ "problems": [],
+ "selftest": true,
+ "derived_from_sha256": {
+  "patterns/ph66-hashdel-uncompared/c/kernel.c": "f50a4c0f431728458069d58c8eca50e089061fb4df6d49b6d65abd39d6ec94e9",
+  "patterns/ph66-hashdel-uncompared/c/kernel_hardened.c": "d5e462370fcd7922959563bee0f2601bd17f98bb899889df23df4d978eb3c1b3",
+  "patterns/ph66-hashdel-uncompared/controls/b73349dbe4e9.patch": "92fd3a1e31744dc5289ff1f5912ff1a37b3d766a76466a4a8546fec67990fa31"
+ },
+ "pin": {
+  "regenerate": "python3 controls/r1h_apply.py --selftest",
+  "note": "extracts the pinned tarball and applies the patch; seconds"
+ }
+}

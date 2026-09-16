@@ -1,0 +1,985 @@
+{
+  "row": "ph66-hashdel-uncompared",
+  "runs": [
+    {
+      "row": "ph66-hashdel-uncompared",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph56-fetchmode-arith: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph66-hashdel-uncompared: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph96-outparam-unwritten: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph97-optarg-unwritten: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph66-hashdel-uncompared: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph66-hashdel-uncompared: Zend/zend_hash.c, Zend/zend_hash.h, Zend/zend_hash.h, Zend/zend_hash.h, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c are in the manifest (9c990dd1c483, 12cdb25d7520, 12cdb25d7520, 12cdb25d7520, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483)",
+        "  ph66-hashdel-uncompared: OK  Zend/zend_hash.c:450-503  1328 bytes  sha256 d232e484baf89477  tier=verbatim",
+        "  ph66-hashdel-uncompared: OK+1 Zend/zend_hash.h:48-58  273 bytes  sha256 1cdb042eaf291eb1  -- `Bucket`. \u26a0\u26a0 `nKeyLength` IS A FIELD OF THE BUCKET AND `arKey[1]` IS L",
+        "  ph66-hashdel-uncompared: OK+2 Zend/zend_hash.h:60-76  392 bytes  sha256 c204885bdb034d8f  -- `HashTable` -- `nTableSize`/`nTableMask`/`nNumOfElements`/`nNextFreeEl",
+        "  ph66-hashdel-uncompared: OK+3 Zend/zend_hash.h:243-270  1107 bytes  sha256 52b4484bdc47f136  -- `zend_inline_hash_func` -- DJBX33A accumulating in a `ulong`, i.e. 64-",
+        "  ph66-hashdel-uncompared: OK+4 Zend/zend_hash.c:24-42  681 bytes  sha256 d661d1f961a9c973  -- `CONNECT_TO_BUCKET_DLLIST` and `CONNECT_TO_GLOBAL_DLLIST`. \u2b50\u2b50 ONE PREP",
+        "  ph66-hashdel-uncompared: OK+5 Zend/zend_hash.c:103-133  1285 bytes  sha256 1dbd022d060172b9  -- `UPDATE_DATA` and `INIT_DATA`. \u26a0 `INIT_DATA`'s definition carries a ST",
+        "  ph66-hashdel-uncompared: OK+6 Zend/zend_hash.c:137-176  903 bytes  sha256 87674f645087da0e  -- `_zend_hash_init` -- `while ((1U << i) < nSize) i++;` from `i = 3`, so",
+        "  ph66-hashdel-uncompared: OK+7 Zend/zend_hash.c:195-263  1641 bytes  sha256 e498e461ea1465b7  -- `_zend_hash_add_or_update`. \u2b50\u2b50 ITS PREDICATE AT `:215` IS ALREADY THE ",
+        "  ph66-hashdel-uncompared: OK+8 Zend/zend_hash.c:342-407  1602 bytes  sha256 19440d54d98cceb0  -- `_zend_hash_index_update_or_next_insert`. Two load-bearing lines: `:38",
+        "  ph66-hashdel-uncompared: OK+9 Zend/zend_hash.c:506-529  437 bytes  sha256 4b313586fa46e4f5  -- `zend_hash_destroy` -- what the kernel calls at the end of every call ",
+        "  ph66-hashdel-uncompared: per-span overlap: span0 97% (35/36), span1 100% (11/11), span2 93% (14/15), span3 93% (14/15), span4 100% (13/13), span5 36% (5/14), span6 85% (23/27), span7 86% (31/36), span8 79% (27/34), span9 93% (14/15)  -- the UNION is what is reported below, and it is what 10 cited spans oblige the row to",
+        "  ph66-hashdel-uncompared: kernel overlap 84% (144/171 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=verbatim is expected to clear 50% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph66-hashdel-uncompared: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph66-hashdel-uncompared: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH66_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph56-fetchmode-arith": {
+          "row_specific_words": 1586,
+          "prefix_words": 1586,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph66-hashdel-uncompared": {
+          "row_specific_words": 858,
+          "prefix_words": 858,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph96-outparam-unwritten": {
+          "row_specific_words": 1620,
+          "prefix_words": 1620,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph97-optarg-unwritten": {
+          "row_specific_words": 1315,
+          "prefix_words": 1315,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "--preflight",
+        "ph66-hashdel-uncompared"
+      ],
+      "tool_argv": [
+        "ph66-hashdel-uncompared"
+      ],
+      "verdict": "preflight only"
+    },
+    {
+      "row": "ph66-hashdel-uncompared",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph56-fetchmode-arith: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph66-hashdel-uncompared: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph96-outparam-unwritten: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph97-optarg-unwritten: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph66-hashdel-uncompared: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph66-hashdel-uncompared: Zend/zend_hash.c, Zend/zend_hash.h, Zend/zend_hash.h, Zend/zend_hash.h, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c are in the manifest (9c990dd1c483, 12cdb25d7520, 12cdb25d7520, 12cdb25d7520, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483)",
+        "  ph66-hashdel-uncompared: OK  Zend/zend_hash.c:450-503  1328 bytes  sha256 d232e484baf89477  tier=verbatim",
+        "  ph66-hashdel-uncompared: OK+1 Zend/zend_hash.h:48-58  273 bytes  sha256 1cdb042eaf291eb1  -- `Bucket`. \u26a0\u26a0 `nKeyLength` IS A FIELD OF THE BUCKET AND `arKey[1]` IS L",
+        "  ph66-hashdel-uncompared: OK+2 Zend/zend_hash.h:60-76  392 bytes  sha256 c204885bdb034d8f  -- `HashTable` -- `nTableSize`/`nTableMask`/`nNumOfElements`/`nNextFreeEl",
+        "  ph66-hashdel-uncompared: OK+3 Zend/zend_hash.h:243-270  1107 bytes  sha256 52b4484bdc47f136  -- `zend_inline_hash_func` -- DJBX33A accumulating in a `ulong`, i.e. 64-",
+        "  ph66-hashdel-uncompared: OK+4 Zend/zend_hash.c:24-42  681 bytes  sha256 d661d1f961a9c973  -- `CONNECT_TO_BUCKET_DLLIST` and `CONNECT_TO_GLOBAL_DLLIST`. \u2b50\u2b50 ONE PREP",
+        "  ph66-hashdel-uncompared: OK+5 Zend/zend_hash.c:103-133  1285 bytes  sha256 1dbd022d060172b9  -- `UPDATE_DATA` and `INIT_DATA`. \u26a0 `INIT_DATA`'s definition carries a ST",
+        "  ph66-hashdel-uncompared: OK+6 Zend/zend_hash.c:137-176  903 bytes  sha256 87674f645087da0e  -- `_zend_hash_init` -- `while ((1U << i) < nSize) i++;` from `i = 3`, so",
+        "  ph66-hashdel-uncompared: OK+7 Zend/zend_hash.c:195-263  1641 bytes  sha256 e498e461ea1465b7  -- `_zend_hash_add_or_update`. \u2b50\u2b50 ITS PREDICATE AT `:215` IS ALREADY THE ",
+        "  ph66-hashdel-uncompared: OK+8 Zend/zend_hash.c:342-407  1602 bytes  sha256 19440d54d98cceb0  -- `_zend_hash_index_update_or_next_insert`. Two load-bearing lines: `:38",
+        "  ph66-hashdel-uncompared: OK+9 Zend/zend_hash.c:506-529  437 bytes  sha256 4b313586fa46e4f5  -- `zend_hash_destroy` -- what the kernel calls at the end of every call ",
+        "  ph66-hashdel-uncompared: per-span overlap: span0 97% (35/36), span1 100% (11/11), span2 93% (14/15), span3 93% (14/15), span4 100% (13/13), span5 36% (5/14), span6 85% (23/27), span7 86% (31/36), span8 79% (27/34), span9 93% (14/15)  -- the UNION is what is reported below, and it is what 10 cited spans oblige the row to",
+        "  ph66-hashdel-uncompared: kernel overlap 84% (144/171 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=verbatim is expected to clear 50% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph66-hashdel-uncompared: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph66-hashdel-uncompared: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH66_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph56-fetchmode-arith": {
+          "row_specific_words": 1586,
+          "prefix_words": 1586,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph66-hashdel-uncompared": {
+          "row_specific_words": 858,
+          "prefix_words": 858,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph96-outparam-unwritten": {
+          "row_specific_words": 1620,
+          "prefix_words": 1620,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph97-optarg-unwritten": {
+          "row_specific_words": 1315,
+          "prefix_words": 1315,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "build",
+      "gate_argv": [
+        "--tool",
+        "build",
+        "ph66-hashdel-uncompared",
+        "--all"
+      ],
+      "tool_argv": [
+        "ph66-hashdel-uncompared",
+        "--all"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph66-hashdel-uncompared",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph56-fetchmode-arith: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph66-hashdel-uncompared: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph96-outparam-unwritten: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph97-optarg-unwritten: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph66-hashdel-uncompared: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph66-hashdel-uncompared: Zend/zend_hash.c, Zend/zend_hash.h, Zend/zend_hash.h, Zend/zend_hash.h, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c are in the manifest (9c990dd1c483, 12cdb25d7520, 12cdb25d7520, 12cdb25d7520, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483)",
+        "  ph66-hashdel-uncompared: OK  Zend/zend_hash.c:450-503  1328 bytes  sha256 d232e484baf89477  tier=verbatim",
+        "  ph66-hashdel-uncompared: OK+1 Zend/zend_hash.h:48-58  273 bytes  sha256 1cdb042eaf291eb1  -- `Bucket`. \u26a0\u26a0 `nKeyLength` IS A FIELD OF THE BUCKET AND `arKey[1]` IS L",
+        "  ph66-hashdel-uncompared: OK+2 Zend/zend_hash.h:60-76  392 bytes  sha256 c204885bdb034d8f  -- `HashTable` -- `nTableSize`/`nTableMask`/`nNumOfElements`/`nNextFreeEl",
+        "  ph66-hashdel-uncompared: OK+3 Zend/zend_hash.h:243-270  1107 bytes  sha256 52b4484bdc47f136  -- `zend_inline_hash_func` -- DJBX33A accumulating in a `ulong`, i.e. 64-",
+        "  ph66-hashdel-uncompared: OK+4 Zend/zend_hash.c:24-42  681 bytes  sha256 d661d1f961a9c973  -- `CONNECT_TO_BUCKET_DLLIST` and `CONNECT_TO_GLOBAL_DLLIST`. \u2b50\u2b50 ONE PREP",
+        "  ph66-hashdel-uncompared: OK+5 Zend/zend_hash.c:103-133  1285 bytes  sha256 1dbd022d060172b9  -- `UPDATE_DATA` and `INIT_DATA`. \u26a0 `INIT_DATA`'s definition carries a ST",
+        "  ph66-hashdel-uncompared: OK+6 Zend/zend_hash.c:137-176  903 bytes  sha256 87674f645087da0e  -- `_zend_hash_init` -- `while ((1U << i) < nSize) i++;` from `i = 3`, so",
+        "  ph66-hashdel-uncompared: OK+7 Zend/zend_hash.c:195-263  1641 bytes  sha256 e498e461ea1465b7  -- `_zend_hash_add_or_update`. \u2b50\u2b50 ITS PREDICATE AT `:215` IS ALREADY THE ",
+        "  ph66-hashdel-uncompared: OK+8 Zend/zend_hash.c:342-407  1602 bytes  sha256 19440d54d98cceb0  -- `_zend_hash_index_update_or_next_insert`. Two load-bearing lines: `:38",
+        "  ph66-hashdel-uncompared: OK+9 Zend/zend_hash.c:506-529  437 bytes  sha256 4b313586fa46e4f5  -- `zend_hash_destroy` -- what the kernel calls at the end of every call ",
+        "  ph66-hashdel-uncompared: per-span overlap: span0 97% (35/36), span1 100% (11/11), span2 93% (14/15), span3 93% (14/15), span4 100% (13/13), span5 36% (5/14), span6 85% (23/27), span7 86% (31/36), span8 79% (27/34), span9 93% (14/15)  -- the UNION is what is reported below, and it is what 10 cited spans oblige the row to",
+        "  ph66-hashdel-uncompared: kernel overlap 84% (144/171 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=verbatim is expected to clear 50% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph66-hashdel-uncompared: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph66-hashdel-uncompared: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH66_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph56-fetchmode-arith": {
+          "row_specific_words": 1586,
+          "prefix_words": 1586,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph66-hashdel-uncompared": {
+          "row_specific_words": 858,
+          "prefix_words": 858,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph96-outparam-unwritten": {
+          "row_specific_words": 1620,
+          "prefix_words": 1620,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph97-optarg-unwritten": {
+          "row_specific_words": 1315,
+          "prefix_words": 1315,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "measure",
+      "gate_argv": [
+        "--tool",
+        "measure",
+        "ph66-hashdel-uncompared"
+      ],
+      "tool_argv": [
+        "ph66-hashdel-uncompared"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph66-hashdel-uncompared",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph56-fetchmode-arith: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph66-hashdel-uncompared: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph96-outparam-unwritten: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph97-optarg-unwritten: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph66-hashdel-uncompared: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph66-hashdel-uncompared: Zend/zend_hash.c, Zend/zend_hash.h, Zend/zend_hash.h, Zend/zend_hash.h, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c are in the manifest (9c990dd1c483, 12cdb25d7520, 12cdb25d7520, 12cdb25d7520, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483)",
+        "  ph66-hashdel-uncompared: OK  Zend/zend_hash.c:450-503  1328 bytes  sha256 d232e484baf89477  tier=verbatim",
+        "  ph66-hashdel-uncompared: OK+1 Zend/zend_hash.h:48-58  273 bytes  sha256 1cdb042eaf291eb1  -- `Bucket`. \u26a0\u26a0 `nKeyLength` IS A FIELD OF THE BUCKET AND `arKey[1]` IS L",
+        "  ph66-hashdel-uncompared: OK+2 Zend/zend_hash.h:60-76  392 bytes  sha256 c204885bdb034d8f  -- `HashTable` -- `nTableSize`/`nTableMask`/`nNumOfElements`/`nNextFreeEl",
+        "  ph66-hashdel-uncompared: OK+3 Zend/zend_hash.h:243-270  1107 bytes  sha256 52b4484bdc47f136  -- `zend_inline_hash_func` -- DJBX33A accumulating in a `ulong`, i.e. 64-",
+        "  ph66-hashdel-uncompared: OK+4 Zend/zend_hash.c:24-42  681 bytes  sha256 d661d1f961a9c973  -- `CONNECT_TO_BUCKET_DLLIST` and `CONNECT_TO_GLOBAL_DLLIST`. \u2b50\u2b50 ONE PREP",
+        "  ph66-hashdel-uncompared: OK+5 Zend/zend_hash.c:103-133  1285 bytes  sha256 1dbd022d060172b9  -- `UPDATE_DATA` and `INIT_DATA`. \u26a0 `INIT_DATA`'s definition carries a ST",
+        "  ph66-hashdel-uncompared: OK+6 Zend/zend_hash.c:137-176  903 bytes  sha256 87674f645087da0e  -- `_zend_hash_init` -- `while ((1U << i) < nSize) i++;` from `i = 3`, so",
+        "  ph66-hashdel-uncompared: OK+7 Zend/zend_hash.c:195-263  1641 bytes  sha256 e498e461ea1465b7  -- `_zend_hash_add_or_update`. \u2b50\u2b50 ITS PREDICATE AT `:215` IS ALREADY THE ",
+        "  ph66-hashdel-uncompared: OK+8 Zend/zend_hash.c:342-407  1602 bytes  sha256 19440d54d98cceb0  -- `_zend_hash_index_update_or_next_insert`. Two load-bearing lines: `:38",
+        "  ph66-hashdel-uncompared: OK+9 Zend/zend_hash.c:506-529  437 bytes  sha256 4b313586fa46e4f5  -- `zend_hash_destroy` -- what the kernel calls at the end of every call ",
+        "  ph66-hashdel-uncompared: per-span overlap: span0 97% (35/36), span1 100% (11/11), span2 93% (14/15), span3 93% (14/15), span4 100% (13/13), span5 36% (5/14), span6 85% (23/27), span7 86% (31/36), span8 79% (27/34), span9 93% (14/15)  -- the UNION is what is reported below, and it is what 10 cited spans oblige the row to",
+        "  ph66-hashdel-uncompared: kernel overlap 84% (144/171 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=verbatim is expected to clear 50% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph66-hashdel-uncompared: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph66-hashdel-uncompared: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH66_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph56-fetchmode-arith": {
+          "row_specific_words": 1586,
+          "prefix_words": 1586,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph66-hashdel-uncompared": {
+          "row_specific_words": 858,
+          "prefix_words": 858,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph96-outparam-unwritten": {
+          "row_specific_words": 1620,
+          "prefix_words": 1620,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph97-optarg-unwritten": {
+          "row_specific_words": 1315,
+          "prefix_words": 1315,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "report",
+      "gate_argv": [
+        "--tool",
+        "report",
+        "ph66-hashdel-uncompared"
+      ],
+      "tool_argv": [
+        "ph66-hashdel-uncompared"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    },
+    {
+      "row": "ph66-hashdel-uncompared",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph56-fetchmode-arith: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph66-hashdel-uncompared: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph96-outparam-unwritten: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph97-optarg-unwritten: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph66-hashdel-uncompared: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph66-hashdel-uncompared: Zend/zend_hash.c, Zend/zend_hash.h, Zend/zend_hash.h, Zend/zend_hash.h, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c are in the manifest (9c990dd1c483, 12cdb25d7520, 12cdb25d7520, 12cdb25d7520, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483)",
+        "  ph66-hashdel-uncompared: OK  Zend/zend_hash.c:450-503  1328 bytes  sha256 d232e484baf89477  tier=verbatim",
+        "  ph66-hashdel-uncompared: OK+1 Zend/zend_hash.h:48-58  273 bytes  sha256 1cdb042eaf291eb1  -- `Bucket`. \u26a0\u26a0 `nKeyLength` IS A FIELD OF THE BUCKET AND `arKey[1]` IS L",
+        "  ph66-hashdel-uncompared: OK+2 Zend/zend_hash.h:60-76  392 bytes  sha256 c204885bdb034d8f  -- `HashTable` -- `nTableSize`/`nTableMask`/`nNumOfElements`/`nNextFreeEl",
+        "  ph66-hashdel-uncompared: OK+3 Zend/zend_hash.h:243-270  1107 bytes  sha256 52b4484bdc47f136  -- `zend_inline_hash_func` -- DJBX33A accumulating in a `ulong`, i.e. 64-",
+        "  ph66-hashdel-uncompared: OK+4 Zend/zend_hash.c:24-42  681 bytes  sha256 d661d1f961a9c973  -- `CONNECT_TO_BUCKET_DLLIST` and `CONNECT_TO_GLOBAL_DLLIST`. \u2b50\u2b50 ONE PREP",
+        "  ph66-hashdel-uncompared: OK+5 Zend/zend_hash.c:103-133  1285 bytes  sha256 1dbd022d060172b9  -- `UPDATE_DATA` and `INIT_DATA`. \u26a0 `INIT_DATA`'s definition carries a ST",
+        "  ph66-hashdel-uncompared: OK+6 Zend/zend_hash.c:137-176  903 bytes  sha256 87674f645087da0e  -- `_zend_hash_init` -- `while ((1U << i) < nSize) i++;` from `i = 3`, so",
+        "  ph66-hashdel-uncompared: OK+7 Zend/zend_hash.c:195-263  1641 bytes  sha256 e498e461ea1465b7  -- `_zend_hash_add_or_update`. \u2b50\u2b50 ITS PREDICATE AT `:215` IS ALREADY THE ",
+        "  ph66-hashdel-uncompared: OK+8 Zend/zend_hash.c:342-407  1602 bytes  sha256 19440d54d98cceb0  -- `_zend_hash_index_update_or_next_insert`. Two load-bearing lines: `:38",
+        "  ph66-hashdel-uncompared: OK+9 Zend/zend_hash.c:506-529  437 bytes  sha256 4b313586fa46e4f5  -- `zend_hash_destroy` -- what the kernel calls at the end of every call ",
+        "  ph66-hashdel-uncompared: per-span overlap: span0 97% (35/36), span1 100% (11/11), span2 93% (14/15), span3 93% (14/15), span4 100% (13/13), span5 36% (5/14), span6 85% (23/27), span7 86% (31/36), span8 79% (27/34), span9 93% (14/15)  -- the UNION is what is reported below, and it is what 10 cited spans oblige the row to",
+        "  ph66-hashdel-uncompared: kernel overlap 84% (144/171 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=verbatim is expected to clear 50% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph66-hashdel-uncompared: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph66-hashdel-uncompared: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH66_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph56-fetchmode-arith": {
+          "row_specific_words": 1586,
+          "prefix_words": 1586,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph66-hashdel-uncompared": {
+          "row_specific_words": 858,
+          "prefix_words": 858,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph96-outparam-unwritten": {
+          "row_specific_words": 1620,
+          "prefix_words": 1620,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph97-optarg-unwritten": {
+          "row_specific_words": 1315,
+          "prefix_words": 1315,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph66-hashdel-uncompared"
+      ],
+      "tool_argv": [
+        "ph66-hashdel-uncompared"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 1
+    },
+    {
+      "row": "ph66-hashdel-uncompared",
+      "provenance_checked": true,
+      "provenance_skipped": false,
+      "shim_ok": true,
+      "shim_repaired": [],
+      "digest_bridge_ok": true,
+      "c_digest_ok": true,
+      "allocator_symlink_ok": true,
+      "allocator_symlink_notes": [
+        "ph00-smoke: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph03-uudecode-bound: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph07-strcut-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph16-fdset-index: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph29-recvfrom-alloc: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph45-htmlent-cache-int: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph52-concat-copy-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph53-iface-tail-uninit: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph55-opdata-stride: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph56-fetchmode-arith: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph64-callback-frees-cursor: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph66-hashdel-uncompared: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph96-outparam-unwritten: c/emalloc_shim.h OK -- symlink, in BOTH digests",
+        "ph97-optarg-unwritten: c/emalloc_shim.h OK -- symlink, in BOTH digests"
+      ],
+      "overlap_selftest_ok": true,
+      "manifest": {
+        "manifest": "2047b49d03029d1e1f96f29897a1311dfc0e0768e905a60f372f4605deb4ec06"
+      },
+      "manifest_ok": true,
+      "provenance_ok": true,
+      "provenance_stdout": [
+        "ph66-hashdel-uncompared: uses_allocator=True -- \u26a0 DECLARED BY THE AUTHOR, NEVER DETECTED, and nothing depends on it being right. A reviewer checks it against the kernel; the `c/emalloc_shim.h` symlink is unconditional either way (TASK_PHP_008 \u00a70).",
+        "  ph66-hashdel-uncompared: Zend/zend_hash.c, Zend/zend_hash.h, Zend/zend_hash.h, Zend/zend_hash.h, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c, Zend/zend_hash.c are in the manifest (9c990dd1c483, 12cdb25d7520, 12cdb25d7520, 12cdb25d7520, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483, 9c990dd1c483)",
+        "  ph66-hashdel-uncompared: OK  Zend/zend_hash.c:450-503  1328 bytes  sha256 d232e484baf89477  tier=verbatim",
+        "  ph66-hashdel-uncompared: OK+1 Zend/zend_hash.h:48-58  273 bytes  sha256 1cdb042eaf291eb1  -- `Bucket`. \u26a0\u26a0 `nKeyLength` IS A FIELD OF THE BUCKET AND `arKey[1]` IS L",
+        "  ph66-hashdel-uncompared: OK+2 Zend/zend_hash.h:60-76  392 bytes  sha256 c204885bdb034d8f  -- `HashTable` -- `nTableSize`/`nTableMask`/`nNumOfElements`/`nNextFreeEl",
+        "  ph66-hashdel-uncompared: OK+3 Zend/zend_hash.h:243-270  1107 bytes  sha256 52b4484bdc47f136  -- `zend_inline_hash_func` -- DJBX33A accumulating in a `ulong`, i.e. 64-",
+        "  ph66-hashdel-uncompared: OK+4 Zend/zend_hash.c:24-42  681 bytes  sha256 d661d1f961a9c973  -- `CONNECT_TO_BUCKET_DLLIST` and `CONNECT_TO_GLOBAL_DLLIST`. \u2b50\u2b50 ONE PREP",
+        "  ph66-hashdel-uncompared: OK+5 Zend/zend_hash.c:103-133  1285 bytes  sha256 1dbd022d060172b9  -- `UPDATE_DATA` and `INIT_DATA`. \u26a0 `INIT_DATA`'s definition carries a ST",
+        "  ph66-hashdel-uncompared: OK+6 Zend/zend_hash.c:137-176  903 bytes  sha256 87674f645087da0e  -- `_zend_hash_init` -- `while ((1U << i) < nSize) i++;` from `i = 3`, so",
+        "  ph66-hashdel-uncompared: OK+7 Zend/zend_hash.c:195-263  1641 bytes  sha256 e498e461ea1465b7  -- `_zend_hash_add_or_update`. \u2b50\u2b50 ITS PREDICATE AT `:215` IS ALREADY THE ",
+        "  ph66-hashdel-uncompared: OK+8 Zend/zend_hash.c:342-407  1602 bytes  sha256 19440d54d98cceb0  -- `_zend_hash_index_update_or_next_insert`. Two load-bearing lines: `:38",
+        "  ph66-hashdel-uncompared: OK+9 Zend/zend_hash.c:506-529  437 bytes  sha256 4b313586fa46e4f5  -- `zend_hash_destroy` -- what the kernel calls at the end of every call ",
+        "  ph66-hashdel-uncompared: per-span overlap: span0 97% (35/36), span1 100% (11/11), span2 93% (14/15), span3 93% (14/15), span4 100% (13/13), span5 36% (5/14), span6 85% (23/27), span7 86% (31/36), span8 79% (27/34), span9 93% (14/15)  -- the UNION is what is reported below, and it is what 10 cited spans oblige the row to",
+        "  ph66-hashdel-uncompared: kernel overlap 84% (144/171 excerpt lines in kernel.c, kernel.h, kernel_hardened.c)  tier=verbatim is expected to clear 50% -- REPORTED, NOT ENFORCED (TASK_PHP_008 \u00a72)",
+        "  ph66-hashdel-uncompared: \u26a0 the overlap measures TEXT IN kernel.c, kernel.h, kernel_hardened.c, not code in the benchmark -- it never reads main.c, the driver loop or the build, so a HIGH NUMBER is not evidence that the cited lines are COMPILED (TASK_PHP_005 F-4), and a LOW one is not a refusal (TASK_PHP_008 \u00a72).",
+        "  ph66-hashdel-uncompared: \u26a0 1 preprocessor condition(s) in the kernel this heuristic CANNOT evaluate: ['#ifndef PH66_KERNEL_H']. Anything inside a dead one of those is counted as live (TASK_PHP_007 M2 measured nine such spellings). This is the size of the residual, not a defect.",
+        "",
+        "1 row(s) checked, 0 FAILED"
+      ],
+      "why_sizes": {
+        "ph00-smoke": {
+          "row_specific_words": 201,
+          "prefix_words": 200,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph03-uudecode-bound": {
+          "row_specific_words": 572,
+          "prefix_words": 571,
+          "tail_words": 1,
+          "shared_block": true
+        },
+        "ph07-strcut-cursor": {
+          "row_specific_words": 495,
+          "prefix_words": 495,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph16-fdset-index": {
+          "row_specific_words": 463,
+          "prefix_words": 463,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph29-recvfrom-alloc": {
+          "row_specific_words": 419,
+          "prefix_words": 419,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph45-htmlent-cache-int": {
+          "row_specific_words": 983,
+          "prefix_words": 983,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph52-concat-copy-uninit": {
+          "row_specific_words": 1815,
+          "prefix_words": 1815,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph53-iface-tail-uninit": {
+          "row_specific_words": 1122,
+          "prefix_words": 1122,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph55-opdata-stride": {
+          "row_specific_words": 1098,
+          "prefix_words": 1098,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph56-fetchmode-arith": {
+          "row_specific_words": 1586,
+          "prefix_words": 1586,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph64-callback-frees-cursor": {
+          "row_specific_words": 609,
+          "prefix_words": 609,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph66-hashdel-uncompared": {
+          "row_specific_words": 858,
+          "prefix_words": 858,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph96-outparam-unwritten": {
+          "row_specific_words": 1620,
+          "prefix_words": 1620,
+          "tail_words": 0,
+          "shared_block": true
+        },
+        "ph97-optarg-unwritten": {
+          "row_specific_words": 1315,
+          "prefix_words": 1315,
+          "tail_words": 0,
+          "shared_block": true
+        }
+      },
+      "why_band_pat": {
+        "n": 33,
+        "min": 197,
+        "median": 989,
+        "p90": 1817,
+        "max": 3140
+      },
+      "uncertified_records": [],
+      "uncertified_records_other_rows": [],
+      "harness_php_sha256": {
+        "gate.py": "3a978debfc615d5feba142b0aad29e30f849960bca1c013c4b303855ec106a68",
+        "provenance.py": "724abb2fb22b1e5c1b60e7babbd02b2812871bc5cc6e580ce8d288697fe0e896",
+        "root.py": "385544750bfe4c7a179747fe851b1d1df73fc7b3085fbafc624a782b73c1ab79"
+      },
+      "problems": [],
+      "tool": "check",
+      "gate_argv": [
+        "ph66-hashdel-uncompared"
+      ],
+      "tool_argv": [
+        "ph66-hashdel-uncompared"
+      ],
+      "verdict": "tool exited",
+      "tool_returncode": 0
+    }
+  ]
+}

@@ -209,9 +209,30 @@ instrument, like `objdump`.
    a stable signal, a stable signal with a varying address, or a flaky one.**
    *(`TASK_PHP_057` §1.2, which found this; it is NOT the manager's obligation
    and the manager did not think of it.)*
-5. ⭐⭐⭐ **RE-RUN THE TRIGGER AGAINST THE R1h POST-IMAGE BUILD — REQUIRED,
-   GATED ON *"the pre-image run faulted"*.** If the row's trigger did **not**
-   fault, this is vacuous and you skip it, saying so.
+5. ⭐⭐⭐ **RE-RUN THE TRIGGER AGAINST THE R1h POST-IMAGE BUILD — REQUIRED
+   WHENEVER THE ROW CAN NAME AN OBSERVABLE THE REPAIR IS EXPECTED TO MOVE,
+   WHICH IS EVERY ROW — because a row that cannot name one has no R1h claim to
+   make.** Record the observable on BOTH images: exit status **and** output.
+   > ⛔⛔⛔ **THIS READ *"REQUIRED, GATED ON 'the pre-image run faulted'. If the
+   > row's trigger did not fault, this is vacuous and you skip it"* UNTIL
+   > 2026-09-16, AND THAT GATE WAS STATED ON THE INSTRUMENT INSTEAD OF THE
+   > QUESTION.** §A3's criterion 2 is *"does the C exhibit the target ERROR"*,
+   > not *"does it FAULT"*, and this obligation's own rationale box below says
+   > the point is *"the upstream fix's efficacy measurable on real PHP"*.
+   > ⭐ **`ph66` is the row that showed it**: `rc=0` on BOTH images while the
+   > adversarial answer flips and the benign one stays byte-identical — the
+   > cleanest obligation-5 result in the corpus, on a row the old wording told
+   > you to SKIP. `RECAP_PHP.md` **`F141`**.
+   > ⚠⚠ **LANDED ON THE ENGINEER'S PROPOSAL** (`_062` §8.1 option (b)), which
+   > was routed to the manager BY NAME and is answered here rather than in a
+   > reply nobody can grep — that is `F140`'s lesson applied.
+   > ⛔ **`F141` IS STILL `⛔ UNREVIEWED` AND THIS WORDING IS OVERTURNABLE.**
+   > What the review settles is the SCOPE (*"vacuous on 61.3 % of the temporal
+   > axis"* is a forecast over unbuilt rows), **not whether the gate named the
+   > wrong predicate** — that part is measured. ▶ **The durable repair is an
+   > ARM THAT PRINTS which rows discharged this, not this paragraph**
+   > (`_061` §5.0: *location is not the variable*). **Open item 141.**
+   > ⓘ Cost, measured twice: **30 s cold build + ~600 ms incremental, per row.**
 6. **Write all of it into `NOTES.md` as an EVENT**: what was run, on which
    binary, on which date, and what came back.
 

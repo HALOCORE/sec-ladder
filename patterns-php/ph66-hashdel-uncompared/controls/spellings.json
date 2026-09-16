@@ -1,0 +1,19 @@
+{
+ "obligations": 32,
+ "unsatisfied": 0,
+ "problems": [],
+ "derived_from_sha256": {
+  "patterns/ph66-hashdel-uncompared/spec.md": "8a6d6016fd14283c778c9c763924711fca1b10d1904ed362c44070bbe7a3de2e",
+  "patterns/ph66-hashdel-uncompared/c/kernel.c": "f50a4c0f431728458069d58c8eca50e089061fb4df6d49b6d65abd39d6ec94e9",
+  "patterns/ph66-hashdel-uncompared/c/kernel_hardened.c": "d5e462370fcd7922959563bee0f2601bd17f98bb899889df23df4d978eb3c1b3",
+  "patterns/ph66-hashdel-uncompared/c/kernel.h": "ea9775e84ced6e9048b071e3d7043bb3c24f1c0d939d836ea62ad45670036414",
+  "patterns/ph66-hashdel-uncompared/safe_naive.rs": "b7639bc4d3fe165676cfc09e6f8a624e87bec53db2dbc9d569650cbaa8da424e",
+  "patterns/ph66-hashdel-uncompared/safe_tuned.rs": "1d10771b75e39cb1c819bcb8b5c0d5372214e86828007f17abdd884f37f5b65f",
+  "patterns/ph66-hashdel-uncompared/unsafe.rs": "fada9f54e4a28d500f017965fe597167c7137ebf73e666876ae0acf7c00efc4b",
+  "patterns/ph66-hashdel-uncompared/verus.rs": "92be2c4288db96812395b044ab318d599d221cf301bf6703b2992f9374f8b7b2"
+ },
+ "pin": {
+  "regenerate": "python3 controls/spellings.py",
+  "note": "seconds"
+ }
+}

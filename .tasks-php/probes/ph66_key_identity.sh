@@ -118,10 +118,12 @@ SILENT TOO; there is no UAF variant (see this file's header).
 a two-sided result. Run:
     sh .tasks-php/probes/rebuild_hardened_php.sh --label ph66 \
        --patch <b73349dbe4e9.patch> --trigger <cell D's script>
-⛔⛔ AND NOTE WHAT OBLIGATION 5 SAYS: it is "GATED ON the pre-image run
-faulted", and this row's pre-image run does NOT fault -- so the protocol as
-written tells this row to SKIP it. That is F141, and the row must discharge the
-obligation anyway and say so.
+✅ AND OBLIGATION 5 HAS SINCE BEEN RE-WORDED BECAUSE OF THIS ROW. It used to
+read "GATED ON the pre-image run faulted", and this row's pre-image run does NOT
+fault -- so the protocol as written told this row to SKIP the obligation that
+produced its best evidence (F141). It now reads "REQUIRED WHENEVER THE ROW CAN
+NAME AN OBSERVABLE THE REPAIR IS EXPECTED TO MOVE", which is every row.
+⚠ F141 is still UNREVIEWED and the wording is overturnable.
 EOF
 else
 	cat <<'EOF'

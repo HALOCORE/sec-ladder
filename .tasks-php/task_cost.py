@@ -75,7 +75,7 @@ def row_family():
     return fam
 
 ROWS = ["ph03", "ph07", "ph16", "ph29", "ph64", "ph45", "ph53",
-        "ph52", "ph55", "ph56", "ph97", "ph96"]  # BUILD order
+        "ph52", "ph55", "ph56", "ph97", "ph96", "ph66"]  # BUILD order
 
 # ---------------------------------------------------------------------------
 # THE CLASSIFICATION. `ONCE` = paid once for the programme. A dict = the row
@@ -318,20 +318,35 @@ CLASS = {
                                # Reviewing whether a finding generalises is
                                # methodology; building the control that settles
                                # it is the row's.
-    "062": "PENDING:ph66",     # BUILD row 13 = ph66 (E2, TEMPORAL). ⚠ PENDING,
-                               # not {"ph66": 1.0}, for the reason the PENDING
-                               # block above gives: the numerator is row cost
-                               # over BUILT rows, and ph66 is not built. ▶ FLIP
-                               # IT to {"ph66": 1.0} the moment the row gates --
-                               # `N8` bounds the pile and `N14` fires if ROWS
-                               # and the gated corpus disagree, so neither half
-                               # of the flip can be forgotten silently.
-                               # ⓘ The scoping that preceded it (ROW13_001.md,
-                               # the two ph66 probes, the rebuild generalisation)
-                               # was done by the MANAGER inside _061's own
-                               # session and is charged NOWHERE -- which is a
-                               # real understatement of this row's cost and is
-                               # said here rather than discovered later.
+    "062": {"ph66": 1.0},      # BUILD row 13 = ph66 (E2, TEMPORAL), the TEMPORAL
+                               # axis's second row. ONE task, gated PASS, no
+                               # resume.
+                               # ⭐ FLIPPED FROM `PENDING:ph66` BY THE ENGINEER
+                               # IN THE SAME EDIT THAT ADDED `ph66` TO `ROWS`,
+                               # 2026-09-16, which is what the PENDING text
+                               # below asked for and what `N14` exists to force.
+                               # Both halves in one change; doing one without
+                               # the other is the failure it catches (`_060`'s
+                               # entry is the precedent and says so).
+                               # ⚠⚠ THE 1.00 IS AN UNDERSTATEMENT AND THE
+                               # PENDING TEXT ALREADY SAID WHY, so it is kept
+                               # rather than dropped: the scoping that preceded
+                               # this task -- ROW13_001.md, the two ph66 probes,
+                               # the `rebuild_hardened_php.sh` generalisation --
+                               # was done by the MANAGER inside `_061`'s own
+                               # session and is charged NOWHERE. ▶ The row
+                               # really cost more than one task; what `1.00`
+                               # measures is the BUILD task, which is what every
+                               # other entry in this table measures too, so the
+                               # series stays comparable and the residue is
+                               # named here instead of being averaged away.
+                               # ⓘ It also carries controls the row did not
+                               # strictly owe -- `key_identity.py` (the Verus
+                               # obligation the defect violates, three arms) and
+                               # `inside_share.py` swept at TWO optimisation
+                               # levels rather than ph96's one. Under `_058`'s
+                               # rule a control a row should have shipped with
+                               # is that row's debt, so the 1.00 is WITH them.
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them
@@ -966,7 +981,19 @@ def selftest():
             out += [f"{tid}->{r}" for r in c.partition(":")[2].split(",")
                     if r and r in ROWS]
         return out
-    built, unbuilt = ROWS[0], "ph66"
+    # ⛔⛔ `unbuilt` WAS THE LITERAL `"ph66"` UNTIL 2026-09-16 AND `ph66` GOT
+    #    BUILT, WHICH TURNED THIS ARM RED FOR A REASON THAT HAD NOTHING TO DO
+    #    WITH THE THING IT CHECKS. The arm needs *some* id that is not in
+    #    `ROWS`; naming one makes the arm depend on that row never being built,
+    #    which is the one thing this programme is trying to do to every row in
+    #    the catalogue. ▶ DERIVED FROM `ROWS` ITSELF instead, so it is unbuilt
+    #    BY CONSTRUCTION and cannot go stale: the first `phNN` in catalogue
+    #    order that `ROWS` does not contain. ⓘ Same class as `F101`/item 109 --
+    #    a check whose correctness depended on a literal that the work moved --
+    #    and the repair is the same shape: compute the operand, do not spell it.
+    built = ROWS[0]
+    unbuilt = next(f"ph{n:02d}" for n in range(1, 103)
+                   if f"ph{n:02d}" not in ROWS)
     syn_hit = _landed({"901": f"PENDING:{built}"})
     syn_miss = _landed({"902": f"PENDING:{unbuilt}"})
     syn_multi = _landed({"903": f"PENDING:{unbuilt},{built}"})

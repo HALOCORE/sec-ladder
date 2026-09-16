@@ -397,6 +397,30 @@ REGISTRY = {
             "-- same call as `probes/rebuild_hardened_php.sh`. ▶ Run it by "
             "hand; it exits non-zero if any cell deviates, and a deviation is "
             "a RESULT to report, never an expectation to edit (F43/F47)."),
+    "probes/item139_sibling_census.py": dict(
+        kind="checker", argv=["--selftest"], expect=0, negatives="flag",
+        st_expect=0,
+        why="⭐⭐⭐ ITEM 139 — `F133`(i) across all 13 rows AS A GREP (the `_061` "
+            "reviewer's binding form: one grep per row, NOT ten censuses). "
+            "6 arms, 5 must-fire. **The result is not a tally**: `F133`(i) — "
+            "*the R1h's strategy was already present elsewhere in the same "
+            "construct* — is only a WELL-FORMED question for repairs that ADD "
+            "A GUARD (8 of 13 rows; it holds on 7). For the rest the repair "
+            "changes a STRUCT (ph45 adds the field it then uses), DELETES a "
+            "line (ph52's whole patch is one removal), alters the BUILD (ph16, "
+            "10 files + configure.in) or imports a TREE-WIDE api (ph29, ph53) "
+            "— and the question has NO ANSWER rather than a NO. ⭐⭐ Every "
+            "positive is a SIBLING: ph64's `calling` flag was declared, set "
+            "and cleared by the same file three years before the fix that "
+            "READS it; ph55's repair text is already in the file verbatim. "
+            "⛔⛔ AND SCOPE DOES REAL WORK: on ph29 the answer is NO in-file "
+            "(`safe_emalloc` 0x) and YES tree-wide (250 sites / 78 files) — "
+            "'the same construct' is undefined and the answer flips with it. "
+            "⚠⚠ The `tok` column is a TRIPWIRE, NOT the claim: it does not "
+            "compute the `claim` beside it (ph96's claim is 7-of-23, the token "
+            "reads 3). The first draft printed it under a bare `n` heading — "
+            "law 6's defect — and said '7 of 13' while the table computed 8. "
+            "N6 now pins the prose to the table permanently."),
     "probes/ph66_key_identity.sh": dict(
         kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
         why="⭐⭐⭐ ROW 13's criterion-2 instrument, and THE ROW IN THE CORPUS "
