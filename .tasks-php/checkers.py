@@ -523,7 +523,25 @@ REGISTRY = {
             "would pass it. ⓘ Its own first draft picked a victim row from the "
             "`_047` DATED SNAPSHOT table and all four arms went FAIL -- kept in "
             "the docstring, because that is a free demonstration that the "
-            "table-scoping regex holds."),
+            "table-scoping regex holds. "
+            "⛔⛔⛔ TWO OF ITS OWN ARMS WERE FOUND BROKEN ON 2026-09-16 WHILE "
+            "LANDING _063, AND BOTH WERE THE SAME CLASS -- AN ARM PINNED TO A "
+            "POPULATION INSTEAD OF A PROPERTY (F132). (1) It kept a PRIVATE "
+            "COPY of boxcheck's router regex and the copy was the NARROW "
+            "pre-widening form, so the arm that exists to prove the widening "
+            "catches a route naming a ROUND passed WITHOUT the widening -- it "
+            "matched `is a REVIEWER` in the same sentence. Row 908 now says "
+            "ONLY a round name, and the regex is imported (bc.ROUTE), not "
+            "duplicated: F131 and F138 at once, inside the harness that "
+            "polices this arm. (2) `open-cycle set is ... non-empty at "
+            "baseline` FAILED the first time the backlog reached ZERO, which "
+            "is the GOAL STATE -- an arm that can only pass while the tree is "
+            "UNHEALTHY is not a must-fire arm. It now plants an UNREVIEWED row "
+            "in a STRING, which is what this file's own docstring prescribes. "
+            "⭐ Rows 906/907 were added in the same pass: a STRUCK route is "
+            "HISTORICAL and must not print, and striking one route must NOT "
+            "mask a second live one -- or `unstruck()` would be a licence to "
+            "hide."),
     "probes/ph66_djbx33a_collide.py": dict(
         kind="checker", argv=["--selftest"], expect=0, negatives="inline",
         st_expect=0,

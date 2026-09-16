@@ -18,6 +18,37 @@ import re, sys, glob, collections
 # per-group table, and neither is an index of cycles.
 _R9 = re.compile(r'^> \| finding \| verdict \|.*?\n(.*?)(?=^> *$)', re.S | re.M)
 
+# ⭐⭐ MODULE-LEVEL ON PURPOSE. `probes/rule9_mustfire.py` kept its OWN COPY of
+# this pattern and the two DIVERGED: the copy was the narrow, pre-widening form,
+# so the must-fire arm that exists to prove the widening works **passed without
+# the widening** -- its `_063` case matched on `is a REVIEWER`, not on the round
+# spelling the widening added. ⛔ F131 (one home per fact) and F138 (`"I called
+# the tool's function" is not "I ran the tool"`), in the harness that polices
+# this very arm. ▶ There is now ONE regex and the probe imports it.
+ROUTE = re.compile(r"(▶|and it)[^|]{0,80}?"
+                   r"(is a REVIEWER|Give it to a reviewer|a reviewer can rule"
+                   r"|belongs in the round|THE REVIEWER SAYS"
+                   r"|a REVIEWER'?s\b|goes to `_0[0-9]+`|\*\*`_0[0-9]+`\*\*"
+                   r"|scope (it|them) into|_0[0-9]+ beside)", re.I)
+
+_STRUCK = re.compile(r'~~.*?~~', re.S)
+
+
+def unstruck(t):
+    """PURE. Drop `~~struck~~` spans -- a struck route is a HISTORICAL route.
+
+    ⚠⚠ WHY: after `_063` ruled all nine routed items, five still printed as
+    `LIVE, unscheduled` because the arm matched inside the strikethrough that
+    RECORDED the routing as spent. A report whose population never shrinks is
+    one nobody reads (item 131's shape: a check that cannot come back clean).
+    ⛔ AND THE RISK IS REAL AND IS ACCEPTED DELIBERATELY: striking a route is now
+    a way to leave the report. That is tolerable ONLY because this arm never
+    gates -- it prints -- and because the item text stays in the table where a
+    reader sees both the route and its strike. It would NOT be tolerable in a
+    gate.
+    """
+    return _STRUCK.sub('', t)
+
 
 def rule9_rows(s):
     """PURE. -> (keys, open_cycles) for the live RULE-9 table, or (None, None).
@@ -138,24 +169,33 @@ def main():
     #    leave the judgement to a reader.
     # ▶ THIS IS `_061` SS5.0's RULING APPLIED TO ITS OWN NEXT INSTANCE: four
     #   homes for a trap all failed, and the durable home is an arm that PRINTS.
-    # ⛔⛔⛔ WIDENED 2026-09-16 BECAUSE ITS AUTHOR EVADED IT FOUR TIMES IN ONE
-    #    TURN. Items 144-147 were registered saying "▶ A REVIEWER's, and it goes
-    #    to `_063`" and "▶ `_063`" -- and the arm matched NONE of them, because
-    #    it keyed on the spellings F140 happened to use ("is a REVIEWER",
-    #    "belongs in the round"). ⭐ NAMING A ROUND THAT DOES NOT EXIST YET IS
+    # ⛔⛔⛔ WIDENED 2026-09-16 BECAUSE ITS AUTHOR EVADED IT IN THE TURN THAT
+    #    WROTE IT. Items 144-147 were registered saying "▶ A REVIEWER's, and it
+    #    goes to `_063`" and "▶ `_063`", and the arm did not print them all.
+    #    ⛔⛔ THIS COMMENT SAID "the arm matched NONE of them" AND THAT IS FALSE.
+    #    `_063` §6.2(d) MEASURED IT by running the exact pre-widening regex
+    #    (`git show 3f8298e:.tasks-php/boxcheck.py`) against the same text: it
+    #    matches 145, 146 AND 147, and misses only 144 -- plus 139, which this
+    #    comment never mentioned. ▶ THE WIDENING BOUGHT TWO ITEMS, NOT FOUR.
+    #    ⭐⭐ AND THE BACK-TEST IS THE ARM'S BEST DEFENCE, NOT ITS INDICTMENT:
+    #    WIDE and NARROW print the SAME list at every historical dispatch commit
+    #    (2, 2, 2, 4, 4), so the arm is NOT tuned to the instance that produced
+    #    it -- it reproduces `_061`'s miss in the form it had BEFORE the tuning.
+    #    ⛔ UNMEASURABLE, AND SAY SO: the regex widening and the item re-wording
+    #    landed in ONE commit (`8c2a546`) with no intermediate state, so
+    #    `NARROW x pre-rewording text` cannot be computed from this tree.
+    #    ▶ `_063`'s layer-shaped clause: A VALIDATOR CHANGE AND THE DATA CHANGE
+    #      IT IS MEASURED AGAINST MUST NOT LAND IN THE SAME COMMIT.
+    #    ⭐ NAMING A ROUND THAT DOES NOT EXIST YET IS
     #    THE SAME ACT AS NAMING "the round the backlog already owes": a round is
     #    a PROCESS and a process has no inbox. ▶ So `_0NN` is now a routing
     #    spelling in its own right. ⚠ THE LESSON IS NOT THE REGEX -- it is that
     #    an arm keyed to the phrasing of the instance that produced it catches
     #    that instance and nothing else (F43/F47's shape, one level up).
-    route = re.compile(r"(▶|and it)[^|]{0,80}?"
-                       r"(is a REVIEWER|Give it to a reviewer|a reviewer can rule"
-                       r"|belongs in the round|THE REVIEWER SAYS"
-                       r"|a REVIEWER'?s\b|goes to `_0[0-9]+`|\*\*`_0[0-9]+`\*\*"
-                       r"|scope (it|them) into|_0[0-9]+ beside)", re.I)
     sec = s[s.index('## Open items'):] if '## Open items' in s else ''
     items = re.findall(r'^\| (~~)?([0-9]+)(~~)? \|(.*)$', sec, re.M)
-    routed = [n for struck, n, _, t in items if not struck and route.search(t)]
+    routed = [n for struck, n, _, t in items
+              if not struck and ROUTE.search(unstruck(t))]
     print(f'{"items -> a reviewer":18} {len(routed):4}  '
           f'LIVE, unscheduled: {" ".join(routed) if routed else "none"}')
 

@@ -209,11 +209,21 @@ instrument, like `objdump`.
    a stable signal, a stable signal with a varying address, or a flaky one.**
    *(`TASK_PHP_057` §1.2, which found this; it is NOT the manager's obligation
    and the manager did not think of it.)*
-5. ⭐⭐⭐ **RE-RUN THE TRIGGER AGAINST THE R1h POST-IMAGE BUILD — REQUIRED
-   WHENEVER THE ROW CAN NAME AN OBSERVABLE THE REPAIR IS EXPECTED TO MOVE,
-   WHICH IS EVERY ROW — because a row that cannot name one has no R1h claim to
-   make.** Record the observable on BOTH images: exit status **and** output.
-   > ⛔⛔⛔ **THIS READ *"REQUIRED, GATED ON 'the pre-image run faulted'. If the
+5. ⭐⭐⭐ **RE-RUN THE TRIGGER AGAINST THE R1h POST-IMAGE BUILD. REQUIRED, WITH
+   NO CONDITION.** Record the observable on BOTH images: exit status **and**
+   output. **A row that cannot name an observable the repair should move has no
+   R1h claim, and that is a FINDING TO REPORT — not a reason to skip step 5.**
+   > ⛔⛔ **AND THIS IS THE SECOND WORDING, NOT THE FIRST — `TASK_PHP_063` §4.4
+   > OVERTURNED THE ONE THAT STOOD FOR ONE DAY.** It read *"REQUIRED **WHENEVER**
+   > THE ROW CAN NAME AN OBSERVABLE THE REPAIR IS EXPECTED TO MOVE, **WHICH IS
+   > EVERY ROW**"*, and ⭐⭐⭐ **THAT IS STILL A GATED OBLIGATION**: *"whenever"*
+   > is a condition and *"which is every row"* is a parenthetical assertion that
+   > the condition always holds. ▶ **A reader who acts on the first clause and
+   > not the second re-derives exactly the defect `F141` found** — and this
+   > programme has measured that failure mode twice (`F134`/`F139`: a
+   > person-facing caution in capitals, lost by 9h25m **to its own author**).
+   > ⓘ **Two words shorter, no conditional to mis-read, same content.**
+   > ⛔⛔⛔ **THE FIRST WORDING READ *"REQUIRED, GATED ON 'the pre-image run faulted'. If the
    > row's trigger did not fault, this is vacuous and you skip it"* UNTIL
    > 2026-09-16, AND THAT GATE WAS STATED ON THE INSTRUMENT INSTEAD OF THE
    > QUESTION.** §A3's criterion 2 is *"does the C exhibit the target ERROR"*,
@@ -226,12 +236,22 @@ instrument, like `objdump`.
    > ⚠⚠ **LANDED ON THE ENGINEER'S PROPOSAL** (`_062` §8.1 option (b)), which
    > was routed to the manager BY NAME and is answered here rather than in a
    > reply nobody can grep — that is `F140`'s lesson applied.
-   > ⛔ **`F141` IS STILL `⛔ UNREVIEWED` AND THIS WORDING IS OVERTURNABLE.**
-   > What the review settles is the SCOPE (*"vacuous on 61.3 % of the temporal
-   > axis"* is a forecast over unbuilt rows), **not whether the gate named the
-   > wrong predicate** — that part is measured. ▶ **The durable repair is an
-   > ARM THAT PRINTS which rows discharged this, not this paragraph**
-   > (`_061` §5.0: *location is not the variable*). **Open item 141.**
+   > ✅✅ **`F141` HAS NOW BEEN REVIEWED (`_063`): UPHELD as an `n = 1` EXISTENCE
+   > PROOF — the gate really did name the wrong predicate, and that half is
+   > arithmetic over the text.** ⛔⛔ **ITS `61.3 %` SCOPE CLAIM IS REFUTED** as a
+   > population substitution (a rate over *corpus reproducers*, asserted about
+   > *the row's authored trigger*). **The obligation does not rest on it.**
+   > ⛔⛔ **AND `_063` §4.3 KILLED THE TRADE THIS OBLIGATION WAS ARGUED OVER**:
+   > item 126 framed it as *"REQUIRING makes every row pay for a full PHP
+   > compile"*, and **that premise is false by ~100×, measured twice, in this
+   > same file, four lines below.** ▶ ***With the cost at ~0 there is nothing to
+   > trade.*** **PERMITTING ⛔ refuted · REQUIRING ✅ · REQUIRED-BUT-GATED ⛔⛔ the
+   > worst of the three** — it exempts precisely the rows where the check is most
+   > informative, **and it reads as required, so nobody re-opens it.**
+   > ▶ **The durable repair is still an ARM THAT PRINTS which rows discharged
+   > this, not this paragraph** (`_061` §5.0). **Open item 141** — ⚠ **and check
+   > `F131` first: `boxcheck.py` already prints per-row state and is the natural
+   > host; a new tool would be a second home.**
    > ⓘ Cost, measured twice: **30 s cold build + ~600 ms incremental, per row.**
 6. **Write all of it into `NOTES.md` as an EVENT**: what was run, on which
    binary, on which date, and what came back.

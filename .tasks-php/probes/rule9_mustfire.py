@@ -102,8 +102,32 @@ checks = [
      len(mut_b.split('\n')) == len(DOC.split('\n'))),
     # ⭐⭐ And the backlog must be derivable and must NOT move under a mutation
     #   that only duplicates a verdicted row -- F131 §2's half.
-    ("open-cycle set is derived and non-empty at baseline",
-     bool(base_oc)),
+    # ⛔⛔⛔ THIS READ `bool(base_oc)` -- "the live backlog is non-empty" -- AND IT
+    #   FAILED ON 2026-09-16 WHEN `_063` CLEARED THE BACKLOG TO ZERO FOR THE
+    #   FIRST TIME IN THE PROGRAMME'S HISTORY. ⭐ The arm was pinned to the
+    #   POPULATION (a backlog happens to exist) instead of to the PROPERTY (the
+    #   set is DERIVED from the table). That is F132's shape, and it is the
+    #   SECOND time in this one file -- `_routed == ["901"]` was the first, and
+    #   the comment 40 lines down already says so. ⚠ A must-fire arm that can
+    #   only pass while the tree is UNHEALTHY is not a must-fire arm.
+    # ▶ REPAIRED THE WAY THIS FILE'S OWN DOCSTRING PRESCRIBES: plant an
+    #   UNREVIEWED row in a STRING and assert it is FOUND, so the arm is
+    #   non-vacuous whether or not the real backlog is empty.
+    ("open-cycle set is DERIVED: a planted `⛔ **UNREVIEWED**` row is found, "
+     "and a verdicted one is not -- asserted on a synthetic table so the arm "
+     "does not depend on the live backlog being non-empty",
+     bc.rule9_rows(
+         "> | finding | verdict | what |\n"
+         "> |---|---|---|\n"
+         "> | **F901** | ⛔ **UNREVIEWED** -- planted | nothing |\n"
+         "> | **F902** | ✅ **UPHELD** (`_063`) | something |\n"
+         "> \n")[1] == ["F901"]),
+    # ⓘ and the live set stays REPORTED rather than asserted: an empty backlog
+    #   is the goal state, not a defect, and nothing here may punish reaching it.
+    ("open-cycle set on the LIVE document is a derived list (reported, not "
+     f"constrained) -- currently {len(base_oc)}: "
+     f"{' '.join(base_oc) if base_oc else 'none, backlog CLEAR'}",
+     isinstance(base_oc, list)),
 ]
 # =============================================================================
 # ⭐⭐ F140's REPORT, MADE TO FIRE -- boxcheck's `items -> a reviewer` line.
@@ -116,9 +140,13 @@ checks = [
 #    pattern FINDS it, and plants a struck row and asserts it does NOT.
 import re as _re
 
-_ROUTE = _re.compile(r"(▶|and it)[^|]{0,80}?"
-                     r"(is a REVIEWER|Give it to a reviewer|a reviewer can rule"
-                     r"|belongs in the round|THE REVIEWER SAYS)", _re.I)
+# ⛔⛔⛔ THIS FILE USED TO CARRY ITS OWN COPY OF THE ROUTER REGEX, AND THE COPY
+#   WAS THE NARROW PRE-WIDENING FORM. So `904` -- the row that exists to prove
+#   the widening catches a route naming a ROUND -- PASSED WITHOUT THE WIDENING,
+#   by matching `is a REVIEWER` instead. ⭐ A must-fire arm testing a stale
+#   duplicate of the thing it guards is F131 and F138 at once, inside the
+#   harness that polices this arm. ▶ ONE HOME: import it.
+_ROUTE = bc.ROUTE
 
 _SYNTH = """## Open items
 | 900 | a title | plain prose, nobody is asked anything |
@@ -127,16 +155,21 @@ _SYNTH = """## Open items
 | 903 | a title | narration: the reviewer found X last round, which is not a route |
 | 904 | a title | the answer is settled here. ▶ **It is a REVIEWER's, and it goes to `_063`** |
 | 905 | a title | a question with no addressee at all, registered and left to drift |
+| 906 | a title | ~~▶ **It is a REVIEWER's, and it goes to `_063`**~~ ✅ RULED, the route is SPENT |
+| 907 | a title | ~~▶ **Give it to a reviewer**~~ superseded, but ▶ **it is a REVIEWER's** all over again |
+| 908 | a title | the answer is settled here. ▶ **`_064`** takes it |
 """
 _items = _re.findall(r'^\| (~~)?([0-9]+)(~~)? \|(.*)$', _SYNTH, _re.M)
-_routed = [n for st, n, _, t in _items if not st and _ROUTE.search(t)]
+_routed = [n for st, n, _, t in _items
+           if not st and _ROUTE.search(bc.unstruck(t))]
 
 checks += [
     # ⚠ ASSERTED AS A SET, NOT AS A SINGLETON. This read `_routed == ["901"]`
     #   and broke the moment 904 was added -- the arm was pinned to the
     #   POPULATION rather than to the property (F132's shape, in a must-fire).
-    ("F140 report: finds BOTH routed LIVE items (901, 904) and only those",
-     _routed == ["901", "904"]),
+    ("F140 report: finds exactly the routed-and-LIVE items "
+     "(901, 904, 907, 908) and only those",
+     _routed == ["901", "904", "907", "908"]),
     ("F140 report: does NOT count a RETIRED row (902)", "902" not in _routed),
     ("F140 report: does NOT count narration about a reviewer (903)",
      "903" not in _routed),
@@ -153,6 +186,23 @@ checks += [
     ("F140 report: an item with NO addressee is invisible to the router (905) "
      "-- a KNOWN HOLE, asserted so it is not mistaken for coverage",
      "905" not in _routed),
+    # ⛔⛔ 906/907 ADDED WHEN `_063` RULED ALL NINE ROUTED ITEMS AND FIVE STILL
+    #   PRINTED AS `LIVE, unscheduled` -- the arm was matching inside the very
+    #   strikethrough that recorded the route as spent. A report whose
+    #   population can never shrink is one nobody reads.
+    ("F140 report: a route that is STRUCK is HISTORICAL and is not counted "
+     "(906)", "906" not in _routed),
+    # ⭐ and the other side of it, or `unstruck` would be a licence to hide:
+    #   striking one route must NOT suppress a second, LIVE one on the same row.
+    ("F140 report: a struck route does NOT mask a second LIVE route on the "
+     "same item (907)", "907" in _routed),
+    # ⛔⛔⛔ 908 IS THE ARM THAT THE OLD PRIVATE REGEX COPY COULD NOT PASS.
+    #   `904` names a round AND says "is a REVIEWER's", so the narrow form
+    #   matched it for the wrong reason and the widening looked tested. 908 says
+    #   ONLY `**`_064`**` -- nothing else in it is routing language at all.
+    ("F140 report: counts a route whose ONLY addressee is a ROUND NAME (908) "
+     "-- the case the pre-widening regex could not see",
+     "908" in _routed),
     # ⭐ and it must be non-vacuous against the REAL corpus, or it is measuring
     #   a string literal and nothing else.
     ("F140 report: the pattern is non-vacuous on the live items table",
