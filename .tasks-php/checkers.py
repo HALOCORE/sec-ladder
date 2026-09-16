@@ -542,6 +542,44 @@ REGISTRY = {
             "HISTORICAL and must not print, and striking one route must NOT "
             "mask a second live one -- or `unstruck()` would be a licence to "
             "hide."),
+    "probes/item125_extract.py": dict(
+        kind="checker", argv=[], expect=0, negatives="none", st_expect=None,
+        why="⭐ ITEM 125's POPULATION, AND IT IS PROMOTED OUT OF `.temp/` ON "
+            "PURPOSE. `_063` §7.2 ruled that the genuinely uncovered citation "
+            "case is a GENERATOR in `.temp/` with no committed twin and no "
+            "validator role -- neither citecheck's §F6 arm nor its §H arm sees "
+            "one. This produced the 27-item census that item125_demoted.py "
+            "adjudicates, so leaving it in auto-`rm`-able scratch would make "
+            "that 27 a number nobody can re-derive (F51/F99). ⛔⛔ AND THE "
+            "ITEM-LEVEL GRANULARITY IS THE WHOLE POINT: a LINE-based grep "
+            "misses F123's OWN FOUNDING INSTANCE, because `_051_REPORT.md` "
+            "§8.1 straddles a line break (`cheapest remaining` on :440, `and "
+            "it is not done` on :441). ▶ A count done the way item 125 "
+            "SPECIFIES returns a set that excludes the one member we know is a "
+            "member -- which is why the item as specified is REFUTED and the "
+            "census had to be re-run at item granularity."),
+    "probes/item125_demoted.py": dict(
+        kind="checker", argv=[], expect=0, negatives="flag", st_expect=0,
+        why="⭐⭐⭐ ITEM 125 ADJUDICATED -- and it is THE WORKED INSTANCE OF "
+            "F139's CORRECTED AXIS. `_063` §6.1 refuted *location is not the "
+            "variable*: the axis is TEXT vs AN INVOKED ARM. F123's repair was "
+            "a PROSE BOX, three rounds carried it in capitals, and none did "
+            "the work -- while F140's printing arm scoped the item on its "
+            "first run. This file is that arm for item 125. "
+            "⛔ ⓘ REPORT ONLY, rc=0 ALWAYS: a member sitting undone for six "
+            "rounds is a FINDING, not a build error, and a checker that went "
+            "red on it would be re-classified as noise inside a week (F135). "
+            "⚠ ITS TRACKING TEST IS A PROXY AND SAYS SO: token recurrence is "
+            "weaker than an answer, so it can only move a row OUT -- the "
+            "printed member set is a LOWER BOUND. ⭐⭐ N4 EARNED ITS PLACE "
+            "IMMEDIATELY: it refused its own author's hand verdict on `_035` "
+            "within minutes, because the token chosen (`four spellings`) was "
+            "generic enough to match unrelated text in three earlier reports "
+            "and manufacture tracking that did not exist. ⭐ N2 RUNS the "
+            "extractor rather than trusting a typed 27 (F138). ⭐ N3 forbids "
+            "deleting the census's own false positives -- a census that hides "
+            "its misses cannot be audited, and deleting them is the cheapest "
+            "way to make this report look better than it is."),
     "probes/ph66_djbx33a_collide.py": dict(
         kind="checker", argv=["--selftest"], expect=0, negatives="inline",
         st_expect=0,
