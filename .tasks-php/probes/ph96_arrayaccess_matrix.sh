@@ -52,8 +52,15 @@
 #
 # ⚠⚠ TWO CAUTIONS TRAVEL WITH ANY RESULT FROM THIS PROBE (§A3a), AND A ROW
 # THAT QUOTES IT MUST REPEAT THEM:
-#   (1) the binary is php-in-safe-rust's ORACLE build (`-O3 -march=native
-#       -flto`, mysql+webext), NOT a museum-default 5.0.0;
+#   (1) the binary is php-in-safe-rust's ORACLE build, the PLAIN
+#       `php-5.0.0-mysql-webext`, NOT a museum-default 5.0.0.
+#       ⛔⛔ THIS SAID `-O3 -march=native -flto` AND THAT IS THE WRONG BUILD
+#       (F139). Those flags belong to the `-O3lto` / `-maxlto` SIBLINGS, which
+#       are the only two carrying a `.buildinfo`; the binary this script
+#       actually defaults to on line 63 has none, and its `config.status`
+#       says `-O0`. ▶ SAY "flags not recorded in a .buildinfo" RATHER THAN
+#       NAMING FLAGS. PROTOCOL_PHP.md SSA3a carried this correction in
+#       capitals 9h25m before this comment was written;
 #   (2) a CLEAN run would NOT be evidence of absence (F3). A faulting run is
 #       evidence of PRESENCE, which is the half this programme long lacked.
 

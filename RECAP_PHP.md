@@ -47,24 +47,24 @@ between them read `CLAUDE.md`'s top table.
 ```
 STATE   ⭐ ROWS BUILT 12 -- ph03+ph07 (S1), ph16, ph29 spatial · ph64 TEMPORAL · ph45
         (T1)+ph53+ph52 (T3)+ph55+ph56 (T5)+ph97+ph96 (T6 ✅QUOTA MET) TYPE. 8/20
-        fam, 25 owed to floor 37. ⛔ BACKLOG 8 = THE RULE-9 ⛔ UNREVIEWED ROWS.
-▶FLIGHT **_061 DISPATCHED = THE 9th REVIEW ROUND, ALL 8**: F137>F136>F133>F135,
-        THEN F134+F132+F131+F138 BATCHED BEHIND ONE QUESTION (*where does a trap
-        live?*). ⛔ WHILE IT RUNS: **NO EDIT, NO COMMIT** TO WHAT IT READS.
-NEXT    ▶ (1) ⭐⭐⭐ ROW 13 = **TEMPORAL** -- 15 of 25 OWED ARE, THE AXIS HAS **1**
-        BUILT, THE DEFERRAL GROUND IS REFUTED, AND EXPECT **NO** ORACLE DISCOUNT
-        (38.7% vs TYPE 78.6%): PLAN FOR ASan/Miri, NOT A CLI REPRODUCER.
-        ▶ (2) ITEM 129 ~289 ITEMS, NOT 1 TASK. ▶ (3) 4 CHECKERS UNSWEPT.
-        ▶ (4) ⛔⛔ ITEM 105 = **THE USER'S CALL**, NOT MINE.
-⛔ F138  **"PEAK 9" WAS 6 ROWS OF DOUBLE-COUNTING** (F120-F125, ALREADY VERDICTED,
-        LISTED TWICE = F131's OWN DEFECT). DEDUPED MAX **7 = TODAY**. ⭐ I *RAN*
-        THE TOOL AND TOOK `len()` OF A SET I NEVER PRINTED.
-⚠ _061  §0.1 CORRECTS **F137's OWN FALSIFIER**: ph97's null-sentinel input is
-        `absent`, NOT the one NAMED `nullvalue`; its RUST half is ALREADY ON DISK.
-⚠ TRAPS ADJUDICATE THE **SET**; `len()` IS NOT ADJUDICATING (F132/F138). ONE HOME
-        PER FACT (F131). **BODIES** NOT `@@` (F134). `grep -a`; EVENT NOT STATE;
-        NEVER `git add -A`.
-READ    RULE-9 · .memory-php/ · F1-F138 · items 1-138 · _061 BRIEF · _060 REPORT.
+        fam, 25 owed to floor 37. ✅ **BACKLOG 8 -> 1** (F139, opened BY the round).
+✅ DONE  **_061 = THE 9th ROUND, ALL 8 VERDICTED.** ⛔ F137 CLAUSE 2 **REFUTED BY
+        THE ROW IT NAMED AS ITS OWN FALSIFIER** (ph97 FAULTS IN ALL 8 BUILDS).
+        ⛔ F136's HEADLINE **REFUTED**: "FREE" IS AN `A1,O3` FACT -- AT `O0` W1
+        MOVES `−2.24..−19.58 Ir/call` AND **UPSTREAM'S IS THE DEARER**. MY
+        PREDICTIONS **1 OF 5**; MY OWN §1.1 CORRECTION WAS WRONG TOO.
+NEXT    ▶ (1) ⭐⭐⭐ ROW 13 = **TEMPORAL** -- 15 of 25 OWED ARE, 7 of 8 FAMILIES
+        HAVE **ZERO**. ⭐ SCOPED: `ph66` (E2) HAS THE CLEANEST R1h IN THE CORPUS
+        AND ITS "UNCOMPUTED PREIMAGE" BLOCKER **DISSOLVES** -- SEE `.temp/mgr-
+        row13/`, WHICH MUST BE PROMOTED OUT OF SCRATCH BEFORE IT IS CITED.
+        ▶ (2) ITEM 139 = F133(i) x10 **AS A GREP, NOT TEN CENSUSES** (BINDING).
+        ▶ (3) ITEM 140 3-VALUED `st_expect`. ▶ (4) ⛔⛔ ITEM 105 = **USER'S CALL**.
+⭐ RULED **LOCATION IS NOT THE VARIABLE**: 4 HOMES, 4 FAILURES, ALL AGAINST THE
+        AUTHOR. ONE CLAUSE ON **LAW 6**. ✅ ITEM 129 **UNBLOCKED**, NOT BLOCKING.
+⚠ TRAPS "I CALLED THE TOOL'S FUNCTION" IS NOT "I RAN THE TOOL" (F138). DIFF THE
+        **SET** (F132). **BODIES** NOT `@@`/FIELD LABELS (F134, 3 LEVELS DEEP THIS
+        ROUND). `grep -a`; EVENT NOT STATE; NEVER `git add -A`.
+READ    RULE-9 · .memory-php/ · F1-F139 · items 1-140 · _061 REPORT + BRIEF.
 ```
 
 ---
@@ -185,15 +185,16 @@ READ    RULE-9 · .memory-php/ · F1-F138 · items 1-138 · _061 BRIEF · _060 R
 > | ⭐ **F127** | ⓘ opened ⛔ UNREVIEWED (`_057`'s own round) → ⚠ **UPHELD-NARROWED / REASON REFUTED** (`_059`) | ⭐⭐ **`F127` IS ITSELF A CASUALTY OF `F129`'s NAME COLLISION**: its claim is true of the **`W`** quantity and **FALSE of `F74`'s**, which is arithmetic over committed records and was therefore available for **all 360 cells all along**. ▶ *"Five rows never measured `inside_share`"* means *"five rows ship no `W` control"* — and `_058` measured **the quantity the rule is not stated in**. ⛔ Its *"the EXACT comparison"* identity claim is false (one rung off). ✅ **The CONCLUSION survives on a ground that needs no bar**: `RECAP_PHP.md` published a one-column, opt/mode-unlabelled cross-language `A1` figure — **`F108`'s fifth thing and its third.** ▶ **Re-state `F127` on `F108`, not on `F74`'s bar.** ⓘ The residue (`ph07`, `ph53`, `ph64`) is **bookkeeping**, not a precondition — reading (b) removes the argument that made it load-bearing |
 > | **F128** | ⓘ opened ⛔ UNREVIEWED, then **self**-narrowed by its own sweep (manager on manager, **not** a review — the cell that said *"UPHELD-NARROWED BY ITS OWN SWEEP"* scanned as a verdict and made the backlog uncountable, `F131` §2) → ⚠ **UPHELD / REPLACEMENT RULE NARROWED** (`_059`) | ⭐⭐ **THE KIND-A/KIND-B SPLIT IS NOT A PROPERTY OF THE ARM — it is a property of the arm's RELATION to a finding's CURRENT STATUS, and that status changes without the arm changing.** `N11` was a textbook Kind A arm until the first-in-family premium was refuted at `n = 8`, at which point it became a textbook Kind B arm **with no edit to it**. ▶ **So the rule's second half is the whole mechanism, not a nicety**: *an arm that asserts a published direction **without printing the measured margin** is a Kind B arm that has not been caught yet.* ⛔ **A second gap: the rule has no RETIREMENT condition** — the sweep noticed that on `N6` and did not generalise it. ▶ **Land the rule with BOTH sentences in it**, `width.py` `N4`/`N3b` as the model. ⚠ **And the residue stands: FIVE checkers are still unswept** (`quota`, `citecheck`, `contract_audit`, `preimage_screen`, `fixsurvey`) — `_059` swept `cbaseline_check.py` only. ⓘ Below: ✅ The `N13` defect is real and repaired; ⭐ **a THIRD instance found (`N5`)**. ⛔⛔ **But its RULE as worded is WITHDRAWN — too broad: five correct arms assert a direction legitimately.** Replaced by the Kind-A/Kind-B rule, item 130. ⚠ **Still a manager self-finding, and the sweep was the manager's too** |
 > | ⭐⭐⭐ **F130** | ⓘ opened ⛔ UNREVIEWED (manager self-finding) → ⚠ **CONCLUSION UPHELD / HEADLINE REFUTED** (`_059`) | ✅ **The DRIFT is upheld and independently reproduced** (70 vs 69 at `1cc2c0e`, by `git show`-ing the 31 scanned files rather than by worktree; 69/69 at the two commits before). ⛔⛔ **The headline *"A RATCHET THAT NOTHING EVER INVOKED"* is REFUTED — it WAS invoked, by hand, by name**: two task files instruct the flag and `TASK_PHP_051_REPORT.md:55` records the run *and its output*. ▶ **The surviving claim is *no AUTOMATED caller passed it*.** ⭐ **And it is a BIRTH DEFECT, not a regression** — the guard is in the file's first commit; the un-enforced window is ~32 hours and three commits, not the open stretch the tone implied. ✅ **The 70th hit is FOUND and BENIGN** (`RECAP_PHP.md:1812`, `F127`'s own body quoting the defect to criticise it — item 115's class, **eighth** instance), so the ratchet is honest **retrospectively** too. ✅ All eight adjudications agreed on verdict, **three corrected on their REASON**. ⛔ **Item 134's widening: REFUSED, an eighth time, as framed** |
-> | ⛔ **F131** | ⛔ **UNREVIEWED** — manager self-finding **about this very table**, 2026-09-15 | ⛔ **NOTHING**, and it may not need to enter: it is a document repair, not a research claim. ⚠ **Its one LAYER-shaped clause is the one to review**: *a verdict-shaped phrase in a verdict column is a verdict, whoever wrote it — so self-narrowing must not share a column with review outcomes, because that erases law 12's distinction.* ▶ **Scoped into `_059` §0 by implication, not as a section: the reviewer reads this table to know what it owes, so if the table is wrong the round is wrong** |
+> | ⛔ **F131** | ✅✅ **UPHELD, AND VERIFIED LIVE BY THIS ROUND'S OWN SCOPE** (`_061`) | ✅ **The repair held**: `boxcheck.py` printed `33 rows, 33 distinct, 0 duplicate keys`, so `_061` was correctly scoped **by the artefact this finding repaired**. ⭐ **The only one of the four whose lesson lives in an ARM THAT RUNS, and the only one that has not recurred** — which is §5.0's ruling in one row. ✅ **Its layer-shaped clause may enter**: *a verdict-shaped phrase in a verdict column is a verdict, whoever wrote it* |
 > | ⭐⭐⭐ **F129** | ⓘ opened ⛔ UNREVIEWED (`_058`'s own round) → ⚠⚠ **UPHELD-NARROWED, AND REFUTED IN TWO CLAUSES** (`_059`) | ✅ **The name collision is UPHELD and UNDER-STATED** — the gap is **8.9 pp on `ph29` and 0.01 pp on `ph45`**, so it is a measurement, never a constant, and `F129` picked the row where they nearly agree. ⛔⛔ **Its CORPUS clause is REFUTED in two documents** — `RECAP_PHP.md`'s `ph97` `98.84 % → 64.50 %` and `.memory-php/03-numbers.md`'s own `ph52` figures are the **`W`** one — **so the two quantities are INTERLEAVED INSIDE SINGLE SENTENCES, not separated between documents.** ⛔⛔⛔ ***"INADMISSIBLE" IS WITHDRAWN***: `F74`'s bar is **not a gate** (four documents, one of them the layer, one of them the same cell), and the conjunction **admits** `ph55` `c-gcc` vs `c-gcc-h` where A1 reads `+0.0000 %` against **66.14 `Ir`/call**. ⛔ **§2 mislabelled family B as W1.** ⛔ **§4a's *"zero of five"* is wrong in the SELF-CRITICAL direction — it is two of five.** ✅ Every arithmetic claim reproduced under a tool sharing no code with the original. ⭐ **The manager's `P2` — written against his own strongest clause, marked low confidence — is the one prediction that held** |
-> | ⛔⛔⛔ **F132** | ⛔ **UNREVIEWED** — manager, 2026-09-15, **two of its three instances made by the manager while landing `_059`** | ⛔ **NOTHING.** ⚠ **What a reviewer owes it: is *"adjudicate the set, never the number"* the right repair, or does the paragraph-unit itself need changing?** ⭐ The tool is committed with four must-fire arms and reproduces `F130`'s `1cc2c0e` baseline without a worktree. ⓘ **It is the strongest evidence on file that *"remember to check"* is not a control** — the person who wrote the warning tripped it twice within the hour |
-> | ⭐⭐⭐ **F133** | ⛔ **UNREVIEWED** — manager, measured 2026-09-15 while scoping row 12 | ⭐⭐ **THE STRONGEST LAYER-SHAPED CLAUSE THE PROGRAMME HAS OPENED ABOUT R1h, AND IT IS THE ONE TO ATTACK**: *an R1h is evidence about what was CHOSEN, not always about what was KNOWN* — because here the repair was already correct, in the same file, in use on 7 of 23 call sites, before the bug was filed. ⚠ **Attack the GENERALISATION, not the measurement**: the 2×2 re-runs from a committed probe in ~2 s, so the cheap review is *"does this hold on any other row's R1h, or is `ph96` the only one?"* ⓘ **It commits the ladder to nothing** — it is a C-side finding, and `CLAUDE.md` rule 6 means the Rust rungs' answer is a result whatever it is. ⛔ **Its scope caveat is load-bearing and must survive any quote**: *no repair in the 163-patch CACHE* ≠ *upstream never fixed it* |
-> | ⭐⭐⭐ **F137** | ⛔ **UNREVIEWED** — `_060`, measured, **predicted by nobody** | ⭐⭐⭐ **THE BIGGEST ONE IN THIS BATCH, AND THE ONE TO ATTACK HARDEST**: it states safe Rust's advantage in a currency the ladder's cost columns cannot express — *detection that survives the optimiser* — and it is drawn from **ONE row, ONE defect shape, TWO compilers, ONE box.** ▶ **The cheap falsifier is another row with a null-sentinel adversarial input; `ph97` is the obvious candidate and was NOT swept.** ⚠ **Do not let it be quoted as *"clang miscompiles"*** — the C is UB, so clang is within its rights; the finding is about **detection**, not correctness. ⓘ Its `F3` half (a clean `-O3` run would have read as *defect not reachable*) is the strongest live instance of `F3` on file |
-> | ⭐⭐⭐ **F136** | ⛔ **UNREVIEWED** — `_060`, measured; **refutes the manager's `P1` 4 cells of 4 AND both headlines he offered** | ⭐⭐ **The CONCLUSION is arithmetic over committed records and will survive; the clause to attack is the MECHANISM** — *"the test was already written once in the callee for all seven no-output call sites"* — which is a claim about **why** the price is zero, not that it is. ⚠ **`identity_level=exact` under `c-clang` is the strong evidence and `counts` under `c-gcc` is weaker**; a reviewer should ask whether *counts* hides a real difference `exact` would not. ⭐ **The manager's method lesson is his own and is registered**: *registering both poles of a disjunction does not make the disjunction exhaustive* — he offered "cheaper" and "dearer" as a matched pair and the answer was **neither** |
-> | ⛔⛔⛔ **F135** | ⛔ **UNREVIEWED** — manager **about the manager's own tooling**, 2026-09-15 | ⛔ **NOTHING yet.** ⚠ **What a reviewer owes it: is `st_expect` DERIVED FROM INTENT anywhere else, or is this the only one that was captured from observation?** The registry has exactly one other non-zero expectation (`citecheck`'s BARE `expect=1`) and it is adjudicated — **but nobody has asked the question of the `expect` column as a whole.** ⭐⭐ **Its layer-shaped clause is the one to verdict**: *a ratchet silenced by editing its EXPECTATION is silenced exactly as surely as one silenced by editing its INPUT, and only the second is forbidden in writing.* ⓘ Found by a sweep looking for something else, which is an argument for the sweeps the `F128` residue still owes |
-> | ⛔⛔⛔ **F138** | ⛔ **UNREVIEWED** — manager **about the manager**, 2026-09-16, caught while writing the brief for the round that reviews `F131` and `F132` | ⛔ **NOTHING yet.** ⚠ **What a reviewer owes it, and it is NOT the arithmetic** — the six duplicated keys are checkable in one command. ▶ **Is it a DISTINCT finding from `F132`, or `F132` restated on a second corpus?** ⭐⭐ **The manager's claim that it is distinct rests on one clause**: `F132` is about a ratchet whose count moves for reasons unrelated to its claims, whereas here **the tool was correct and the CALLER discarded the information** — *"I used the tool" is not the defence it sounds like.* ⛔ **If that clause does not hold, `F138` should be MERGED INTO `F132` and not carried separately**, which would be the right outcome and the manager says so in advance. ⓘ Its measured half — raw 9 vs de-duplicated 3 at `f98e716`, corrected max **7 at `1db52a3`, today's number** — is arithmetic over committed records |
-> | ⛔⛔⛔ **F134** | ⛔ **UNREVIEWED** — manager **about the manager**, 2026-09-15, caught in-flight | ⛔ **NOTHING yet, and the manager deliberately did NOT decide its home.** ⚠ **What a reviewer owes it: is a task file's `§3 TRAPS` the right place for a trap a TOOL already guards, or does it belong in `.memory-php/04-process.md` as a law?** ⭐⭐ **It is the sharpest instance on file of a class `F123`'s unverdicted clause also names** — knowledge stored where the CODE meets it is not stored where the PERSON meets it — and **item 129's census is the instrument that would size it.** ⛔ **Do NOT let it be quoted as moving `same_function`'s measured *"1 of 170"*; the manager states in the body that he did not measure that** |
+> | ⛔⛔⛔ **F132** | ⚠ **UPHELD-NARROWED** (`_061`) | ✅ **The repair is right and the tool is committed.** ⛔ ***"Never the number"* is over-stated by its own evidence**: the bare run **failed loudly and stopped the manager mid-edit**, which is the count working. ▶ **The count is a valid TRIPWIRE and an invalid ADJUDICATION** — that distinction is what may enter, not the absolute. ⓘ **Its durable home already exists as an arm that prints** (`cbaseline_diff.py`); §5.0 rules that no document would have helped |
+> | ⭐⭐⭐ **F133** | ⚠ **UPHELD-NARROWED · ⛔⛔ TITLE REFUTED** (`_061`) | ⛔⛔ ***"BY ONE AUTHOR"* has no support in the record and the record cuts against it** — two named authors on one file, a third as last committer, a different one on the other. ✅ *"In one file"* stands. ▶ **The rule is re-worded to *what was CHOSEN, not always what was DISCOVERED*** and (iii) re-grounded on (i). ✅✅ **(i) GENERALISES: `ph56`'s repair also copies a sibling arm** (`BP_VAR_R`/`BP_VAR_UNSET` already guarded) — **two rows, and the answer was in a committed control's own header at zero cost.** ⛔ A third row has no instrument; **the cheap generalisation is a grep per row, NOT ten censuses** |
+> | ⭐⭐⭐ **F139** | ⛔ **UNREVIEWED** — reviewer-found (`_061` §3.3), manager-verified independently 2026-09-16 | ⭐⭐⭐ **THE MEASUREMENT IS SETTLED AND IS NOT WHAT A REVIEWER OWES IT**: the wrong build is checkable in three commands and I ran all three. ⚠ **What IS owed is the INFERENCE `_061` §5.0 hangs on it** — *four homes, four failures, therefore location is not the variable.* ▶ **Attack the n.** Four instances, all from one programme and largely one author, is a small sample for a claim that general; and the comparison has **no positive control** — nobody has asked how many traps in these same four homes DID hold. ⛔ **If that control is missing the ruling is an argument from silence**, and the ruling is what closed item 129 as a blocker. ⓘ **It commits the ladder to nothing** — a process finding. ⭐ Its one durable clause may be simply *`F127` is now at three instances, and this is the first where corrected and re-broken text share an author within one day* |
+> | ⭐⭐⭐ **F137** | ⚠⚠ **CLAUSE 1 UPHELD · ⛔⛔ CLAUSE 2 REFUTED · ⛔ CLAUSE 3 REFUTED-AS-WRITTEN, UPHELD-ON-NEW-GROUND** (`_061`) | ⛔⛔⛔ **Refuted by the row it named as its own falsifier**: `ph97`'s C rung faults in **all eight** builds. ⛔ **And it named the wrong input** — `adversarial-nullvalue.bin` is clean in all eight; the faulting one is `absent`, as the row's own `gen.py` says. ✅ **What may enter is the NARROWED rule, which is stronger as a rule and weaker as a headline**: *an optimiser can convert a detected fault into a silent wrong answer when the UB licenses folding a **branch** whose outcome is the answer, and does not when the faulting load's **value IS** the answer* — with `ph97` as the negative instance **in the same sentence**. ⛔ **NOT the two tables as parallel**: the C row is the shipped R1, the Rust row a guard-deleted **mutant that is no rung**. ⓘ The third outcome (**hung**) is real and is on the Rust side |
+> | ⭐⭐⭐ **F136** | ✅ **CONCLUSION UPHELD AS MEASURED · ⛔⛔ HEADLINE REFUTED · ⭐⭐ MECHANISM UPHELD AND UNDER-STATED** (`_061`) | ⛔ ***"IS FREE" IS AN `A1, O3/isolated` FACT.*** At `O0/isolated` in **W1** the two repairs differ by `−2.24`…`−19.58 Ir/call` on four cells while A1 reads `+0.0000`, and **upstream's no-output repair is the DEARER one**. ✅ **The four published cells reproduce to the digit** — it is the TITLE that travels past its cell. ✅ **Mechanism measured per symbol for the first time**: `−83 419` leaves the callee, `+38 581` arrives in the caller, **`+0` in `kernel`**, which is exactly why A1 saw none of it. ▶ **May enter with the INLINING narrowing in the same sentence**; ⛔ not the bare *"free"*. ⚠ **Item 137's live consequence** |
+> | ⛔⛔⛔ **F135** | ✅ **CONCLUSION UPHELD · ⛔ *"EXACTLY AS SURELY"* REFUTED** (`_061`) | ✅ **§0.1's population reproduces exactly**; `citecheck.py`'s `expect=1` is the only observation-captured expectation left. ⛔ **The two mechanisms are not equally severe**: editing the INPUT destroys evidence, editing the EXPECTATION leaves the failure fully visible — and this finding was itself recovered from the registry text. ⛔⛔ **A LIVE THIRD MECHANISM FOUND**: `width.py` and `php_null.py` — **the two files law 16 calls the model** — ship passing `--selftest`s the registry never runs, so `st_expect: None` conflates *has none* with *has one, unfiled*. ✅ **Lands as a CLAUSE ON LAW 6, not a new law** |
+> | ⛔⛔⛔ **F138** | ⚠ **CONCLUSION UPHELD (keep SEPARATE from `F132`) · ⛔⛔ REASON REFUTED IN ITS LOAD-BEARING WORD** (`_061`) | ⛔⛔ ***"I DID RUN THE TOOL" IS FALSE.*** `boxcheck.py`'s `main()` already prints the members, in a line the manager wrote **the day before** as part of `F131`'s own repair; what ran was a bespoke sweep that reimplemented the reporting path. ⭐⭐ **That makes it MORE distinct from `F132`, on a ground it did not state**: `F132` = *a count standing in for a set* (remedy: **diff the set**); this = *a one-off caller not inheriting the checker's reporting* (remedy: **run the checker**). ▶ **The corrected lesson: *"I called the tool's function" is not "I ran the tool."*** ⛔ Its de-dup rule is the right answer from the wrong rule, and its falsy-return residue is refuted in mechanism (`len(None)` raises) |
+> | ⛔⛔⛔ **F134** | ✅ **DISCLAIMER CLEAN · ⛔ ITS REMEDY REFUTED** (`_061`) | ✅ **The body does carry its own caveat and nothing else implies otherwise** — the *"1 of 170"* disclaimer is clean, read end to end. ⛔⛔ **Its remedy — *move the trap to where a PERSON meets it* — is REFUTED BY `F139`**, which is that remedy's experiment: a person-facing protocol section, in capitals, lost by 9h25m to its own author. ✅ **Its core sentence survives as prose** (*a trap documented only where the code meets it is documented for the code*); ⛔ **the converse it implies does not** |
 >
 > #### ⭐⭐⭐ `F96`, PER GROUP — **SEVEN groups, not the four I wrote** (`_055` §1.1)
 >
@@ -1935,6 +1936,48 @@ The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
 
+### F139 — ⭐⭐⭐ **A CAUTION WHOSE ENTIRE CONTENT IS *SAY WHICH BUILD* NAMED THE WRONG BUILD, NINE AND A HALF HOURS AFTER ITS OWN AUTHOR CORRECTED THAT EXACT CLAUSE IN THE PROTOCOL — AND IT IS THE EXPERIMENT THAT ANSWERS *WHERE DOES A TRAP LIVE?***
+
+⚠ **`TASK_PHP_061` §3.3, reviewer-found, manager-verified independently
+2026-09-16. UNREVIEWED as a finding; its measurement is settled.**
+
+`F133`'s `§A3a` caution read *"the binary is php-in-safe-rust's **oracle** build
+(**`-O3 -march=native -flto`**, mysql+webext)"*. ⛔ **It is not.**
+
+| | measured |
+|---|---|
+| what the probe actually runs | `.tasks-php/probes/ph96_arrayaccess_matrix.sh:63` defaults to the **plain** `php-5.0.0-mysql-webext` |
+| which binaries carry those flags | **only** the `-O3lto` and `-maxlto` siblings — they are the only two with a `.buildinfo` |
+| the plain binary's own flags | **no `.buildinfo` at all**; its `config.status` says **`-O0`** |
+
+⛔⛔⛔ **AND THE CORRECTION WAS ALREADY IN THE PROTOCOL, IN CAPITALS, IN THE
+SECTION `F133` CITES.** `PROTOCOL_PHP.md` §A3a: *"⛔⛔ **THIS CLAUSE SAID
+`-O3 -march=native -flto` FOR ONE DAY.** Those flags are the SIBLING variants'
+… the plain binary has none and its `config.status` says `-O0`. ⭐ **The caution
+whose whole point is *say which build* named the wrong build** — `F127`."*
+
+**Dates, from `git log`:** the protocol correction landed at **`1cc2c0e`,
+2026-09-15 07:47**. `F133` landed at **`46560f9`, 2026-09-15 17:12**.
+▶ **Nine hours and twenty-five minutes. Same author. Same day.**
+
+⭐⭐⭐ **WHY THIS IS THE ROUND'S BIGGEST RESULT AND IS NOT ABOUT `ph96` AT ALL.**
+`F134` proposed a remedy — *move a trap out of the tool docstring to where a
+PERSON meets it* — and **`F139` is that remedy's experiment, run by accident.**
+The knowledge was in a person-facing prose document, **in capitals**, in the
+very section the finding cites, written **that morning** by the person who broke
+it **that afternoon**. ▶ **The person-facing document lost.** That is the
+evidence `_061` §5.0's ruling rests on, and a ruling whose evidence is buried in
+a review report will not survive the next round — which is why this is a finding
+and not a footnote.
+
+✅ **REPAIRED IN BOTH HOMES, and the second one is the point**: the `RECAP_PHP.md`
+caution **and the probe's own header comment**, which repeated the wrong flags
+seven lines above the line that defaults to the right binary. ⛔ **Two homes for
+one fact, and both were wrong in the same way** (`F131`).
+
+ⓘ **`F127` is now at three instances**, and this one is the first where the
+corrected text and the re-broken text had the **same author within one day**.
+
 ### F138 — ⛔⛔⛔ **I RAN THE TOOL AND STILL PUBLISHED A FALSE SUPERLATIVE, BECAUSE I CONSUMED ITS CARDINALITY AND NEVER PRINTED ITS MEMBERS: THE BACKLOG "PEAK 9" IS SIX ROWS OF DOUBLE-COUNTING, AND THE DOUBLE-COUNTING IS `F131`'s OWN DEFECT**
 
 ⚠ **Manager about the manager, 2026-09-16, caught while scoping `_061` —
@@ -1961,18 +2004,39 @@ than of any backlog. ⛔ **The corrected maximum in the window is `7`, at
 `1db52a3` — which is TODAY's number**, so *"the second-largest ever"* is wrong
 in the other direction too: **today ties the record.**
 
-⚠⚠ **THE PART THAT MAKES THIS A FINDING AND NOT AN ERRATUM: I DID RUN THE
-TOOL.** `rule9_rows` returns the **set**; I took `len()` of it and never looked
-at the members. **One `print` of the set at `f98e716` would have shown
-`F120 … F125` sitting in it and ended the question in a second.**
+⛔⛔ **THE PART THAT MAKES THIS A FINDING AND NOT AN ERRATUM — AND MY FIRST
+STATEMENT OF IT WAS WRONG, REFUTED BY `_061` §5.0a IN ITS LOAD-BEARING WORD.**
 
-> ⭐⭐⭐ **THE RULE, AND IT IS `F132`'s ONE LEVEL UP: *ADJUDICATE THE SET, NEVER
-> THE NUMBER* APPLIES TO THE RULE-9 INDEX TOO — AND "I USED THE TOOL" IS NOT
-> THE DEFENCE IT SOUNDS LIKE.** A tool that returns a set and is consumed for
-> its cardinality has been **converted back into an unchecked number** by its
-> caller. ⛔ **`F132` was written by the manager, about the manager, eight days
+> ⛔ ~~*"I DID RUN THE TOOL. `rule9_rows` returns the set; I took `len()` of it.
+> One `print` of the set would have ended the question."*~~ **FALSE. THE TOOL
+> WAS NOT RUN.** `.tasks-php/boxcheck.py`'s `main()` **already prints the
+> members** — `… open cycle(s): {" ".join(open_cycles)}` — and
+> `git log -S` dates that line to **`c868e60`, 2026-09-15 14:43**, which is
+> **`F131`'s own repair, written by me the day before.** ▶ **What I ran was a
+> bespoke sweep that imported `rule9_rows` and reimplemented the reporting path
+> badly.**
+
+> ⭐⭐⭐ **THE CORRECTED RULE, AND IT IS SHARPER THAN MINE WAS:
+> *"I CALLED THE TOOL'S FUNCTION" IS NOT "I RAN THE TOOL."*** ⭐⭐ **And that
+> makes `F138` MORE distinct from `F132`, not less, on a ground it did not
+> state**: `F132` is *a count standing in for a set* and its remedy is **diff
+> the set**; this is *a one-off caller not inheriting the checker's reporting*
+> and its remedy is **run the checker**. ✅ **Verdict: keep them separate.**
+> ⛔ **`F132` was written by the manager, about the manager, eight days
 > earlier; this instance was made WHILE WRITING THE BRIEF THAT ASKS A REVIEWER
 > WHERE `F132`'s LESSON SHOULD LIVE.**
+
+⚠ **Two further corrections from the same round, applied rather than appended:**
+**(a)** my de-duplication rule — *a key with two rows has been verdicted in one
+of them* — is the **right answer from the wrong rule**; it holds only because
+every duplicated key happened to have one verdicted row. ▶ **The structural rule
+needs no heuristic: the backlog is the distinct KEYS no row of which carries a
+verdict.** **(b)** my *"a tool returning a falsy value for 'cannot answer'
+invites the `len()` mistake"* is **refuted in its mechanism** — `rule9_rows`
+returns `(None, None)` and **`len(None)` raises**, so it is loud, not silent.
+✅ **The recommendation survives for the SERIES** (twelve no-parse commits are
+UNKNOWN, never 0) **but not for that reason, and the tool needs no repair for
+it.**
 
 ⛔⛔ **AND IT PROPAGATED INTO A TASK FILE BEFORE IT WAS CAUGHT** —
 `TASK_PHP_061.md` §0 carried *"a measured peak of 9"* as a premise.
@@ -2001,8 +2065,13 @@ adversarial input:
 
 Above `-O1`, clang propagates *`retval` is non-NULL* backwards from the
 dereference and the sentinel path returns `18121308747923605504` where the
-correct answer is `15642763268152511488`. **No crash, no diagnostic, a wrong
-checksum.**
+**R1h** answers `15642763268152511488`. **No crash, no diagnostic, a wrong
+checksum.** ⚠ **The control's own wording is the one to quote and it is
+sharper**: *"SILENT WRONG ANSWER — **UB exploited, not lowered**"*
+(`controls/widened_domain.py:202`). ⛔ **Do NOT let this be read as *"clang
+miscompiles"*: the C is UB and clang is within its rights** — and *"the correct
+answer"* over-states it, because a program with UB has no correct answer. **The
+finding is about DETECTION, not correctness.**
 
 ⭐⭐ **THAT IS `F3` — *a clean run is not evidence of absence* — FIRING LIVE, on
 a row that carries a faulting run to compare it against.** ▶ **A reviewer who
@@ -2023,15 +2092,91 @@ detection is the only one invariant across `-O0..-O3`. ⚠ **This is the first r
 where safe Rust's advantage is stated in a currency the ladder's cost columns
 cannot express at all** — which is a **finding**, not a gap (`CLAUDE.md` rule 6).
 
-⚠ **What a reviewer owes it**: the sweep is one row, one defect shape, two
-compilers on one box. ▶ ***Does it generalise?*** The cheap test is any other
-built row with a null-sentinel adversarial input; `ph97` is the obvious first
-candidate and was not swept.
+⚠ ~~**What a reviewer owes it**: … `ph97` is the obvious first candidate and was
+not swept.~~ ✅✅ **SWEPT AT `_061` §1.2 — AND IT REFUTED THE GENERALISATION.**
 
-### F136 — ⭐⭐⭐ **THE CONTRACT THAT CANNOT BE MISUSED IS FREE — AND IT IS FREE BECAUSE THE TEST IT APPEARS TO DELETE WAS ALREADY WRITTEN ONCE, IN THE CALLEE, FOR ALL SEVEN NO-OUTPUT CALL SITES**
+> ⛔⛔⛔ **CLAUSE 2 — *"a property of the C-vs-Rust ladder, not of `ph96`"* — IS
+> REFUTED BY THE ROW THIS FINDING NAMED AS ITS OWN FALSIFIER.** On `ph97`'s
+> `adversarial-absent.bin`, built the same way, the C rung **faults in all eight
+> builds**: gcc `SIGSEGV (nil)` at every `-O`, clang `SIGSEGV (nil)` at `-O0`/
+> `-O1` and `SIGSEGV 0x1` at `-O2`/`-O3`. **No silent answer anywhere.**
+>
+> ⛔⛔ **AND THIS FINDING NAMED THE WRONG INPUT.** *"Any row with a
+> null-sentinel adversarial input"* pointed at `ph97`'s file literally called
+> `adversarial-nullvalue.bin` — **eight builds, eight clean runs.** The faulting
+> input is `adversarial-absent.bin`, and `ph97`'s own `inputs/gen.py` says so.
+> ▶ **A reviewer picking by NAME would have reported `F137` refuted for the
+> wrong reason.** ⭐ `F134`'s class, inside this finding's own falsifier.
+>
+> ⭐⭐⭐ **WHAT SURVIVES IS STRONGER AS A RULE AND WEAKER AS A HEADLINE — and
+> the `-O2` clang boundary is REAL ON BOTH ROWS** (`ph97`'s `si_addr` moves
+> `(nil) → 0x1` at exactly `-O2`, where `ph96` goes silent). **What differs is
+> the consequence, and the discriminator is where the faulting load sits:**
+>
+> > *An optimiser can convert a **detected** fault into a **silent wrong
+> > answer**, and whether it does is compiler-, level- and **row**-dependent. It
+> > happens when the UB licenses folding a **branch** whose outcome is the
+> > answer; it does not happen when the faulting load's **value IS** the answer.*
+>
+> `ph96`'s sentinel feeds `if (!retval)` — a foldable branch. `ph97`'s is passed
+> into a byte loop whose result is the answer — **nothing to fold**, so the
+> optimiser can only reorder, which is what `si_addr` `0 → 1` looks like.
+>
+> ⚠⚠ **AND THE TWO TABLES ABOVE ARE NOT PARALLEL, WHICH THIS FINDING MUST SAY.**
+> The **C** table's build-dependent rung is the **shipped R1**; the **Rust**
+> table's is a **guard-deleted mutant that is no rung of the ladder** — the
+> shipped `unsafe.rs` answers correctly at all four levels on both rows. ▶ **So
+> *"unsafe Rust buys back C's failure mode"* is a claim about a HYPOTHETICAL R4
+> that spells the defect, not about either row's R4 as built.**
+> ⓘ ⛔ **The manager's own correction here was ALSO wrong**: `_061` §1.3 shows
+> `ph97`'s variant *is* a guard-deleted mutant of the shipped rung, same
+> construction as `ph96`'s — the JSON's `source:` field names the **base**, not
+> the program. **`F134`'s class three levels deep in one round: the finding, the
+> brief's correction of it, and the brief's correction of its own correction.**
+>
+> ⭐ **And the third outcome the two-way split has no room for is real, on the
+> Rust side, in `ph97`'s committed `rust_bug.json`**: `O0` rc `−6`, then
+> **`TIMEOUT`** at `O1`/`O2`/`O3`. **Not detected, not silent — hung.**
+
+### F136 — ⭐⭐ **THE CONTRACT THAT CANNOT BE MISUSED IS FREE *ONCE IT INLINES* — AND UN-INLINED IT IS NOT FREE, AND UPSTREAM'S SPELLING IS THE DEARER ONE**
 
 ⚠ **`TASK_PHP_060`, measured. ⛔ IT REFUTES THE MANAGER'S `P1` IN FOUR CELLS OF
-FOUR **AND** BOTH HEADLINES HE OFFERED. UNREVIEWED.**
+FOUR **AND** BOTH HEADLINES HE OFFERED.** ⚠ **REVIEWED AT `_061`: conclusion
+upheld as measured, MECHANISM upheld and under-stated, ⛔⛔ HEADLINE REFUTED.**
+
+> ⛔⛔⛔ **THE TITLE SAID *"IS FREE"* FULL STOP, AND THAT GENERALISES PAST THE
+> CELL IT MEASURED.** `_061` §2.2 took this finding's own closing parenthesis —
+> *"and inlining erases even that"* — as the **forward prediction** it is, and
+> ran the same control with `-O3` changed to `-O0`. Checksums equal in all 24
+> runs, so every difference is a price:
+>
+> | statistic | cell | `guard − noout`, `c-gcc` `small`/`large` | `c-clang` `small`/`large` |
+> |---|---|---|---|
+> | **A1** | `O3/isolated` | `+0.0000` / `+0.0000` | `+0.0000` / `+0.0000` |
+> | **A1** | `O0/isolated` | `+0.0000` / `+0.0000` | `+0.0000` / `+0.0000` |
+> | **W1** | `O3/isolated` | `+0.0000` / `+0.0000` | `+0.0000` / `+0.0000` |
+> | ⛔ **W1** | **`O0/isolated`** | **`−2.2419` / `−19.5768`** | **`−0.7397` / `−6.5296`** |
+>
+> (**`c-gcc`** `−0.1370 %` / `−0.1417 %` and **`c-clang`** `−0.0565 %` /
+> `−0.0584 %`, W1, `O0/isolated`, base `noout`, **both C columns named**.)
+> ⭐ **It is real work, not startup noise**: the deltas are **not** proportional
+> to driver calls but to **records processed** — `0.3203` and `0.3157` Ir/record
+> under **`c-gcc`**, `0.1057` and `0.1053` under **`c-clang`**. **Two inputs,
+> one constant, per compiler.**
+>
+> ▶ ⭐⭐⭐ **THE CORRECTED CLAIM: the price is zero BECAUSE BOTH SPELLINGS INLINE
+> INTO ONE SYMBOL. Un-inlined they differ — and in the direction the finding
+> ruled out: upstream's no-output repair is the DEARER of the two.**
+> ✅ **The published figures are NOT wrong** — every one of the four cells
+> reproduces to the digit and the finding names its cell. **It is the TITLE and
+> the body's *"the price is exactly zero"* that travel past it.**
+>
+> ⚠⚠ **AND THIS IS OPEN ITEM 137's LIVE CONSEQUENCE, WHICH IT DID NOT HAVE
+> WHEN I REGISTERED IT.** `ph96` publishes **`A1` only**. At `O0/isolated` the
+> two statistics disagree in the strongest possible way — **A1 reads `+0.0000`
+> against a sign-stable, scaling W1 difference on four cells** — which is the
+> `ph55` counterexample already on file, **reproduced on `ph96`, on this
+> finding's own quantity.**
 
 The two upstream-attested repairs of `I12/O1` (`F133`) priced against each
 other — **A1, `O3/isolated`, base = `noout` (upstream's own strategy), BOTH C
@@ -2057,6 +2202,23 @@ from `zend_interfaces.c:94`'s contract onto `:88-93`'s, where `:89`'s
 inlining erases even that. ⭐ **`cf020f133487` is therefore best read not as
 *deleting a test* but as *moving a call site onto a contract whose test is
 already written*.**
+
+✅✅ **UPHELD AND UNDER-STATED — AND NOW MEASURED PER SYMBOL, WHICH IT NEVER
+WAS** (`_061` §2.3, `callgrind_annotate` per function on the two `-O0` builds;
+gcc, `small.bin`, 20 000 calls):
+
+| symbol | `noout` | `guard` | delta |
+|---|---:|---:|---:|
+| `ph96_call_method` — the callee, `:88-93`'s home | 4 977 962 | 4 894 543 | **−83 419** |
+| `ph96_unset_dimension` — the caller, `:512` | 873 429 | 912 010 | **+38 581** |
+| `kernel` — **the A1 symbol** | — | — | **+0** |
+| **whole program** | | | **−44 838** |
+
+**At `-O3`: no symbol differs at all.** ▶ ⭐⭐ **The structural story is now a
+number — 83 419 `Ir` leaves the callee and 38 581 arrives in the caller — and
+it under-states in one direction: the two contracts are NOT the same amount of
+work.** The callee's `:88-93` disposal costs **more** than the caller's guard.
+⛔ **And `+0` in `kernel` is exactly why A1 could not see any of it.**
 
 ⛔⛔ **BOTH OF THE MANAGER'S OFFERED READINGS ARE UNSUPPORTED**, and he offered
 them as a matched pair so that either would be a result: *removing the output is
@@ -2158,7 +2320,23 @@ still-unverdicted clause has, and item 129's census is the instrument.**
 reading outside the tool's path, and whether `235e6c0afe1d` is even in that 170
 **I did not measure.** ⛔ **Do not quote this finding as moving that number.**
 
-### F133 — ⭐⭐⭐ **BOTH CORRECT SPELLINGS OF AN OBLIGATION AND BOTH WRONG ONES LIVED IN ONE FILE, BY ONE AUTHOR: THE 2005 REPAIR OF `ph96` CONSISTS OF COPYING A SIBLING 99 LINES UP, AND THE UNMISUSABLE CONTRACT WAS ALREADY SUPPORTED IN THE VULNERABLE TREE**
+### F133 — ⭐⭐⭐ **BOTH CORRECT SPELLINGS OF AN OBLIGATION AND BOTH WRONG ONES LIVED IN ONE FILE: THE 2005 REPAIR OF `ph96` CONSISTS OF COPYING A SIBLING 99 LINES UP, AND THE UNMISUSABLE CONTRACT WAS ALREADY SUPPORTED IN THE VULNERABLE TREE**
+
+> ⛔⛔ **THE TITLE SAID *"IN ONE FILE, BY ONE AUTHOR"* AND THE SECOND HALF IS
+> REFUTED FROM THE CITATION BASE** (`_061` §3.2). Measured from the pinned
+> tarball: `zend_object_handlers.c` (all four call sites) carries
+> **`Authors: Andi Gutmans, Zeev Suraski`** with **`wez`** as last `$Id`
+> committer; `zend_interfaces.c` (the contract) carries **`Marcus Boerger`** /
+> **`helly`**. **Two named authors on one file, a third as last committer, and a
+> different one on the other. There is no git history in a tarball.**
+> ✅ ***"IN ONE FILE" IS TRUE*** of the four call sites and is kept.
+> ⭐ **What IS establishable is weaker and is the one the bytes support**: the
+> **fixer** is Boerger (`cf020f133487`, 2005-03-19), who authored the file the
+> contract lives in — **evidence that the person who APPLIED the repair knew the
+> contract, not that whoever WROTE the defective call sites did.**
+> ▶ ⭐⭐ **SO (iii) IS RE-GROUNDED ON (i) AND THE RULE IS RE-WORDED: an R1h is
+> evidence about what was CHOSEN, not always about what was *DISCOVERED*** —
+> *"known"* was a claim about minds that the corpus cannot carry.
 
 ⚠ **Manager, measured 2026-09-15 while scoping row 12, from the pinned tarball
 and the 5.0.0 oracle. UNREVIEWED. This is a C-side finding; it commits the
@@ -2206,9 +2384,28 @@ where the source says it must, and the address discriminates siblings."*
 programme reads an R1h as *the repair upstream eventually found*. Here the repair
 was **available, correct, in the same file, and already in use on 7 of 23 call
 sites before the bug was filed.** ▶ ***An R1h is evidence about what was CHOSEN,
-not always about what was KNOWN*** — and row 12 is the first row that can price
-**two** upstream-attested repairs of one obligation against each other
+not always about what was DISCOVERED*** — and row 12 is the first row that can
+price **two** upstream-attested repairs of one obligation against each other
 (`_060` §2.6: `NULL`-passing vs guarding).
+
+✅✅ **AND (i) GENERALISES TO A SECOND ROW AT ZERO COST** (`_061` §3.4). `ph56`
+is the only other row shipping a `census` control, and its `census.json`
+`evidence.guards` — measured against the pinned tarball — says **`BP_VAR_R` and
+`BP_VAR_UNSET` already carried the guard in pristine 5.0.0**, while
+`1e708a5aeb30` adds it to **`BP_VAR_IS` only**. ▶ **On `ph56` too the repair was
+already written, in the same `switch`, in the same file, before the bug was
+filed: the fix copies a sibling arm.** ⭐⭐ **And `ph56` answers the authorship
+half in the OPPOSITE direction, which is why (iii) had to be re-grounded**: its
+own docstring records the sibling defect fixed *"11½ months later, at RUNTIME,
+in a different file, **by a different author**"* (Dmitry Stogov). ▶ **Where the
+corpus can speak about authorship at all, it says the repairs of one construct
+come from different hands.** ⛔⛔ **THE ANSWER WAS IN A COMMITTED CONTROL'S OWN
+HEADER AND COST NOTHING — `F134`'s class, fourth instance in one round.**
+⚠ **A third row has no instrument**: the other ten ship no census, and building
+one is **an estimate of one task per row, explicitly not measured.** ▶ **The
+cheap half is free and is what to dispatch** — *"was the R1h's strategy already
+present elsewhere in the same construct?"* is one `grep` per row against the
+pinned tarball. **Do NOT dispatch ten censuses.**
 
 ⛔⛔ **TWO THINGS THE CATALOGUE ENTRY GETS INCOMPLETE, BOTH REPORTED NOT
 REPAIRED** (`patterns-php/` is the engineer's to edit, and `CATALOGUE.md` is a
@@ -2239,7 +2436,7 @@ landed artefact):
 > ▶ ⭐ **AND THE SECOND LIMB IS ROUTED TO THE CATALOGUE AS A CANDIDATE ROW, NOT
 > KEPT AS A LIMB OF `ph96`** — manager's ruling, 2026-09-15, written in place in
 > `patterns-php/ph96-outparam-unwritten/NOTES.md` §5 where the question was
-> asked. Same obligation, different site, **no known repair**. ⛔⛔ **The ruling
+> asked. Same obligation, different site, **no repair IN THE CACHE** — ⚠ **not *no known repair*, which is the phrase that will travel badly: that is the 163-patch screened corpus, not php-src's full history** (`F10`). ⛔⛔ **The ruling
 > also records that the tension was the MANAGER'S DEFECT**: `TASK_PHP_060` §2.5
 > said *"model the CONTRACT, not the site"* while pinning an R1h that repairs
 > one of the two faulting shapes, and those cannot both be honoured. **The rule
@@ -2247,8 +2444,13 @@ landed artefact):
 > input may only exercise a shape the row's R1h repairs.**
 
 ⚠⚠ **THE TWO §A3a CAUTIONS TRAVEL WITH EVERY NUMBER ABOVE**: the binary is
-php-in-safe-rust's **oracle** build (`-O3 -march=native -flto`, mysql+webext),
-**not** a museum-default 5.0.0; and **a clean run would NOT have been evidence of
+php-in-safe-rust's **oracle** build — ⛔⛔ **THIS SAID `-O3 -march=native -flto`
+AND THAT IS THE WRONG BUILD, SEE `F139`. The probe runs the PLAIN
+`php-5.0.0-mysql-webext`, which carries no `.buildinfo` at all; only the
+`-O3lto` and `-maxlto` siblings do, and the plain binary's `config.status` says
+`-O0`.** ▶ **Quote it as *the oracle build, plain `mysql-webext`, flags not
+recorded in a `.buildinfo`*, and say that rather than guessing** — **not** a
+museum-default 5.0.0; and **a clean run would NOT have been evidence of
 absence** (F3). ⭐ **A faulting run is evidence of presence — and here two
 non-faulting cells are evidence that the two correct spellings WORK, in the
 vulnerable binary, which is the half that makes this a 2×2 rather than a pair.**
@@ -8386,7 +8588,7 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 ## Open items — carried, not closed
 
 ⚠ **THE NUMBERS HAVE GAPS AND THAT IS CORRECT — DO NOT "REPAIR" THEM.**
-**134 rows present, numbered 1 → 138, with 45–47 and 106 ABSENT** and a
+**136 rows present, numbered 1 → 140, with 45–47 and 106 ABSENT** and a
 growing set retired IN PLACE as `~~N~~`; no number is ever reused.
 ⛔⛔ **THIS LINE READ *"130 rows, 1 → 134"* UNTIL 2026-09-16 while the check
 below printed `133 rows, max 137`** — items **135, 136 and 137 were appended in
@@ -8597,3 +8799,5 @@ the wrong one.
 | 136 | ⛔⛔ **`quota.py`'s `CLOSED` LABEL WAS UNREACHABLE FROM THE DAY IT WAS WRITTEN, AND FOUR FAMILIES HAVE BEEN PRINTING THE OPPOSITE OF WHAT THEY MEAN** | Manager, 2026-09-15, found while landing row 12. The line read `if need == 0: st = 'open' if nb >= target else 'CLOSED'` — and `need` is `max(0, target - nb)`, so **`need == 0` IS `nb >= target`**: the guard and the ternary tested the same condition, the ternary was a constant, and **`CLOSED` could never print.** ⭐⭐ **HOW IT WAS CAUGHT, AND IT IS THE ONLY REASON IT WAS**: the manager wrote *“T6 ✅CLOSED”* into the START HERE box and checked it against the tool, which said `open`. ▶ ***A tool and a document disagreeing is the cheapest defect detector this programme has, and it only works if the document is checked against the tool rather than written from memory*** — ⛔ **the THIRD time in this one session that a tool's output and the manager's prose disagreed** (`F134`'s hunk label, `F135`'s expected exit code, this). ✅ **REPAIRED, with the intent stated as INFERRED**: once quota is met, `open` = the family can take more catalogued rows, `CLOSED` = all of them are built. **That is the only reading under which `CLOSED` is reachable.** ⓘ **It changes no label today** — no family is exhausted, so the defect was **vacuous now and would have mislabelled the FIRST exhausted family**. ⭐ §H honoured: `family_status` extracted PURE so the new `N6` drives the real code and not a copy (5 cases, both labels, both singleton shapes), plus `N6b` which tests reachability **from the live catalogue** and **declares itself vacuous** rather than passing silently. ⚠⚠ **THE CLASS, AND IT IS THE POINT: a dead branch and a correct branch are indistinguishable from outside.** Every quota-met family printed `open`, which is what a reader expected for most of them, so the wrong label never showed. ⓘ Same shape as `F135` — a check that could not do its job, passing quietly — and the second instance today |
 | 137 | ⭐⭐ **THE RULE IS *“PUBLISH BOTH, LABELLED, ALWAYS”* AND SEVEN OF TWELVE ROWS DO NOT — INCLUDING ONE THAT DECLINED DELIBERATELY AND JUSTIFIED IT. IS THE RULE NARROWER THAN ITS OWN WORDING?** | Manager, 2026-09-16, exposed by the pre-compact audit that corrected the `which statistic` cell. **Measured across all 12 rows**: `W1` appears in `NOTES.md` for `ph45`, `ph52`, `ph53`, `ph55`, `ph56` — **five**. It appears **zero** times for `ph03`, `ph07`, `ph16`, `ph64`, `ph96`, `ph97` and once for `ph29`. ⭐⭐ **`ph96` IS THE INTERESTING ONE BECAUSE IT DECLINED ON PURPOSE AND SHOWED ITS WORKING**: `_060` §8 computed the 16-cell share matrix FIRST, found the two differences the row leans on hardest are **exactly zero** (which `A1` resolves trivially) and the rest between cells at 91–97 % `W`, and concluded *“`A1` is the resolving statistic for this row and every figure here is published in it.”* ▶ **That is either (a) a violation of a rule that says ALWAYS, or (b) evidence the rule's real content is *measure both, publish the one that RESOLVES, and show the matrix that proves which* — which is what `F108`/`STATISTICS_001.md` argue for and NOT what the cell's wording says.** ⚠⚠ **THE MANAGER DOES NOT RULE THIS AND SHOULD NOT**: the wording is in the `which statistic` cell, the argument is in `STATISTICS_001.md`, and deciding between them by fiat would settle a measurement question with a preference. ▶ **It is a REVIEWER's, and it belongs in the round the backlog already owes.** ⓘ **If (b) wins, the residue framing changes too**: the thing a row owes is the MATRIX, not the second column — and `ph07`, `ph53`, `ph64` ship neither, which is why they stay the residue under either reading. ⓘ **Registered rather than fixed, because a question routed to nobody is one nobody answers** (`F123`; `_059` found one buried in a row's `NOTES.md` that the manager then contradicted in print) |
 | 138 | ⛔⛔ **`task_cost.py`'s `060` ENTRY CARRIED TWO GENERATIONS OF ITS OWN COMMENT — THE LANDED TEXT, AND THE PENDING-ERA DRAFT IN THE FUTURE TENSE BELOW IT** | Manager, 2026-09-16, found while registering `_061` in the same ledger. The stale half read *“▶ WHEN THE ROW GATES, do BOTH in one edit”* and *“It WILL then carry two extras”* — **written before `ph96` gated, and left in place under the landed text when it did.** ⭐⭐ **IT SAT BELOW THE LIVE VERSION, WHICH IS THE WORST PLACE FOR IT**: a reader scrolling to the nearest copy gets the oldest, which is the reason the *“backlog trend”* prefix in the RULE-9 block was struck for the same shape. ▶ **Item 73 — a correction APPENDED instead of APPLIED — made by the manager IN THE EDIT THAT LANDED THE ROW**, i.e. `F131`'s class inside the cost ledger. ✅ **REPAIRED BY REPLACEMENT, not striking**: the surviving text keeps the one clause the stale draft said better (`_058`'s rule *a control a row should have shipped with is that row's debt*, named rather than alluded to) and drops the rest. ⓘ **The draft's closing question is ANSWERED, which is why it could not stay** — *“ph97 came in at 1.00; that is the comparison to watch”* — both `T6` rows cost 1.00. ⚠⚠ **NOT A NUMBERS DEFECT: every figure `task_cost.py` prints was and is correct** (`--selftest` PASS across the edit, `N14` gated rows = `ROWS` = 12). **The defect is entirely in the prose a future reader would have consumed as the rationale**, which is why no re-run caught it and why it needed an item |
+| 139 | ⭐⭐ **THE CHEAP GENERALISATION OF `F133`(i) TO THE OTHER TEN ROWS — AS A GREP, NOT AS TEN CENSUSES** | `TASK_PHP_061` §3.4, the reviewer's own priority 4. `F133`(i) — *the R1h's strategy was already present elsewhere in the same construct* — now holds on **two** rows (`ph96` 7-of-23 call sites; `ph56` `BP_VAR_R`/`BP_VAR_UNSET` already guarded). ⛔ **The other ten ship no `census` control, so the instrument does not exist**, and `ph56`'s census is not a clone of `ph96`'s (different question, different evidence tiers). ⚠ **The reviewer's cost for building them is ONE TASK PER ROW and is EXPLICITLY LABELLED AN ESTIMATE, not measured.** ▶ **The cheap half is free and is the thing to dispatch**: *was the R1h's strategy already present elsewhere in the same construct?* is one `grep` per row against the pinned tarball. ⛔ **DO NOT dispatch ten censuses** — that is the reviewer's instruction and it binds |
+| 140 | ⚠⚠ **`st_expect: None` CONFLATES *HAS NO SELF-TEST* WITH *HAS ONE, UNFILED* — A THIRD SILENCING MECHANISM, WEAKER THAN `F135`'s BUT IN THE SAME FAMILY** | `TASK_PHP_061` §4.2, found live. **`width.py` and `php_null.py` — the TWO FILES `.memory-php/04-process.md` LAW 16 NAMES AS THE MODEL — shipped passing `--selftest`s the registry never ran.** ✅ **BOTH DECLARED `st_expect=0` 2026-09-16** after measuring them (`rc=0 SELFTEST PASS`, **33.3 s** and **0.08 s**); ⚠ **the sweep roughly DOUBLED, 35 s → 66 s, and that cost is accepted deliberately** — it is a task-boundary check, and a passing self-test nobody runs is `F135`'s class exactly: it will go red and nothing will say so. ⛔ **THE DESIGN RESIDUE IS NOT FIXED**: the field is two-valued over three states, so the registry still cannot tell *has none* from *has one, unfiled* at a glance, and nothing would catch the next instance. ▶ **A three-valued field separates them at ZERO runtime cost** — the reviewer's suggestion, not costed by me. ⓘ **`F135` found the first mechanism by sweep; this one was found by a reviewer asking the harder version of `F135`'s own question**, which is an argument for asking it of every `expect`-like column |

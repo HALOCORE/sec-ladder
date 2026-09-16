@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F138** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F139** live in `RECAP_PHP.md`
 > (⚠ this said *F1–F41* for **forty-nine** findings, then *F1–F90* for **eleven** more — `PROTOCOL.md` rule 13, **and it has now rotted THREE TIMES.** ✅ **`.tasks-php/boxcheck.py` CHECKS THIS LINE against the actual highest finding as of 2026-09-13, so it is the last time.**
 > **Count it yourself: `grep -c '^### F' RECAP_PHP.md`.**)
 > ⭐ **And the statistic decision — which column every row publishes in — is
@@ -89,6 +89,31 @@ successive versions of a size rule** and was never measured (`p01`'s is 2 057).
    re-pinned.** ⚠ **The tell is a comment that states the arithmetic**
    (`# floor 40 - built 6`): **it is the derivation, so write it as code.**
    (Items 93, 87, 88; `RECAP_PHP.md` tasks cell.)
+
+   ⭐⭐⭐ **EXTENDED 2026-09-16 BY `TASK_PHP_061` §4.4/§5.0 — from VALIDATORS to
+   DOCUMENTS, and from NUMBERS to SETS. Reviewer-landed, covering `F135`,
+   `F138` and `F132` at once, and deliberately NOT a new law:**
+
+   > *…and the same applies to a figure a **DOCUMENT** asserts about the tree:
+   > if a committed tool prints it, quote the tool's output **and the commit you
+   > ran it at**, never a literal. ⚠ **And a tool that prints a SET must be RUN
+   > for its set** — calling its function and taking `len()` is not running it,
+   > and the count is a valid **tripwire** and an invalid **adjudication**.
+   > ⭐ A benign cause does not make a failing arm benign.*
+
+   ⚠⚠ **WHY THIS AND NOTHING ELSE FROM THAT ROUND'S EIGHT FINDINGS.** `_061`
+   §5.0 measured **four homes for a trap — a tool docstring, a committed tool's
+   output, a handoff finding, and a protocol section IN CAPITALS — and all four
+   failed against the text's own author** (`F134`, `F138`, `F132`, and `F139`
+   at nine and a half hours). ▶ ***Location is not the variable***, so a law
+   about **where traps live** must NOT enter: the general claim *a document is
+   not a control* is exactly a fact about people in general. ⭐ **The clause
+   above is programme-specific for one reason only — it names an artefact this
+   programme has: a committed checker that prints the thing.**
+   ⓘ **The durable home for each of those four is an arm in a tool that prints,
+   and three of the four already have one.** ⛔ **There is no ratchet rule
+   anywhere in this layer to append to** — measured, zero hits across `00`–`04`
+   and PAT's `.memory/` — which is why `F135` routes here.
 
 7. ⭐⭐ **A CONTROL CLONED BETWEEN ROWS CARRIES ITS DEFECTS, AND ONLY THE ROW
    THAT WRITES *NEW* NEGATIVES FINDS THEM — FIVE INSTANCES AND ONE SUCCESSFUL

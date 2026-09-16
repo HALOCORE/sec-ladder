@@ -282,15 +282,27 @@ REGISTRY = {
             "ground (argv and envp are NOT the same knob). Same inline-arms "
             "design as php50_align_sweep.py, same bare-run caveat."),
     "php_null.py": dict(
-        kind="checker", argv=[], expect=0, negatives="none", st_expect=None,
+        kind="checker", argv=[], expect=0, negatives="none", st_expect=0,
         why="Has any php family-B figure been compared against its own R5-R4 "
             "null? Cites harness/check.py's null-control rule that no php "
-            "document carried."),
+            "document carried. ⛔ `st_expect` WAS `None` over a PASSING "
+            "`--selftest` the registry never ran (TASK_PHP_061 §4.2); the "
+            "other file law 16 calls the model. Measured 2026-09-16: rc=0 "
+            "SELFTEST PASS, 0.08 s -- free."),
     "width.py": dict(
-        kind="checker", argv=[], expect=0, negatives="none", st_expect=None,
+        kind="checker", argv=[], expect=0, negatives="none", st_expect=0,
         why="F92: the probe_iters lever's gain is W^(-0.5), which settled item "
             "68 NO and refuted F90's operative half. ⚠ ~27 s -- the slowest "
-            "entry, and the only reason the sweep is not instant."),
+            "entry, and the only reason the sweep is not instant. "
+            "⛔⛔ `st_expect` WAS `None` AND THIS FILE HAS A PASSING "
+            "`--selftest` THE REGISTRY NEVER RAN -- found by TASK_PHP_061 §4.2, "
+            "and this is one of the TWO FILES LAW 16 NAMES AS THE MODEL. "
+            "A passing self-test nobody runs is F135's class exactly: it will "
+            "go red and nothing will say so. Measured 2026-09-16: rc=0 "
+            "SELFTEST PASS, 33.3 s -- which roughly DOUBLES the sweep, and the "
+            "cost is accepted deliberately at a task-boundary check. "
+            "⚠ `st_expect=None` STILL CONFLATES *has none* WITH *has one, "
+            "unfiled* -- that is the design residue, open item 140."),
     "php50_table.py": dict(
         kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
         why="Renders the item-112 sweep table from .temp/php50/*.json. A "
