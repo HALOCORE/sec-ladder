@@ -919,3 +919,43 @@ pattern `CLAUDE.md` records, one level deeper: here the row beats `.memory-php/`
   `.memory/04-verus.md` marks the accounting rule itself **PROVISIONAL**.
   (F106; ruled `TASK_PHP_047` §1.3–1.4, which found the adjudication the manager
   had not cited.)
+
+  ✅✅ **AND IT IS NOT PUBLISHED INSIDE THE CORPUS — DECIDED BY THE USER,
+  2026-09-17, AND THIS IS THE NOTE THAT DECISION ASKED FOR.** `harness/check.py`
+  refuses **all three** of `ph52`'s smaller-TCB R4 variants: `r4_no_wrapper` by
+  `_scan_unsafe_sites` (**F97**) because the `unsafe` token now sits in a body the
+  gate does not treat as trusted **and there is no hatch**, and the other two by
+  stage 5c-twin's `n_twins == 0` (**F104**). ⛔ **So the gate makes its strongest
+  statement about a trusted item exactly where the trusted base is SMALLEST, and
+  therefore pressures a row to ENLARGE it.** That is a real defect and it is
+  **accepted, not fixed.**
+
+  ▶ **WHAT WAS CHOSEN, AND WHY IT IS NOT MERELY THE TIMID OPTION: the route
+  `harness-php/gate.py`'s OWN HEADER PRESCRIBES** — *"if a php row needs a check
+  the PAT gate does not have, it goes in that row's `controls/` or in a separate
+  tool, and the report says which."* ▶ **The demonstration stays in the row.**
+  `ph52` `NOTES.md` §11 carries the six-variant table, the refusing stage for each
+  and the pressure analysis; that is the worked case and **a reader should go
+  there, not re-derive it.**
+
+  ⚠⚠ **THE PRICE OF THE ALTERNATIVE, MEASURED RATHER THAN ESTIMATED, BECAUSE IT
+  IS WHAT MAKES THE CHOICE A CHOICE**: editing `harness/check.py` invalidates the
+  recorded provenance of **47 gate records — all 33 PAT and all 14 php** — whose
+  `source_sha256` carries the identical hash `eeb7ffa7b034…`. ⛔ **The open item
+  had priced this at *"33"* for weeks** — `law 17`: the PAT population asserted of
+  the decision's scope, on the one item that asked the user to spend something.
+  ⚠ **NO EXCUSE IS OFFERED, BECAUSE THE FIRST ONE I WROTE WAS FALSE**: I claimed
+  the php half went unpriced because no bracket reports it. **It does** —
+  `harness-php/gate.py --tool measure --check-stale` examines all 14 php GATE
+  records and their `source_sha256` carries `harness/check.py`. ▶ **The count was
+  simply written from the PAT side and never taken over php.**
+
+  ⛔⛔ **THE STANDING CONSEQUENCE, SAID HERE SO IT IS NOT A SURPRISE AT ROW 20:
+  every future row whose best R4 has a smaller trusted base pays a
+  `twin_justifications` hatch plus a blocked variant, and its reduction is
+  demonstrable but not publishable on the corpus's own axis.** ▶ **Record each
+  instance against this entry.** ⓘ **Re-opening needs a NEW measurement — a row
+  where (c) loses something (c) cannot demonstrate — not a fresh argument;** the
+  arguments are all on file (`RECAP_PHP.md` item 105, `TASK_PHP_046` §4,
+  `TASK_PHP_047` §1.7–1.8, which also drafted the condition text if it is ever
+  wanted). ⛔ **`harness/` was NOT edited and must not be edited to test this.**
