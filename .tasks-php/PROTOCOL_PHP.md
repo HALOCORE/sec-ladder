@@ -1397,10 +1397,39 @@ each**. ⛔ **No `harness/` change is proposed or wanted** — the blanking is
 deliberate and documented in `exec_code`'s own docstring, and `exec_code` is
 hashed.
 
-✅ **LATENT, NOT LIVE: 0 affected spellings across 33 PAT rows and 6 PHP rows, 0
+~~✅ **LATENT, NOT LIVE: 0 affected spellings across 33 PAT rows and 6 PHP rows, 0
 of them `forbidden`** (F73, `.temp/mgr169/charlit_reach.py`, `--selftest` PASS,
 6 must-fire negatives; the detector is **differential** — it asks whether the
-shipped blanker changes the span, so it cannot drift from the matcher).
+shipped blanker changes the span, so it cannot drift from the matcher).~~
+
+> ⛔⛔ **THAT `0 of 6 PHP` WAS A 2026-09-11 SNAPSHOT AND IT HAS MOVED. RE-MEASURED
+> 2026-09-17** (`TASK_PHP_064`, which promoted the probe to
+> `.tasks-php/probes/charlit_reach.py` — it was cited here as gitignored scratch,
+> and `probes/scratchdeps.py::scan_set` reads `RECAP_PHP.md` and
+> `.memory-php/*.md` only, so **this citation was never in the law-11 census at
+> all**; `F151`'s class at a new site):
+>
+>     PAT  patterns/      33 rows  ->  0 affected, 0 forbidden   UNCHANGED
+>     PHP  patterns-php/  14 rows  ->  **1 affected**, 0 forbidden
+>
+> **The hit is `ph52-concat-copy-uninit` `required[0].rust`, spelling
+> `` `ensures` ``**, which `check.exec_code(…, "rust")` blanks to seven spaces.
+> It is already visible in that row's gate record (`required_pins_nothing: 25`),
+> so nothing is hidden — but only to a reader who already distrusts the field.
+>
+> ⭐⭐ **AND THE MECHANISM IS NOT A CHARACTER LITERAL, WHICH IS WHY THIS HEADING'S
+> SPELLING DID NOT CATCH IT.** `ensures` is a **Verus clause keyword** stripped
+> by `exec_code`'s rust layer. The hazard the probe actually tests is *any span
+> the shipped blanker erases*; this section's title narrows it to a C character
+> literal. ▶ **The RULE's force is undiminished — the `forbidden` half, the ban
+> that cannot fire and that FAILS the gate, is still `0`** — but its title is
+> narrower than its subject, and *"LATENT, NOT LIVE"* is no longer true of the
+> php half. ⚠⚠ **UNREVIEWED correction, engineer, `TASK_PHP_064` 2026-09-17.**
+> It is measured, not argued: run
+> `python3 .tasks-php/probes/charlit_reach.py`. **Whether the heading should be
+> re-spelled *"a spelling the blanker erases"* is a RULE change and is left to
+> the manager**; this block corrects a figure and repoints a citation, nothing
+> more.
 ⭐⭐ **AND THAT IS WHY THIS IS A WRITING RULE AND NOT A REPAIR TASK: backticking
 `read_buf[recvd] = '\0'` would CREATE the first affected spelling in either
 programme.** The rule exists to stop the first one, not to clean up after it.

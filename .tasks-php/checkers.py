@@ -896,6 +896,331 @@ REGISTRY = {
             "⚠ `ph45` is EXCLUDED from its 6 rows (TASK_PHP_037 was rebuilding "
             "it; that task has since landed, so the gap is now standing, not a "
             "precaution) and the corpus has grown to 14 gated php rows since."),
+
+    # --- TASK_PHP_064: the 14 files 13 PUBLISHED FINDINGS REST ON ------------
+    # ⛔⛔ `probes/scratchdeps.py`'s ADJUDICATION (item 148, ruling F150) rules
+    #    17 law-11 citations `RESTS` -- *the published number IS the gitignored
+    #    file's output* -- over 14 files and 13 findings: F44 F50 F53 F70 F72
+    #    F73 F74 F85 F89 F90 F95 F100 F102. **Only F89 and F95 had ever been
+    #    reviewed**, and for 11 of the 13 there is no second method anywhere in
+    #    the tree. This block is that batch.
+    # ⭐ THREE THINGS THE BATCH FOUND THAT THE BRIEF DID NOT PREDICT, all
+    #    recorded in the files' own headers and in `TASK_PHP_064_REPORT.md`:
+    #    (a) `F102`'s `asanfill.c` was **ALREADY PROMOTED** as
+    #        `.tasks-php/asan_fill_byte.c` on 2026-09-13 -- same program, fuller
+    #        header. Nothing to promote; the citation needed repointing.
+    #    (b) the SIBLING RULE caught `enclosing_fn.py`, which produces F69's
+    #        OTHER headline number and which the census cannot see, and
+    #        `fn_body.py`, without which F50's named regenerator cannot run.
+    #    (c) TWO probes arrived BROKEN and NEITHER was a missing cache:
+    #        `ph29_predict.py` crashed because its prediction CAME TRUE, and
+    #        `item83_sim.py` exited 1 because `ph53` was re-searched under it.
+    #        ▶ **A MOVED SUBJECT is a second failure mode and item 149's rule
+    #        does not cover it.**
+    "probes/callee_share.py": dict(
+        kind="checker", argv=["--selftest"], expect=0, negatives="inline",
+        st_expect=0,
+        why="⭐⭐⭐ **F85 AND F74 BOTH REST ON IT**, and F85 is *the programme's "
+            "central claim* -- the CROSS-LANGUAGE column carries 29 of 38 "
+            "family-A/B sign flips -- and is UNREVIEWED. ⚠⚠ IT CARRIES A "
+            "POPULATION AND THE POPULATION HAS MOVED: `29 of 38 / 366 "
+            "comparisons` is a 2026-09-12 fact over SIX gated rows; this file "
+            "globs `results-php/ph*.json`, so a fresh run over the 14 rows "
+            "gated 2026-09-17 gives **758 comparisons, 141 flips, 111 "
+            "cross-language**. ⭐ The RATIO survives (76.3 % -> 78.7 %); the "
+            "COUNT does not. Quote it with its date. ⚠ And its own closing "
+            "RULE is refuted by its own output four lines above it -- `flips "
+            "with Δshare <= 0.02` has gone 0 -> 6 -> **13** (F74 records the "
+            "middle correction in place). ⭐ Its C4 negative is the "
+            "claim-under-test control: `ph64`'s C rung must read well below "
+            "1.0 because item 54 measured ~60 % of it in libc. ✅ FREE: 0.2 s, "
+            "committed records only, writes nothing. Swept under `--selftest` "
+            "and not bare -- the bare arm is a report, and its negatives run "
+            "there FIRST anyway."),
+    "probes/spread_stat.py": dict(
+        kind="checker", argv=["--selftest"], expect=0, negatives="inline",
+        st_expect=0,
+        why="⭐⭐ THE FIRST OF F74's THREE PROBES -- the one that found the START "
+            "HERE box quoting `ph03`/`ph16`/`ph29` in family **A1** and `ph64` "
+            "in **B1**, mixing statistics while being FAITHFUL, because the "
+            "rows disagree. ✅ That Q3 result reproduces UNCHANGED over the 14 "
+            "gated rows, 2026-09-17. ⛔⛔ ITS Q1 DOES NOT: "
+            "`.temp/mgr170/NOTES.md` §1c concluded *'Not one row flips sign "
+            "across all five statistics'* and §1h re-asserted it; today the "
+            "file prints **SIGN FLIPS on ph45, ph66**, so item 52 is a "
+            "DIRECTION question on this corpus. ⚠ Nothing published is refuted "
+            "-- that sentence never left gitignored scratch, which was checked "
+            "by grepping `RECAP_PHP.md` and `.memory-php/` -- but a probe's own "
+            "printed conclusion is a reading of one day's corpus. ⚠ `BOX` is a "
+            "hand-transcribed four-row literal (law 6's class), kept because "
+            "Q3's whole job is to catch a mismatch. ✅ FREE: 0.2 s, committed "
+            "records only, writes nothing."),
+    "probes/ph64_draws.py": dict(
+        kind="tool", argv=None, expect=None, negatives="flag", st_expect=None,
+        why="⭐⭐⭐ ONE FILE, TWO FINDINGS: **F89**'s `0.07 pp` same-language "
+            "spread and its N4 control (`0.034 %` against F88's `0.03 %`), and "
+            "**F90** ENTIRELY -- F90 is *this file's data re-sliced*, and it "
+            "refutes a published recommendation. ⚠ F89 is MITIGATED (`_043` "
+            "§5.7 reproduced the CONTRAST at 55.6x by a different design, so "
+            "the finding survives the loss and the two figures do not); **F90 "
+            "has no second method at all**. ⛔⛔ NOT IN THE SWEEP, and not for "
+            "cost alone: it needs the PINNED valgrind, gitignored build trees "
+            "under `.temp/php-root/`, gitignored fixture blobs "
+            "(`patterns-php/*/inputs/*.bin`) and 80 gitignored callgrind "
+            "profiles it generates itself. A checker that reddens when scratch "
+            "is cleaned is reporting on the scratch. ⭐⭐ REPAIRED AT "
+            "PROMOTION, BOTH WAYS: it used to print `FAIL` and exit 1 when the "
+            "build tree was gone -- which says *'F89 is refuted'* where the "
+            "truth is *'the tree is gone'* -- and a bare run with a cleaned "
+            "cache silently launched 80 valgrind invocations. It now checks "
+            "its inputs first, REPORTS AND RETURNS 0 saying `NOT RUN -- NOT A "
+            "PASS` in capitals, and regeneration is opt-in behind `--collect` "
+            "(item 149; `width.py`'s X3). ⚠ THAT rc=0 IS WHY `kind` IS `tool`: "
+            "swept, a green NOT-RUN line reads as a checker passing, which is "
+            "F135. ⓘ `st_expect=None` is item 140's conflation and is not "
+            "honest in the usual way -- the file HAS a passing `--selftest` "
+            "(five negatives, rc 0 measured 2026-09-17); it is simply not "
+            "swept."),
+    "probes/charlit_reach.py": dict(
+        kind="checker", argv=["--selftest"], expect=0, negatives="inline",
+        st_expect=0,
+        why="⭐⭐ **F73**, AND ALSO THE EVIDENCE `PROTOCOL_PHP.md` §H1 CITES FOR "
+            "A STANDING WRITING RULE. Its differential detector asks the "
+            "SHIPPED blanker whether a declared spelling changes, so it cannot "
+            "drift from the matcher. ⛔⛔ THE PUBLISHED HEADLINE HAS MOVED: "
+            "`0 of 33 PAT AND 0 of 6 PHP` was 2026-09-11; re-run 2026-09-17 it "
+            "is **0 of 33 PAT and 1 of 14 PHP** -- `ph52` `required[0].rust` "
+            "backticks `ensures`, which `exec_code`'s rust layer blanks to "
+            "seven spaces. ⭐ AND THE MECHANISM IS NOT A CHARACTER LITERAL: "
+            "§H1 is spelled *'never backtick a spelling that contains a "
+            "CHARACTER LITERAL'* and that spelling does not reach a Verus "
+            "clause keyword, while the hazard -- *any span the blanker erases* "
+            "-- does. ✅ The DANGEROUS half is unchanged: `forbidden`, a ban "
+            "that cannot fire, is still **0**, so §H1's force is undiminished "
+            "and only its reassurance is stale. ⚠⚠ §H1's citation was never in "
+            "the law-11 census at all: `probes/scratchdeps.py::scan_set` reads "
+            "`RECAP_PHP.md` and `.memory-php/*.md` and nothing else -- F151's "
+            "class (`ph53/verus.rs`) at a new site. ⚠ The count is a REPORT, "
+            "not an arm: nothing here FAILS when it moves off 0, which is why "
+            "the drift was found by running it. ✅ FREE: 0.5 s, imports "
+            "`harness/check.py` + `vparse.py`, reads `spec.md`, writes "
+            "nothing."),
+    "probes/item48_decide.py": dict(
+        kind="checker", argv=["--selftest"], expect=0, negatives="flag",
+        st_expect=0,
+        why="⭐⭐ THE MEASUREMENT THAT **DECIDED ITEM 48**, cited inside F70 and "
+            "producing **F69**'s `29 of 30 at file:line`. ⛔ Its own v1 is a "
+            "cautionary tale the finding records: it compared PROSE-BEARING "
+            "`c_file_line` cells, so *distinct sites* was guaranteed and it "
+            "returned a perfect **30 of 30** -- F52's shape, *a result that is "
+            "too clean*. The repaired file brackets three granularities and "
+            "carries must-fires for the prose strip. ⚠ IT NEEDS TWO THINGS A "
+            "CLEAN CHECKOUT LACKS and they differ: the corpus `index.csv` "
+            "(ANOTHER repo, not re-derivable here) and "
+            "`.temp/mgr/batch/fixsurvey.json` (gitignored, generator committed "
+            "at `.tasks-php/fixsurvey.py`). ⭐ REPAIRED AT PROMOTION: it raised "
+            "`FileNotFoundError`; it now REPORTS AND RETURNS 0 with `NOT RUN "
+            "-- NOT A PASS`, and `--selftest` SPLITS -- six PURE string arms "
+            "still run and report, three index-reading arms say they did not "
+            "(item 149). ⚠ It prints arm names and verdicts on DIFFERENT "
+            "lines, so `_arms_in` reads it as zero -- open item 131's dialect "
+            "blind spot, and why no count is filed. ✅ Swept under `--selftest` "
+            "and not bare: the bare arm is a 30-row report."),
+    "probes/enclosing_fn.py": dict(
+        kind="checker", argv=["--selftest"], expect=0, negatives="flag",
+        st_expect=0,
+        why="⭐⭐⭐ **THE SIBLING THE BRIEF DID NOT NAME, AND THE REASON THE "
+            "SIBLING RULE EXISTS.** F69 states TWO numbers in ONE sentence -- "
+            "*at `file:line` 29 of 30 … and by ENCLOSING FUNCTION 24 of 30* -- "
+            "and the second is THIS file's output, re-derived to the digit "
+            "2026-09-17 (`fns==ids 24 of 30 · fns<ids 6 · unresolved 0`). "
+            "⛔⛔ THE LAW-11 CENSUS COULD NOT HAVE FOUND IT, for two "
+            "independent reasons: F69's section NAMES NO FILE, and the one "
+            "place it is cited spells its siblings "
+            "`.temp/mgr168/{item48_decide,enclosing_fn,spread_axis,sha_norm}"
+            ".py` -- a BRACE EXPANSION that `scratchdeps.PATH_RE` matches only "
+            "as the bare directory, so **four citations register as zero** "
+            "(measured, not argued). ⚠⚠ ITS FINDER IS A HEURISTIC AND THAT IS "
+            "THE POINT: it scans backwards for a column-0 definition header, "
+            "gets macro-generated ZEND_VM bodies wrong, and therefore PRINTS "
+            "EVERY FUNCTION NAME so a reader can check by eye -- an unnamed "
+            "count would be an assertion. Its N1/N2 calibration is the single "
+            "`_safe_emalloc`/`_ecalloc` pair F7 caught the manager confusing, "
+            "and nothing measures the heuristic's error rate. ⭐ REPAIRED AT "
+            "PROMOTION: `selftest` returned **2** under the words *CANNOT "
+            "SELFTEST* when the pinned tarball was absent -- neither the filed "
+            "pass nor an adjudicated red. It now reports and returns 0 saying "
+            "`NOT RUN -- NOT A PASS` (item 149)."),
+    "probes/ph29_predict.py": dict(
+        kind="checker", argv=["--selftest"], expect=0, negatives="flag",
+        st_expect=0,
+        why="⭐⭐⭐ **F72's SIX PUBLISHED PREDICTION NUMBERS**, and the entry that "
+            "shows a SECOND way a promoted probe fails to run. ⛔⛔ IT ARRIVED "
+            "CRASHING, AND NOT FROM A MISSING CACHE -- **from SUCCESS**: "
+            "`apply_edit`'s assert refuses a stale simulation, item 51's edit "
+            "LANDED at `TASK_PHP_033`, so `spec.md` now opens `required[0].c` "
+            "with the backticked span and the file died `AssertionError: … "
+            "spec.md moved`. **A prediction tool whose prediction came true.** "
+            "⭐⭐ REBUILT AS A VERIFIER: it detects which image of `spec.md` is "
+            "on disk and, on the POST-IMAGE, checks the six published numbers "
+            "against the COMMITTED gate record. ✅ Measured 2026-09-17: "
+            "**spellings 12 · pairs 36 · present 22 · pins_nothing 0 · absent "
+            "2 · forbidden_hits 0 -- ALL SIX LAND EXACTLY.** F72's prediction "
+            "was falsifiable and was NOT falsified, and that is now checkable "
+            "rather than a sentence in a handoff. ⚠ `PREDICTED` is a HARDCODED "
+            "literal ON PURPOSE (law 6's class, and deliberately so): it is "
+            "the published 2026-09-11 constant, and one that re-derived itself "
+            "from the gate record could never fail. ⚠ F72's own caveat is not "
+            "softened: `required` CANNOT FAIL THE GATE -- `ph29` became "
+            "SEARCHABLE, not enforced. ✅ FREE: 0.4 s, committed sources only, "
+            "writes nothing."),
+    "probes/item83_sim.py": dict(
+        kind="checker", argv=["--selftest"], expect=0, negatives="flag",
+        st_expect=0,
+        why="⭐⭐ **F100**'s simulation harness -- it drives `ph53`'s OWN verdict "
+            "functions rather than reimplementing them, so the degeneracy was "
+            "SIMULATED, not inherited. ✅ Its load-bearing arm still passes: "
+            "the harness reproduces the committed `controls/spellings.json` on "
+            "all five verdict fields and the bare run reproduces `a1_spread_pp "
+            "{R3: 39.899657, R4: 45.313019}`. ⛔⛔ IT ARRIVED **RED**, on two "
+            "arms, for two reasons, both because `TASK_PHP_042` re-searched "
+            "`ph53` under it. **N4 REPORTED A MOVE THAT HAD NOT HAPPENED**: it "
+            "compared a LIST, and each bitmask variant now matches "
+            "`required[4]` TWICE, so six duplicated entries read as *exclusion "
+            "set moved* -- a membership question asked of a multiset; repaired "
+            "to a SET. **N2/N3 WENT VACUOUS**: both perturb the R4 endpoint, "
+            "which is now degenerate as committed (`r4_beaters: []`), so N2 is "
+            "trivially satisfied and N3 asserts a state that no longer exists. "
+            "▶ An arm that cannot discriminate is NOT PASSING and one whose "
+            "subject moved is not FAILING: they print `VACUOUS -- NOT A PASS`, "
+            "the discriminating pair is rebuilt on the LIVE R3 side (N2r/N3r, "
+            "six beaters), N3r DERIVES the dearest variant instead of naming "
+            "it, and N5 MEASURES the vacuity's cause so it is a reading rather "
+            "than an assertion. ⛔ **F100 has been REVIEWED AND NARROWED and "
+            "its R4 half is WITHDRAWN** -- this preserves the harness, not the "
+            "withdrawn ruling. ⚠ `ROOT` is a hardcoded absolute path, same "
+            "class as `probes/sweep_cg.sh`; reported, not repaired. ✅ FREE: "
+            "0.3 s, committed row files only, writes nothing."),
+    "probes/samefunc_hole.py": dict(
+        kind="checker", argv=[], expect=0, negatives="inline", st_expect=None,
+        why="⭐⭐⭐ **THE REVIEWER'S OWN COUNTEREXAMPLE**, and the only copy of "
+            "it. `.memory-php/04-process.md` LAW 12: the reviewer's "
+            "INDEPENDENCE is the product, and a counterexample aimed at the "
+            "manager's own `same_function` guard, left in a directory "
+            "`CLAUDE.md` constraint 6 schedules for deletion, is the one "
+            "artefact here the party it was aimed at cannot reconstruct. ⭐⭐ "
+            "**ITS MEANING HAS CHANGED AND THAT IS THE RESULT**: the guard was "
+            "REPAIRED, so all four cases now come out as wanted and the script "
+            "prints *no hole found*. ▶ It is no longer a hole-finder, it is a "
+            "REGRESSION TEST for the repair -- and CASE 4 is what stops the "
+            "repair over-correcting into demoting honest hunks. A "
+            "counterexample whose target has been fixed is the one people "
+            "delete, and the one that has to stay. ⚠ IT PROMISES A COUNT IT "
+            "DOES NOT PRINT (*'REACH ON THE REAL CORPUS … counted below'*, "
+            "then `return`) -- left visible with a line saying so. ⭐ BUT THE "
+            "NUMBER IS SOURCED, AND THE FIRST DRAFT OF THAT NOTE SAID IT WAS "
+            "NOT: `preimage_screen.py --selftest`'s **N13 MUST-NOT-FIRE** "
+            "walks every screened record and fails if the zero-context branch "
+            "is reached -- `0 []`, rc 0, measured 2026-09-17. Caught by "
+            "grepping the code instead of trusting a header. ⓘ No `--selftest` "
+            "flag: the whole file IS four must-fire/must-NOT-fire cases "
+            "against a committed validator, so `negatives='inline'` and "
+            "`st_expect=None` are both honest. ✅ FREE: 0.3 s, synthetic input "
+            "only, writes nothing."),
+    "probes/entcount.py": dict(
+        kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
+        why="⭐⭐ **F53's WHOLE EVIDENCE**, and the INDEPENDENT method behind "
+            "F44. It counts `ext/standard/html.c`'s entity tables WITH GCC: "
+            "comments are the real C lexer's, `entity_map[]`'s bounds come "
+            "from the COMPILED struct (so the 15 HEX rows a `(\\d+)` regex "
+            "silently skips are handled), the map is walked to "
+            "`cs_terminator`, and table<->row is joined by POINTER IDENTITY. "
+            "▶ Where it and `probes/count_ent.py` disagree, THIS one wins. "
+            "✅ F53's load-bearing half RE-DERIVES EXACTLY, re-run 2026-09-17 "
+            "against `b9ff04703f16` fetched fresh: `ent_uni_spacing` 23/23 and "
+            "`ent_uni_8592_9002` 411/411 are already `ok` two months before "
+            "`56adfe1f3cf1`, while `ent_uni_338_402` is still 63/65 -- so "
+            "`ph32`'s stated R1h is wrong for two of three tables. ⛔⛔ WHAT IS "
+            "NOT RE-DERIVABLE: **the NINE-COMMIT CORPUS HAS NO COMMITTED "
+            "GENERATOR.** F53 names two of the nine; "
+            "`probes/refetch_upstream002.sh` fetches TAGS, not intermediate "
+            "commits. The header carries the exact recipe; writing it as a "
+            "script is OWED and was deliberately not done in a promotion pass, "
+            "because *which nine* is a judgement F53's author did not record. "
+            "⚠ It needs an ARGUMENT and `gcc`, and it has NO must-fire "
+            "negatives -- `negatives='none'` is honest and is not a pass. "
+            "⭐ Repaired at promotion: a bare run raised `FileNotFoundError` on "
+            "`sys.argv[1]`; it now prints usage and exits 2, because a "
+            "traceback reads as a broken probe."),
+    "probes/count_ent.py": dict(
+        kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
+        why="⭐ **F44's FOUR-TABLE RESULT** -- `63/65 · 22/23 · 66/67 · "
+            "410/411` -- re-derived TO THE DIGIT on promotion, 2026-09-17, "
+            "against the pinned 5.0.0 tarball (`17 tables · 4 short · 0 "
+            "UNEVALUATED`). ⚠⚠ `nm -S` corroborates those numbers, so what the "
+            "tree would have lost is the INDEPENDENT METHOD, not the figures "
+            "-- which is `scratchdeps.py`'s ADJUDICATION's own reason line. "
+            "⛔ IT IS CITED FOUR TIMES AND THREE ARE `HISTORY`, NOT A DEFECT: "
+            "under F50/F51/F52 it is the SUBJECT of a sentence about a defect "
+            "class and those sentences state the claim in full. **The verdict "
+            "is the sentence, not the bucket.** ⭐⭐ AND THE DEFECT THEY NAME "
+            "IS THIS FILE'S OWN -- v1's `declared()` matched bounds with "
+            "`(\\d+)`, could not read the 15 hex rows, and printed *'(not in "
+            "entity_map -- unused?)'*: a broken computation rendering as a "
+            "positive claim about the C. ▶ A correction whose target has been "
+            "deleted cannot be read, which is the `null_control.py` argument "
+            "again. ⚠ NO must-fire negatives, on the file the programme cites "
+            "three times as a cautionary precedent -- `negatives='none'` is "
+            "honest and is the loudest debt in this batch. ⚠ Its "
+            "`strip_comments` is a REGEX over C; `probes/entcount.py` asks the "
+            "compiler. ⭐ Repaired at promotion: a bare run raised `IndexError`; "
+            "it now prints usage and exits 2."),
+    "probes/fn_body.py": dict(
+        kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
+        why="⭐ A SECOND-ORDER LAW-11 CASE, AND THE REASON IT IS HERE IS THE "
+            "SIBLING RULE. No finding cites it, so the census cannot see it -- "
+            "but `probes/refetch_upstream002.sh`, which **F50 names as the "
+            "script that regenerates all of its evidence**, opened with "
+            "`FN=../php17/r1h/fn.py` and called it once per tag. ▶ Promoting "
+            "the regenerator and leaving this in deletable scratch would have "
+            "produced **a committed generator that cannot generate**. Same "
+            "call `probes/sweep_cg.sh` got. ⭐ It is F35's rule in code -- ask "
+            "about a FUNCTION, not about text -- which is why the regenerator "
+            "can hash `PHP_FUNCTION(mb_strcut)` across 19 tags where a grep "
+            "for the guard's text MISSES 5.3.0. ⚠ RENAMED from `fn.py`: "
+            "`.tasks-php/` already carries a `refetch.sh` that is a DIFFERENT "
+            "script from the one promoted beside this, and a two-character "
+            "basename in a flat `probes/` directory is how that collision "
+            "happens twice. ⛔ **NO must-fire negatives** -- the `^token` + "
+            "`\\s*\\{` heuristic has never been shown failing on a prototype, "
+            "a macro-generated definition or a K&R header, and every number "
+            "the regenerator prints goes through it. `negatives='none'` is "
+            "honest, not a pass."),
+    "probes/refetch_upstream002.sh": dict(
+        kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
+        why="⭐⭐ **F50's NAMED REGENERATOR**, and F44/F45's too -- "
+            "`RECAP_PHP.md:8335` names it in the finding's own sentence. "
+            "`CLAUDE.md` Don't #1 says KEEP THE GENERATOR, DELETE THE "
+            "ARTEFACT; it never says WHERE the generator lives, so obeying it "
+            "to the letter still produced a law-11 defect. ⛔⛔ RENAMED, AND "
+            "NOT COSMETICALLY: `.tasks-php/refetch.sh` ALREADY EXISTS and is a "
+            "DIFFERENT script (F34/F35/F36's `.temp/mgr/` downloads, itself "
+            "promoted 2026-09-08 by *'Move the two cited generators out of "
+            "gitignored scratch'*). Promoting this as `refetch.sh` would have "
+            "OVERWRITTEN it. ⚠ Three changes were forced at promotion: it "
+            "used to `cd $(dirname $0)` and would have dropped ~25 "
+            "re-derivable downloads into a COMMITTED tree (Don't #1 inverted) "
+            "-- it now works in `.temp/mgr165/`; `FN=../php17/r1h/fn.py` "
+            "pointed into gitignored scratch -- now `probes/fn_body.py`; and "
+            "`count_ent.py` is resolved from `probes/`. ✅ RE-RUN END TO END ON "
+            "PROMOTION, rc 0: it re-derives the `mb_strcut` body hashes across "
+            "19 tags, finds `c2471b495009` as the removal and `cb3cca21b345` "
+            "as the 2005 fix, and walks the entity-table chain 5.0.0 **4 "
+            "short** -> 5.0.4 **1 short** -> 5.0.5 **0**. ⛔ NEVER IN A SWEEP: "
+            "it needs NETWORK and the pinned tarball, and it PRINTS rather "
+            "than ASSERTS -- nothing in it fails if a hash moves, so "
+            "`negatives='none'` and `st_expect=None` are both honest. ⓘ Cached "
+            "files are skipped, so a re-run is cheap."),
     "probes/sweep_cg.sh": dict(
         kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
         why="⭐⭐ THE GENERATOR FOR F83's AND F84's PROFILES, and it is committed "
