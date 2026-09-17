@@ -349,6 +349,29 @@ ADJUDICATION = {
         "`generator kept, binaries deleted` -- `CLAUDE.md` Don't #1 OBEYED. "
         "The rule says keep the generator and never says WHERE, so obeying it "
         "to the letter still produces a law-11 defect"),
+
+    # ⭐⭐ AND THESE FOUR ARE THE ARM CATCHING ITS OWN AUTHOR, ON THE FIRST TRY.
+    # Writing F150 and F151 -- the findings that REPORT this adjudication --
+    # put four fresh `.temp/` citations inside published finding sections, and
+    # `N20` went red before the commit. ▶ A finding ABOUT a citation quotes the
+    # citation; that is unavoidable and it is why the verdict must be RECORDED
+    # rather than assumed. `F131`: the ruling is keyed on the citation, so a
+    # new one is a new question even when the file already has an answer
+    # elsewhere.
+    ("F150", ".temp/mgr176/asanfill.c"): (
+        VERDICT_HISTORY, "F150 quotes F102's citation as the EXHIBIT for its "
+        "central point (`generator kept` in a gitignored directory). The file "
+        "is the subject; F102's own row above is where the debt is recorded"),
+    ("F150", ".temp/php27/streamsfuncs.c"): (
+        VERDICT_NOTDEP, "named as the false positive it is -- still upstream "
+        "source, still re-derivable from the manifest"),
+    ("F150", ".temp/mgr166/asan_reach.c"): (
+        VERDICT_HISTORY, "quoted to show the same FILE ruling two ways under "
+        "two findings; the debt is booked once, against F50"),
+    ("F151", ".temp/php41/probe_wrap.rs"): (
+        VERDICT_HISTORY, "F151 is ABOUT this citation being unscanned inside "
+        "`ph53/verus.rs`. ▶ The DEBT is open item 152 (a re-gate), not a "
+        "promotion -- the file is a subject here and a hashed pointer there"),
 }
 
 

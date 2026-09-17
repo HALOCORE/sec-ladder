@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F149** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F151** live in `RECAP_PHP.md`
 > (⚠ this said *F1–F41* for **forty-nine** findings, then *F1–F90* for **eleven** more — `PROTOCOL.md` rule 13, **and it has now rotted THREE TIMES.** ✅ **`.tasks-php/boxcheck.py` CHECKS THIS LINE against the actual highest finding as of 2026-09-13, so it is the last time.**
 > **Count it yourself: `grep -c '^### F' RECAP_PHP.md`.**)
 > ⭐ **And the statistic decision — which column every row publishes in — is
@@ -183,6 +183,35 @@ successive versions of a size rule** and was never measured (`p01`'s is 2 057).
     instruments to do it. ⚠⚠ **THE LAW ITSELF IS UNCHANGED AND CORRECT; it was
     its SCOPE SENTENCE that was invented rather than counted.**
     ▶ ⛔ **DO NOT WRITE A NEW RANGE HERE. RUN THE TOOL.** (`F147`, open item 148.)
+
+    ✅✅ **ADJUDICATED 2026-09-17 — AND THE LAW IS NOW A MEASURED POPULATION
+    RATHER THAN A WARNING.** Every law-11 citation was read **against its citing
+    sentence**, and the verdicts live in `scratchdeps.ADJUDICATION`, keyed on
+    `(finding, cited file)` — ⛔ **not on the file**, because the same
+    `asan_reach.c` rules `RESTS` under `F50` and `HISTORY` under `F52`, and a
+    ruling filed against the path would be wrong for one of them.
+    ▶ **`RESTS` 17 citations / 14 files / 13 findings · `HISTORY` 6 · `NOTDEP`
+    4.** ⛔⛔ **A MAJORITY, 63 %, where the item predicted a minority** — and
+    **11 of the 13 findings have never been reviewed**, so for those the
+    gitignored probe is the only evidence that exists anywhere. (`F150`, item
+    153 for the promotions.)
+
+    ⭐⭐ **THE SENTENCE WORTH KEEPING, BECAUSE IT EXPLAINS WHY CAREFUL AUTHORS
+    KEEP PRODUCING THIS DEFECT: `CLAUDE.md` Don't #1 SAYS *KEEP THE GENERATOR*
+    AND NEVER SAYS *WHERE*.** `F102`'s citation reads *"generator kept, binaries
+    deleted"* — the rule followed exactly — and the generator was kept in
+    `.temp/`, which is gitignored. ▶ **So this law is not about carelessness,
+    and telling people to be careful will not move it.** The only thing that
+    does is promoting the file. ⚠ **When you keep a generator, keep it where a
+    checkout can see it.**
+
+    ⛔ **AND THE THREE-VERDICT SHAPE IS LOAD-BEARING.** A census row is a
+    QUESTION (`F132`) and **`no` is one of its answers**: three of the 27 were
+    false positives of the census's own bare-name resolver — at `F59` and `F69`
+    the token `streamsfuncs.c` is a PHP 5.0.0 source file in a table, not the
+    scratch copy. **They are ruled `NOTDEP`, not quietly dropped**, and `N23`
+    fails if any verdict ever falls out of use. ▶ **An adjudication that only
+    ever says *defect* is an accusation.**
 
 12. ⭐⭐⭐ **THREE REVIEW ROUNDS IN A ROW HAVE REFUTED MANAGER CLAIMS, AND THE
     PATTERN IS STABLE ENOUGH TO PLAN AROUND: A MANAGER FINDING FROM ONE PROBE OR

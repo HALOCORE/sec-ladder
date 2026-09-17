@@ -258,8 +258,23 @@ def main():
           f'{n[scratchdeps.AMBIG]} ambiguous, {n[scratchdeps.PROMOTED]} stale '
           f'citation(s) of {len(rows)}')
     print(f'{"":18} {"":4}  ⛔ a CANDIDATE SET, not a defect count (F132) -- '
-          f'adjudicate it: item 148')
-    print(f'{"":18} {"":4}  the members: python3 .tasks-php/probes/scratchdeps.py')
+          f'the members:')
+    print(f'{"":18} {"":4}  python3 .tasks-php/probes/scratchdeps.py')
+    # ⭐ The LAW-11 subset was adjudicated at item 148 (`F150`). Report the
+    #   ruling's shape here and NOTHING ELSE -- the verdicts live in
+    #   `scratchdeps.ADJUDICATION` and this arm must not restate them (`F131`).
+    #   ⛔ An UNRULED law-11 citation is the one thing worth shouting about,
+    #   because it means a finding was published after the adjudication closed.
+    pfd = scratchdeps.published_finding_deps()
+    un = scratchdeps.unadjudicated(pfd)
+    rests = [r for r in pfd
+             if (a := scratchdeps.adjudicate(r['finding'], r['cite']))
+             and a[0] == scratchdeps.VERDICT_RESTS]
+    print(f'{"law 11 ruled":18} {len(pfd):4}  citation(s); {len(rests)} RESTS '
+          f'on scratch -> promote them: item 153')
+    if un:
+        print(f'{"":18} {len(un):4}  ⛔⛔ UNRULED -- a finding published since '
+              f'the adjudication closed')
 
     for f in fail: print('FAIL:', f)
     return 1 if fail else 0
