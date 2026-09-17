@@ -50,21 +50,21 @@ STATE   ⭐ 13 ROWS; **9/20 fam, 24 owed** to floor 37. ⛔ **BACKLOG 3 (`F147`,
 ✅ DONE  **THE REVIEWER'S ORDER (2)(3)(4)(5) IS FULLY DISCHARGED.** (2) 6 files not 2:
         `F82`-`F86`'s evidence COMMITTED under `probes/` + **`NULLCTL_001.md`**; 2 of 5
         CRASHED without their cache. (3) `held` SPLIT: **`F133`(i) is `4 CLEAR + 1
-        BORDERLINE`, NOT `7 of 8`**. (4) **LAW 17** -- *name the population in the
-        sentence*; ⚠ its programme-specificity argument is MINE and OWES A REVIEWER.
-        (5) ⛔⛔⛔ **`--opt` LANDED AND THE FIRST `O0` SWEEP EVER RUN CHANGED AN ANSWER:
-        `F149` -- `ph66`'s `large`/gcc cell is SIGN-UNSTABLE** (step `8.89` vs effect
-        `6.12`), so ITEM 146's sign is NOT THERE on 1 of 4 -- ⭐⭐ **and a 4-PAD screen
-        called it `RESOLVABLE`/`SIGN-STABLE`, the opposite on BOTH axes.**
-        ⛔⛔ **`F147`: 4 INSTRUMENTS IN 8 DAYS, EACH SCOPED TO THE INSTANCE THAT PROMPTED
-        IT; law 11's `F88-F101` captures 5 OF 22.** ⛔ **`F148`: `grep -c` over PROSE.**
+        BORDERLINE`, NOT `7 of 8`**. (4) **LAW 17** -- *name the population in the sentence*;
+        ⚠ its programme-specificity argument is MINE and OWES A REVIEWER. (5) ⛔⛔⛔ **`--opt`
+        LANDED AND THE FIRST `O0` SWEEP EVER RUN CHANGED AN ANSWER: `F149` -- `ph66`'s
+        `large`/gcc cell is SIGN-UNSTABLE** (step `8.89` vs effect `6.12`), so ITEM 146's
+        sign is NOT THERE on 1 of 4 -- ⭐⭐ **a 4-PAD screen called it the opposite on BOTH
+        axes.** ⛔⛔ **`F147`: 4 INSTRUMENTS IN 8 DAYS, EACH SCOPED TO ITS OWN INSTANCE;
+        law 11 captures 5 OF 22.** ⛔ **`F148`: `grep -c` over PROSE fails BOTH ways.**
+        ✅ **105 DECIDED BY THE USER: (c) LEAVE IT** -- note in `02-ladder.md`'s `tcb_items`,
+        `harness/` NOT edited, defect ACCEPTED: **record each future small-TCB row there.**
 NEXT    ▶ **148** adjudicate the scratch census (item 125's method, ~25 min) · **149**
         `width.py`'s `X3` exits 1 where `CLAUDE.md` INVITES it · **150** work with no task
         number · **151** `ph66`'s `O0` summary (a RE-GATE) + sweep the other 12 rows.
-        ▶ THEN **ROW 14 = `ph70`** (E3), at **`.tasks-php/ROW14_001.md`**. ▶ ⛔⛔ **105 =
-        USER'S DECISION.**
+        ▶ THEN **ROW 14 = `ph70`** (E3), scoped at **`.tasks-php/ROW14_001.md`**.
 ⚠ TRAPS ⛔ **SWEEP A *DIFFERENCE* AT 32 PADS OR CLAIM NO VERDICT ABOUT IT (`F149`b).**
-        ⛔ **NEVER GREP PROSE TO DECIDE PRESENCE -- grep an IDENTIFIER, or read it.**
+        ⛔ **NEVER INFER AN ABSENCE FROM A CLI's SHAPE OR A `grep -c`. RUN IT.**
 ```
 
 ---
