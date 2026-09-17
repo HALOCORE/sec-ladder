@@ -265,6 +265,59 @@ names which findings these are and what a review round owes.
     (`ASAN_OPTIONS=malloc_fill_byte=0` gives zeros), not a compile-time property.
     (Item 96.)
 
+17. ⛔⛔⛔ **NAME THE POPULATION IN THE SENTENCE — THIS TREE HAS SEVERAL THAT
+    ARE ONE WORD APART, AND EVERY TOOL PRINTS A BARE INTEGER.** Three manager
+    findings filed **within one day** — `F141`, `F142`, `F146` — each measured a
+    rate or a census over one population and asserted it of **another**, and
+    ⭐⭐⭐ **`F142` is the finding that NAMES that error.** `TASK_PHP_063` §3.2,
+    §4.2(a), §6.2(c); all three cycles closed. ▶ **`n = 3` is a rate** (item
+    123's rule), which is why this is a law and not a note.
+
+    | finding | measured over | asserted of |
+    |---|---|---|
+    | `F141` | the corpus's ASan **reproducers** (`61.3 %`) | the rows' **authored triggers** |
+    | `F142` | the `PENDING` pile's **SIZE** (`N8`'s bound) | its **MEMBERSHIP** |
+    | `F146` | `results*/` **measurement records** (`0 of 374`) | **committed records**, which include `controls/*.json` |
+
+    ⛔⛔ **EVERY ONE OF THOSE NUMBERS WAS CORRECT, CURRENT AND RE-DERIVABLE, SO
+    LAW 6 WOULD NOT HAVE CAUGHT ANY OF THEM.** Law 6 asks whether a figure came
+    from the tree; all three did — **from a different part of the tree than the
+    sentence was about.** ▶ **The two laws are SIBLINGS, and `_063` §5.1 ruled
+    exactly that relation for `F142` against `F132`** (*"`F132`'s remedy would
+    not have caught `040`"*): **the family statement is the part that enters.**
+    ⭐ **A REPRODUCIBLE NUMBER IS NOT A CORRECT ONE.**
+
+    ⚠⚠ **WHY THIS IS PROGRAMME-SPECIFIC RATHER THAN A FACT ABOUT PEOPLE** — the
+    test `_061` §5.0 imposed when it refused a law about *where traps live*.
+    This tree carries populations that are one word apart and genuinely differ:
+    `results/` vs `results-php/` vs a row's own `controls/*.json`;
+    `.memory-php/` vs `RECAP_PHP.md` vs `.tasks-php/`; **33** PAT rows vs **13**
+    php rows; the **catalogued** rows vs the **built** ones; corpus
+    **reproducers** vs a row's **authored trigger**; the gated corpus vs the
+    `PENDING` pile. **And it carries a family of committed checkers each scoped
+    to a DIFFERENT one of them, each printing a bare integer.** ▶ **So *the
+    number a tool printed* and *the set the sentence is about* are routinely
+    different objects, and nothing in the output says which.**
+
+    ✅ **THE REMEDY IS ONE LINE OF OUTPUT, NOT AN EXHORTATION TO BE CAREFUL: A
+    TOOL THAT PRINTS A COUNT PRINTS WHAT IT COUNTED OVER.** `quota.py` does it
+    (`built rows 13 ['ph03', …]`); `citecheck.py` does it (`45 total across 24
+    file(s)`); `probes/scratchdeps.py` does it (`scanned 6 document(s)`).
+    ⛔ **A bare integer in a checker's output is this defect's raw material.**
+
+    ⚠ **WHAT IS MINE AND OWES A REVIEWER**: the three instances and their
+    grouping are `_063`'s, verdicted; **the programme-specificity argument two
+    paragraphs up and the remedy sentence are the MANAGER's wording, written to
+    clear `_061` §5.0's bar, and no one has attacked them.** `F53`'s shape —
+    the manager taking a construction into a standing document alone — has bitten
+    twice. ▶ **Give this paragraph to the next reviewer whose round touches the
+    layer; if the argument is wrong, law 17 comes back out and the three
+    findings stay in `RECAP_PHP.md`.**
+    ⓘ A **fourth** instance was filed 2026-09-17 — `F147`, an arm scanning
+    `.memory-php/` whose count the manager asserted of *the documents* — and it
+    is **UNREVIEWED, so it is a POINTER and NOT one of the three this law rests
+    on** (rule 9).
+
 16. ⭐⭐⭐ **AN ARM MAY ASSERT AN EFFECT'S *DIRECTION* ONLY TO DEFEND A
     **PUBLISHED** FINDING, AND ONLY IF IT PRINTS THE MEASURED MARGIN BESIDE THE
     FLOOR — AND IT NEEDS A RETIREMENT CONDITION.** A check that asserts the
