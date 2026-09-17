@@ -1,145 +1,218 @@
-# UPSTREAM_002 — `ph07`'s R1h: **PHP DELETED HALF ITS OWN SECURITY FIX, AND OUR GATE HAD ALREADY SAID WHY**
+# UPSTREAM_002 — the upstream repair survey for the `E3` batch: **`ph70` · `ph69`**
 
-**Author: the manager**, between `TASK_PHP_017` and `TASK_PHP_018`.
-⚠⚠ **UNREVIEWED MANAGER WORK.** `PROTOCOL.md` rule 3 — I may not clear my own
-design. `TASK_PHP_018` builds on this; the review after it must attack it.
-Generator: `.temp/mgr165/REFETCH.sh` (the `.c` blobs are re-derivable and get
-deleted; the script and the `.patch` are the evidence).
+**Author: the manager.** ⚠ **This is EVIDENCE, not a decision.** Nothing here
+has been through a reviewer; `PROTOCOL.md` rule 9 keeps it out of `.memory-php/`
+until it has. ⚠ It does **not** settle admission — the bar is C-side and per-row,
+and `ROW14_001.md` §2 already measured both rows against it.
+
+▶ **What it discharges:** `ROW14_001.md` §7 item 1 — *"pin the commit inside the
+5.0.0→5.1.0 window for both rows"*. `UPSTREAM_001` bracketed fixes to a **release
+window** and said in terms that **a tag is not a commit**; this survey closes that
+gap for the `E3` pair. **Finding the repair is the expensive half of a row and it
+is not row-specific work, so the manager does both at once** (`UPSTREAM_001` §0's
+own precedent).
 
 ---
 
-## §0 Why this exists
+## §0 Method, and how to regenerate every byte
 
-`TASK_PHP_017` §4 refused to land the §A2a clause `ph07` proposed, and gave a
-reason that was **not** a reason about fixtures:
+```sh
+# 1. the 5.0.0 pre-image -- the PINNED TARBALL, never GitHub
+TB=/home/apt/repos_common/php-in-safe-rust/.app-tests/.temp/oracle/build-5.0.0/php-5.0.0.tar.gz
+tar -xzOf "$TB" php-5.0.0/ext/standard/array.c
+tar -xzOf "$TB" php-5.0.0/ext/pcre/php_pcre.c
 
-> *"An R1h of hunk (a) alone is memory-safety-complete, is byte-for-byte what
-> PHP shipped at 5.2.17 / 5.3.2 / 5.3.3 / 5.3.29, changes no benign output,
-> passes stage 7h on an unrestricted corpus, and needs no protocol clause at
-> all."*
+# 2. the candidate commits, by PATH and DATE WINDOW (5.0.0 .. 5.1.0)
+curl -sS "https://api.github.com/repos/php/php-src/commits?path=ext/standard/array.c&since=2004-07-01T00:00:00Z&until=2005-12-01T00:00:00Z&per_page=100"
+curl -sS "https://api.github.com/repos/php/php-src/commits?path=ext/pcre/php_pcre.c&since=2004-07-01T00:00:00Z&until=2005-12-01T00:00:00Z&per_page=100"
 
-It verified the **fact** (hunk (b) is absent at those tags) and stopped. **I
-went looking for the commit that removed it.** The answer is better than the
-fact, and it inverts open item 24.
-
-## §1 The measurement — `PHP_FUNCTION(mb_strcut)`, brace-matched, by body sha256
-
-⚠ **Ask about a FUNCTION, not about text** (F35). A `grep` for the hunk's own
-source line **misses 5.3.0**, which respells the same two guards as
-`(unsigned int)from` / `string.len`. That is this project's own trap, and it
-fired on me while I was writing this document.
-
-| tag | body | sha256/16 | hunk (a) `from > len → FALSE` | hunk (b) `from+len > len → clamp len` |
-|---|---:|---|:---:|:---:|
-| `php-5.1.2` … `php-5.2.6` | 1931 B | `a971fe526e8b8803` | ✅ | ✅ |
-| `php-5.2.7` … **`php-5.2.11`** | 1923 B | `ec8b60b77f5d7e8e` | ✅ | ✅ |
-| **`php-5.2.12`** … `php-5.2.17` | 1823 B | **`26e2099e33433c74`** | ✅ | ❌ **GONE** |
-| `php-5.3.0`, `php-5.3.1` | 1449 B | `08719ef48d57d502` | ✅ | ✅ *(respelled)* |
-| **`php-5.3.2`** … `php-5.3.29` | 1356 B | **`49ad3ab2796d63e4`** | ✅ | ❌ **GONE** |
-
-*(The 5.2.6→5.2.7 move is `MBSTRG(current_language)` → `MBSTRG(language)` — one
-token, unrelated. The 5.2→5.3 size drop is the surrounding rewrite, not the
-guards.)*
-
-**So hunk (b) is continuously present from the 2005 security commit through
-5.2.11 and 5.3.1, and is removed on both branches within five months.**
-
-## §2 ⭐⭐ THE REMOVAL COMMIT, AND IT IS NOT A CLEANUP
-
-`c2471b495009` — **Moriyoshi Koizumi, 2009-09-23**, on `PHP-5.2`. The only
-non-cosmetic commit on that file in the window (the other is a copyright-year
-`sed`). Its diff of `mbstring.c` is **exactly hunk (b) and nothing else**:
-
-```diff
- 	if (from > Z_STRLEN_PP(arg1)) {
- 		RETURN_FALSE;
- 	}
--	if (((unsigned) from + (unsigned) len) > Z_STRLEN_PP(arg1)) {
--		len = Z_STRLEN_PP(arg1) - from;
--	}
- 
- 	ret = mbfl_strcut(&string, &result, from, len);
+# 3. each candidate's patch, and the fix commit's PARENT blob
+curl -sSL "https://github.com/php/php-src/commit/<sha>.patch"
+curl -sSL "https://raw.githubusercontent.com/php/php-src/<parent-sha>/ext/standard/array.c"
 ```
 
-**Subject:** *"Fixed bug #49354 (`mb_strcut()` cuts wrong length when offset is
-within a multibyte character)."* It adds `ext/mbstring/tests/bug49354.phpt`, a
-**regression test** whose `--EXPECT--` block pins six answers that hunk (b) got
-wrong. ⭐ **And the commit message contains a rebuke:**
+⛔ **Nothing fetched here is committed.** Patches and blobs are re-derivable from
+the four commands above; this document is the evidence (`CLAUDE.md` Don't #1,
+and `F150` — *keep the generator where a checkout can see it*).
 
-> *"(This bug was introduced by the commit by r202895. Please double-check the
-> specification of the function you are going to \*fix\*.)"*
+⚠⚠ **A COMMIT MESSAGE IS NOT EVIDENCE.** Both rows had a plausible candidate
+named in its subject line, and for `ph70` the plausible one is **not** the fix.
+Every claim below is settled by **diffing the function**, not by reading the log.
 
-⚠ **NOT VERIFIED: that `r202895` resolves to `cb3cca21b345`.** The 2005 commit
-is CVS-era and the revision is an SVN number, so the identification needs a
-mapping I have not done. **What is measured is the code, not the blame** — and
-the code says the lines removed in 2009 are the lines added in 2005. Whoever
-reviews this should either resolve `r202895` or delete the sentence.
+---
 
-## §3 What this does to open item 24 — **it inverts it**
+## §1 `ph70` — ROW 14. `ext/standard/array.c`, `array_reduce`
 
-The row's position was: *stage 7h refuses R1h because the upstream fix changes
-benign output on 13.5 % of calls, so the fixture must keep the fix's guards
-dead, and protocol should say so.* Set the three facts side by side:
+### 1.1 ✅ PINNED: **`72c6d5cbafc9`** (2005-06-08)
 
-| | |
+> *"Fixed memory allocation bugs in array_reduce() with initial value
+> (#22463 & #24980)"*
+
+Inside the window (5.0.0 = 2004-07-13, 5.1.0 = 2005-11-24). Its first hunk is
+**byte-identical** to the 5.1.0 text `ROW14_001.md` §3 quoted.
+
+⚠ **The decoy, and it is the one a log-reader picks:** `dbc0bb7514a0`
+(2004-11-28) — *"fix #29954 (array_reduce segfaults when initial value is
+array)"*. It names the right function and the right symptom. **It adds
+`convert_to_long_ex(initial);` and nothing else**, leaving `result = *initial;`
+untouched — and `72c6d5cbafc9` **deletes that line again**. ▶ **It is not the
+repair.**
+
+### 1.2 ⛔⛔ THE FIX IS **TWO HUNKS**, AND `ROW14_001.md` §3 QUOTED ONE
+
+```c
+@@ PHP_FUNCTION(array_reduce)
+ 	if (ZEND_NUM_ARGS() > 2) {
+-		convert_to_long_ex(initial);
+-		result = *initial;
++		ALLOC_ZVAL(result);
++		*result = **initial;
++		zval_copy_ctor(result);
++		convert_to_long(result);
++		INIT_PZVAL(result);
+ 	} else {
+@@ the EMPTY-ARRAY early return
+ 	if (zend_hash_num_elements(htbl) == 0) {
+ 		if (result) {
+-			RETVAL_ZVAL(result, 1, 0);
++			RETVAL_ZVAL(result, 1, 1);
+ 		}
+```
+
+⭐⭐⭐ **AND THE TWO HUNKS ARE A MATCHED PAIR — EACH IS HARMFUL ALONE.**
+Hunk 1 makes `result` **owned** (a deep copy); hunk 2 makes the empty-array
+early return **free** that owned copy.
+
+| applied | consequence |
 |---|---|
-| `ph07`'s own `fix_scope.py` | hunk (b) **removes none** of the reads past `val[slen]`; hunk (a) alone closes **all** of them |
-| `ph07`'s own `fix_scope.py` | hunk (b) **changes the answer on 15 870 of 117 612** benign calls (13.5 %); hunk (a) changes none |
-| **upstream, 2009** | **deleted hunk (b) as a correctness bug, with a regression test** |
+| **both** | correct |
+| **hunk 1 only** | ⚠ **LEAK** on the empty-input path — an owned copy nobody frees |
+| **hunk 2 only** | ⛔ **DOUBLE FREE** — destroys the caller's zval, which hunk 1 was what stopped aliasing |
 
-⚠⚠⚠ **So `check.py` stage 7h was not a harness limitation getting in the way of
-a real fix. It detected the same defect PHP's own maintainers detected — four
-years later, from a bug report — and it detected it in the first hour the row
-existed.** The engineer read a true refusal as an obstacle and proposed
-protocol to route around it; `TASK_PHP_017` declined the protocol on other
-grounds and was right for a stronger reason than it gave.
+▶ **I have not seen this programme record an R1h with that property before**, and
+it is a reason to carry both sites in the kernel rather than the cited line only.
+⚠ `ROW14_001.md` §2.1's probe exercises the **loop** path; **an empty-input cell
+is owed** before the build brief ships.
 
-⭐ **This is `ph03`'s finding reached from the opposite direction.** There, a
-stated obligation caught in 2026 what a patch missed for ten years — the fix was
-**incomplete**. Here the fix was **too big**, and the part that was too big was
-not merely dead: it was **wrong**, and upstream removed it. **Two rows, two
-shipped security fixes, neither minimal nor sufficient as shipped.** That is a
-result about security patches, and it is now n = 2 rather than an anecdote.
+### 1.3 ⛔⛔⛔ THE PRE-IMAGE DOES **NOT** MATCH 5.0.0 — SO `ph70` NEEDS A **BACKPORT**
 
-## §4 The decision I am making, and its cost
+Measured by diffing `array_reduce` between the pinned 5.0.0 tarball and
+`cf5a6f81e3af` (the fix commit's parent). ✅ **Exactly three differences, and
+all three are benign for this defect:**
 
-**`ph07`'s R1h becomes the guard configuration upstream CONVERGED on — hunk (a)
-alone — pinned as `php-5.2.12 … php-5.2.17`, `PHP_FUNCTION(mb_strcut)` body
-sha256 `26e2099e33433c74`.** The two-hunk commit and the removal commit both
-stay in `controls/` as the evidence for why.
+| # | 5.0.0 | fix commit's parent | verdict |
+|---|---|---|---|
+| 1 | *(absent)* | `convert_to_long_ex(initial);` | added by the decoy `dbc0bb7514a0`; **a type coercion, not an ownership change** |
+| 2 | `*return_value = *result; zval_copy_ctor(return_value);` | `RETVAL_ZVAL(result, 1, 0)` | ✅ **semantically identical** — `copy=1, dtor=0`, a macro refactor |
+| 3 | `*return_value = *result; zval_copy_ctor(return_value); zval_ptr_dtor(&result);` | `RETVAL_ZVAL(result, 0, 1)` | ⚠ **not identical**: copy+free became a **move**. Same outcome, one fewer copy |
 
-**What it buys:**
+⭐ **`result = *initial;` — the defect — is untouched across all three.** So
+`72c6d5cbafc9` **does** repair 5.0.0's actual defect, and `ph70` joins
+`ph55`/`ph56`/`ph96`/`ph97` as a backported R1h. ⚠ **This is `F44`'s caution
+firing on a second row** (*"`bd2e99ee50ed`'s pre-image does not match 5.0.0 — so
+it is *a* fix, not demonstrably *the* fix"*) — ▶ **and here it is answered by
+measurement rather than left as a caveat.**
 
-1. ✅ **The invented §A2a clause is not needed.** Item 24 closes by **deletion**,
-   not by a rule — the best outcome available for a rule invented on n = 1.
-2. ✅ **`inputs/gen.py`'s corpus restriction goes away**, so the ladder is
-   measured over the **whole** benign domain instead of the 86.5 % of it on
-   which the shipped fix happened to agree with 5.0.0.
-3. ⭐ **F41's *"the fix costs a CONSTANT"* is re-measured on ONE comparison
-   instead of two** — a cleaner number for a cleaner claim.
-4. ⭐ **R1h stops being a choice the row has to defend and becomes a citation.**
+`RETVAL_ZVAL`'s semantics were read out of 5.1.0's `Zend/zend_API.h:441-470`,
+not assumed: `*(z)=*(zv); if(copy) zval_copy_ctor(z); if(dtor){ if(!copy)
+ZVAL_NULL(zv); zval_ptr_dtor(&zv); }`.
 
-**What it costs — and this is a REBUILD of row 2, not an edit:**
+### 1.4 ▶ THE BACKPORT, IN 5.0.0 SPELLING
 
-- `c/kernel_hardened.c`, `spec.md`'s `idiom.required[4]` (which pins R1h as
-  *"`cb3cca21b345` and NOTHING ELSE"* — inside the hashed block, so this is a
-  **re-gate**), `inputs/gen.py` and therefore **every `.bin`**, therefore **every
-  measured number on the row**, therefore F41 and `.memory-php/`.
-- ⚠⚠ **And the Rust rungs.** F41 says R2–R5 *are ports of R1h*. If they carry
-  hunk (b)'s clamp, then on the newly-admitted 13.5 % they will disagree with
-  R1 — **the identity stages will fail, and that failure is correct.** The
-  engineer must check this first and say what it found.
-- ⚠ `TASK_PHP_017`'s `v1` number (**+2.62 %**) was measured on the **restricted**
-  corpus and must be **re-derived**, not carried over.
+```c
+ 	if (ZEND_NUM_ARGS() > 2) {
+-		result = *initial;                      /* :3804 */
++		ALLOC_ZVAL(result);
++		*result = **initial;
++		zval_copy_ctor(result);
++		INIT_PZVAL(result);
+ 	} else {
+ ...
+ 	if (zend_hash_num_elements(htbl) == 0) {
+ 		if (result) {
+ 			*return_value = *result;
+ 			zval_copy_ctor(return_value);
++			zval_ptr_dtor(&result);
+ 		}
+ 		return;
+```
 
-⚠ **The honest risk, stated because it is mine:** a subset of a commit is not a
-commit, and `PROTOCOL_PHP.md` §C says R1h is *the real upstream `fix_commit`*.
-**My answer is that a tagged upstream configuration is a stronger citation than
-a commit, not a weaker one** — it is what the project *shipped and kept*, it is
-pinnable by `(tag, function, sha256)`, and four tags carry it byte-for-byte.
-**But that is a protocol extension and it is unreviewed.** → `TASK_PHP_018`
-proposes the §C wording; **nobody lands it before a reviewer has attacked it**
-(rule 9). ⚠ **It is exactly the shape of thing this programme keeps getting
-wrong: a rule invented to make one row work.** The difference I am claiming — and
-it is the thing to attack — is that the §A2a clause narrowed the *evidence* to
-fit the *artefact*, and this widens the *artefact* to fit the *evidence*.
+⛔⛔ **NOTE WHAT IS DELIBERATELY ABSENT: `convert_to_long(result);`.** Upstream's
+hunk 1 carries it as the *replacement* for `convert_to_long_ex(initial)` — a line
+**5.0.0 does not have**. Including it would make `array_reduce($a, $f, "x")`
+return `0` where 5.0.0 returns a string result: **a behaviour change smuggled in
+with a memory fix.**
+
+▶ **An R1h repairs the cited defect and nothing else.** `UPSTREAM_001` says
+*"cite the hunk, not the commit"*; this is the same rule one level finer —
+**cite the LINES, not the hunk.** ⚠ **The engineer must not silently drop it
+either: `controls/r1h_backport.py` states the choice and checks it**, as
+`ph55`/`ph56`/`ph96`/`ph97` do.
+
+✅ The normal-exit path needs **no** change: 5.0.0 already does
+`zval_ptr_dtor(&result)` there, which is correct once `result` is owned.
+
+### 1.5 ✅ The citation is byte-exact
+
+`ext/standard/array.c:3804` is `result = *initial;` in the pinned tarball —
+`PHP_FUNCTION(array_reduce)` opens at `:3774`, the in-loop
+`zval_ptr_dtor(&result)` is at `:3843`, the normal-exit one at `:3859`.
+**No off-by-one** (`F56`'s shape, checked because it has happened).
+
+---
+
+## §2 `ph69` — ROW 15. `ext/pcre/php_pcre.c`, `php_pcre_match`
+
+### 2.1 ✅ PINNED: **`631da59b5032`** (2005-10-11)
+
+> *"Fixed bug #34790 (preg_match_all(), named capturing groups, variable
+> assignment/return => crash)"*
+
+**One line**, exactly as `ROW14_001.md` §3 recorded:
+
+```c
+ 			zend_hash_update(Z_ARRVAL_P(subpats), subpat_names[i],
+ 							 strlen(subpat_names[i])+1, &match_sets[i], sizeof(zval *), NULL);
++			ZVAL_ADDREF(match_sets[i]);
+ 		}
+ 		zend_hash_next_index_insert(Z_ARRVAL_P(subpats), &match_sets[i], sizeof(zval *), NULL);
+```
+
+### 2.2 ✅✅ THE PRE-IMAGE MATCHES 5.0.0 **BYTE-FOR-BYTE** — NO BACKPORT
+
+5.0.0 `:587-590` and 5.1.0 `:620-626` are **the same seven lines**, differing
+only in offset. ⭐ **So the two rows in this batch sit on opposite sides of the
+backport question, and that asymmetry was not predictable from the window** —
+which is the argument for pinning commits rather than quoting tags.
+
+### 2.3 ⭐ IT SHIPS ITS OWN TRIGGER
+
+The commit adds `ext/pcre/tests/bug34790.phpt` — 23 lines, a named-capture
+`preg_match_all` returned out of a function, with the expected output inline.
+▶ **§A3a obligation 5 wants a trigger to re-run after rebuilding with the R1h,
+and upstream has provided one.** `ph64` already carries a
+`controls/bug41037.phpt`, so the precedent for landing it exists.
+
+⚠⚠ **DO NOT WRITE THE BRIEF'S §A3a SECTION YET.** That obligation's wording is
+`F141`, it is **UNREVIEWED**, and `_063` §4 may overturn it (`ROW14_001.md` §7
+item 2). This note records that the *input* exists, not that the obligation
+stands.
+
+---
+
+## §3 WHAT THIS SURVEY DID **NOT** SETTLE
+
+1. ⛔ **The `.patch` files are not produced.** §0's commands re-derive them; a
+   row's `controls/<sha>.patch` is landed by the row's own task, because it is
+   hashed into `source_sha256`.
+2. ⛔ **`ph70`'s backport is specified, not verified.** Nobody has applied it to
+   5.0.0 and rebuilt. **`controls/r1h_backport.py` is where that check lives**,
+   and §1.4's deliberate omission is the first thing it must assert.
+3. ⛔ **The empty-input cell for `ph70`'s probe is owed** (§1.2), and it is the
+   path hunk 2 exists for.
+4. ⚠ **Neither row's R1h has been run against its trigger.** Blocked on `F141`
+   (§2.3).
+
+⭐ **Everything above is reproducible from §0 in about five minutes**, which is
+the standard this programme has been failing at law 11 — and the reason this
+document exists instead of a scratch note.
