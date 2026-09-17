@@ -172,6 +172,16 @@ REGISTRY = {
             "BE MISLED'. A FALSE POSITIVE, adjudicated and NOT repaired: "
             "silencing a checker by editing its input is the opposite of the "
             "ratchet. READ THE COUNT, never the exit code. "
+            "⚠⚠ IT GREW A THIRD WARNING BLOCK 2026-09-17 (F147(d)) -- `law 11`, "
+            "the PUBLISHED FINDINGS resting on gitignored scratch, imported "
+            "from `probes/scratchdeps.py` rather than re-implemented. Its "
+            "`CLAIMS` list excludes `RECAP_PHP.md` because the handoff cites "
+            "current scratch as provenance for work IN FLIGHT -- TRUE of its "
+            "open-items table (14 of 48 LIVE citations) and FALSE inside its "
+            "`### F<N>` sections (34 of 48). A SECTION-level property written "
+            "as a FILE-level exclusion; NARROWED, not reversed. ⓘ The exit code "
+            "is UNCHANGED at 1 -- the new block is a warning, like the other "
+            "two, and `rot` still decides. "
             "⛔⛔⛔ THIS ENTRY SAID `st_expect=1` AND *'Both arms are red for "
             "this same one cause: --selftest fails N5d/N4, which assert "
             "rot == 0'* -- AND THAT REASONING WAS FALSE, SO THE SWEEP PRINTED "
@@ -576,6 +586,32 @@ REGISTRY = {
             "lines away, and the correct site does the HARDER version. ⚠ Do not "
             "add it to item139's census until `_063` §7.1's `same_construct?` "
             "column lands -- the fourth column changes what `held` counts."),
+    "probes/scratchdeps.py": dict(
+        kind="checker", argv=[], expect=0, negatives="flag", st_expect=0,
+        why="⛔⛔⛔ THE CENSUS OF DOCUMENTS DEPENDING ON GITIGNORED `.temp/`, AND "
+            "IT REPLACES AN ARM I BUILT FOUR DAYS EARLIER THAT WAS WRONG IN "
+            "BOTH DIRECTIONS (F147). `boxcheck.py`'s `mem_temp` arm matched "
+            "`.temp/<path>` only, so FIVE citations naming FOUR probes by BARE "
+            "FILENAME -- the evidence behind F82-F86 -- counted as ZERO; it "
+            "scanned `.memory-php/` only, missing `RECAP_PHP.md`'s own 48; and "
+            "with no tracked-twin test it reported `04-process.md:165 -> "
+            "`.temp/php39/width.py` as a LIVE dependency four days AFTER that "
+            "probe was promoted to `.tasks-php/width.py`. It printed `4`; the "
+            "set is 54 LIVE / 12 AMBIGUOUS / 6 STALE over 94 citations. "
+            "⭐⭐ AND IT WAS A SECOND HOME: `citecheck.py` has reported the same "
+            "`.memory-php/` citations since its FIRST COMMIT, eight days "
+            "earlier (F131). ▶ ONE CENSUS, IMPORTED BY WHOEVER DISPLAYS IT -- "
+            "`boxcheck.py` prints its summary line and `citecheck.py` its "
+            "detail; the `rule9_mustfire.py`->`bc.ROUTE` shape. "
+            "⚠⚠ THREE OUTCOMES, NOT TWO, AND THE THIRD IS PRINTED RATHER THAN "
+            "GUESSED: 50 tracked files are called `NOTES.md`, so a basename "
+            "resolver would report `.temp/mgr172/NOTES.md` -- the evidence "
+            "record behind F82-F86 -- as ALREADY PROMOTED. AMBIGUOUS exists for "
+            "exactly that. ⛔ `LIVE` IS A CANDIDATE SET REQUIRING ADJUDICATION "
+            "BY UNIT TEXT (F132), NOT A DEFECT COUNT -- it cannot tell a probe "
+            "I wrote from upstream source I extracted, and "
+            "`.temp/php27/streamsfuncs.c` is the rule being FOLLOWED. Item 148. "
+            "Read-only; re-derives from the working tree and `git ls-files`."),
     "probes/item125_extract.py": dict(
         kind="checker", argv=[], expect=0, negatives="none", st_expect=None,
         why="⭐ ITEM 125's POPULATION, AND IT IS PROMOTED OUT OF `.temp/` ON "
@@ -674,6 +710,169 @@ REGISTRY = {
             "REMOVED rather than the regex widened (the registry's own rule), "
             "and the blind spot is open item 131 -- three tools now speak that "
             "dialect and N12 could not tell if any went silent."),
+
+    # --- PROMOTE_001, the F82-F86 probes, RESCUED FROM `.temp/` --------------
+    # ⛔⛔ SIX PUBLISHED FINDINGS RESTED ON FIVE SCRIPTS THAT LIVED ONLY IN
+    #    GITIGNORED SCRATCH (`.temp/mgr172/`, `.temp/mgr170/`), which is
+    #    `.memory-php/04-process.md` LAW 11's exact defect: *a published finding
+    #    whose only evidence is a gitignored probe is a finding that will not
+    #    survive a clean checkout*. Same call already made for `width.py` (F92),
+    #    `probes/item125_extract.py` and `probes/ph66_djbx33a_collide.py`.
+    # ⚠⚠ AND THE DISTINCTION THAT DECIDED THE SHAPE OF THIS BATCH: a SCRIPT in
+    #    scratch is the defect; a re-derivable ARTEFACT in scratch is THE RULE
+    #    (CLAUDE.md constraint 6). The callgrind profiles STAY under
+    #    `.temp/mgr172/cg/`; what was repaired is that two probes CRASHED when
+    #    they were absent instead of saying they could not run.
+    "probes/identity_null.py": dict(
+        kind="checker", argv=["--selftest"], expect=0, negatives="flag",
+        st_expect=0,
+        why="⭐⭐⭐ F82, AND IT IS THE CHEAPEST ENTRY IN THIS REGISTRY THAT "
+            "REFUTES A PUBLISHED PREMISE. F74 chose family A by a NULL CONTROL: "
+            "`identity: unsafe == verus, O3 exact` pins R4 and R5 "
+            "byte-identical, so `verus - unsafe` has a known true value of 0. "
+            "⛔ That premise was asserted for all 39 rows and NEVER CHECKED ON "
+            "ONE -- it is FALSE on 7 of 40 (`ph07` norel, `ph45`/`ph64` differ; "
+            "PAT `p25` `p28` `p29` `p34` `p36`), so those cells are not nulls "
+            "in any mode and F74's worst quoted figures sit on some of them. "
+            "9 arms. ⭐ N6 is the one that earns its keep: it reads the level "
+            "out of the GATE RECORD and PROVES why -- `p25`'s `spec.md` carries "
+            "BOTH the boilerplate `identity: unsafe == verus, O3 exact` AND its "
+            "real pin ``O3: norel``, so a script that grepped `spec.md` would "
+            "have called `p25` a null. ⭐⭐ N7 plants a SYNTHETIC blind row and "
+            "N8/N9 assert the tree supplies BOTH `exec_rate == 1.0` and a "
+            "FRACTIONAL one, so §4's `too-clean` control is testable rather "
+            "than tautological. ✅ FREE AND CLEAN-CHECKOUT-SAFE: 0.12 s, reads "
+            "only `results*/` and `patterns/p25-realloc-growth/spec.md`, builds "
+            "nothing, runs no binary, WRITES NOTHING. Swept under `--selftest` "
+            "and not bare: the bare arm is a report."),
+    "probes/flip_exact.py": dict(
+        kind="checker", argv=["--selftest"], expect=0, negatives="flag",
+        st_expect=0,
+        why="⭐⭐⭐ F85 AND F86 -- *this project's central claim* and the proof "
+            "that it has NO SHORTCUT. It derives the EXACT condition F80 was "
+            "approximating: a family-A/family-B sign flip happens precisely "
+            "when `1` lies strictly between the two ratios, so `flip` is not an "
+            "empirical phenomenon to be thresholded but a GEOMETRIC FACT. "
+            "Measured over 366 comparisons: 38 flips, 14 BLIND, **0 "
+            "mispredictions**. 6 arms. ⭐⭐ THE THREE-CLASS SPLIT IS THE RESULT "
+            "A COUNT WOULD HAVE HIDDEN: `BLIND` (A reads exactly 0 against a "
+            "nonzero B) is WORSE than `FLIP`, and scoring it as one inflated "
+            "the first draft to 52 flips against `callee_share.py`'s 37 and "
+            "manufactured 14 `mispredictions` of a predicate that was right. "
+            "⛔ Its N4 checks `A_ratio == (s_a/s_b)*B_ratio` to 3.65e-16 and "
+            "the file SAYS THAT IS DEFINITIONAL, NOT EVIDENCE -- `inside_share` "
+            "IS `A/B`, which is F78's arithmetic-identity trap, printed so "
+            "nobody re-derives it and calls it a mechanism. ⚠ IT CARRIES A "
+            "POPULATION: `ROWS` is a hand-written list of SEVEN rows, so every "
+            "total it prints is over that set and NOT over the gated corpus "
+            "(14 php rows at 2026-09-17). Quote the numbers with the "
+            "population. ✅ FREE: 0.07 s, committed records only, writes "
+            "nothing."),
+    "probes/null_control.py": dict(
+        kind="checker", argv=[], expect=0, negatives="inline", st_expect=0,
+        why="⭐⭐ THE PROBE F74 RESTS ON -- AND THE ONE F82 CAUGHT. It is what "
+            "chose family A as the headline statistic: A's R4/R5 null reads "
+            "0.000 everywhere, B's reaches +3.652 %, and on `ph03`/`small.bin` "
+            "B's NULL EXCEEDS THE EFFECT B IS BEING USED TO MEASURE. ⚠ Its own "
+            "caution is the honest half and is easy to lose: this does NOT say "
+            "B is bad -- B's null is nonzero only on `small.bin`, because it is "
+            "a two-point SLOPE and the small input is dominated by fixed "
+            "per-call cost. B HAS AN INPUT-DEPENDENT NOISE FLOOR, and no "
+            "published table said so. ⛔⛔ AND IT IS COMMITTED **BECAUSE** IT "
+            "WAS REFUTED, NOT DESPITE IT: `probes/identity_null.py` (F82) is a "
+            "correction of THIS file's premise, and a correction whose target "
+            "has been deleted cannot be read. ⭐ Its negatives are INLINE in the "
+            "strongest sense -- a bare run executes them FIRST and refuses to "
+            "print anything if one fails (*'nothing below is believable'*), "
+            "which is `contract_audit.py`'s design reached independently. "
+            "⚠ It prints NO arm names on a pass, so N12 is blind to it -- open "
+            "item 131's dialect problem, and the reason no count is filed here. "
+            "✅ FREE: 0.10 s each arm, `results-php/` only, writes nothing. "
+            "ⓘ One docstring citation still points at `.temp/mgr170/"
+            "callee_share.py`, which was NOT promoted; it is marked in the file "
+            "as uncommitted scratch rather than silently repaired."),
+    "probes/inclusive_ir.py": dict(
+        kind="tool", argv=None, expect=None, negatives="flag", st_expect=None,
+        why="⭐⭐⭐ F83 -- *the null was MEASURING REAL WORK*. On `ph03`/`small` "
+            "the two kernels are BYTE-IDENTICAL (`md5_fn` 3385057...22df4) and "
+            "family A reads `+0.000`/call while B reads `+266.000` and family C "
+            "(kernel INCLUSIVE Ir, via `callgrind_annotate --inclusive=yes`) "
+            "reads `+265.924` -- agreeing to 0.03 % by two independent methods, "
+            "and EXACTLY on `large.bin`. ▶ So B's nonzero null is not noise, it "
+            "is allocator work that NEITHER RUNG'S CODE CAN HAVE CAUSED: B's "
+            "defect is ATTRIBUTION, and a confound does not shrink with more "
+            "measurement. ⭐ The `envctl.*` control is what rules out "
+            "`check.py`'s stack-alignment mechanism -- one binary at three "
+            "environment sizes spanning 4 000 bytes gives kernel-inclusive Ir "
+            "181,733,873 at all three, spread 0. Six must-fire negatives, "
+            "`--selftest` rc=0 measured 2026-09-17 in 1.7 s. "
+            "⛔⛔ NOT IN THE SWEEP, AND THE REASON IS NOT COST: it needs "
+            "GITIGNORED callgrind profiles (`.temp/mgr172/cg/`, generator "
+            "`probes/sweep_cg.sh` and `--regen`) and GITIGNORED build trees. "
+            "A checker that reddens when scratch is cleaned is reporting on the "
+            "scratch -- same call as `probes/ph96_arrayaccess_matrix.sh`. "
+            "⭐⭐ IT USED TO **CRASH** THERE (`TypeError: '>' not supported "
+            "between instances of 'NoneType' and 'NoneType'` at N1); it now "
+            "reports *'the check could not run, which is itself a result to "
+            "report'* and exits 0 having checked NOTHING -- `width.py`'s X3 "
+            "rule. ⚠ THAT rc=0 IS WHY `kind` IS `tool`: swept, a green NOT-RUN "
+            "line would be read as a checker passing, which is F135 exactly. "
+            "ⓘ `st_expect=None` is the item-140 conflation and is NOT honest "
+            "here in the usual way -- this file HAS a passing `--selftest`; it "
+            "is simply not swept. Run it by hand after `sweep_cg.sh`."),
+    "probes/bc_sweep.py": dict(
+        kind="tool", argv=None, expect=None, negatives="flag", st_expect=None,
+        why="⭐⭐⭐ F84, AND IT IS THE ENTRY THAT SHOWS WHY n=2 IS NOT A RATE. "
+            "F83 was published off TWO rows; this runs the same B-vs-C "
+            "comparison on all 12 R4/R5 cells and *'B is measuring real work'* "
+            "comes out TRUE ON 6 AND FALSE ON 6 -- failing in BOTH DIRECTIONS, "
+            "which no two-row sample could have shown. ⭐ `ph29/large`: C "
+            "`+2.383`/call against B `+0.000`, so B REPORTS A CLEAN NULL OVER "
+            "REAL CALL-TREE WORK -- every prior treatment, F74's included, "
+            "assumed B's error was one-directional. ⭐⭐ `ph00` reads B `-1.000` "
+            "on both inputs while C reads `0.000` on both, which puts a whole "
+            "class of `check.py`'s unexplained PAT null table (*'34 cells at "
+            "exactly -1.00'*) in the SLOPE rather than in the program. Seven "
+            "must-fire negatives, `--selftest` rc=0 measured 2026-09-17 in "
+            "8.6 s. ⛔ ITS OWN DOCSTRING SAID `TRUE ON 7 AND FALSE ON 5` WHILE "
+            "ITS OWN `report()` PRINTED `6 of 12` ON EVERY RUN -- the disputed "
+            "cell is `ph64/small` at 10.05 %, called *'agrees closely'* in "
+            "prose and a disagreement by the `< 5 %` rule the script prints. "
+            "Corrected in place at promotion, with the reason; N4 could not "
+            "catch it because it asserts only that AT LEAST ONE cell disagrees. "
+            "⛔⛔ NOT IN THE SWEEP: 24 GITIGNORED profiles (generator "
+            "`probes/sweep_cg.sh`) plus GITIGNORED build trees, same call as "
+            "`probes/inclusive_ir.py`. It used to die `KeyError: 'small'` there "
+            "-- ⚠ and worse, FIVE ARMS PRINTED `FAIL` FIRST over an empty "
+            "collection, which says *'F84 is refuted'* when the truth is *'the "
+            "profiles are gone'*. A MISSING INPUT IS NOT A REFUTATION. It now "
+            "reports that it could not run and exits 0 having checked nothing. "
+            "⚠ `ph45` is EXCLUDED from its 6 rows (TASK_PHP_037 was rebuilding "
+            "it; that task has since landed, so the gap is now standing, not a "
+            "precaution) and the corpus has grown to 14 gated php rows since."),
+    "probes/sweep_cg.sh": dict(
+        kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
+        why="⭐⭐ THE GENERATOR FOR F83's AND F84's PROFILES, and it is committed "
+            "for the reason CLAUDE.md constraint 6 gives: KEEP THE GENERATOR, "
+            "DELETE THE ARTEFACT. The 2 MB of `.out` blobs under "
+            "`.temp/mgr172/cg/` stay gitignored -- committing them would be the "
+            "defect, not the repair -- so this script IS the evidence that the "
+            "24 profiles `probes/bc_sweep.py` reads, and the `envctl.*` control "
+            "`probes/inclusive_ir.py`'s N6 reads, can be rebuilt at all. "
+            "▶ Promoting those two probes and leaving THIS in deletable scratch "
+            "would not have survived a clean checkout either: their evidence "
+            "would be committed and un-regenerable. ⛔ NEVER IN A SWEEP: it runs "
+            "callgrind over 35 binary/input pairs (~20 min cold; existing "
+            "`.out` files are SKIPPED, so a re-run is cheap and safe) and it "
+            "needs the GITIGNORED php build trees plus the PINNED valgrind at "
+            "`~/tools/valgrind/`. It has no self-test and asserts nothing, so "
+            "`negatives='none'` and `st_expect=None` are both honest here. "
+            "⛔⛔ ONE DEFECT REPORTED AND NOT REPAIRED: `R=` is a HARDCODED "
+            "ABSOLUTE PATH to this machine's checkout, not derived from `$0`, "
+            "so a reader on a different clone must edit that line. Left as "
+            "written because it is what produced every committed profile and "
+            "because `probes/rebuild_hardened_php.sh` already carries the same "
+            "shape -- ▶ which makes it a CLASS to adjudicate, not a typo."),
 }
 
 

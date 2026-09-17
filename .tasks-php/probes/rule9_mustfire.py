@@ -158,8 +158,11 @@ _SYNTH = """## Open items
 | 906 | a title | ~~▶ **It is a REVIEWER's, and it goes to `_063`**~~ ✅ RULED, the route is SPENT |
 | 907 | a title | ~~▶ **Give it to a reviewer**~~ superseded, but ▶ **it is a REVIEWER's** all over again |
 | 908 | a title | the answer is settled here. ▶ **`_064`** takes it |
+| 909 | a title | ▶ **The question for a reviewer, and I should not settle it myself** |
+| 910 | a title | a survey written for a reviewer audience, describing no open question |
 """
 _items = _re.findall(r'^\| (~~)?([0-9]+)(~~)? \|(.*)$', _SYNTH, _re.M)
+_WANT = ["901", "904", "907", "908", "909"]
 _routed = [n for st, n, _, t in _items
            if not st and _ROUTE.search(bc.unstruck(t))]
 
@@ -167,10 +170,26 @@ checks += [
     # ⚠ ASSERTED AS A SET, NOT AS A SINGLETON. This read `_routed == ["901"]`
     #   and broke the moment 904 was added -- the arm was pinned to the
     #   POPULATION rather than to the property (F132's shape, in a must-fire).
-    ("F140 report: finds exactly the routed-and-LIVE items "
-     "(901, 904, 907, 908) and only those",
-     _routed == ["901", "904", "907", "908"]),
+    # ⛔ THE EXPECTED SET IS NAMED ONCE AND THE LABEL IS DERIVED FROM IT.
+    #   This label read "(901, 904, 907, 908)" while the assertion had
+    #   already grown 909 -- a PROSE LABEL contradicting the CODE BESIDE
+    #   IT, which is the defect `PROMOTE_001` found in `bc_sweep.py`'s
+    #   docstring the same day (law 6, inside an arm's own name).
+    (f"F140 report: finds exactly the routed-and-LIVE items "
+     f"({', '.join(_WANT)}) and only those",
+     _routed == _WANT),
     ("F140 report: does NOT count a RETIRED row (902)", "902" not in _routed),
+    # ⛔⛔⛔ 909/910 ADDED 2026-09-17. Item 150 routed to a reviewer as
+    #   "▶ **The question FOR A REVIEWER**" and `ROUTE` returned NOTHING --
+    #   `F140`'s defect inside `F140`'s own remedy, and the same mechanism
+    #   as `F147`(c) one tool over: A REGEX KEYED TO AN ENUMERATED SPELLING
+    #   MEASURES THE SPELLING. 909 is the spelling that was missed; 910 is
+    #   the false positive the widening must NOT buy -- prose that merely
+    #   contains "for a reviewer" with no ▶ route marker before it.
+    ("F140 report: catches *for a reviewer*, the spelling item 150 used "
+     "and the router could not see (909)", "909" in _routed),
+    ("F140 report: the widening does NOT route prose that merely mentions "
+     "a reviewer audience with no ▶ marker (910)", "910" not in _routed),
     ("F140 report: does NOT count narration about a reviewer (903)",
      "903" not in _routed),
     # ⛔⛔⛔ 904/905 EXIST BECAUSE THE ARM'S AUTHOR EVADED IT FOUR TIMES IN

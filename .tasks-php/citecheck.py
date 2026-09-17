@@ -192,6 +192,36 @@ if warn:
         print(f'   {doc}  ->  {q}   [{st}]')
     print('   a committed claim should rest on a committed generator.')
 
+# ⛔⛔ THE EXCLUSION ABOVE WAS REASONED, HALF TRUE, AND PRICED AT THE WRONG UNIT
+# -- `F147`(d). `CLAIMS` deliberately omits `RECAP_PHP.md` because the handoff
+# "cites the manager's current scratch on purpose as provenance for work in
+# flight". MEASURED over its 48 LIVE citations: **14 are in the OPEN-ITEMS
+# TABLE, where that premise is exactly right**, and **34 are inside `### F<N>`
+# finding sections, where it is false** -- `F82`'s evidence line has been a
+# published, cited finding for days. ▶ A SECTION-LEVEL PROPERTY IMPLEMENTED AS A
+# FILE-LEVEL EXCLUSION. This NARROWS it; it does not reverse it, because the
+# half that is right bought something real and still does.
+#
+# ⭐ THE CENSUS IS NOT RE-IMPLEMENTED HERE. `probes/scratchdeps.py` owns it --
+# `boxcheck.py` prints one summary line, this prints the law-11 detail. Building
+# a second copy is what produced `F147` in the first place (`F131`).
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                'probes'))
+import scratchdeps as _sd
+
+_pfd = _sd.published_finding_deps()
+if _pfd:
+    _fs = sorted({r['finding'] for r in _pfd}, key=lambda x: int(x[1:]))
+    print(f'\n⛔ law 11 -- a PUBLISHED FINDING resting on gitignored scratch: '
+          f'{len(_pfd)} citation(s) over {len(_fs)} finding(s), '
+          f'{len({r["cite"] for r in _pfd})} distinct file(s):')
+    print(f'   {" ".join(_fs)}')
+    print('   ⚠ a CANDIDATE SET, not a defect count (F132): a finding section '
+          'may cite\n     scratch as HISTORY, and a re-derivable ARTEFACT under '
+          '`.temp/` is CLAUDE.md\n     Don\'t #1 being FOLLOWED. Adjudicate by '
+          'unit text -- open item 148.')
+    print('   members: python3 .tasks-php/probes/scratchdeps.py')
+
 # ⚠ The shared `why` block is BYTE-IDENTICAL across every row, and it carries
 # PAT-era `.temp/` citations of its own. Reporting those once per row would bury
 # the row-specific ones under 7x the noise -- so split them, and detect

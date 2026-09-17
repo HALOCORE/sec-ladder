@@ -12,6 +12,13 @@ file -- `.tasks-php/probes/rule9_mustfire.py`, `PROTOCOL_PHP.md` §H.
 """
 import re, sys, os, glob, collections
 
+# ⭐ ONE CENSUS, IMPORTED. `F147`: this file used to re-implement a `.temp/`
+# dependency census that `citecheck.py` had done for eight days, and got it
+# wrong in both directions. The engine now lives in ONE place.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                'probes'))
+import scratchdeps
+
 # The live RULE-9 table: its header row, then every `> |` row until the first
 # bare `>` line. ⚠ Scoped deliberately -- the block also holds DATED SNAPSHOT
 # tables (the `_047` one keys its findings in column TWO) and the `F96`
@@ -25,11 +32,26 @@ _R9 = re.compile(r'^> \| finding \| verdict \|.*?\n(.*?)(?=^> *$)', re.S | re.M)
 # spelling the widening added. ⛔ F131 (one home per fact) and F138 (`"I called
 # the tool's function" is not "I ran the tool"`), in the harness that polices
 # this very arm. ▶ There is now ONE regex and the probe imports it.
+# ⛔⛔⛔ THIS IS AN ENUMERATION OF SPELLINGS AND IT MEASURES THE SPELLING, NOT THE
+# PROPERTY. Widened 2026-09-17 after item 150 -- *"▶ **The question for a
+# reviewer, and I should not settle it myself**"* -- routed to a reviewer in
+# plain English and this regex returned NOTHING. `F140`'s defect recurring in
+# `F140`'s own remedy, and the SECOND instance that day: `F147`(c) is the same
+# mechanism in `scratchdeps.py` (a citation spelled as a BARE FILENAME instead of
+# a path was invisible to every validator). ▶ TWO REGEXES, ONE MECHANISM.
+# ⚠⚠ THE REPAIR IS NOT "ADD THIS SPELLING AND MOVE ON." Every addition here is
+#   evidence the enumeration cannot be completed by thinking harder; the
+#   durable answer is a ROUTING TOKEN an author must type, not a phrase a
+#   reader must guess. ▶ Open item 148's sibling question -- NOT settled here.
+# ⛔ AND DO NOT SILENCE IT THE OTHER WAY: rewording an item to suit the regex is
+#   "silencing a checker by editing its input", which this tree calls the
+#   opposite of the ratchet (`citecheck.py`'s own registry `why`).
 ROUTE = re.compile(r"(▶|and it)[^|]{0,80}?"
                    r"(is a REVIEWER|Give it to a reviewer|a reviewer can rule"
                    r"|belongs in the round|THE REVIEWER SAYS"
                    r"|a REVIEWER'?s\b|goes to `_0[0-9]+`|\*\*`_0[0-9]+`\*\*"
-                   r"|scope (it|them) into|_0[0-9]+ beside)", re.I)
+                   r"|scope (it|them) into|_0[0-9]+ beside"
+                   r"|for a reviewer\b|a reviewer (should|must)\b)", re.I)
 
 _STRUCK = re.compile(r'~~.*?~~', re.S)
 
@@ -199,43 +221,45 @@ def main():
     print(f'{"items -> a reviewer":18} {len(routed):4}  '
           f'LIVE, unscheduled: {" ".join(routed) if routed else "none"}')
 
-    # ⓘ REPORT, NEVER A GATE -- `.memory-php/` citing gitignored `.temp/`.
-    # ⚠⚠⚠ WHY THIS IS HERE: `TASK_PHP_063` §7.2 measured **114** `.temp/`
-    # citations across the four permanent document families, **10 of them in
-    # `.memory-php/`**, of which THREE are LIVE DEPENDENCIES in `02-ladder.md`
-    # on the MANAGER'S OWN SCRATCH -- the AUTHORITATIVE LAYER resting on paths
-    # `rm` is auto-permitted to delete. ⛔ And this directory family HAS already
-    # lost state once (`RECAP_PHP.md:115`: the rule-9 state lived in
-    # `.temp/mgr175/NOTES.md`).
-    # ▶ ⭐⭐⭐ IT IS AN ARM AND NOT AN OPEN ITEM ON PURPOSE. `_063` §6.3 measured
-    #   what a prose box is worth: `F123`'s repair WAS one, three rounds carried
-    #   it in capitals, and NONE DID THE WORK -- while `F140`'s printing arm
-    #   scoped the item on its first run. Registering this as item 148 would be
-    #   the losing half of that experiment, knowingly.
-    # ⛔ IT MUST NOT FAIL A RUN. A citation may legitimately be HISTORY ("+
-    #   measured at <commit> in scratch since cleaned"); what it may not do is
-    #   be a live dependency nobody can see. Print the population, leave the
-    #   judgement to a reader -- the same discipline as the router arm above.
-    mem_temp = []
-    for mf in sorted(glob.glob('.memory-php/*.md')):
-        for i, line in enumerate(open(mf, encoding='utf-8',
-                                      errors='replace'), 1):
-            for m in re.finditer(r'`?(\.temp/[A-Za-z0-9_./-]+)', line):
-                path = m.group(1).rstrip('.`,')
-                # a citation of the RULE about `.temp/` is not a dependency ON
-                # `.temp/` -- the bare directory is how the rule is spelled.
-                if path in ('.temp', '.temp/'):
-                    continue
-                mem_temp.append((f'{os.path.basename(mf)}:{i}', path,
-                                 os.path.exists(path)))
-    live = [x for x in mem_temp if x[2]]
-    print(f'{".memory-php -> .temp":18} {len(mem_temp):4}  citation(s), '
-          f'{len(live)} whose target still EXISTS (a live dependency)')
-    for where, path, _ in live:
-        print(f'{"":18} {"":4}  {where:26} {path}')
-    gone = [x for x in mem_temp if not x[2]]
-    for where, path, _ in gone:
-        print(f'{"":18} {"":4}  {where:26} {path}  ⛔ ALREADY GONE')
+    # ⓘ REPORT, NEVER A GATE -- documents depending on gitignored `.temp/`.
+    #
+    # ⛔⛔⛔ THIS ARM USED TO IMPLEMENT ITS OWN CENSUS AND THE CENSUS WAS WRONG IN
+    # BOTH DIRECTIONS (`F147`). It matched `.temp/<path>` ONLY, so five
+    # citations naming four probes by BARE FILENAME -- the evidence behind
+    # `F82`-`F86` -- counted as ZERO. It scanned `.memory-php/` ONLY, missing
+    # `RECAP_PHP.md`'s own 48. And with no tracked-twin test it reported
+    # `04-process.md:165 -> .temp/php39/width.py` as a LIVE dependency FOUR DAYS
+    # AFTER that probe was promoted to `.tasks-php/width.py`. It printed `4`;
+    # the set is 54 LIVE / 12 AMBIGUOUS / 6 STALE.
+    #
+    # ⭐⭐ AND IT WAS A SECOND HOME. `citecheck.py` has reported the same
+    #   `.memory-php/` citations since its FIRST COMMIT, eight days earlier --
+    #   so the remedy a round about `F131` produced was itself an `F131`.
+    #   ▶ ONE CENSUS, IMPORTED BY WHOEVER DISPLAYS IT: `probes/scratchdeps.py`
+    #   holds it, `citecheck.py` prints the detail, this prints one line. That
+    #   is the `probes/rule9_mustfire.py` -> `bc.ROUTE` shape, run the other way.
+    #
+    # ⚠⚠ AND THE COMMENT THAT STOOD HERE WAS A FALSE DICHOTOMY. It said
+    #   registering this as item 148 *"would be the losing half of `_063` §6.3's
+    #   experiment, knowingly"* -- pitting an ARM against an OPEN ITEM as if one
+    #   replaced the other. `_063` §7.2 ruled exactly that shape false about
+    #   item 145. ▶ AN ARM PRINTS A CANDIDATE SET; ONLY A PERSON ADJUDICATES
+    #   ONE. Item 148 is the half an arm cannot do, not the half it displaces --
+    #   and the proof is that I consumed this arm's `4` as a SET and wrote it
+    #   into the START HERE box as the next session's instructions.
+    #
+    # ⛔ IT MUST NOT FAIL A RUN. A citation may legitimately be HISTORY, and a
+    #   re-derivable ARTEFACT under `.temp/` is `CLAUDE.md` Don't #1 being
+    #   FOLLOWED, not broken. Print the summary, name where the set lives, leave
+    #   the judgement to a reader -- the same discipline as the router arm above.
+    rows = scratchdeps.census()
+    n = collections.Counter(r['verdict'] for r in rows)
+    print(f'{"docs -> .temp":18} {n[scratchdeps.LIVE]:4}  LIVE, '
+          f'{n[scratchdeps.AMBIG]} ambiguous, {n[scratchdeps.PROMOTED]} stale '
+          f'citation(s) of {len(rows)}')
+    print(f'{"":18} {"":4}  ⛔ a CANDIDATE SET, not a defect count (F132) -- '
+          f'adjudicate it: item 148')
+    print(f'{"":18} {"":4}  the members: python3 .tasks-php/probes/scratchdeps.py')
 
     for f in fail: print('FAIL:', f)
     return 1 if fail else 0
