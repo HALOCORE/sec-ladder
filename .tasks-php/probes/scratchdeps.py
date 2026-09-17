@@ -382,6 +382,13 @@ ADJUDICATION = {
     ("F150", ".temp/mgr166/asan_reach.c"): (
         VERDICT_HISTORY, "quoted to show the same FILE ruling two ways under "
         "two findings; the debt is booked once, against F50"),
+    ("F150", ".temp/mgr165/REFETCH.sh"): (
+        VERDICT_HISTORY, "F150 names it as the EXHIBIT for `keep the generator "
+        "and never say where` -- a regenerator named in a finding's own "
+        "sentence that could not regenerate anything from a clean checkout. "
+        "⭐ It replaced `asanfill.c`, which I had picked for how well it read "
+        "and which turned out to be the one case that REFUTES the lesson. The "
+        "debt itself is discharged: promoted as `probes/refetch_f50_census.sh`"),
     ("F151", ".temp/php41/probe_wrap.rs"): (
         VERDICT_HISTORY, "F151 is ABOUT this citation being unscanned inside "
         "`ph53/verus.rs`. ▶ The DEBT is open item 152 (a re-gate), not a "

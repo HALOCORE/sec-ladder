@@ -45,25 +45,26 @@ between them read `CLAUDE.md`'s top table.
 ## ▶ START HERE — the next action, in ≤ 20 lines
 
 ```
-STATE   ⭐ 13 ROWS; **9/20 fam, 24 owed** to floor 37. ⛔ **BACKLOG 5** (`F147`-`F151`), all
-        MINE, all UNREVIEWED -- rule 9 WORKING, and the pile is the price of it.
-✅ DONE  **ITEM 148 ADJUDICATED** (`F150`): 27 law-11 citations ruled BY UNIT TEXT --
-        **17 RESTS / 6 HISTORY / 4 NOTDEP** over 14 files, 13 findings. ⛔⛔ **THE ROW
-        PREDICTED A MINORITY; IT IS 63 %**, and **11 of the 13 are UNREVIEWED**, so for
-        them the gitignored probe is the ONLY evidence anywhere. ⭐⭐ **THE CAUSE IS THE
-        RULE BEING OBEYED**: `F102` kept its generator and Don't #1 never says WHERE.
-        ⛔⛔⛔ **`F151`: `citecheck.py` READ 3 OF 15 HASHED ROLE-CLASSES** -- 118 `.temp/`
-        citations in 35 files, incl. `ph53/verus.rs:24,350` -> the EXACT leftover named in
-        the comment documenting its own last repair. ✅ Scan set now DERIVED from
-        `source_sha256`; it cannot again be narrower than what it certifies.
-NEXT    ▶ **153** promote the 14 (`PROMOTE_001`'s method, ~2 tasks) -- ⛔ **`F85` FIRST**,
-        the central claim, BOTH probes in scratch · **149** `width.py`'s `X3` · **150** work
-        with no task number · **151** `ph66` `O0` (a RE-GATE) + 12 rows · **152** the
-        `verus.rs` citations (batch per row). ▶ THEN **ROW 14 = `ph70`** (E3), scoped at
-        **`.tasks-php/ROW14_001.md`**.
-⚠ TRAPS ⛔ **SWEEP A *DIFFERENCE* AT 32 PADS OR CLAIM NO VERDICT ABOUT IT (`F149`b).**
-        ⛔ **NEVER INFER AN ABSENCE FROM A CLI's SHAPE OR A `grep -c`. RUN IT.**
-        ⛔ **A CHECKER MUST NOT DEFINE A SET THE THING IT CERTIFIES ALREADY DEFINES.**
+STATE   ⭐ 13 ROWS; **9/20 fam, 24 owed** to floor 37. ⛔ **BACKLOG 6** (`F147`-`F152`), all
+        MINE, all UNREVIEWED. ⭐ **`RESTS` IS `0`** -- law 11's 14 defects are discharged.
+✅ DONE  **148 ADJUDICATED · 149 SETTLED · 153 DISCHARGED** (`_064`, 15 files promoted).
+        ⛔⛔ **THE ENGINEER FILED 5 FINDINGS AGAINST MY BRIEF; 4 CHANGED SOMETHING
+        PUBLISHED.** `F102` was ALREADY promoted (a RENAME the census cannot see) and I had
+        ruled it a defect. ⛔ **`F150`'s *"11 of 13 UNREVIEWED"* WAS WRONG -- it is 4/4/5
+        (reviewed / not / NO MARKER)**, counted with a regex over prose: **`F148` in the
+        session that filed `F148`.** ▶ Corrected IN PLACE; the cause is item **154**.
+        ⭐⭐ **2 FIGURES MOVED, both re-verified by me**: `F73` `0 of 6` -> **1 of 14**;
+        `F85` `29 of 38` -> **111 of 141** -- ▶ **the RATIO survives a 2.3x corpus
+        (76.3->78.7 %), the COUNT does not.** ⛔ **`F151`/`F152`: a scope by DIRECTORY or by
+        LIST where the property is about KIND -- `n = 3` in a week, each in a DIFFERENT
+        instrument, no repair generalising to the next.**
+NEXT    ▶ **ROW 14 = `ph70`** (E3) -- ⭐ **R1h PINNED** (`UPSTREAM_002.md`): `72c6d5cbafc9`,
+        **TWO hunks, each harmful alone**, pre-image NOT 5.0.0 so it needs a BACKPORT.
+        ⛔ `ROW14_001` §7 still owes the kernel design + an EMPTY-INPUT probe cell.
+        ▶ ALSO **154**+**150** (reviewer's) · **155** 3 probes, no negatives · **156** which
+        census owns `.tasks-php/*.md` · **151** `ph66` `O0` · **152** `verus.rs` re-gates.
+⚠ TRAPS ⛔ **A SCOPE IS A CLAIM. SAY WHICH *KIND* OF THING IT COVERS, NOT WHICH FOLDER.**
+        ⛔ **NEVER INFER AN ABSENCE FROM A CLI's SHAPE, A `grep -c`, OR A REGEX OVER PROSE.**
 ```
 
 ---
@@ -1608,7 +1609,7 @@ evidence.** ⚠ The engineer caught it by looking up the number instead of
 trusting the sentence.
 
 ⚠ **Sibling, same week, same class: F52's EIGHTH shape, in a manager probe.**
-`item48_decide.py` v1 compared **prose-bearing** `c_file_line` cells, so
+`.tasks-php/probes/item48_decide.py` v1 compared **prose-bearing** `c_file_line` cells, so
 *"distinct sites"* was guaranteed and it returned a perfect **30 of 30**. ⭐ **A
 result that is too clean is the only warning this shape gives**; the repaired
 probe brackets three granularities and carries must-fires for the prose strip.
@@ -1848,7 +1849,7 @@ those two as written pins spellings the shipped tree **contradicts**:
   per-language keys cannot say it (both are Rust), so ▶ **the entry owes a
   sentence**, or the record carries two absences no reader can adjudicate.
 
-⭐ **The falsifiable prediction** (`ph29_predict.py` runs the *shipped*
+⭐ **The falsifiable prediction** (`.tasks-php/probes/ph29_predict.py` runs the *shipped*
 `idiom_audit` on an *in-memory* edit): `spellings` 4 → **12**, `pairs` 12 → **36**,
 `present` 0 → **22**, `required_pins_nothing` **0**, `required_absent` 0 → **2**,
 `forbidden_hits` **0**. The naive all-eight edit gives `present 20`,
@@ -1894,7 +1895,7 @@ side.
 
 ⭐ **What survives, because it was measured rather than told:** the manager
 reproduced the backtick trap *while writing the task file* — the first draft of
-`ph29_predict.py` put the old span **in backticks** into its explanatory tail,
+`.tasks-php/probes/ph29_predict.py` put the old span **in backticks** into its explanatory tail,
 which would have added a second pin, including the dead char-literal one F73
 warns about. Caught before it ran. ⚠ **And `_033` then hit the trap's SIBLING**
 (F76 below). *A documented trap that goes on catching its own documentation's
@@ -1912,7 +1913,7 @@ author reads. ▶ The keys are `c` and `rust`, **and nothing else.**
 
 ### F73 — ⚠⚠ A DECLARED SPELLING CONTAINING A **CHARACTER LITERAL** CAN NEVER MATCH — LATENT TODAY, **0 of 33 PAT AND 0 of 6 PHP**
 
-Manager, `.temp/mgr169/charlit_reach.py` (`--selftest` PASS, 6 must-fire
+Manager, `.tasks-php/probes/charlit_reach.py` (`--selftest` PASS, 6 must-fire
 negatives; the detector is **differential** — it asks whether the *shipped*
 blanker changes the span, so it cannot drift from the matcher, and P3 confirms
 it does **not** trip on Rust lifetimes `&'a [u8]`).
@@ -1944,6 +1945,46 @@ which pins `kernel.c:247` and `hardened:175`, one line each.
 The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
+
+### F152 — ⛔⛔ **EIGHT STANDING CLAIM DOCUMENTS — INCLUDING `PROTOCOL_PHP.md` ITSELF — ARE IN *NEITHER* `.temp/` CENSUS, BECAUSE BOTH SCOPE BY DIRECTORY AND THE PROPERTY IS ABOUT DOCUMENT KIND**
+
+Manager, ⛔ **UNREVIEWED** (rule 9). **The site was found by `TASK_PHP_064`'s
+engineer**, while repointing a citation it was told to leave alone; the census
+below is mine.
+
+**`citecheck.py`'s `CLAIMS` excludes `.tasks-php/*.md`, and it says why:** task
+files *"say `scratch under .temp/phNN/` as an INSTRUCTION TO CREATE"*.
+✅ **That reason is correct — and it is a reason about `TASK_PHP_NNN*.md`, not
+about a directory.** `scratchdeps.scan_set()` reads only `RECAP_PHP.md` and
+`.memory-php/*.md`, so it does not cover them either.
+
+✅ **MEASURED over `.tasks-php/*.md` minus `TASK_PHP_*` and `*_REPORT.md`:
+8 standing documents · 35 `.temp/` citations · 9 ALREADY GONE.**
+
+| document | citations | note |
+|---|---:|---|
+| **`PROTOCOL_PHP.md`** | **18** | ⛔ **the protocol itself** — 3 targets already gone, and `:1401` cited `F73`'s probe in scratch |
+| `NULLCTL_001.md` | 5 | the evidence record the *last* promotion produced |
+| `ADJUDICATION_001.md` · `ROW13_001.md` · four others | 12 | 6 gone |
+
+⛔⛔ **THE PROTOCOL IS THE WORST PLACE FOR THIS AND THE MOST PREDICTABLE.** It is
+where `§H` is defined — *a validator lands with its must-fire negatives or it
+does not land* — and it carried a `.temp/mgr169/charlit_reach.py` pointer for
+six days, in neither census, next to a figure that had gone false.
+
+⭐⭐ **THE MECHANISM IS THE SESSION'S, FOR THE THIRD TIME: A SCOPE DEFINED BY
+DIRECTORY WHERE THE PROPERTY IS ABOUT KIND.** `F147`(d) was *a section-level
+property implemented as a file-level exclusion*; `F151` was *a role-set
+implemented as a hand-written list*; this is *a document-kind property
+implemented as a glob*. ▶ **All three are the same error and none of the three
+repairs generalised to the next one** — which is `F147`'s own claim, now with
+`n = 3` inside one week, **every instance in a different instrument.**
+
+⚠⚠ **WHAT THIS IS NOT: 35 DEFECTS.** Most are `.log` provenance notes, the
+benign class. ▶ **The finding is that nobody was looking**, and that the nine
+dead pointers had no reporter. ⛔ **NO REPAIR IS PROPOSED HERE** — widening
+either census is a choice between two homes (`F131`), and I have just published
+a wrong count by reaching for the nearest instrument. → open item **156**.
 
 ### F151 — ⛔⛔⛔ `citecheck.py`'s SCAN SET WAS A **LIST** WHERE THE GATE HAS A **DERIVATION**, SO IT CERTIFIED THREE OF FIFTEEN HASHED ROLE-CLASSES — AND THE LEFTOVER IT MISSED IS THE ONE NAMED IN THE COMMENT DOCUMENTING ITS OWN LAST REPAIR
 
@@ -2016,21 +2057,54 @@ reason in the citing sentence's own terms.
 
 ⚠⚠ **THE ROW SAID *"EXPECT A MINORITY"* AND IT IS A MAJORITY — 63 %.** `F21`/`F37`
 say report a dead channel plainly; the same duty runs the other way, and this
-one is live. ⛔ **The severity is worse than the count**: of the 13 findings,
-**only `F89` and `F95` have been independently reviewed**, and `F89`'s reviewer
-reproduced the *contrast* by a different design while its two published figures
-still rest on the probe alone. **For 11 of 13 there is no second method
-anywhere.** ⚠ Nothing has been lost yet — all 17 targets resolve today — so the
+one is live. ⚠ Nothing has been lost yet — all 17 targets resolve today — so the
 exposure is real and the loss is still hypothetical.
 
+⛔⛔⛔ **AND THE SEVERITY SENTENCE THAT STOOD HERE WAS WRONG. IT READ *"only
+`F89` and `F95` have been independently reviewed … for 11 of 13 there is no
+second method anywhere."* REPLACED, NOT ANNOTATED** (item 73). Caught by
+`TASK_PHP_064`'s engineer. **Re-read from each finding's own verdict block:**
+
+| status | findings | n |
+|---|---|---:|
+| ✅ **REVIEWED** | `F89` `F95` `F100` (all `_043`) · `F102` (`_047`, `UPHELD-NARROWED`) | **4** |
+| ⛔ **UNREVIEWED**, marked in the section | `F72` `F74` `F85` `F90` | **4** |
+| ⚠ **NO MARKER AT ALL** | `F44` `F50` `F53` `F70` `F73` | **5** |
+
+▶ ***"No marker" is not "unreviewed" — it is UNKNOWN, and that is its own
+finding.*** The honest statement is **4 of 13 reviewed, 4 explicitly not, and 5
+whose review status the tree does not record.**
+
+⛔⛔ **HOW I GOT IT WRONG, AND IT IS THE SESSION'S OWN LESSON FIRING ON ME.** I
+counted with a regex — `REVIEWED AT (\S+ \S+) — ([A-Z-]+)` — over prose. `F100`'s
+heading spells it `REVIEWED AT \`TASK_PHP_043\` — **UPHELD-NARROWED.` with the
+verdict in markdown bold, so the character class missed it. **`F148` is *"a
+`grep -c` over hard-wrapped prose fails in BOTH directions"*, and I published a
+count off exactly that instrument in the session that filed it.**
+
+⛔⛔⛔ **AND THE REAL DEFECT IS DEEPER: THE PROGRAMME'S HOME FOR THIS FACT CANNOT
+ANSWER THE QUESTION.** `boxcheck.rule9_rows` parses **44 rows and NONE of these
+13** — because the RULE-9 block has **two formats**, one finding per row from
+`F107` on, and a grouped cell (`F97 · F102 · F104`) for the `_047` era. ▶ **So
+review status for pre-`F107` findings is not derivable at all**, and `F102`'s
+own section still says `⚠ UNREVIEWED` while the `_047` block files it under
+`UPHELD-NARROWED`. **Two homes for one fact, disagreeing** (`F131`), on the
+process state that governs what may enter the authoritative layer. → item **154**.
+
 ⭐⭐ **THE MECHANISM, AND IT IS NOT CARELESSNESS — IT IS THE RULE BEING OBEYED
-TO THE LETTER.** `F102`'s citation reads *"`.temp/mgr176/asanfill.c`, generator
-kept, binaries deleted"*. That is `CLAUDE.md` Don't #1 done **exactly right**:
-keep the generator, delete the artefact. ▶ **The rule says KEEP THE GENERATOR
-AND NEVER SAYS WHERE, and `.temp/` is gitignored — so obeying it precisely still
-produces a law-11 defect.** ⚠ **That is the single most useful sentence in this
-finding**, and it explains why the class keeps recurring under authors who are
-following the rules rather than ignoring them.
+TO THE LETTER.** `CLAUDE.md` Don't #1 says **keep the generator, delete the
+artefact** — and it **never says WHERE**, while `.temp/` is gitignored. ▶ **So
+obeying it precisely still produces a law-11 defect.** That is why the class
+recurs under authors following the rules rather than ignoring them.
+
+⚠⚠ **I FIRST ILLUSTRATED THAT WITH `F102`'s *"generator kept, binaries deleted"*
+AND `F102` IS THE WRONG EXHIBIT — ITS AUTHOR HAD ALREADY DONE THE WHOLE JOB.**
+The generator was promoted on 2026-09-13 as `.tasks-php/asan_fill_byte.c`; only
+the citation was never repointed. ⛔ **I picked the exhibit for how well it read
+and it was the one case that refutes it.** ▶ The lesson stands on the *other*
+thirteen, where the generator genuinely had no committed home — and the example
+to quote is **`F50`'s `REFETCH.sh`**, a regenerator named in a finding's own
+sentence that could not regenerate anything from a clean checkout.
 
 ⭐ **THREE OF THE 27 ARE FALSE POSITIVES OF MY OWN CENSUS, AND THEY ARE RULED
 `NOTDEP` RATHER THAN QUIETLY DROPPED.** At `F59` and `F69` the token
@@ -5473,7 +5547,7 @@ counts**: heap vs **stack** · a pointer value vs a **discriminant** · a fold v
 
 > ### ⛔⛔⛔ THE MEASURED RESULT, AND IT CHANGES THE ROW: **A CLEAN STACK SLOT IS `IS_NULL`, AND `zval_dtor` NO-OPS ON IT**
 >
-> **Measured on this box** (`.temp/mgr176/asanfill.c`, generator kept, binaries
+> **Measured on this box** (`.tasks-php/asan_fill_byte.c`, generator kept, binaries
 > deleted), `clang -O1 -fsanitize=address`: fresh `malloc(64)` reads
 > **`be be be be be be be be`**; an un-initialised `stack[64]` reads
 > **`00 00 00 00 00 00 00 00`** — **with and without the sanitizer.**
@@ -5645,7 +5719,7 @@ could not. ⚠ **So the next row's suite should be expected to find a fifth.**
 > PURPOSE, AND THE TWO DISAGREE"* — IS ITSELF WRONG, and it is the sentence that
 > made this look undecidable for two tasks.**
 >
-> ✅ **The degeneracy was SIMULATED, not inherited** — `.temp/php43/item83_sim.py`
+> ✅ **The degeneracy was SIMULATED, not inherited** — `.tasks-php/probes/item83_sim.py`
 > (`--selftest` PASS, 4 negatives) drives the row's **own** verdict functions.
 > ✅ **All six published A1 percentages re-derive to the digit.** ⭐ *"Eight
 > corrections, none of them arithmetic"* holds for a ninth: **F100's arithmetic
@@ -6017,7 +6091,7 @@ now 4 of 7 rows** (item 58's residue → item **80**); `MAXD = 16`; and the
 > hardcode and will move at row 9.**
 > ⛔⛔ **AND THE MANAGER'S `same_function` GUARD IS *NECESSARY, NOT SUFFICIENT*:
 > the reviewer MADE IT ACCEPT A ZERO-LEADING-CONTEXT HUNK AS PROOF**
-> (`.temp/php43/samefunc_hole.py`). ✅ **Live reach on the real corpus is `0`**, so
+> (`.tasks-php/probes/samefunc_hole.py`). ✅ **Live reach on the real corpus is `0`**, so
 > it is **latent, not live** — ⚠ **but it is exactly the shape F95 itself exists to
 > name: a soundness test promoting an exclusion to a proof.** → item **87**.
 
@@ -6567,7 +6641,7 @@ delivered by an experiment written to be able to say it** (`_039` §1's `E5` was
 a declared falsifier for its own conclusion; it did not fire, but the
 disconfirming arm existed). **The section below is left as written.**
 
-Manager, `.temp/mgr173/ph64_draws.py`'s data re-sliced. ⚠ **UNREVIEWED**, and it
+Manager, `.tasks-php/probes/ph64_draws.py`'s data re-sliced. ⚠ **UNREVIEWED**, and it
 **disagrees with `TASK_PHP_038` §6**, whose work it rests on.
 
 **F88's draw effect is ORDINARY SAMPLING ERROR AND `probe_iters` IS A LEVER ON
@@ -6633,7 +6707,7 @@ adjudicated F85 — but **it is no longer the answer to B's instability**, and
 > must be quoted as *that sweep's* same-language spread and never as *the*
 > same-language spread.**
 
-Manager, `.temp/mgr173/ph64_draws.py` (`--selftest` **PASS, 5 negatives**).
+Manager, `.tasks-php/probes/ph64_draws.py` (`--selftest` **PASS, 5 negatives**).
 ⚠ **UNREVIEWED** (rule 9). Nine **100-wide** spans at different offsets, so every
 slope is a 100-draw sample and the only thing varying is *which* draws.
 
@@ -6983,7 +7057,7 @@ ALWAYS.**
 
 ### F85 — ⚠⚠⚠ THE **CROSS-LANGUAGE** COLUMN CARRIES **29 OF 38** SIGN FLIPS, AND **28 OF THE 29** SURVIVE FAMILY C
 
-Manager, `.temp/mgr172/STATISTIC-DECISION-DRAFT.md` §5, probes `callee_share.py`
+Manager, `.tasks-php/STATISTIC_DECISION_001.md` §5, probes `.tasks-php/probes/callee_share.py`
 + `sweep_cg.sh`. ⚠ **UNREVIEWED** (rule 9), **and it needs a reviewer** — this is
 the programme's central claim.
 
@@ -7393,7 +7467,7 @@ hunt F52.
 ### F74 — ⭐⭐⭐ ITEM 52 IS SETTLED **BY A NULL CONTROL THE PROJECT ALREADY SHIPS**, AND THE ANSWER IS FAMILY A
 
 Manager, `.temp/mgr170/NOTES.md` §1a–§1k. Three probes, each `--selftest` PASS:
-`spread_stat.py` · `callee_share.py` · `null_control.py`. ⚠ **UNREVIEWED**
+`.tasks-php/probes/spread_stat.py` · `.tasks-php/probes/callee_share.py` · `.tasks-php/probes/null_control.py`. ⚠ **UNREVIEWED**
 (rule 9).
 
 **There are not two statistics, there are SIX in TWO FAMILIES**, and **three are
@@ -8188,7 +8262,7 @@ first — which is why the check must be **reported, never enforced**.
 
 `TASK_PHP_023` §2.6 and §4.3. **The landed `ph32` block said all three short
 entity tables *"are repaired by ONE commit … which is why they are one row"*.**
-✅ **Measured at each commit** (`entcount.py` run at nine PHP-5.0 commits
+✅ **Measured at each commit** (`.tasks-php/probes/entcount.py` run at nine PHP-5.0 commits
 touching `html.c` between 5.0.3 and 5.0.4): at **`b9ff04703f16` (2005-01-11)**,
 two months earlier, `ent_uni_spacing` and `ent_uni_8592_9002` are **already
 `ok`** while `ent_uni_338_402` is still **63/65**. **`56adfe1f3cf1` repairs one
@@ -8332,7 +8406,7 @@ the landing scripts.
 
 ### F50 (MANAGER, UNREVIEWED, n = 1) — ⭐⭐ A FIX COMMIT IS A **CENSUS** OF ITS DEFECT'S SIBLINGS, AND WE HAVE ONLY EVER READ IT AS A SOURCE OF R1h
 
-Found while prepping `ph16`'s build task — evidence and a `REFETCH.sh` that
+Found while prepping `ph16`'s build task — evidence and a `.tasks-php/probes/refetch_f50_census.sh` that
 regenerates all of it in `.temp/mgr166/`. ⚠ **`PROTOCOL.md` rule 3: this is my
 own observation and I have not cleared it. `TASK_PHP_026` is written to attack
 it, and my prediction is written down there so it can be refuted.**
@@ -8393,7 +8467,7 @@ Win32's `fd_set` is a counted array of `SOCKET`s. **R1h must state which branch
 it compiles.**
 
 ⭐⭐ **AND THE ROW'S ORACLE PROBLEM IS SOLVED, BY MEASUREMENT** (rule 14 —
-`.temp/mgr166/asan_reach.c`, one write per process past a 128-byte on-stack
+`.tasks-php/probes/asan_reach.c`, one write per process past a 128-byte on-stack
 `fd_set`, **identical at `-O0`, `-O1`, `-O3`**):
 
 | bytes past the object | ASan | canary |
@@ -8921,7 +8995,7 @@ independently, but **two of its four cells are wrong.**
    comment bug it repairs is a **later** regression (*"merge error from 4.3"*) —
    so it is *a* fix, not demonstrably *the* fix. **F38 half 2 landing on the
    evidence I used to make the point.**
-2. ⭐ **It is FOUR tables, not two.** `.temp/mgr165/count_ent.py`, comment-aware,
+2. ⭐ **It is FOUR tables, not two.** `.tasks-php/probes/count_ent.py`, comment-aware,
    at 5.0.0: `ent_uni_338_402` **63/65**, `ent_uni_spacing` **22/23**,
    `ent_uni_punct` **66/67**, `ent_uni_8592_9002` **410/411**; **the other
    thirteen are exact**, and all four are repaired by 5.0.5. ✅ **This
@@ -9717,4 +9791,7 @@ the wrong one.
 | 150 | ⚠ **I DISPATCHED A TASK'S WORTH OF WORK WITHOUT A TASK NUMBER, AND THE COST LEDGER CANNOT SEE IT — `n = 1`, STATED AS `n = 1`** | Manager, 2026-09-17. `task_cost.py` is keyed on `TASK_PHP_NNN`, so `PROMOTE_001` — a dispatched subagent with a brief, a 406-line engineer report, ~20 minutes and 110 tool calls — **is priced at ZERO**, and every figure the ledger publishes (`marginal 2.38`, `PUBLISH ~57..~72`) is computed without it. ⛔ **This is `F142`'s defect in a NEW SPELLING**: there, real row work sat misclassified `PENDING` *inside* the namespace and understated the projection; here it sits *outside* the namespace entirely, where no classification can be wrong because none exists. ✅ **MEASURED, and the population is exactly one**: `PROMOTE_001_REPORT.md` is the ONLY `*_REPORT.md` in `.tasks-php/` without a task number. ⚠⚠ **The other 12 unnumbered documents are NOT evidence for this** — `ADJUDICATION_00N`, `QUOTA_001`, `ROW13/14_001`, `STATISTICS_001`, `UPSTREAM_00N`, `FIXSURVEY_001`, `NULLCTL_001` are MANAGER write-ups produced inside numbered sessions, so their effort is plausibly already charged. **I have not verified that, and I am not claiming it** — ⛔ **`n = 1` is not a rate** (item 123). | ▶ **The question for a reviewer, and I should not settle it myself because it prices my own work** (`_057`'s engineer refused exactly this, and was right): should a dispatched chore be NUMBERED, or should the ledger learn a second namespace? ⚠ **Numbering is the cheaper answer and the one that needs no tool change** — but it makes every promotion a task file, which is the ceremony `_063` §7.2 ruled a false dichotomy about. ⓘ **Do NOT retro-number `PROMOTE_001`**: the ledger's own figures are quoted with commits, and moving a denominator under a published range is `F126`'s defect |
 | 151 | ⛔⛔ **CORRECT `ph66`'s `O0` SUMMARY (a RE-GATE), AND SWEEP THE OTHER TWELVE ROWS AT `O0` — NOBODY HAS LOOKED BECAUSE UNTIL TODAY NOBODY COULD** | `F149`. **(a)** `patterns-php/ph66-hashdel-uncompared/NOTES.md:345-346` summarises four `O0` family-B figures as *“the extra conjunct costs at `O0`”*; the certified 32-pad sweep says that holds on **three** cells and is **NOT ESTABLISHED** on `large`/gcc, where the alignment step (`8.89`) EXCEEDS the effect (`6.12`) and the pair reads **SIGN-UNSTABLE**. ⛔ `NOTES.md` is in the gate record's `source_sha256` (`19b8d3fa72be0dba…`), so the fix **costs a `ph66` RE-GATE** — ▶ **batch it with that row's next task**, the practice items 36 and 39(c) already set. ⓘ **Not an accusation of over-claiming**: the row labels its `O0` rows *“LOWERING READINGS AND NOT PERFORMANCE CLAIMS”* in capitals and was correct under the rule as it stood; the defect is in the SUMMARY and the row was structurally unable to detect it. **(b)** ⭐⭐ **THE BIGGER HALF: twelve other built rows have never been swept at `O0` at all**, and the one row that has just produced a sign-unstable cell on its first look. **Cost: ~20 min per row per input at 32 pads** (measured: `ph66` both inputs ≈ 25 min), so this is a sweep task, not a by-hand one. ⚠⚠ **DO NOT let this become a licence to publish `O0` MAGNITUDES** — `.memory-php/03-numbers.md` stands and `--opt` buys a SIGN only, labelled a lowering reading, and only if swept | ⚠ **AND THE METHOD WARNING THAT COMES WITH IT, which is `F149`(b) and is bigger than either half above**: a **4-pad** screen reported that same cell `RESOLVABLE`/`SIGN-STABLE` with range `0.00` — ⛔ **the opposite verdict on BOTH axes** — because at the four sampled residues the two cells move together and diverge only where the screen never looks. ▶ **Sweep DIFFERENCES at 32 pads or do not claim a verdict about them**; a sparse screen is complete for a CELL and not for a DIFFERENCE, which `php50_align_sweep.py`'s docstring has argued since it was written and which is now MEASURED |
 | 152 | ⛔⛔ **34 ROW-SPECIFIC `.temp/` CITATIONS SIT INSIDE HASHED SOURCES — BATCH EACH WITH ITS ROW'S NEXT TASK** | `F151`. ▶ **Run it, do not quote this row**: `python3 .tasks-php/citecheck.py`, the section headed *ROW-SPECIFIC `.temp/` citations inside OTHER HASHED sources*. **118 citations across 35 files** the checker could not see before today — **34 row-specific, 84 inherited through shared files, 1 already gone.** ⛔ **Each sits in `source_sha256`, so repairing one costs that row a RE-GATE and not a re-measure** — which is `citecheck.py`'s own standing rule for `controls/*`, and the reason this is a batching item and not a wave. ⭐ **THE ONE TO DO FIRST IS `ph53/verus.rs:24` and `:350`** → `.temp/php41/probe_wrap.rs`: it is the leftover the `F99` repair was written to catch, it is named in `citecheck.py`'s own comment, and `ph53` is the row most likely to be re-gated next. ⚠⚠ **THIS IS A CANDIDATE SET, NOT A DEFECT COUNT** (`F132`): most of the 118 are provenance notes in comments (*"measured at `.temp/php13/02-reach.log`"*), the same benign class as the 32 historical `controls/*` ones, and **`.temp/php4/*` under `c/emalloc_shim.h` is inherited by all 14 rows** — a corpus-wide debt with items 55/61, not a row's. ⓘ **The six inherited ones are listed separately by the tool for exactly that reason.** ▶ **The rule that decides each: a re-derivable log or blob cited as PROVENANCE is `CLAUDE.md` Don't #1 being followed; a SCRIPT or EVIDENCE DOCUMENT the row's claim depends on is the defect** — the same test item 148 used, applied one layer down | ⚠ **DO NOT "fix" these by committing artefacts.** A `.log` under `.temp/` is deletable by constraint 6; the repair is to drop the pointer or re-ground it, never to freeze the blob |
-| 153 | ⛔⛔⛔ **PROMOTE THE 14 FILES 13 PUBLISHED FINDINGS REST ON — `PROMOTE_001`'s METHOD, AND `F85` FIRST** | `F150`, the discharge of item 148's ruling. ▶ **Run it for the list, do not quote this row**: `python3 .tasks-php/probes/scratchdeps.py`, the `RESTS` block. ⭐ **`PROMOTE_001` discharged 6 files in ONE task**, so 14 is about two — and it is the only task shape in this programme with a measured rate. ⛔ **`F85` FIRST AND IT IS NOT CLOSE**: the finding is *"the programme's central claim"* (29 of 38 sign flips are cross-language), it is **UNREVIEWED**, and **both** its named probes — `.temp/mgr170/callee_share.py` and `.temp/mgr172/STATISTIC-DECISION-DRAFT.md` §5 — are in scratch. ⚠ **`F74` shares `callee_share.py`, so those two discharge together**; `spread_stat.py` comes with them and `null_control.py` is already promoted, which is exactly how this gap survived — **a sibling promotion that took three of four.** ▶ **Order after `F85`/`F74`: `F89`+`F90` (`ph64_draws.py`, one file, two findings) · `F73` (`charlit_reach.py`, 6 negatives lost with it) · `F70`/`F69` (`item48_decide.py`, the measurement that DECIDED item 48) · `F50` (`asan_reach.c` + `REFETCH.sh`) · `F100` · `F95` · `F53` · `F44` · `F102`.** ⭐ **`F95`'s file is the REVIEWER's own counterexample** — `law 12` says the reviewer's independence is the product, and this is the only copy of it. ⚠⚠ **PROMOTION IS NOT COPYING**: `PROMOTE_001`'s engineer refused to copy a header that claimed a guard *"does not fail"* when it does (item 149), and its report filed five findings against my brief. **Each file needs a header stating what it measured, when, and what is still owed** — `NULLCTL_001.md` is the model. ⓘ **Free** — `.tasks-php/` is in no digest | ⚠ **Nothing is lost yet**: all 17 targets resolve today, so this buys durability, not recovery. ⛔ **But `CLAUDE.md` constraint 6 MANDATES deleting `.temp/` once gates are green**, so the expiry is scheduled and not hypothetical |
+| ~~153~~ | ✅✅ **DISCHARGED 2026-09-17 — `TASK_PHP_064`. `RESTS` IS NOW `0`, MEASURED, NOT ASSERTED** (`python3 .tasks-php/probes/scratchdeps.py`). **15 files promoted, 13 new registry entries, every probe RUN rather than copied**; `F102` needed a REPOINT, not a promotion. ⭐⭐ **THE ENGINEER FILED FIVE FINDINGS AGAINST MY BRIEF AND FOUR CHANGED SOMETHING PUBLISHED** — item 11 was already done; *"only `F89` and `F95` reviewed"* was wrong (it is **4 of 13**, `F150` corrected in place); `item83_sim.py --selftest` exited **1** where I quoted it as live output; `F69` rests on `enclosing_fn.py` too, which my brief did not name while quoting its number. ⭐ **The §1.1 sibling rule earned itself twice**: `enclosing_fn.py` and `fn_body.py`, **neither findable by the census** — the one place the siblings are named uses a **BRACE EXPANSION** that `PATH_RE` reads as a bare directory, so **four citations register as zero**. ▶ **A third spelling the census cannot see**, after bare filenames (`F147`) and renames (`F150`). ⛔ **TWO PROBES ARRIVED BROKEN WITH NO CACHE PROBLEM — item 149 does not cover this**: `ph29_predict.py` crashed **because its prediction came true** (the simulated edit landed, so its own staleness assert fired) and `item83_sim.py` reddened because `ph53` was **re-searched** under it. ▶ **A probe can rot because the WORLD MOVED THE WAY IT PREDICTED.** ⭐⭐ **TWO PUBLISHED FIGURES MOVED, BOTH RE-VERIFIED BY THE MANAGER INDEPENDENTLY**: `F73` `0 of 6 PHP` → **1 of 14** (and the hit is a **Verus keyword**, so `PROTOCOL_PHP.md` §H1's title does not reach its own subject); `F85` `29 of 38` → **111 of 141**, counted off `--flips` by hand — ▶ **the RATIO survives a 2.3× corpus (76.3 % → 78.7 %) and the COUNT does not.** ⚠ **Quote `29 of 38` only as *that corpus's* number** (law 17). ⚠ **STILL OWED, stated by the engineer**: `F53`'s nine-commit corpus has **no committed generator**; three promoted probes carry **no must-fire negatives at all**, including `count_ent.py`, which this programme cites three times as a cautionary tale. → folded into item **155**. **The original row:** | ⛔⛔⛔ **PROMOTE THE 14 FILES 13 PUBLISHED FINDINGS REST ON — `PROMOTE_001`'s METHOD, AND `F85` FIRST** | `F150`, the discharge of item 148's ruling. ▶ **Run it for the list, do not quote this row**: `python3 .tasks-php/probes/scratchdeps.py`, the `RESTS` block. ⭐ **`PROMOTE_001` discharged 6 files in ONE task**, so 14 is about two — and it is the only task shape in this programme with a measured rate. ⛔ **`F85` FIRST AND IT IS NOT CLOSE**: the finding is *"the programme's central claim"* (29 of 38 sign flips are cross-language), it is **UNREVIEWED**, and **both** its named probes — `.temp/mgr170/callee_share.py` and `.temp/mgr172/STATISTIC-DECISION-DRAFT.md` §5 — are in scratch. ⚠ **`F74` shares `callee_share.py`, so those two discharge together**; `spread_stat.py` comes with them and `null_control.py` is already promoted, which is exactly how this gap survived — **a sibling promotion that took three of four.** ▶ **Order after `F85`/`F74`: `F89`+`F90` (`ph64_draws.py`, one file, two findings) · `F73` (`charlit_reach.py`, 6 negatives lost with it) · `F70`/`F69` (`item48_decide.py`, the measurement that DECIDED item 48) · `F50` (`asan_reach.c` + `REFETCH.sh`) · `F100` · `F95` · `F53` · `F44` · `F102`.** ⭐ **`F95`'s file is the REVIEWER's own counterexample** — `law 12` says the reviewer's independence is the product, and this is the only copy of it. ⚠⚠ **PROMOTION IS NOT COPYING**: `PROMOTE_001`'s engineer refused to copy a header that claimed a guard *"does not fail"* when it does (item 149), and its report filed five findings against my brief. **Each file needs a header stating what it measured, when, and what is still owed** — `NULLCTL_001.md` is the model. ⓘ **Free** — `.tasks-php/` is in no digest | ⚠ **Nothing is lost yet**: all 17 targets resolve today, so this buys durability, not recovery. ⛔ **But `CLAUDE.md` constraint 6 MANDATES deleting `.temp/` once gates are green**, so the expiry is scheduled and not hypothetical |
+| 154 | ⛔⛔ **REVIEW STATUS FOR PRE-`F107` FINDINGS IS NOT DERIVABLE, AND TWO HOMES FOR IT DISAGREE** | `F150`. ▶ **Run it**: `python3 -c "import sys;sys.path.insert(0,'.tasks-php');import boxcheck;print(len(boxcheck.rule9_rows(open('RECAP_PHP.md').read())[0]))"` → **44 rows, and NONE of `F44 F50 F53 F70 F72 F73 F74 F85 F89 F90 F95 F100 F102`.** ⛔ **The RULE-9 block has TWO FORMATS**: one finding per row from `F107` on, which the parser reads, and a **grouped verdict cell** for the `_047` era (`⚠ UPHELD-NARROWED | F97 · F102 · F104`), which it cannot. ▶ **So the programme's own home for *has this been reviewed?* is silent on every finding before `F107`** — and `F140`'s round-scoping derives from that same table, so the silence is not cosmetic. ⛔⛔ **AND THE TWO HOMES CONTRADICT EACH OTHER TODAY**: `F102`'s section says `⚠ **UNREVIEWED** (rule 9)` while the `_047` block files it under `UPHELD-NARROWED` with *"narrowings APPLIED not appended"*. **`F131`'s class, on the process state that governs what may enter the authoritative layer.** ⚠⚠ **THIS IS WHY `F150` PUBLISHED A WRONG COUNT**: with no derivable answer I reached for a regex over prose, and `F100`'s `— **UPHELD-NARROWED.` (markdown bold inside the verdict) fell outside the character class — **`F148` in the session that filed `F148`.** ▶ **THE ROUTES, and I have not chosen**: (a) reformat the `_047` block to one row per finding, which is a RECAP edit and makes the parser total; (b) teach `rule9_rows` the grouped cell, which keeps the document as written; (c) accept that pre-`F107` status lives only in each finding's own section and **make `boxcheck` SAY SO** rather than reporting a count that silently excludes 13 findings. ⭐ **(c) is the cheapest and the most honest, and it is `F10`'s rule — a checker that cannot answer must say it cannot**, but it leaves the `F102` contradiction standing, so (c) does not dismiss (a) | ⚠ **A reviewer's, not mine, on one limb**: I am the author of the count that was wrong, so *how much this matters* is not mine to size (`_057`'s engineer refused exactly this shape). ▶ **The MEASUREMENT above is mine and is reproducible; the ROUTE is a decision** |
+| 155 | ⚠⚠ **THREE PROMOTED PROBES CARRY NO MUST-FIRE NEGATIVES, AND ONE OF THEM IS THIS PROGRAMME'S OWN CAUTIONARY TALE** | `TASK_PHP_064` §6, the engineer's own statement of what it left undone — ⭐ **volunteered, not extracted.** `PROTOCOL_PHP.md` §H says a validator change lands **with its must-fire negatives or it does not land**; these arrived as *promotions* of pre-existing scratch, so §H never gated them. ⛔ **`count_ent.py` is the sharp one**: `F44` rests on its four-table result, and **`F50`, `F51` and `F52` each cite it as an example of a probe whose SETUP ENCODED ITS ANSWER.** ▶ ***A probe the corpus quotes three times as a cautionary tale, now committed, asserting nothing.*** ⚠ **`F53`'s nine-commit corpus has NO committed generator at all** — only two of the nine commits are named anywhere, so the measurement behind *"`ph32`'s stated R1h is wrong for two of three tables"* cannot be re-run even now that `entcount.py` is promoted. ▶ **That is a law-11 defect the promotion did not close, and it is the ONE the ruling's `RESTS → 0` does not cover** — ⛔ **so do not read `0` as *"nothing is owed"*.** ⭐ **The check that works on this class is already written down** (`F52`): **change the setup's arbitrary constant and see whether the verdict moves.** ⓘ Free — `.tasks-php/` is in no digest | ⚠ **Sizing, honestly: three probes × (one negative that must fire + one that must not) is not a task, it is an hour** — but `F53`'s generator is a re-derivation of a nine-commit sweep and **is** a task. **Do not batch them under one estimate** (item 125 sat six rounds behind an hour-shaped number) |
+| 156 | ⚠⚠ **DECIDE WHICH CENSUS OWNS THE STANDING CLAIM DOCUMENTS IN `.tasks-php/` — AND IT IS A CHOICE BETWEEN TWO HOMES, NOT A WIDENING** | `F152`. **8 documents, 35 `.temp/` citations, 9 already gone**, in neither `citecheck.py`'s `CLAIMS` nor `scratchdeps.scan_set()`. ▶ **THE TWO ROUTES ARE NOT SYMMETRIC.** (a) **`citecheck.py`** already owns *"does a cited path resolve?"* across the corpus and **already scans these files for ROT** (they are in `DOCS`); it is only `CLAIMS`, the `.temp/`-dependency hunt, that skips them. ▶ **Adding `.tasks-php/*.md` minus `TASK_PHP_*` to `CLAIMS` is a two-line change to the tool that already reads them.** (b) **`scratchdeps.py`** owns *"which PUBLISHED FINDING rests on scratch?"* and keys everything on `(finding, file)` — but these documents have **no `### F<N>` sections**, so its whole law-11 machinery would be inert on them. ⭐ **(a) is right and (b) is a category error**, which is worth writing down because *"widen the newest tool"* was my instinct and it is the one that does not fit. ⛔⛔ **BUT DO NOT LAND (a) BLIND**: `PROTOCOL_PHP.md` alone adds **18** rows to a report that is already 118 lines long, and `F151`'s repair just taught that **burying the row-specific hits under inherited noise is the failure mode** — so it needs the same INHERITED/ROW-SPECIFIC split, or a `kind=` column. ⚠ **And `citecheck.py` is filed `expect=1`**: a new warning class must not touch `rot`, which is what `N5d`/`N7f` exist to assert. ▶ **Copy `N7f`.** ⓘ Free — `.tasks-php/` is in no digest | ⚠ **The 9 dead pointers are the only part that is urgent**, and they are urgent only in the sense that nobody would ever find out. ⛔ **Do NOT "fix" them by committing artefacts** — most are `.log` files that constraint 6 says to delete. **The repair is to drop the pointer or re-ground it** |
