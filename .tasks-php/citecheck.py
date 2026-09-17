@@ -10,7 +10,7 @@ pointers. Anything else is rot -- `PROTOCOL.md` rule 13.
 
 Known-benign, printed but not counted: see BENIGN below.
 """
-import re, os, glob, sys
+import re, os, glob, sys, json
 
 ROOTS = ('harness/', 'harness-php/', 'common/', 'common-php/', 'patterns/',
          'patterns-php/', 'results/', 'results-php/', '.tasks/', '.tasks-php/',
@@ -293,6 +293,98 @@ if ctlwarn:
           'row a\n      RE-GATE and not a re-measure. Batch with the row\'s next '
           'task.')
 
+# ---- the REST of the hashed surface (item 152, found adjudicating item 148) --
+# ⛔⛔⛔ AND THIS IS THE LAYER THE TWO EXTENSIONS ABOVE STILL DID NOT REACH.
+# The `spec.md`/`NOTES.md` scan was added because `_041` wrote a `.temp/` path
+# into `ph53`'s hashed contract. The `controls/*` scan was added because `_044`
+# found one in `ph53/controls/spellings.py`. ▶ BOTH REPAIRS WERE SCOPED TO THE
+# FILE THE INSTANCE HAPPENED TO TOUCH -- `F147`'s mechanism exactly -- and
+# `source_sha256` hashes NINE role-classes per row, not three.
+#
+# ⭐⭐ THE SHARPEST PROOF THAT THE SCOPING WAS THE BUG: the very citation named
+# in the comment above, `.temp/php41/probe_wrap.rs`, is STILL LIVE TWICE in
+# `ph53/verus.rs:24` and `:350` -- a file hashed into `source_sha256` exactly as
+# `controls/*` is, and one this checker has never opened. The repair for F99 did
+# not cover F99's own leftover.
+#
+# ▶ SO THE SCAN SET IS NO LONGER A LIST. It is DERIVED from what the gate
+# records say they hashed, so this checker cannot again be narrower than the
+# thing it certifies. `F114`'s lesson: the right definition was already written
+# down in the repo and the tool was using a different one.
+# ⚠ Gate records spell row paths `patterns/phNN-*` because `PLAN_PHP.md` §2
+# rebinds the PAT root at run time; on disk they are `patterns-php/phNN-*`.
+def hashed_sources():
+    out = set()
+    for g in sorted(glob.glob('results-php/gate/ph*.json')):
+        try:
+            rec = json.load(open(g, encoding='utf-8'))
+        except (OSError, ValueError):
+            continue
+        for k in rec.get('source_sha256', {}):
+            if k.startswith('patterns/ph'):
+                out.add('patterns-php/' + k[len('patterns/'):])
+    return out
+
+
+# ⛔ MINUS what already has a home, so a citation is reported ONCE (`F131`).
+_SEEN = set(ROW_CLAIMS) | set(CONTROL_CLAIMS)
+HASHED_CLAIMS = sorted(p for p in hashed_sources()
+                       if p not in _SEEN and os.path.isfile(p))
+
+hashwarn = []
+for doc in HASHED_CLAIMS:
+    try:
+        lines = open(doc, encoding='utf-8', errors='replace').read().split('\n')
+    except OSError:
+        continue
+    for i, ln in enumerate(lines, 1):
+        for q in {c for c in cited(ln) if c.startswith('.temp/')}:
+            hashwarn.append((doc, i, q,
+                             'resolves TODAY' if exists(q) else 'ALREADY GONE'))
+
+# A citation carried by the SAME ROLE in >= 2 rows is inherited from a shared
+# file, not written by that row -- the same split, and the same reason, as the
+# `spec.md` one above: reporting it per row buries the row-specific ones.
+_role = lambda p: '/'.join(p.split('/')[2:])
+_by_role = {}
+for doc, i, q, st in hashwarn:
+    _by_role.setdefault((_role(doc), q), set()).add(doc.split('/')[1])
+hash_inherited = {k for k, rows in _by_role.items()
+                  if len(rows) >= INHERIT_MIN_ROWS}
+hash_row = [r for r in hashwarn if (_role(r[0]), r[2]) not in hash_inherited]
+
+if hash_row:
+    print('\n⚠⚠ ROW-SPECIFIC `.temp/` citations inside OTHER HASHED sources '
+          '(`verus.rs`, `c/*`, `model.py`, `inputs/gen.py`, `README.md`, the '
+          'safe rungs):')
+    for doc, i, q, st in hash_row:
+        print(f'   {doc}:{i}  ->  {q}   [{st}]')
+if hash_inherited:
+    gone = sorted({q for _, q in hash_inherited if not exists(q)})
+    print(f'\nⓘ {len(hash_inherited)} `.temp/` citation(s) are INHERITED by '
+          f'>= {INHERIT_MIN_ROWS} rows through a SHARED hashed file')
+    print('   (`c/emalloc_shim.h` and friends). Repairing one costs every row '
+          'that carries\n   it a RE-GATE, so it is a corpus-wide debt and not '
+          "a row's:")
+    for role, q in sorted(hash_inherited):
+        print(f'   {role}  ->  {q}   '
+              f'[{"resolves TODAY" if exists(q) else "ALREADY GONE"}]')
+    if gone:
+        print(f'   ⛔⛔ {len(gone)} of them is ALREADY GONE and is frozen into '
+              f'every carrier row\'s\n      `source_sha256`: '
+              f'{", ".join(gone)}')
+if hashwarn:
+    print(f'\nⓘ `.temp/` citations inside hashed sources this checker did NOT '
+          f'read before\n   item 152: {len(hashwarn)} across '
+          f'{len({r[0] for r in hashwarn})} file(s) -- '
+          f'{len(hash_row)} row-specific, '
+          f'{len(hashwarn) - len(hash_row)} inherited, '
+          f'{sum(1 for r in hashwarn if r[3] == "ALREADY GONE")} ALREADY GONE.')
+    print('   ⓘ WARNING ONLY, and deliberately: most are provenance notes in '
+          'comments, the\n      same benign class as the historical '
+          '`controls/*` ones. The finding is the\n      COVERAGE, not the '
+          'count -- RECAP_PHP.md item 152.')
+
 if inherited:
     print(f'\nⓘ {len(inherited)} `.temp/` citation(s) are INHERITED by all '
           f'{len(specs)} rows\' `spec.md`')
@@ -437,6 +529,54 @@ def selftest():
     ck('N4', len(_ext) > 0 and len(_live) > 0,
        f'both sets are non-empty, so N5d\'s disjointness is a real separation '
        f'and not an empty one: {len(_live)} live, {len(_ext)} extension')
+
+    # ---- the hashed-sources layer (item 152) ---------------------------------
+    # ⛔⛔ N7 MUST-FIRE (capability): the scan reaches `verus.rs`. THE WHOLE
+    #    POINT. `verus.rs` is hashed into `source_sha256` exactly as
+    #    `controls/*` is, and this checker had never opened one -- while the
+    #    comment at the top of `HASHED_CLAIMS`' section names the very citation
+    #    still sitting in `ph53/verus.rs`.
+    _roles = {_role(d) for d in HASHED_CLAIMS}
+    ck('N7a', 'verus.rs' in _roles,
+       f'the scan reaches per-row `verus.rs` -- the file whose leftover '
+       f'`probe_wrap.rs` citation the F99 repair did not cover')
+    ck('N7b', len(_roles) >= 6,
+       f'and the rest of the hashed surface, not one more role: '
+       f'{len(_roles)} role(s) over {len(HASHED_CLAIMS)} file(s)')
+
+    # ⛔⛔⛔ N7c MUST-FIRE: the scan set is DERIVED from the gate records, not
+    #    listed. This is the arm that stops the next scoped repair: if someone
+    #    replaces `hashed_sources()` with a literal list, a role the gate starts
+    #    hashing tomorrow is silently unscanned again -- which is how this layer
+    #    was missed for 41 commits.
+    _declared = hashed_sources()
+    ck('N7c', len(_declared) >= 100 and all(
+        p.startswith('patterns-php/ph') for p in _declared),
+       f'the scan set is DERIVED from `source_sha256` in the gate records '
+       f'({len(_declared)} hashed per-row file(s)), so it cannot be narrower '
+       f'than what the gate certifies')
+
+    # ⚠ N7d MUST-NOT-FIRE: no double reporting. A file already scanned by the
+    #   `spec.md`/`NOTES.md` or `controls/*` layer must not appear here too --
+    #   `F131`, one home per fact, and a doubled count is how a candidate set
+    #   gets read as a defect count.
+    ck('N7d', not (set(HASHED_CLAIMS) & (set(ROW_CLAIMS) | set(CONTROL_CLAIMS))),
+       'no file is reported by two layers (`F131`: one home per fact)')
+
+    # ⛔ N7e MUST-FIRE: inherited and row-specific are actually SPLIT, or the 34
+    #   row-specific hits drown under `emalloc_shim.h` repeated 14 times. Stated
+    #   relatively so it survives the repairs: the split must REMOVE something.
+    ck('N7e', len(hash_row) < len(hashwarn),
+       f'the inherited split is doing work: {len(hashwarn)} raw -> '
+       f'{len(hash_row)} row-specific ({len(hashwarn) - len(hash_row)} '
+       f'suppressed as carried by a shared hashed file)')
+
+    # ⚠ N7f MUST-NOT-FIRE: this layer is a WARNING like the other two -- it must
+    #   not reach `rot`. Same structural form as N5d, for the same reason.
+    ck('N7f', not (_live & set(HASHED_CLAIMS)),
+       f'the hashed-sources layer is DISJOINT from the rot-bearing LIVE set '
+       f'({len(HASHED_CLAIMS)} inputs, {len(_live & set(HASHED_CLAIMS))} '
+       f'shared) -- it cannot move the exit code')
 
     # ⛔ N6 MUST-FIRE: BOTH report spellings are benign, and a non-report is NOT.
     #    The arm for the F117 repair above. Without the last clause, widening

@@ -234,6 +234,144 @@ def finding_of(doc_rel, line):
     return _section_of(sections(doc_rel), line)
 
 
+# ------------------------------------------------- THE ADJUDICATION (item 148)
+# ⛔⛔ A VERDICT PER (finding, cited file), reached on 2026-09-17 by READING THE
+# CITING SENTENCE -- item 125's method, which is the only one that has ever
+# worked here. `F132`: the census prints a CANDIDATE SET and a person rules on
+# it. This table IS the ruling; the prose write-up is `F150`.
+#
+# THREE VERDICTS, and the two that are NOT defects carry the whole lesson:
+#
+#   RESTS    the finding's PUBLISHED NUMBER is this file's OUTPUT. Lose the
+#            file and the number cannot be re-derived by anyone. ▶ LAW-11
+#            DEFECT. Remedy: promote the probe, or re-ground the finding.
+#   HISTORY  the file is the SUBJECT of the sentence, not its evidence -- a
+#            retracted probe being named, a defect class being illustrated.
+#            The claim is stated in full where it is made, so losing the file
+#            loses no evidence. ⚠ NOT a licence: it applies only where the
+#            finding makes no live quantitative claim the file alone supports.
+#   NOTDEP   not a dependency on scratch AT ALL. Either upstream source
+#            (`CLAUDE.md` Don't #1 being FOLLOWED), or -- and this is the one
+#            that surprised me -- the census's BARE-NAME resolver matching a
+#            token that is a FILENAME IN A TABLE and not a citation of scratch.
+VERDICT_RESTS, VERDICT_HISTORY, VERDICT_NOTDEP = "RESTS", "HISTORY", "NOTDEP"
+
+ADJUDICATION = {
+    # (finding, cited path) -> (verdict, why -- in the citing sentence's terms)
+    ("F44", ".temp/mgr165/count_ent.py"): (
+        VERDICT_RESTS, "the four-table result 63/65 22/23 66/67 410/411 is its "
+        "output; the `nm -S` figures corroborate but the INDEPENDENT method is "
+        "the added value and only this file carries it"),
+    ("F50", ".temp/mgr165/REFETCH.sh"): (
+        VERDICT_RESTS, "named in the finding as the script that REGENERATES all "
+        "of F50's evidence -- the generator `CLAUDE.md` Don't #1 asks for, kept "
+        "where a clean checkout cannot see it"),
+    ("F50", ".temp/mgr166/asan_reach.c"): (
+        VERDICT_RESTS, "the instrument behind the published bytes x ASan x "
+        "canary table and the `cliff is at 32 bytes, not near 384` claim"),
+    ("F50", ".temp/mgr165/count_ent.py"): (
+        VERDICT_HISTORY, "`same class as count_ent.py` -- a precedent for a "
+        "defect SHAPE, and the shape is spelled out in the sentence"),
+    ("F51", ".temp/mgr165/count_ent.py"): (
+        VERDICT_HISTORY, "`the exact failure count_ent.py produced last "
+        "session` -- a precedent; F51's own evidence is `coverage.py`, PROMOTED"),
+    ("F52", ".temp/mgr165/count_ent.py"): (
+        VERDICT_HISTORY, "a row in the three-probes table, whose cell states "
+        "the construction error in full"),
+    ("F52", ".temp/mgr166/asan_reach.c"): (
+        VERDICT_HISTORY, "same table; the cell quotes the literal that caused "
+        "it (`CANARY_BYTE 0xA5`, bit 0 already set)"),
+    ("F52", ".temp/php21/ph94_probe2.c"): (
+        VERDICT_HISTORY, "same table; `a memset PHP does not do` is the whole "
+        "claim and it is retracted, not relied on"),
+    ("F53", ".temp/php19/entcount.py"): (
+        VERDICT_RESTS, "`entcount.py run at nine PHP-5.0 commits` IS the "
+        "evidence for `ph32`'s stated R1h being wrong for two of three tables"),
+    ("F59", ".temp/php27/streamsfuncs.c"): (
+        VERDICT_NOTDEP, "⚠ FALSE POSITIVE of the bare-name resolver: here "
+        "`streamsfuncs.c` is a COLUMN HEADING naming a PHP 5.0.0 source file, "
+        "and the counts come from the committed `index.csv`"),
+    ("F69", ".temp/php27/streamsfuncs.c"): (
+        VERDICT_NOTDEP, "⚠ FALSE POSITIVE, same shape: one of the five files "
+        "`ph73` spans, in a parenthesised list of upstream sources"),
+    ("F147", ".temp/php27/streamsfuncs.c"): (
+        VERDICT_NOTDEP, "cited AS the example of the rule being FOLLOWED -- "
+        "PHP 5.0.0 source, re-derivable from `php-5.0.0.manifest`"),
+    ("F70", ".temp/mgr168/item48_decide.py"): (
+        VERDICT_RESTS, "F69's `29 of 30 at file:line` and `24 of 30 by "
+        "enclosing function` -- the measurement that DECIDED item 48 -- are "
+        "this probe's output, and its must-fires go with it"),
+    ("F72", ".temp/mgr169/ph29_predict.py"): (
+        VERDICT_RESTS, "the six published prediction numbers (spellings 4->12, "
+        "pairs 12->36, present 0->22, ...) are its output, and the finding "
+        "calls them `the falsifiable prediction`"),
+    ("F73", ".temp/mgr169/charlit_reach.py"): (
+        VERDICT_RESTS, "the headline `0 of 33 PAT AND 0 of 6 PHP` is its "
+        "output; its 6 must-fire negatives and its DIFFERENTIAL design are the "
+        "reason the headline is believable, and both are gitignored"),
+    ("F74", ".temp/mgr170/spread_stat.py"): (
+        VERDICT_RESTS, "one of the three probes the finding names as settling "
+        "item 52; the six-statistics-in-two-families table is their output"),
+    ("F74", ".temp/mgr170/callee_share.py"): (
+        VERDICT_RESTS, "as above -- and its sibling `null_control.py` was "
+        "PROMOTED while these two were not, which is how the gap survived"),
+    ("F85", ".temp/mgr170/callee_share.py"): (
+        VERDICT_RESTS, "⛔ THE SHARPEST: F85 is `the programme's central "
+        "claim` (29 of 38 sign flips are cross-language) and this is one of "
+        "its two named probes"),
+    ("F85", ".temp/mgr172/STATISTIC-DECISION-DRAFT.md"): (
+        VERDICT_RESTS, "the finding cites `§5` of it by section -- an EVIDENCE "
+        "DOCUMENT, not an artefact, and the only home of the derivation"),
+    ("F89", ".temp/mgr173/ph64_draws.py"): (
+        VERDICT_RESTS, "the `0.07 pp` same-language spread and the N4 control "
+        "(`0.034 %` against F88's `0.03 %`) are its output. ⭐ MITIGATED: "
+        "`_043` §5.7 reproduced the CONTRAST at 55.6x by a different design, "
+        "so the finding survives the loss and the two figures do not"),
+    ("F90", ".temp/mgr173/ph64_draws.py"): (
+        VERDICT_RESTS, "`ph64_draws.py`'s data RE-SLICED -- the re-slice is the "
+        "whole of F90, and it refutes a published recommendation"),
+    ("F95", ".temp/php43/samefunc_hole.py"): (
+        VERDICT_RESTS, "⭐ THE REVIEWER'S OWN COUNTEREXAMPLE, the artefact that "
+        "made my `same_function` guard accept a zero-leading-context hunk. "
+        "`law 12`: the reviewer's INDEPENDENCE is the product, and this is the "
+        "only copy of it"),
+    ("F99", ".temp/php41/probe_wrap.rs"): (
+        VERDICT_HISTORY, "in RECAP the finding is ABOUT the citation having "
+        "been written into a hashed block -- the file is the subject. ⛔ BUT "
+        "SEE F150(c): it is cited LIVE twice inside `ph53/verus.rs`, which is "
+        "hashed and which NO checker was reading"),
+    ("F100", ".temp/php43/item83_sim.py"): (
+        VERDICT_RESTS, "`all six published A1 percentages re-derive to the "
+        "digit` is its output, and it drives the row's OWN verdict functions"),
+    ("F102", ".temp/mgr176/asanfill.c"): (
+        VERDICT_RESTS, "⭐ THE INSTRUCTIVE ONE. The measured result CHANGES THE "
+        "ROW (a clean stack slot is `IS_NULL`), and the sentence says "
+        "`generator kept, binaries deleted` -- `CLAUDE.md` Don't #1 OBEYED. "
+        "The rule says keep the generator and never says WHERE, so obeying it "
+        "to the letter still produces a law-11 defect"),
+}
+
+
+def adjudicate(finding, cite):
+    """PURE. The ruling for one law-11 row, or `None` if nobody has ruled.
+
+    ⭐ SPLIT OUT SO THE ARM CAN PLANT ITS OWN INPUT -- the same reason
+    `_section_of` is split out, and for the same failure it prevents.
+    """
+    return ADJUDICATION.get((finding, cite))
+
+
+def unadjudicated(rows):
+    """PURE. Law-11 rows with no ruling. ⛔ THIS, NOT A COUNT, IS THE ARM.
+
+    An arm asserting `17 RESTS` would go RED the day the promotions land, i.e.
+    the day the work is DONE -- `F147`'s sibling lesson, and the trap this file
+    already dodged once in `_section_of`. What must never happen is a NEW
+    citation appearing inside a published finding with nobody having read it.
+    """
+    return [r for r in rows if adjudicate(r["finding"], r["cite"]) is None]
+
+
 def published_finding_deps():
     """The rows a COMMITTED FINDING depends on -- the law-11 population.
 
@@ -277,6 +415,38 @@ def report():
     print(f"    ⚠ the REST of `RECAP_PHP.md`'s LIVE citations are in the "
           f"OPEN-ITEMS TABLE,\n      where citing current scratch as provenance "
           f"for work in flight is CORRECT.")
+
+    # ⛔ THE RULING (item 148). REPORTED, never asserted -- the tally moves as
+    # the promotions land, and an arm pinned to it would go red on success.
+    tally = {}
+    for r in pfd:
+        a = adjudicate(r["finding"], r["cite"])
+        tally.setdefault(a[0] if a else "⛔ UNADJUDICATED", []).append(r)
+    print(f"\n  {'ruling':10}     item 148, by unit text -- "
+          f"{len(pfd)} citation(s) ruled on")
+    for v in (VERDICT_RESTS, VERDICT_HISTORY, VERDICT_NOTDEP,
+              "⛔ UNADJUDICATED"):
+        sel = tally.get(v, [])
+        if not sel and v != VERDICT_RESTS:
+            continue
+        files = sorted({r["cite"] for r in sel})
+        finds = sorted({r["finding"] for r in sel}, key=lambda x: int(x[1:]))
+        print(f"    {v:16} {len(sel):3} citation(s)  "
+              f"{len(files):2} file(s)  {len(finds):2} finding(s)")
+        if v == VERDICT_RESTS:
+            print(f"      ▶ LAW-11 DEFECTS -- promote or re-ground: "
+                  f"{' '.join(finds)}")
+        for r in sel:
+            print(f"        {r['finding']:<5} {r['cite']}")
+    print(f"    ⚠⚠ `RESTS` is a DEFECT and `HISTORY`/`NOTDEP` are NOT. "
+          f"Read `ADJUDICATION` for the\n       reason on each row -- "
+          f"the verdict is the sentence, not the bucket.")
+
+    un = unadjudicated(pfd)
+    if un:
+        print(f"\n  ⛔⛔ {len(un)} law-11 citation(s) NOBODY HAS RULED ON:")
+        for r in un:
+            print(f"      {r['finding']:<5} {r['doc']}:{r['line']} {r['cite']}")
     return bad
 
 
@@ -352,6 +522,39 @@ def selftest():
     live = sections("RECAP_PHP.md")
     chk("N18", bool(live) and any(k for _, k in live), True,
         "the `### F<N>` regex still finds finding headings in RECAP_PHP.md")
+
+    # ---- the ADJUDICATION (item 148) -------------------------------------
+    # ⛔ THE ARM IS COVERAGE, NOT CARDINALITY. `17 RESTS` would go RED the day
+    #   the promotions land -- the day the work is DONE. What must never pass
+    #   silently is a NEW citation inside a published finding that nobody read.
+    synth = [
+        {"finding": "F102", "cite": ".temp/mgr176/asanfill.c",
+         "doc": "RECAP_PHP.md", "line": 1},
+        {"finding": "F999", "cite": ".temp/zzz/brand_new_probe.py",
+         "doc": "RECAP_PHP.md", "line": 2},
+    ]
+    chk("N19", [r["finding"] for r in unadjudicated(synth)], ["F999"],
+        "⛔ an UNRULED law-11 citation is caught, and a ruled one is not -- "
+        "asserted on PLANTED rows so the arm does not depend on the live "
+        "backlog being empty or full")
+    chk("N20", unadjudicated(pfd := published_finding_deps()) == [], True,
+        "every law-11 citation in the LIVE tree has a ruling (item 148 done)")
+    chk("N21", adjudicate("F59", ".temp/php27/streamsfuncs.c")[0], VERDICT_NOTDEP,
+        "⭐ the bare-name resolver's FALSE POSITIVE is ruled NOTDEP, not "
+        "quietly dropped -- a census row is a QUESTION and `no` is an answer")
+    chk("N22", adjudicate("F50", ".temp/mgr166/asan_reach.c")[0] !=
+        adjudicate("F52", ".temp/mgr166/asan_reach.c")[0], True,
+        "⛔⛔ THE SAME FILE RULES DIFFERENTLY UNDER TWO FINDINGS -- if the key "
+        "were the FILE the ruling would be wrong for one of them (`F131`)")
+    chk("N23", sorted({v[0] for v in ADJUDICATION.values()}),
+        sorted([VERDICT_HISTORY, VERDICT_NOTDEP, VERDICT_RESTS]),
+        "all three verdicts are USED -- a table that only ever says `defect` "
+        "is an accusation, not an adjudication (`F21`/`F37`)")
+    chk("N24", all(len(w) > 40 for _, w in ADJUDICATION.values()), True,
+        "every ruling carries a REASON in the citing sentence's own terms, "
+        "because the verdict is the sentence and not the bucket")
+    chk("N25", len({f for f, _ in ADJUDICATION}) >= 13, True,
+        "the ruling spans the findings it claims to -- non-vacuous")
 
     print("\nSELFTEST " + ("PASS" if not fails else f"FAIL ({len(fails)})"))
     for f in fails:
