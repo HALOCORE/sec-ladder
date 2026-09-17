@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F146** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F148** live in `RECAP_PHP.md`
 > (⚠ this said *F1–F41* for **forty-nine** findings, then *F1–F90* for **eleven** more — `PROTOCOL.md` rule 13, **and it has now rotted THREE TIMES.** ✅ **`.tasks-php/boxcheck.py` CHECKS THIS LINE against the actual highest finding as of 2026-09-13, so it is the last time.**
 > **Count it yourself: `grep -c '^### F' RECAP_PHP.md`.**)
 > ⭐ **And the statistic decision — which column every row publishes in — is
@@ -160,13 +160,29 @@ successive versions of a size rule** and was never measured (`p01`'s is 2 057).
     count. The figures are in the row's `NOTES.md:550` and `:741`.** (Item 84.)
 
 11. ⛔⛔ **A PUBLISHED FINDING WHOSE ONLY EVIDENCE IS A GITIGNORED PROBE IS A
-    FINDING THAT WILL NOT SURVIVE A CLEAN CHECKOUT.** F92 answers open item 68
-    `NO` in a committed document, and its measurement lives in
-    `.temp/php39/width.py` — **gitignored, and its `--selftest` no longer
-    completes** (a `ZeroDivisionError` at `X3b`, ⭐ **because its check now passes
-    MORE cleanly than the guard expected**). ▶ **The fix is the one F99
-    prescribes: commit the probe beside the other checkers.** ⚠ **The same shape
-    covers every probe behind every finding in F88–F101.** (Item 86, F99.)
+    FINDING THAT WILL NOT SURVIVE A CLEAN CHECKOUT.** ✅ **THE FOUNDING EXAMPLE
+    IS DISCHARGED AND IS KEPT AS THE WORKED CASE.** F92 answers open item 68
+    `NO` in a committed document, and its measurement **was** in
+    `.temp/php39/width.py` — gitignored, with a `--selftest` that had stopped
+    completing (a `ZeroDivisionError` at `X3b`, ⭐ **because its check had begun
+    passing MORE cleanly than the guard expected**). ▶ **PROMOTED TO
+    `.tasks-php/width.py` ON 2026-09-13**, both `X3b` defects repaired,
+    `--selftest` rc = 0; **that file's own header carries the record.**
+    (Item 86, F99.)
+
+    ⛔⛔⛔ **AND THE SCOPE CLAUSE THAT USED TO CLOSE THIS LAW WAS MEASURED AND IS
+    WRONG BY 4×.** It read *"the same shape covers every probe behind every
+    finding in **F88–F101**."* Counted — `python3 .tasks-php/probes/scratchdeps.py`,
+    its `law 11` block — **22 published findings cite a scratch file inside their
+    own `### F<N>` section, and `F88–F101` captures 5 of them: 23 %.** The 17
+    outside are F44, F50–F53, F59, F69, F70, F72–F74, **F82–F86** and F102 —
+    ⚠ **sixteen of them EARLIER findings in the same file, including five whose
+    probes sat in the very scratch directories this law was written beside.**
+    ▶ **The law generalised to the NEIGHBOURHOOD OF THE INSTANCE THAT PROMPTED
+    IT** — which is `F147`'s whole mechanism, and this is the **second of four**
+    instruments to do it. ⚠⚠ **THE LAW ITSELF IS UNCHANGED AND CORRECT; it was
+    its SCOPE SENTENCE that was invented rather than counted.**
+    ▶ ⛔ **DO NOT WRITE A NEW RANGE HERE. RUN THE TOOL.** (`F147`, open item 148.)
 
 12. ⭐⭐⭐ **THREE REVIEW ROUNDS IN A ROW HAVE REFUTED MANAGER CLAIMS, AND THE
     PATTERN IS STABLE ENOUGH TO PLAN AROUND: A MANAGER FINDING FROM ONE PROBE OR

@@ -45,26 +45,24 @@ between them read `CLAUDE.md`'s top table.
 ## ▶ START HERE — the next action, in ≤ 20 lines
 
 ```
-STATE   ⭐ 13 ROWS; **9/20 fam, 24 owed** to floor 37. ⭐⭐⭐ **BACKLOG 0 -- A FIRST,
-        AND `rule9_mustfire` FAILED ON IT**: an arm could only pass while the tree was SICK.
-✅ DONE  **`_063` LANDED -- 17 OBJECTS. ⛔ 15 OF 17 REFUTED; OF THE 9 MANAGER-OPENED, 9
-        OF 9.** ⭐⭐⭐ **ITS HEADLINE IS NOT ONE OF THE 17: F141, F142 AND F146 -- ALL MINE,
-        ALL ONE DAY -- EACH MEASURE A RATE OVER ONE POPULATION AND ASSERT IT OF ANOTHER,
-        AND F142 IS THE FINDING THAT NAMES THAT ERROR. n=3 IS A RATE.** ⛔ F146's ⭐⭐⭐
-        WITHDRAWN (ph66's OWN committed control refutes it); F145 REFUTED for *catch*;
-        F139's "location is not the variable" REFUTED (axis = TEXT vs AN INVOKED ARM);
-        §A3a obl.5 = **REQUIRED, NO CONDITION**. ✅ **RESUME (1) DONE: ITEM 125 = 27
-        candidates -> **7 MEMBERS**, 4 from `_058` OR LATER (still FORMING).**
-NEXT    ⛔⛔ **THE REVIEWER'S ORDER BINDS ME (F123)**: ▶ (2) **PROMOTE THE 4 LIVE `.temp/`
-        DEPS `boxcheck.py` NOW PRINTS** -- `02-ladder.md` x3 + `04-process.md:165`; the
-        arm found a FOURTH `_063`'s count missed. ▶ (3) `same_construct?` IN
-        item139_sibling_census.py. ▶ (4) F141/F142/F146's SHARED ERROR = a LAYER
-        DECISION, MINE. ▶ (5) `php50_align_sweep.py --opt`. ▶ THEN **ROW 14 = `ph70`**
-        (E3): scoped, measured and COMMITTED at **`.tasks-php/ROW14_001.md`** + probes
-        `ph70_overdec.sh` (rc=139 3/3) and `ph69_refcount.sh`. ▶ ⛔⛔ ITEM 105 = **USER'S**.
-⚠ TRAPS ⛔ **A RATE OVER ONE POPULATION IS NOT A PROPERTY OF ANOTHER** (the n=3 above).
-        ⛔ **AN ARM PINNED TO A POPULATION BREAKS WHEN THE TREE GETS HEALTHY.**
-        ⛔ **A PROSE BOX LOSES TO AN ARM THAT PRINTS -- measured on F123 itself.**
+STATE   ⭐ 13 ROWS; **9/20 fam, 24 owed** to floor 37. ⛔ **BACKLOG 0 -> 2 (`F147`, `F148`),
+        both MINE, filed the day it first reached 0 -- rule 9 WORKING, not a regression.**
+✅ DONE  **RESUME (2) DISCHARGED, AND IT WAS 6 FILES NOT 2.** `F82`-`F86`'s evidence is
+        COMMITTED: `probes/`{`identity_null`,`inclusive_ir`,`bc_sweep`,`flip_exact`,
+        `null_control`}`.py` + `sweep_cg.sh` + **`NULLCTL_001.md`**; ⛔ 2 of 5 CRASHED
+        without their cache -- law 11's prediction TESTED -- now guarded. ⛔⛔⛔ **`F147`:
+        FOUR INSTRUMENTS IN 8 DAYS, EACH SCOPED TO THE INSTANCE THAT PROMPTED IT; law
+        11's `F88-F101` captures 5 OF 22.** My arm printed `4`, and **the "FOURTH
+        `_063` missed" was MY false positive, booked against the reviewer.** ⛔ **`F148`:
+        a `grep -c` over PROSE fails BOTH ways -- I hit both, today, in one session.**
+NEXT    ▶ (3) `same_construct?` IN `item139_sibling_census.py`. ▶ (4) F141/F142/F146's
+        SHARED ERROR = a LAYER DECISION, MINE. ▶ (5) `php50_align_sweep.py --opt`.
+        ▶ **ITEM 148** adjudicate the census (item 125's method, ~25 min) · **ITEM 149**
+        `width.py`'s `X3` exits 1 in the state `CLAUDE.md` INVITES. ▶ THEN **ROW 14 =
+        `ph70`** (E3), scoped at **`.tasks-php/ROW14_001.md`**. ▶ ⛔⛔ 105 = **USER'S**.
+⚠ TRAPS ⛔ **AN ARM PRINTS A CANDIDATE SET; ONLY A PERSON ADJUDICATES ONE.**
+        ⛔ **NEVER GREP PROSE TO DECIDE PRESENCE -- grep an IDENTIFIER, or read it.**
+        ⛔ **BEFORE BUILDING AN ARM, ASK WHICH TOOL ALREADY REPORTS IT (`F131`).**
 ```
 
 ---
@@ -202,6 +200,8 @@ NEXT    ⛔⛔ **THE REVIEWER'S ORDER BINDS ME (F123)**: ▶ (2) **PROMOTE THE 4
 > | ⛔⛔⛔ **F135** | ✅ **CONCLUSION UPHELD · ⛔ *"EXACTLY AS SURELY"* REFUTED** (`_061`) | ✅ **§0.1's population reproduces exactly**; `citecheck.py`'s `expect=1` is the only observation-captured expectation left. ⛔ **The two mechanisms are not equally severe**: editing the INPUT destroys evidence, editing the EXPECTATION leaves the failure fully visible — and this finding was itself recovered from the registry text. ⛔⛔ **A LIVE THIRD MECHANISM FOUND**: `width.py` and `php_null.py` — **the two files law 16 calls the model** — ship passing `--selftest`s the registry never runs, so `st_expect: None` conflates *has none* with *has one, unfiled*. ✅ **Lands as a CLAUSE ON LAW 6, not a new law** |
 > | ⛔⛔⛔ **F138** | ⚠ **CONCLUSION UPHELD (keep SEPARATE from `F132`) · ⛔⛔ REASON REFUTED IN ITS LOAD-BEARING WORD** (`_061`) | ⛔⛔ ***"I DID RUN THE TOOL" IS FALSE.*** `boxcheck.py`'s `main()` already prints the members, in a line the manager wrote **the day before** as part of `F131`'s own repair; what ran was a bespoke sweep that reimplemented the reporting path. ⭐⭐ **That makes it MORE distinct from `F132`, on a ground it did not state**: `F132` = *a count standing in for a set* (remedy: **diff the set**); this = *a one-off caller not inheriting the checker's reporting* (remedy: **run the checker**). ▶ **The corrected lesson: *"I called the tool's function" is not "I ran the tool."*** ⛔ Its de-dup rule is the right answer from the wrong rule, and its falsy-return residue is refuted in mechanism (`len(None)` raises) |
 > | ⛔⛔⛔ **F134** | ✅ **DISCLAIMER CLEAN · ⛔ ITS REMEDY REFUTED** (`_061`) | ✅ **The body does carry its own caveat and nothing else implies otherwise** — the *"1 of 170"* disclaimer is clean, read end to end. ⛔⛔ **Its remedy — *move the trap to where a PERSON meets it* — is REFUTED BY `F139`**, which is that remedy's experiment: a person-facing protocol section, in capitals, lost by 9h25m to its own author. ✅ **Its core sentence survives as prose** (*a trap documented only where the code meets it is documented for the code*); ⛔ **the converse it implies does not** |
+> | ⛔⛔⛔ **F147** | ⛔ **UNREVIEWED** | ⛔ **NOTHING MAY ENTER.** ⚠⚠ **ATTACK THE MECHANISM, NOT THE COUNT**: the claim is that four instruments for the scratch-dependency class in eight days were EACH scoped to the instance that prompted them, and the falsifiable part is **law 11's `F88–F101` capturing 5 of 22 (23 %)** — re-derive it with `python3 .tasks-php/probes/scratchdeps.py`, do not read it here. ⛔ **Row 4 of that table is MINE AND IS NOT EXEMPT**: `scratchdeps.py` resolves by BASENAME, cannot tell a probe I wrote from upstream source I extracted, and scans two document families — **the pattern predicts a row 5 and the reviewer should try to be it.** ⚠ **`LIVE` is a CANDIDATE SET, not a defect count** (`F132`); if this finding is quoted anywhere as *“48 defects”* that is the error to report. ⓘ Parts (c′) and (g) were **found by `PROMOTE_001`'s engineer against my own brief** and are already conceded — the open question is whether (b)'s *booked my false positive against the reviewer* is fair to `_063`, and I am not the one to judge it. |
+> | ⛔⛔ **F148** | ⛔ **UNREVIEWED** | ⛔ **NOTHING MAY ENTER.** ⚠ **n = 4 and it says so** — two identifier probes right, two prose probes wrong, verified by reading the matched line; the other six probes that session were never checked and are NOT evidence. **The mechanism is the argument; the count illustrates it.** ▶ The rule it proposes — *never grep prose to decide presence; grep an IDENTIFIER or read the section* — **would forbid checks this programme runs constantly**, so the scope clause (*locating* text is fine, *asserting absence* is not) is the load-bearing part and the place to attack. ⚠ It also supersedes `NULLCTL_001.md` §10's prescription (*“a short unwrappable token”*), which my own `coin flip` homonym refutes — **check that supersession is real and not just a restatement.** |
 >
 > #### ⭐⭐⭐ `F96`, PER GROUP — **SEVEN groups, not the four I wrote** (`_055` §1.1)
 >
@@ -1942,6 +1942,303 @@ which pins `kernel.c:247` and `hardened:175`, one line each.
 The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
+
+### F148 — ⚠⚠⚠ A `grep -c` OVER HARD-WRAPPED PROSE FAILS IN **BOTH** DIRECTIONS, AND I HIT BOTH IN ONE SESSION WHILE READING THE NOTE THAT WARNS ABOUT THE FIRST
+
+Manager, **UNREVIEWED** (rule 9). No probe — the evidence is the session's own
+commands and is reproducible by re-running them.
+
+**THE UNDERLYING LESSON WAS WRITTEN ON 2026-09-12 AND HAS NEVER BEEN
+COMMITTED.** `NULLCTL_001.md` §10 (promoted from `.temp/mgr172/NOTES.md` under
+`F147`) records it: I told `TASK_PHP_037` its F72 hedge was **absent**, citing
+`grep -a -c 'DO NOT QUOTE IT AS A RESULT' … → 0`. **The hedge was there.** The
+phrase **wrapped across a line break**, and `grep` matches within a line, so it
+returns 0 whether the text is present or not — ▶ **the check could not
+distinguish presence from absence, and I read it as absence.** ⭐ The agent
+caught it, not me. `grep -ar "wraps across a line break" --include=*.md .`
+returns **0 files**: the lesson exists nowhere in the committed tree.
+
+⛔ **(a) FALSE ABSENCE — THE WRAP, REPRODUCED TODAY.** Testing whether
+`NULLCTL_001.md` §5's routing note was already published, I ran
+`grep -aci "harness/check.py HAS THE SAME UNCHECKED PREMISE" RECAP_PHP.md` →
+**0**, and wrote it down as absent. `grep -arl "SAME UNCHECKED PREMISE"` then
+returned **`RECAP_PHP.md`**. ▶ **Same file, same session, opposite answers,
+because the first pattern was nine words in prose hard-wrapped at ~76 columns.**
+
+⛔⛔ **(b) FALSE PRESENCE — THE HOMONYM, WHICH §10's OWN PRESCRIPTION DOES NOT
+COVER.** §10 prescribes *"match a short unwrappable token, or read the
+section."* I did exactly that: `grep -ac "coin flip" RECAP_PHP.md` → **1**, and
+concluded §10's grep lesson was already published. **Reading the line showed it
+is about whether a missing benchmark number's DIRECTION is a coin flip — an
+unrelated use of a common phrase.** ▶ **A token short enough never to wrap is
+short enough to collide.** ⚠ **The two failure modes push in OPPOSITE
+directions, so there is no safe length**: long prose under-reports, short prose
+over-reports.
+
+✅ **(c) WHAT ACTUALLY WORKS, AND IT IS A CLASS, NOT A LENGTH: AN IDENTIFIER.**
+A symbol, a filename, a hash, a number — **unwrappable because it has no spaces,
+and unique because nobody writes it by accident.** Measured in the same session:
+`grep -ac "shout_section" RECAP_PHP.md` → **1**, which correctly found §10's
+*other* half **published** after my phrase test had implied the whole section
+was not; and `ptr_as_i32` → **0**, correctly absent. ▶ **Of the four probes I
+went on to VERIFY BY READING the matched line, the two IDENTIFIER probes were
+both right and the two PROSE probes were both wrong.** ⚠ **n = 4, and it is
+stated as n = 4** — the other six probes in that session were never checked
+against the text, so they are not evidence for anything. **The mechanism is the
+argument here; the count is only an illustration of it.**
+
+▶ **THE RULE, replacing §10's:** ⛔ **never grep prose to decide presence.**
+Grep an **identifier** the claim must contain, or **read the section**. If the
+claim contains no identifier, that is itself the finding — **a claim with no
+greppable token cannot be checked mechanically and must be read.**
+
+⚠ **SCOPE, and it is narrow on purpose.** This says nothing about `grep` for
+*locating* text, which is what it is for and what it does well — every census in
+`F147` greps, and each one greps a **path or a filename**. It is specifically
+about **asserting an ABSENCE, or confirming a PRESENCE, from a count over
+prose.** `F35`'s family at a third joint: **the tool answered a narrower
+question than the one I asked it, and the output looks identical either way.**
+
+⚠⚠ **AND THE REASON THIS IS A FINDING RATHER THAN A NOTE:** the defect is
+invisible in review. `grep -c … → 0` pasted into a report reads as a
+measurement, carries a command anyone can re-run, and **re-running it reproduces
+the wrong answer.** ▶ `law 6` says *a figure a validator asserts is computed
+from the tree, or it is not asserted* — **this is a figure computed from the
+tree that is still wrong**, because the computation answers a different
+question. ⭐ **A reproducible number is not a correct one.**
+
+### F147 — ⛔⛔⛔ FOUR INSTRUMENTS HAVE BEEN BUILT FOR THE SCRATCH-DEPENDENCY CLASS IN EIGHT DAYS, **EACH ONE SCOPED TO THE INSTANCE THAT PROMPTED IT**, AND EACH NEXT INSTANCE WAS FOUND OUTSIDE THE LAST ONE'S SCOPE — LAW 11's OWN SCOPE CLAUSE CAPTURES **5 OF 22**
+
+Manager, **UNREVIEWED** (rule 9). Probe:
+`.tasks-php/probes/scratchdeps.py` (`--selftest` **PASS, 12 must-fire
+negatives**). Read-only; re-derives from the working tree and `git ls-files`.
+
+⚠⚠ **THE FINDING IS THE MECHANISM, NOT THE COUNT.** Every time this class was
+rediscovered, someone (twice me) built an instrument, and **generalised it to
+the neighbourhood of the instance in front of them**:
+
+| # | date | prompted by | instrument | scoped to | what it captures |
+|---|---|---|---|---|---|
+| 1 | **2026-09-09** | `F51` — *"the catalogue's coverage claim rested on a script the repo does not carry"* | `citecheck.py` (`ceb40b5`) | the CLAIM layer; ⛔ **excludes `RECAP_PHP.md`** by a reasoned premise | `.temp/` **paths**; no tracked-twin test |
+| 2 | **2026-09-13** | `F99` / item 86, promoting `width.py` | `.memory-php/04-process.md` **law 11** | *"every probe behind every finding in **F88–F101**"* | ⛔ **5 of the 22 findings that have the shape — 23 %** |
+| 3 | **2026-09-17** | `_063` §7.2 | `boxcheck.py`'s `mem_temp` arm (`604b51a`, **mine**) | `.memory-php/` only | **printed 4 — and 1 of the 4 is a false positive** |
+| 4 | **2026-09-17** | this finding | `probes/scratchdeps.py` | + `RECAP_PHP.md`'s finding sections · + **bare-filename** spelling · + tracked-twin resolution | **54 LIVE / 12 AMBIGUOUS / 6 STALE** |
+
+⚠ **ROW 4 IS NOT EXEMPT AND I AM NOT CLAIMING IT IS COMPLETE.** Its known
+blind spots are written into its own docstring: it cannot tell a probe I wrote
+from upstream source I extracted, it resolves by basename, and it scans two
+document families. **The pattern above predicts row 5.**
+
+---
+
+**THE SET, MEASURED — AS A READING TAKEN AT `604b51a`, BEFORE THIS FINDING WAS
+WRITTEN.** Over `RECAP_PHP.md` + the five `.memory-php/*.md`:
+**94** `.temp/` citations → **54 LIVE** (no tracked file of that basename) ·
+**12 AMBIGUOUS** (all `NOTES.md`, across 7 scratch dirs — see (c)) · **6 STALE**
+(a tracked twin exists, so the citation points into scratch for a probe that is
+committed) · **22 not a dependency** (a re-derivable artefact, or the bare
+`.temp/` that is how the RULE itself is spelled).
+
+**22 PUBLISHED FINDINGS CITE A SCRATCH FILE INSIDE THEIR OWN `### F<N>`
+SECTION** — F44, F50, F51, F52, F53, F59, F69, F70, F72, F73, F74, F82, F83,
+F84, F85, F86, F89, F90, F95, F99, F100, F102 — over **34** citations and
+**23** distinct files, all of them in `RECAP_PHP.md`. ⓘ **These four numbers are
+what `probes/scratchdeps.py` PRINTS** (its `law 11` block), not a transcription:
+an earlier draft of this finding said *"32"* from a one-off script, and the
+figure was re-derived from the committed tool before it was published — `law 6`.
+
+✅ **AND THE READING THAT KEEPS THIS HONEST, AS AN EVENT: at `604b51a`,
+2026-09-17, ALL 29 TARGETS STILL EXIST — 0 GONE.** ▶ **Nothing has been lost;
+the exposure is real and the loss is hypothetical**, and a finding that blurred
+those two would be the over-claim `F108` exists to stop. ⚠⚠ **A READING WITH A
+DATE, NOT A PROPERTY**: `.temp/` is auto-`rm`-able, `CLAUDE.md` constraint 6
+*mandates* deleting its blobs once gates are green, and `citecheck.py` already
+reports **4** `controls/*` citations whose targets **are** gone. ▶ **Re-run it;
+do not quote the 0.**
+
+---
+
+⛔⛔ **AND THESE FOUR NUMBERS WENT STALE THE MOMENT THIS FINDING LANDED, BY ITS
+OWN HAND — WHICH IS THE POINT, NOT AN EMBARRASSMENT.** Publishing `F147` and
+`F148` moved the census to **58 LIVE / 14 AMBIGUOUS / 8 STALE of 108**, and
+every one of the ten added citations is **inside `F147` or `F148` or items
+148/149** — measured, not guessed: `F147` contributes 5 LIVE, 3 AMBIGUOUS and 2
+STALE, `F148` one AMBIGUOUS, the two item rows eight. ▶ **They are the
+illustrative class, and a reader ruling on them should rule *correct as
+written*.** ⭐ **`F147` NOW APPEARS IN ITS OWN `law 11` LIST — 23 findings, not
+22 — because the finding that defines the population is inside it.** ✅ **The
+adjudication is *correct as written*: `F147` cites scratch as ILLUSTRATION, and
+its EVIDENCE is `.tasks-php/probes/scratchdeps.py`, committed and swept.**
+▶ **Which is the distinction item 148 exists to make, demonstrated on the first
+member anyone will look at.** ⚠⚠ **SO DO NOT QUOTE 54/12/6 OR 58/14/8. RUN THE TOOL.** A finding
+whose subject is *"an instrument's cardinality was consumed as a set"* has no
+business shipping a cardinality that reads as current — ⭐ **and dating it is
+necessary and not sufficient: the LABEL has to be historical too** (`F126`'s
+lesson, the one a date alone did not save).
+
+⛔ **(a) MY ARM WAS A STRICT DUPLICATE OF A REPORT THAT ALREADY EXISTED, EIGHT
+DAYS OLDER.** `citecheck.py` has scanned `.memory-php/*.md` for `.temp/`
+citations **since its first commit**, and prints the same three paths under *"a
+committed claim should rest on a committed generator"*. I built the second home
+**as the remedy produced by a round whose own findings are about facts having
+two homes** (`F131`). ▶ The repair is not a third tool: **one census, imported
+by whoever displays it** — the `rule9_mustfire.py` → `bc.ROUTE` shape.
+
+⛔⛔ **(b) THE CELEBRATED "FOURTH" IS THE ONE ENTRY IN THE SET THAT IS NOT A
+DEPENDENCY AT ALL.** `_063` §9 item 2 reads *"THE THREE LIVE `.temp/`
+DEPENDENCIES IN `.memory-php/02-ladder.md` (`:447`, `:451`, `:612`)"* — **scoped
+to one file, named member by member, correct on every one.** My arm printed
+**4** because it also scanned `04-process.md`. **The fourth is
+`04-process.md:165 → .temp/php39/width.py`, and that probe was promoted to
+`.tasks-php/width.py` on 2026-09-13 — four days before the arm ran.**
+
+⛔⛔⛔ **AND THE PART THAT IS WORSE THAN THE ARITHMETIC: I BOOKED MY OWN FALSE
+POSITIVE AGAINST THE REVIEWER.** I wrote *"the arm found a FOURTH `_063`'s count
+missed"* into the START HERE box, **under the line saying the reviewer's order
+binds me** (`F123`). The reviewer did not miss a fourth; the reviewer bounded a
+different set and said which. ▶ **Two counts over overlapping sets disagreed,
+and I read the disagreement as a discovery instead of asking which set each was
+over** — `F132`, broken in the act of scheduling the work `F132` exists to make
+possible. ⚠⚠ **AN ARM THAT PRINTS BEATS A PROSE BOX ON RECALL AND SAYS NOTHING
+WHATEVER ABOUT PRECISION, and I published the recall win as if it settled
+both** — `_063` §6.3's experiment over-read by the person who ran it.
+
+⛔⛔⛔ **(c) A BARE FILENAME IS INVISIBLE TO EVERY VALIDATOR, AND THAT IS THE
+SPELLING F82–F86's EVIDENCE USES.** Both tools match `` `.temp/<path>` ``.
+`.memory-php/02-ladder.md:448` and `:612-613` cite their probes as *"probe
+`identity_null.py`"* and *"probes `identity_null.py` · `inclusive_ir.py` ·
+`bc_sweep.py` · `flip_exact.py`"* — **no path, therefore no match, therefore
+five citations naming four probes behind five published findings counted as
+zero.** ▶ **A CITATION'S SPELLING IS NOT A PROPERTY OF THE THING CITED**, and an
+arm keyed to one spelling measures the spelling.
+
+⛔⛔⛔ **(c′) AND THE FIFTH INSTANCE OF THIS CLASS IS IN THE FIRST DRAFT OF THIS
+FINDING, WHERE THE CORRECT ANSWER WAS ALREADY PRINTED TWENTY LINES ABOVE IT.**
+The brief I wrote for the promotion said the probes carry *"six published
+findings — **F82–F87**"*. **`F87` is evidenced by none of them**: its tokens
+`get_unchecked` and `a1_spread_pp` appear in zero of the six files, and its own
+section cites `TASK_PHP_037` and `results-php/gate/ph45-….json` — **all
+committed, so F87's law-11 debt was discharged before this task existed.**
+▶ **I read the range off `02-ladder.md:612`'s citation line — *"`RECAP_PHP.md`
+F83–F87, …, probes X · Y · Z"* — and took the RANGE for the MEMBERSHIP. A
+citation line naming a range and a probe list does not assert that every member
+of the range rests on every probe.**
+⭐⭐⭐ **AND THE CENSUS IN THIS VERY DOCUMENT HAD IT RIGHT: the measured list
+above runs *… F82, F83, F84, F85, F86, F89 …* — `F87` IS NOT IN IT.** The tool
+printed the correct set, the prose beside it asserted a range, **and I published
+the prose.** ▶ `law 6`'s defect in its purest form: **a figure was computed from
+the tree and then not used.** ⓘ Caught by the promotion engineer, not by me. ⚠ The same regex blindness runs
+the other way into `AMBIGUOUS`: **50 tracked files are called `NOTES.md`**, so a
+basename resolver would report `.temp/mgr172/NOTES.md` — the evidence record
+behind F82–F86 — as *already promoted*. **Three outcomes, not two, and the third
+is printed rather than guessed.**
+
+⛔⛔ **(c″) AND THE SAME MECHANISM FIRED AGAIN, IN A DIFFERENT TOOL, THE SAME
+DAY — SO IT IS `n = 2` AND NOT AN ANECDOTE.** Writing item 150 above, I spelled
+its route *"▶ **The question **for a reviewer**, and I should not settle it
+myself**"*. `boxcheck.py`'s `ROUTE` returned **nothing**: its alternation
+enumerates *"is a REVIEWER"*, *"a REVIEWER's"*, *"Give it to a reviewer"* … and
+**not** *"for a reviewer"*. ▶ **`F140`'s defect recurring inside `F140`'s own
+remedy**, and structurally identical to (c): **A REGEX KEYED TO AN ENUMERATED
+SPELLING MEASURES THE SPELLING, NOT THE PROPERTY.** ✅ Widened, with two arms —
+`909` for the missed spelling, `910` for the false positive the widening must
+not buy. ⛔⛔ **BUT ADDING A SPELLING IS NOT THE FIX AND THE CODE NOW SAYS SO:
+every addition is evidence the enumeration cannot be completed by thinking
+harder. The durable answer is a ROUTING TOKEN AN AUTHOR MUST TYPE, not a phrase
+a reader must guess** — unsettled, deliberately. ⚠ **And the other repair was
+refused**: rewording item 150 to suit the regex is *silencing a checker by
+editing its input*, which this tree already calls the opposite of the ratchet.
+
+⚠⚠ **(d) `citecheck.py`'s EXCLUSION OF `RECAP_PHP.md` IS REASONED, HALF TRUE,
+AND WRONG AT THE WRONG GRANULARITY — SO THE REPAIR NARROWS IT, NOT REVERSES
+IT.** Its comment gives the reason: the handoff *"cites the manager's current
+scratch on purpose as provenance for work in flight… not a committed claim
+resting on deletable evidence, which is the thing being hunted."* Measured over
+its 48 LIVE citations: **14 sit in the open-items table**, where that premise is
+**exactly right**, and **32 sit inside `### F<N>` finding sections**, where it is
+false — F82's evidence line has been a published, cited, five-day-old finding.
+▶ **A SECTION-LEVEL PROPERTY IMPLEMENTED AS A FILE-LEVEL EXCLUSION.** Scan the
+finding sections; keep excluding the items table. ⭐ **The half that is right is
+why this is a narrowing: the exclusion bought something real and was priced at
+the wrong unit.**
+
+⚠⚠ **(e) LAW 11's OWN EXAMPLE IS STALE IN THREE WAYS AND ITS PRESCRIBED FIX WAS
+ALREADY PERFORMED.** It says F92's measurement *"lives in `.temp/php39/width.py`
+— **gitignored**, and its `--selftest` **no longer completes**"*, and *"▶ **The
+fix is the one F99 prescribes: commit the probe beside the other checkers.**"*
+All three clauses are false today: the probe is `.tasks-php/width.py`, its
+`--selftest` returns **0**, and that file's own header records the promotion and
+the two `X3b` repairs, **dated 2026-09-13**. ▶ **The law's example is the law's
+own remedy, applied and never recorded back — the fix has one home and the rule
+has another** (`F131`) — and the tree's arm then reported the law's stale
+example back to me as new work.
+
+✅✅ **(e′) THE POSITIVE CONTROL, WHICH IS WHY (e) IS A REPAIRABLE SHAPE AND NOT
+A COMPLAINT.** `RECAP_PHP.md:115` faced the identical situation — the rule-9
+state had been living in gitignored `.temp/mgr175/NOTES.md` — and its repair
+reads *"⛔⛔ **THIS BLOCK EXISTS BECAUSE THIS STATE WAS LIVING IN GITIGNORED
+`.temp/mgr175/NOTES.md`** — which is **F99's own defect**…"*. ▶ **The fact moved
+into the committed document and the citation stayed, re-spelled as THE REASON
+THE BLOCK EXISTS.** That is the form law 11's example owes: not a deleted
+pointer and not a live one — **a pointer whose tense says the work is done.**
+
+⭐⭐ **(f) MEASURED, NOT ASSUMED: 2 OF THE 5 PROBES BEHIND F82–F86 CRASH ON A
+CLEAN CHECKOUT RATHER THAN DEGRADE.** With `.temp/mgr172/cg/` moved aside,
+`inclusive_ir.py --selftest` dies `TypeError: '>' not supported between
+instances of 'NoneType' and 'NoneType'` and `bc_sweep.py --selftest` dies
+`KeyError: 'small'`; the other three are unaffected because they read only
+committed gate records. ▶ **That is law 11's prediction, TESTED for the first
+time, with a mechanism — and it is stronger than the law states: the probe does
+not merely go missing, it prints a Python traceback where a result should be.**
+✅ Repaired on promotion: both now print *"⛔⛔ NOT RUN — NO VERDICT WAS REACHED.
+THIS IS NOT A PASS"*, list every missing path, name the generators, and **exit
+0**.
+
+⛔⛔⛔ **(g) AND THE PRECEDENT I TOLD THE ENGINEER TO COPY IS ITSELF FALSE — ON
+THE SAME FILE AS (e).** `.tasks-php/width.py`'s committed header says of its
+cross-session check: *"`X3`/`X3b` … reports **"the check could not run, which is
+itself a result to report"** **and does not fail**. ✅ So the selftest degrades
+honestly rather than lying."* **It does fail.** With `.temp/mgr173/cg` moved
+aside it prints `FAIL X3`, ends `SELFTEST FAIL ['X3']`, **rc=1** — because
+`reuse_check` returns `("X3", False, …)` and `selftest`'s `check()` appends every
+falsy `cond` to `fails`. ✅ **Verified statically at `width.py:1323` and
+`:893-896`**, independently of the engineer's run.
+
+⚠⚠ **THIS IS LIVE, NOT COSMETIC.** `width.py` is filed `st_expect=0`, and the
+state that turns it red — an empty `.temp/mgr173/cg` — is the state
+**`CLAUDE.md` Don't #1 actively INVITES** (*"blobs … get deleted once your gates
+are green"*). ▶ **The routine sweep goes red for following the rules, and no
+`why` says so.** ⭐ The engineer refused the instruction and made its guards
+return 0, saying in capitals that nothing was checked — **the right call, and it
+is why row 4's guards do not inherit the defect.**
+
+▶ ⚠ **MY DECISION, RECORDED HERE BECAUSE IT IS A POLICY CALL AND NOT A REPAIR:
+an unrunnable CROSS-SESSION check REPORTS AND RETURNS 0.** The tree already
+argues this one directory over — `probes/ph66_djbx33a_collide.py`'s registry
+entry says *"a checker that reddens when a sibling repo is cleaned is reporting
+on that repo"* — and `X3` is the same shape. ⛔ **Not done here**: `width.py`
+carries `F92`, and a validator change lands with its must-fire negatives or it
+does not land (`§H`). **Open item 149.**
+
+---
+
+⚠⚠⚠ **WHAT THIS IS NOT, AND THE SENTENCE MATTERS MORE THAN THE TABLE.** `LIVE`
+is a **CANDIDATE SET REQUIRING ADJUDICATION BY UNIT TEXT** (`F132`), **not a
+defect count**, and this finding must not be quoted as *"54 defects"*. At least
+one member is the rule being **FOLLOWED**: `.temp/php27/streamsfuncs.c` is
+PHP 5.0.0 source extracted into scratch, re-derivable from
+`patterns-php/php-5.0.0.manifest`, and committing it would be the error.
+▶ **Adjudicating the remaining 23 is open item 148 and is NOT closed here.**
+
+⛔⛔⛔ **AND THE CLASS IS NOW AT THREE, ALL MINE, INSIDE ONE WEEK.** `F138` —
+*"I consumed its CARDINALITY and never printed its MEMBERS"* — is this defect on
+the rule-9 backlog. `F142` — *"the arm bounds the pile's SIZE and the property
+is about its MEMBERS"* — is this defect on the cost ledger's `PENDING` pile.
+**`F147` is this defect on the arm I built four days later AS A REMEDY, and the
+number I consumed without checking its members is the one I then wrote into the
+START HERE box as the next session's instructions.** ▶ `F138`'s remedy was
+*print the members*; **I printed four members and never asked whether the four
+were the set.** ⚠ **PRINTING A MEMBERSHIP IS NOT ADJUDICATING ONE.**
 
 ### F146 — ⚠ **`A1` IS NEVER MEASURED AT `O0/large.bin` IN EITHER MEASUREMENT-RECORD CORPUS — `0 of 374` ISOLATED CELLS, BY ONE DELIBERATE LINE IN `harness/measure.py`. SO A ROW WANTING THE MATRIX AT TWO OPTIMISATION LEVELS GETS THAT CELL FROM A *ROW-LEVEL CONTROL*, AND `ph66`'s IS THE MODEL AND THE ONLY ONE**
 
@@ -5764,13 +6061,23 @@ is a **bias against a known population mean**, not a spread.
 > ✅ **The `NO` survives regardless**, on F93's start-of-run bias and F91's bias —
 > **the lever cannot fix a BIAS at any width**, which is the real reason and is
 > stronger than the exponent.
-> ⚠⚠ **AND ITS PROBE NO LONGER SELFTESTS**: `.temp/php39/width.py --selftest`
-> dies with a `ZeroDivisionError` at `X3b` — ⭐ **it crashes because its check now
-> passes MORE cleanly than the guard expected.** ⛔ **And the probe is in
-> GITIGNORED `.temp/`, so a published finding's only evidence will not survive a
-> clean checkout — F99's own defect, applied to F99's sibling.** → item **86**.
+> ✅✅ **ITS PROBE IS COMMITTED AND GREEN — `.tasks-php/width.py`, `--selftest`
+> rc = 0.** Was: *"NO LONGER SELFTESTS"* — `.temp/php39/width.py` died with a
+> `ZeroDivisionError` at `X3b`, ⭐ **crashing because its check had begun passing
+> MORE cleanly than the guard expected** — and it sat in GITIGNORED `.temp/`,
+> F99's own defect applied to F99's sibling. ▶ **PROMOTED 2026-09-13, both `X3b`
+> defects repaired; item 86 DISCHARGED.**
+> ⛔⛔ **THAT REPAIR WAS RECORDED IN THE PROMOTED FILE AND NOWHERE ELSE, SO FOUR
+> DOCUMENTS KEPT DESCRIBING THE OLD STATE FOR FOUR DAYS** — this block, the line
+> seven below it (which says `--selftest` **PASS** of the same path, so the two
+> contradicted each other), item 86 left UNSTRUCK, and `.memory-php/`'s law 11.
+> ▶ **`F131` at its sharpest: the fact had exactly ONE home and every other home
+> kept the old fact.** ⚠ **AND A FIFTH SITE IS STILL WRONG THE OTHER WAY** —
+> `width.py`'s own header claims `X3` *"does not fail"* and it does (`F147`(g),
+> item 149).
 
-`TASK_PHP_039`, probe `.temp/php39/width.py` (`--selftest` **PASS**).
+`TASK_PHP_039`, probe **`.tasks-php/width.py`** (`--selftest` **PASS**; written
+as `.temp/php39/width.py`, promoted 2026-09-13 — see the block above).
 ⚠ **UNREVIEWED** (rule 9). ✅ **Manager-verified cheaply**: 396 callgrind
 profiles = 33 endpoints × 4 cells × 3 rows, exactly the mandated design; the
 `(100,200)` span reproduced every published `marginal_ir_per_call` (N2).
@@ -9133,7 +9440,7 @@ the wrong one.
 | ~~83~~ | ✅✅ **CLOSED AT `TASK_PHP_043` §1 — RULED (a), AND ITEM 83's OWN SUMMARY SENTENCE WAS WRONG.** ⛔ **The pin and its English do NOT disagree.** The entry's **leading appositive** — the clause defining what the backticked span IS — reads *"THE ONE-BYTE-PER-SLOT WITNESS"*, a **representation** (`unsafe.rs:230`, `[bool; MAXD]`, one byte per slot); the challenger is declared *"a u32 bitmask **instead of `[bool; MAXD]`**"*, one BIT per slot; and *"indexed SAFELY on purpose"* fails on a bitmask too, which performs no indexed access. ▶ **English 2-to-1 against the bitmask, AGREEING with the backticks.** ⭐ **So `idiom.required[4]` pins the REPRESENTATION, `r4_bitmask{,_pool,_min}` are OUT OF CONTRACT, `r4_endpoint_degenerate → true`, and every remaining in-contract R4 variant is DEARER (+0.50…+33.92 %).** ⛔⛔ **AND THE MANAGER'S ROUTE WAS AN OVER-READ**: I argued from the `why`'s *"WHAT NO GREP SETTLES"* sentence that English decides scope and backticks decide spelling — but that sentence's own final clause says *"which spelling … is a reading"*, and `harness/check.py::idiom_audit` (`:2198-2212`) measures the naive reading at **41 misses of 158 obligations, all 41 non-defects, 17 ANTI-signal**. ▶ **My route would have licensed (a) on every backticked `required` span.** ✅ Degeneracy **simulated through the row's own verdict functions** (`.temp/php43/item83_sim.py`, selftest PASS, 4 negatives), not inherited. ✅✅ **LANDED AT `TASK_PHP_044`: `contract_sha256` **`c41ffad2b795…` → `6924e66fde49…`**, `verdict PASS-WITH-BLOCKED-ROWS`, `failures []`, `complete_run true`, identity `O0 differ / O3 differ`, `problems []`, and **`r4_endpoint_degenerate true` / `r3_endpoint_degenerate false` / `cheapest_r3_in_contract r3_chunks_mask`** — all re-read by me from the regenerated records.** ⛔⛔ **AND `_043` §1.8's DRAFT WOULD HAVE ADDED THREE FALSE PINS** — see item **100**. ⓘ Reading (c) refuted as stated → item **91** | F100. The entry's backticked spelling is `` `wrote[i]` `` (an indexed **byte array**); its English says *"THE ONE-BYTE-PER-SLOT WITNESS … what makes R4's unsafe read DISCHARGEABLE"* (a **purpose**). **A `u32` bitmask satisfies the purpose — twins `31/0` and `32/0` — and does not carry the spelling.** ▶ **Under the English both endpoints move; under F72's rule that these entries are *spellings with the ticks dropped*, the R4 endpoint is DEGENERATE.** ⛔ **`idiom.required` is presence-only and CANNOT FAIL THE GATE**, so nothing mechanical was ever going to decide it, and `required_absent` correctly *reported* the absence on both winners. ⭐⭐ **This is F72 recurring at a new site and item 56's prediction coming true** (*"a bare-identifier pin is a weak pin, and nothing measures pin quality"*) — ⚠ **and it is the FIRST time the ambiguity decides a published RESULT rather than a pin's tidiness.** ▶ **The repair: restate `required[4]` so its spelling and its English bind the same thing** — one sentence inside the hashed block, so **one `ph53` re-gate** and no re-measure. **Batch with item 82's F87 restatement if that turns out to need a row edit.** ⚠ **Do NOT resolve it by weakening the pin to match whichever variant won** — `.memory/02-bench-rules.md`'s rule that a rung is never cost-selected applies to its pins too |
 | 84 | ⚠ **A FIGURE F100 CITES IS NOT IN THE FILE F100 IMPLIES — F99's OWN RULE, BROKEN BY F99's AUTHOR** | `_043` §1.9. F100 quotes the twin verdicts **`31/0`** and **`32/0`** in a paragraph whose other fields come from `controls/spellings.json` — **and `spellings.json`'s `verus_checked` is a bare `true`, not a count.** The figures are in **`ph53`'s `NOTES.md:550` and `:741`.** ▶ **Repaired in F100 in place.** ⭐ **The item is the GENERAL one: F99's lesson is *name the file every field came from*, and the very next finding written after F99 did not.** ▶ **Owed: one sweep of the F88–F101 block for any other field quoted without its file.** ⓘ Free — `RECAP_PHP.md` only |
 | ~~85~~ | ✅ **CLOSED AT `TASK_PHP_044` §6 — AND THE CENSUS WAS WRONG IN **BOTH** DIRECTIONS.** ⛔ **The *"twice independently"* claim was at **FOUR** sites, not the two I named** — `spec.md:23`, `:68`, ⭐ **`:570` (`provenance.fix_commit_note`, which my table omitted)** and `NOTES.md:146+:150` — **all four repaired**, found with a **wrap-tolerant** census because a line-based grep cannot match a phrase that wraps (F35's second half, and I had warned about it in the same task file). ⛔⛔ **AND A FIFTH IS UNREPAIRABLE → item 98.** ⛔⛔ **AND THE `:1945` → `:1944` HALF WAS MY OWN ERROR BILLED TO THE ROW**: the row never made it — `spec.md:514` says `zend_compile.c:1941-1945`, a **correct RANGE**, and `:1942`/`:1944` elsewhere. ▶ **`:1945` came from MY prose, `_043` corrected MY slip, and I wrote that correction into this file as a debt owed by the ROW.** ⭐ **F12's propagation shape with the roles inverted: a manager number travelled into a task file as a premise and came back as a phantom defect.** ✅ **R1h unchanged** — `d09cdd9f71f3`, still zero fuzz | `_043` §4.1. **`patterns-php/ph53-iface-tail-uninit/spec.md:23` AND `:68`** (`idiom.required[5]`) both assert the two-route exclusion of `be8daf1f47fa` and both name the screen route — **which F95's own repair demoted to `INAPPLICABLE-SAME-FILE`**, a label the screen prints as *"NOT exclusions … says nothing about these"*. ✅ **The exclusion STANDS on the tag walk alone**, so nothing about the row's R1h changes. ⚠ **Also `:1945` → `:1944`** for the inheritance-merge survivor. ▶ **BATCH WITH ITEMS 83 / 89 / 90 — ONE `ph53` re-gate, NO re-measure** (`idiom` is in `source_sha256`, not in any measurement digest; verified) |
-| 86 | ⛔⛔ **F92's PROBE NO LONGER SELFTESTS, AND IT IS IN GITIGNORED `.temp/` — A PUBLISHED FINDING WHOSE ONLY EVIDENCE WILL NOT SURVIVE A CLEAN CHECKOUT** | `_043` §4.3. `.temp/php39/width.py --selftest` dies with a **`ZeroDivisionError` at `X3b`** — ⭐ **and it crashes because its check now passes MORE cleanly than the guard expected**, which is a guard written for a noisier world, not a refutation. ⛔⛔ **The structural half is worse than the crash: F92 is PUBLISHED (`STATISTICS_001.md` §5 answers item 68 `NO`) and its only evidence is a gitignored probe.** ▶ **That is F99's defect applied to F99's sibling, and the fix is the one F99 prescribes: COMMIT the probe to `.tasks-php/`** beside the other eight checkers, **with the X3b guard repaired and its must-fire negative** (§H). ⓘ **Free — `.tasks-php/` is in no digest.** ⚠ **And sweep for the same shape: `_043`'s four probes, and `mgr17{0,2,3,4,5}`/`php3{8,9}`/`php4{0,1,2}`, are all gitignored** |
+| ~~86~~ | ✅✅ **DISCHARGED 2026-09-13 AND LEFT UNSTRUCK FOR FOUR DAYS, WHICH IS ITS OWN FINDING.** `width.py` is committed at `.tasks-php/width.py`, both `X3b` defects repaired, `--selftest` rc = 0; ⭐ **and the sweep this row asked for was finally run on 2026-09-17** — `mgr170`/`mgr172`'s five probes plus `sweep_cg.sh` promoted under `F147`, with `NULLCTL_001.md` as their evidence record. ⛔⛔ **THE REMEDY WAS RECORDED IN THE PROMOTED FILE AND NOWHERE ELSE**, so this row, `RECAP_PHP.md`'s F92 block, its own next line and `.memory-php/`'s law 11 all kept describing the pre-promotion state — two of them contradicting each other seven lines apart (`F131`, `F147`(e)). ⛔ **AND ITS SUCCESSOR IS OPEN: `width.py`'s header claims `X3` *"does not fail"* and it DOES (item 149).** ⚠ **The sweep is NOT finished — `probes/scratchdeps.py` prints 48 LIVE citations still; adjudicating them is item 148.** Was: | `_043` §4.3. `.temp/php39/width.py --selftest` dies with a **`ZeroDivisionError` at `X3b`** — ⭐ **and it crashes because its check now passes MORE cleanly than the guard expected**, which is a guard written for a noisier world, not a refutation. ⛔⛔ **The structural half is worse than the crash: F92 is PUBLISHED (`STATISTICS_001.md` §5 answers item 68 `NO`) and its only evidence is a gitignored probe.** ▶ **That is F99's defect applied to F99's sibling, and the fix is the one F99 prescribes: COMMIT the probe to `.tasks-php/`** beside the other eight checkers, **with the X3b guard repaired and its must-fire negative** (§H). ⓘ **Free — `.tasks-php/` is in no digest.** ⚠ **And sweep for the same shape: `_043`'s four probes, and `mgr17{0,2,3,4,5}`/`php3{8,9}`/`php4{0,1,2}`, are all gitignored** |
 | 87 | ⚠⚠ **THE MANAGER'S `same_function` SOUNDNESS GUARD IS *NECESSARY, NOT SUFFICIENT* — AND IT IS F95's OWN DEFECT CLASS** | `_043` §4.2. My guard — *the matched hunk must contain no function-definition header before its first changed line* — **was made to accept a ZERO-LEADING-CONTEXT hunk as proof** (`.temp/php43/samefunc_hole.py`): with no leading context there is no header to find, so the check passes vacuously. ✅ **Live reach on the real corpus is `0`** — **latent, not live.** ⛔ **But the shape is exactly what F95 exists to name: a soundness test promoting an exclusion to a proof**, which is F95's headline defect recurring **inside F95's own repair**. ▶ **Repair: require a minimum leading context, or fail closed when there is none** — **with its must-fire negative** (§H binds the manager equally). ⓘ Free — `.tasks-php/preimage_screen.py` is in no digest. ⚠ **`N10e`'s `43` is still a hardcode and WILL move at row 9** |
 | 88 | ⛔⛔ **`citecheck.py` SILENTLY CHECKS NOTHING AT ONE ROW — AND THE DIRECTION I ASKED ABOUT WAS THE SAFE ONE** | `_043` §5.3. I asked whether `inherited = set.intersection(*per_spec.values())` breaks when a row is **ADDED**; ✅ **that direction fails LOUD and is acceptable.** ⛔ **The real hole is the single-row case: the intersection over one set IS that set, so EVERY citation classifies as *inherited* and all of them are suppressed — and `N2` still passes.** ⭐ **A checker that cannot fail, which is `F10`'s shape and §H's whole reason.** ▶ **Repair: `len(specs) >= 2`, with its must-fire negative.** ⓘ Free. ⚠⚠ **And the general lesson is about MY question: I asked after the direction I could imagine and the defect was in the one I could not — so a guard audit should enumerate the DEGENERATE inputs (0 rows, 1 row, all-identical), not the interesting ones** |
 | ~~89~~ | ✅ **CLOSED FOR `ph53` AT `TASK_PHP_044` §5**; the `invariant` clause now says `in_contract` means **`forbidden_hits` empty**, with `required_absent` reported beside it and judged against each entry's English. ⚠ **STILL OWED BY `ph07` · `ph16` · `ph29` · `ph45`** — one re-gate each, batch with each row's next task | `_043` §1.5. **`controls/spellings.json`'s `invariant` field opens *"Every variant is in contract by `harness/check.py::spelling_matches` over EVERY backticked idiom entry"* — and that clause is FALSE AS WRITTEN in 5 of 5 php rows**, because `required_absent` is non-empty on variants the row ships, **including on R3's `v0_shipped`**. ⓘ **PAT's two copies do not carry the clause.** ⭐⭐ **Item 81 predicted *"expect the next row's suite to find a fifth"* and it did — so the law *a control cloned between rows carries its defects, and only the row that writes NEW negatives finds them* now has FIVE instances and ONE successful forward prediction.** ▶ **Repair drafted (`_043` §1.8 item 3): state that `in_contract` means `forbidden_hits` empty, and that `required_absent` is reported beside it and judged against each entry's English, because `required` is presence-only and cannot fail the gate.** ⓘ **Cost: one re-gate PER ROW — `ph53` batches with item 83; `ph07` / `ph16` / `ph29` / `ph45` batch with each row's next** |
@@ -9194,3 +9501,6 @@ the wrong one.
 | 145 | ⚠⚠ **A COMMITTED DOCUMENT MAY CITE `.temp/`, AND THE RULE THAT FORBIDS IT COVERS ONLY `spec.md`/`NOTES.md` — SO THE QUESTION IS NOT *DOES IT CITE SCRATCH* BUT *DOES A GENERATOR LIVE THERE WITH NO OTHER HOME*** | Manager, 2026-09-16, pre-compact audit, starting from `_062` §8.3 and **measured before being believed**. §F6 forbids `spec.md`/`NOTES.md` from citing `.temp/`, and `citecheck.py` enforces exactly that (3 inherited PAT-era hits, `ph66` adds none). ⛔ **But REPORTS cite `.temp/` universally** — counted across all landed PHP reports, every one does, and **`_062` at 3 is among the LOWEST**. ▶ **So this is not a `ph66` defect and not a new drift**; a report is a dated narrative and naming the directory you worked in is accurate history. ⛔⛔⛔ **AND MY FIRST DRAFT OF THIS ITEM PROPOSED AN ARM THAT MOSTLY ALREADY EXISTS — CHECKED BEFORE FILING, WHICH IS THE ONLY REASON IT IS NOT A SECOND HOME** (`F131`). `citecheck.py` **already scans `.tasks-php/*.md`**, reports itself **rc=1 at `HEAD`** on the long-standing `spec.md` debt (items 55/61, each repair a re-gate), and **already carries a `§H AT RISK` arm** for *a COMMITTED VALIDATOR citing its NEGATIVES in gitignored `.temp/`* — 8 live hits across `ph16`/`ph29`. ▶ **So the report-citation half is DELIBERATELY benign and the validator half is ALREADY ARMED.** ⭐⭐ **WHAT IS GENUINELY UNCOVERED IS NARROWER THAN I WROTE**: a `.temp/` path holding a **GENERATOR** — a `.py`/`.sh` that rebuilds evidence — **with no committed twin and no validator role**, so neither arm sees it. For `_062` that is `.temp/php66/clausetest.py` (the clause-mutation pre-check, §7.6, and it looks **REUSABLE across R5 rows**) and `REGEN.sh`. ⛔⛔ **AND THE TENSION IS IN THE RULES THEMSELVES, NOT IN ANYONE'S CONDUCT**: `CLAUDE.md` rule 1 says the `.py` probe and the logs **ARE the evidence and stay** — in `.temp/`, which is gitignored — while `F51`/`F99` say a committed document may not point at deletable scratch. **Both are followed here and they disagree.** ⚠ **NOT BUILT and the two files NOT promoted by fiat** — it decides what `CLAUDE.md` rule 1 means, which is above the manager, and the right shape may be a WIDENING of `citecheck.py`'s existing arm rather than a new one. ⛔⛔ **RULED `_063` §7.2 — AND THE SCOPE WAS WRONG BY ~100×**** ⛔⛔⛔ **RULED AT `_063` §7.2, AND BOTH HALVES WENT AGAINST ME.** **(1) THE TENSION IS A FALSE DICHOTOMY**: `CLAUDE.md` rule 1 and `F51`/`F99` govern **two different document lifetimes**, and **the tree already implements the resolution three times over.** **(2) ⛔⛔ THE SCOPE IS REFUTED BY ~100×** — I scoped it to ONE file; measured, there are **114 `.temp/` citations across the four permanent document families**, **10 of them in `.memory-php/`**, of which ⛔⛔⛔ **THREE ARE LIVE DEPENDENCIES IN `02-ladder.md` ON THE MANAGER'S OWN SCRATCH** (`:447`, `:451`, `:612` → `.temp/mgr172/NOTES.md`, `.temp/mgr170/null_control.py`). ▶ ***The AUTHORITATIVE LAYER depends on auto-`rm`-able scratch, and this directory family has already lost state once*** (`RECAP_PHP.md:115`). ⛔ **OPEN, and the reviewer's #2 resume priority: promote the two files, or re-write the three citations as HISTORY** |
 | 146 | ⚠⚠ **`ph66`'s `O0` FAMILY-B SIGN IS THE OPPOSITE OF ITS `O3` SIGN, AND THE ROW PUBLISHED NEITHER — THE SWEEP IS `O3`-ONLY BY A HARD-CODED CONSTANT** | `_062` §8.2, the engineer's own flagged uncertainty. At `O0` the R1h **COSTS** (`+4.00`/`+6.12` gcc, `+5.00`/`+9.69` clang Ir/call); at `O3` it **SAVES** (`−3.20`/`−19.83` gcc, `−2.03`/`−12.00` clang), **sign-stable over a 32-residue pad sweep**. ⛔ `php50_align_sweep.py` hard-codes `OPT = "O3"`, and `.memory-php/03-numbers.md` forbids quoting an `O0` figure as a performance figure — **so the engineer treated the `O0` numbers as lowering readings and published none.** ⭐ **That is the conservative reading and the engineer says it may be the wrong one**: *“a row that could publish both would be saying something the corpus currently cannot.”* ▶ **The question is whether *‘never quote an `O0` figure as a performance result’* has quietly become *‘never MEASURE at `O0`’*** — `F136`'s headline was refuted AT `O0` and `F144` was caught by looking at two levels, so the corpus's two most recent statistic findings both came from the level nothing sweeps. ⚠ **This is NOT a proposal to publish `O0` magnitudes.** It is a question about what a sweep is for. ⛔ **RULED `_063` §3.4 — THE ITEM NAMES THE WRONG INSTRUMENT**** ⛔ **RULED AT `_063` §3.4: THE ANSWER IS *NO* — MEASURING AT `O0` IS ALIVE AND WELL, AND THE ITEM NAMES THE WRONG INSTRUMENT.** ⭐ **What is dead is SWEEPING**: `php50_align_sweep.py:86` hard-codes `OPT, MODE = "O3", "isolated"`, so **no `O0` SIGN can clear §B5 and therefore none can be published** — which is exactly why `ph66`'s engineer published neither sign and was right not to. ▶ **So the question *“has ‘never quote’ become ‘never measure’?”* is answered NO, and replaced by a sharper one: *nothing can establish an `O0` sign because nothing sweeps there.*** ⚠ **OPEN — reviewer's #5 resume priority: `php50_align_sweep.py --opt`, ~30 min, with its two §H negatives.** ⛔ **Still NOT a proposal to publish `O0` magnitudes** |
 | 147 | ⚠ **`ph66`'s `inside_share` MATRIX HAS AN UNEXPLAINED `n/a` IN EVERY `O0/large` CELL, IN A MATRIX THE ROW CALLED COMPLETE** | `_062` §8.2, raised by the engineer against itself: *“a `n/a` I have not explained is a hole in a matrix I called complete.”* `controls/inside_share.py`'s `F74` column reads `n/a` on every `O0/large` cell; `marginal_ir_per_call` has the key, so the likely cause is a `large.bin` `A1` the record does not carry at `O0` — ~~**but that was not confirmed.** ⭐ **Cheap**: it is one read of the record's keys, not a re-measure.~~ ✅✅ **CONFIRMED 2026-09-16 BY RUNNING IT, AND THE SCOPE IS THE ANSWER — `F146`.** The engineer's conjecture is **exactly right**, and the cause is **not `ph66`'s**: `kernel_exclusive_ir` is absent from the `O0/large.bin` cell of **every isolated cell of every row in BOTH programmes** — `0 of 263` PAT, `0 of 111` php — because `harness/measure.py`'s `CG_PLAN` adds `large` **only at `O3`**, in one deliberate line whose comment says *“where the perf claims live.”* ⛔ **So the `n/a` is INHERITED, not incurred, and `ph66`'s control reports it faithfully.** ⭐⭐ **What the run ALSO showed and the item did not anticipate**: the printed matrix mixes **two provenances in adjacent columns** — `A1`/`W`/`share_W` from a **live** callgrind over the build root, `share_F74` from the **committed** record — so the blank falls on exactly the 8 cells `CG_PLAN` never wrote, and a reader cannot tell which column was measured today. ⚠ **It matters more than it looks because of item 146**: if the `O0` half of the matrix is structurally incomplete, then *‘show the matrix at more than one optimisation level’* — the `_061` rule that caught `F144` — **is asking for something the instrument cannot fully supply**, and nobody has said so. ⛔ **THAT HALF IS STILL OPEN AND IS NOW `F146`'s LOAD-BEARING CLAUSE**: `_061` obeyed the rule by running its OWN callgrind, so *“cannot supply”* may be only *“does not supply for free.”* ✅ **RULED `_063` §3.3**** ✅✅ **RULED AT `_063` §3.3: THE ENGINEER'S CONJECTURE IS CONFIRMED, `F146` §3.2 IS ITS SCOPE, AND THE PROVENANCE QUESTION IS ANSWERED *YES — IT IS WORTH A RULE*.** ⭐ **But the rule is PER-COLUMN, not per-file**: a matrix may legitimately mix a live measurement and a committed one, and what it may not do is fail to say **which column is which**. ▶ **`F108` one level down — five things every percentage owes, and *which build* is one of them.** ⓘ **One of only TWO objects in `_063`'s seventeen that carry no refutation, and both were engineer-raised against themselves.** ⚠ **Open at LOW: the per-column label, plus `controls/inside_share.py`'s dead loop at `:113-116`** |
+| 148 | ⛔⛔ **ADJUDICATE THE SCRATCH-CITED FILES BEHIND PUBLISHED FINDINGS — BY UNIT TEXT, NEVER BY COUNT** | `F147`. ▶ **Run it, do not quote this row**: `python3 .tasks-php/probes/scratchdeps.py` prints the SET — at the commit that filed `F147`, **54 LIVE citations over 29 distinct files**, and its `law 11` block: **34 citations inside a `### F<N>` section, over 22 published findings, 23 distinct files** (F44, F50–F53, F59, F69, F70, F72–F74, F82–F86, F89, F90, F95, F99, F100, F102). ✅ **6 files discharged by the `F82`–`F86` promotion** — `probes/{identity_null,inclusive_ir,bc_sweep,flip_exact,null_control}.py` + `sweep_cg.sh`, with `NULLCTL_001.md` as their evidence record. ⚠⚠⚠ **THIS IS A CANDIDATE SET, NOT A DEFECT COUNT** (`F132`), and the tool says so in its own docstring: it cannot tell a probe I wrote from upstream source I extracted, and **at least one member is the rule being FOLLOWED** — `.temp/php27/streamsfuncs.c` is PHP 5.0.0 source, re-derivable from `patterns-php/php-5.0.0.manifest`, where **committing it would be the error**. ▶ **The method is item 125's, which worked**: the extractor exists, so each member needs ONE read against its citing sentence, and the verdicts go into a must-fire arm rather than into prose. **Cost: ~25 min** — ⛔ **and an hour-shaped estimate is exactly why item 125 sat for six rounds.** ⓘ **Three classes are already someone else's home and must NOT be re-adjudicated here**: the §H subclass (`negatives_spellings.py`, 13 citations) is `citecheck.py`'s standing report and open item 97; the `controls/*` citations cost a per-row RE-GATE and batch with that row's next task; and the `.temp/` citations in the **OPEN-ITEMS TABLE** are provenance for work in flight and are **correct as written** — that is the half of `citecheck.py`'s exclusion that `F147`(d) upholds. ⭐ **Expect a MINORITY, and say so plainly if the channel is dead** (`F21`/`F37`) | ✅ **EVENT, 2026-09-17: ALL 29 TARGETS STILL EXIST — 0 GONE. Nothing has been lost; the exposure is real and the loss is hypothetical.** ⚠⚠ **A READING WITH A DATE, NOT A PROPERTY** — `citecheck.py` already reports **4** `controls/*` citations whose targets **are** gone, and `CLAUDE.md` constraint 6 *mandates* deleting `.temp/` blobs once gates are green. ⛔ **Do NOT "fix" this by committing artefacts**: a callgrind profile, a `.bin` or a build tree under `.temp/` is `CLAUDE.md` Don't #1 being **obeyed**. The defect is a SCRIPT or an EVIDENCE DOCUMENT in scratch — **never a re-derivable blob, and never its generator's output** |
+| 149 | ⚠⚠ **DECIDE WHAT AN *UNRUNNABLE* CHECK RETURNS — AND `width.py` IS RED IN A STATE `CLAUDE.md` INVITES** | `F147`(g), found by `PROMOTE_001`'s engineer when I told it to copy `width.py` as the precedent. **`.tasks-php/width.py`'s committed header says its cross-session check *"reports … **and does not fail**. ✅ So the selftest degrades honestly rather than lying."* ⛔ It fails.** With `.temp/mgr173/cg` absent it prints `FAIL X3`, ends `SELFTEST FAIL ['X3']`, **rc=1** — `reuse_check` returns `("X3", False, …)` at `width.py:1323` and `selftest`'s `check()` appends every falsy `cond` to `fails` (`:893-896`). ✅ **Verified statically by the manager, independently of the engineer's run.** ⚠ **Live, not cosmetic**: `width.py` is filed `st_expect=0`, and the state that reddens it — an emptied `.temp/mgr173/cg` — is the one `CLAUDE.md` Don't #1 *tells you to create*. **The routine sweep goes red for following the rules and no `why` says so.** ▶ **MY DECISION, ALREADY WRITTEN: an unrunnable CROSS-SESSION check REPORTS AND RETURNS 0.** The tree argues this one directory over — `probes/ph66_djbx33a_collide.py`'s entry says *"a checker that reddens when a sibling repo is cleaned is reporting on that repo"* — and `X3` is the same shape one level in. ⭐ **The engineer REFUSED my instruction and made its two new guards return 0 while saying in capitals that nothing was checked. That was the right call and it is why the promoted probes do not inherit the defect** | ⛔ **NOT a one-liner.** `width.py` carries `F92`, and `PROTOCOL_PHP.md` §H says a validator change lands **with its must-fire negatives or it does not land** — so this owes an arm that plants an absent cache and asserts *reports-and-returns-0*. ⚠ **And fix the HEADER in the same edit**: today it describes a behaviour the file does not have, which is `F147`(e)'s defect on the same file — **the record of the remedy being wrong about the remedy.** ⓘ `probes/inclusive_ir.py` and `probes/bc_sweep.py` already carry the shape to copy |
+| 150 | ⚠ **I DISPATCHED A TASK'S WORTH OF WORK WITHOUT A TASK NUMBER, AND THE COST LEDGER CANNOT SEE IT — `n = 1`, STATED AS `n = 1`** | Manager, 2026-09-17. `task_cost.py` is keyed on `TASK_PHP_NNN`, so `PROMOTE_001` — a dispatched subagent with a brief, a 406-line engineer report, ~20 minutes and 110 tool calls — **is priced at ZERO**, and every figure the ledger publishes (`marginal 2.38`, `PUBLISH ~57..~72`) is computed without it. ⛔ **This is `F142`'s defect in a NEW SPELLING**: there, real row work sat misclassified `PENDING` *inside* the namespace and understated the projection; here it sits *outside* the namespace entirely, where no classification can be wrong because none exists. ✅ **MEASURED, and the population is exactly one**: `PROMOTE_001_REPORT.md` is the ONLY `*_REPORT.md` in `.tasks-php/` without a task number. ⚠⚠ **The other 12 unnumbered documents are NOT evidence for this** — `ADJUDICATION_00N`, `QUOTA_001`, `ROW13/14_001`, `STATISTICS_001`, `UPSTREAM_00N`, `FIXSURVEY_001`, `NULLCTL_001` are MANAGER write-ups produced inside numbered sessions, so their effort is plausibly already charged. **I have not verified that, and I am not claiming it** — ⛔ **`n = 1` is not a rate** (item 123). | ▶ **The question for a reviewer, and I should not settle it myself because it prices my own work** (`_057`'s engineer refused exactly this, and was right): should a dispatched chore be NUMBERED, or should the ledger learn a second namespace? ⚠ **Numbering is the cheaper answer and the one that needs no tool change** — but it makes every promotion a task file, which is the ceremony `_063` §7.2 ruled a false dichotomy about. ⓘ **Do NOT retro-number `PROMOTE_001`**: the ledger's own figures are quoted with commits, and moving a denominator under a published range is `F126`'s defect |

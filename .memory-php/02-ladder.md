@@ -9,7 +9,7 @@
 > discipline, same Verus notes. **Do not restate any of it here; two copies of
 > one rule is how both go stale.**
 >
-> The narrative, the open items and findings **F1–F146** live in `RECAP_PHP.md`
+> The narrative, the open items and findings **F1–F148** live in `RECAP_PHP.md`
 > ⭐ **and the statistic decision is `.tasks-php/STATISTICS_001.md`, committed**
 > (⚠ this said *F1–F41* for seven findings, then *F1–F48* for forty-two
 > more, then *F1–F90* for eleven more — `PROTOCOL.md` rule 13, **and it
@@ -444,11 +444,16 @@ pattern `CLAUDE.md` records, one level deeper: here the row beats `.memory-php/`
   > `ph64`) — and F77 has just shown that debt is **not cosmetic**.
 
   > ⚠⚠⚠ **FIFTH FLAG — NOT A FINDING (rule 9), AND IT IS THE MANAGER'S OWN
-  > CORRECTION TO THE FOURTH.** `RECAP_PHP.md` **F82**, `.temp/mgr172/NOTES.md`,
-  > probe `identity_null.py` (`--selftest` PASS, 9 must-fire negatives).
+  > CORRECTION TO THE FOURTH.** `RECAP_PHP.md` **F82**,
+  > `.tasks-php/NULLCTL_001.md`, probe `.tasks-php/probes/identity_null.py`
+  > (`--selftest` PASS, 9 must-fire negatives).
+  > ✅ **BOTH WERE GITIGNORED SCRATCH UNTIL 2026-09-17** (`.temp/mgr172/`) —
+  > promoted under `F147`, law 11. **The citation is REPOINTED, not deleted, so
+  > the move stays legible.**
   >
   > ⚠⚠ **F74's NULL CONTROL RESTS ON A PREMISE THAT WAS NEVER CHECKED PER ROW.**
-  > `.temp/mgr170/null_control.py` asserted *"`identity` pins R4 and R5
+  > `.tasks-php/probes/null_control.py` (gitignored `.temp/mgr170/` until
+  > 2026-09-17) asserted *"`identity` pins R4 and R5
   > byte-identical"* for **all 39 rows**. Measured at O3: `exact` on **4 of 7
   > PHP** and **28 of 33 PAT**. ✅ **Every number F74 published SURVIVES** —
   > the correct predicate is **`Δnopad == 0 and Δbytes == 0`**, not the level,
@@ -609,9 +614,16 @@ pattern `CLAUDE.md` records, one level deeper: here the row beats `.memory-php/`
   > arithmetic.** Every one came from a second method applied to something I
   > had published from a single probe, a two-row sample, or — twice now — a
   > restatement of a definition mistaken for a measurement.
-  > `RECAP_PHP.md` **F83–F87**, `.temp/mgr172/NOTES.md`, probes
-  > `identity_null.py` · `inclusive_ir.py` · `bc_sweep.py` · `flip_exact.py`,
-  > all `--selftest` PASS. ⚠ **The statistic decision is
+  > `RECAP_PHP.md` **F83–F86**, `.tasks-php/NULLCTL_001.md`, probes
+  > `.tasks-php/probes/`{`identity_null` · `inclusive_ir` · `bc_sweep` ·
+  > `flip_exact`}`.py`, all `--selftest` PASS.
+  > ✅ **ALL FIVE WERE GITIGNORED SCRATCH UNTIL 2026-09-17**; promoted under
+  > `F147`, law 11. ⛔⛔ **AND THIS LINE READ *"F83–F87"*: `F87` IS EVIDENCED BY
+  > NONE OF THESE PROBES** — its evidence is `patterns-php/ph45-…/controls/` and
+  > `TASK_PHP_037_REPORT.md`, **all already committed.** ▶ **A citation line
+  > naming a RANGE and a probe list does not assert that every member of the
+  > range rests on every probe**, and reading it that way is how the promotion
+  > brief over-counted by one (`F147`(c′)). ⚠ **The statistic decision is
   > `.tasks-php/STATISTICS_001.md`, COMMITTED.** ✅ **AS OF 2026-09-13 TWELVE OF
   > ITS FOURTEEN UNREVIEWED FINDINGS HAVE CLOSED THEIR CYCLE, so the parts quoted
   > in this file ARE authoritative** — ⚠ **but that file is still marked NOT
