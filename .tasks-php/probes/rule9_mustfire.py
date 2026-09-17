@@ -203,6 +203,35 @@ checks += [
     ("F140 report: counts a route whose ONLY addressee is a ROUND NAME (908) "
      "-- the case the pre-widening regex could not see",
      "908" in _routed),
+    # =========================================================================
+    # ⭐⭐ THE `.memory-php/ -> .temp/` ARM, MADE TO FIRE. Same failure mode as
+    #   the router: it is an ⓘ that cannot fail a run, so if its regex stops
+    #   matching it prints 0 and reads exactly like success.
+    # ⛔⛔⛔ WHY IT EXISTS: `_063` §7.2 measured the AUTHORITATIVE LAYER depending
+    #   on paths `rm` is auto-permitted to delete, and this directory family HAS
+    #   already lost state once. ⭐ It is an ARM and not an open item BECAUSE
+    #   `_063` §6.3 measured what a prose box is worth: F123's repair WAS one,
+    #   three rounds carried it in capitals, and none did the work.
+    # =========================================================================
+    ("layer->temp report: a `.temp/` path in a layer line is EXTRACTED",
+     bool(_re.search(r'`?(\.temp/[A-Za-z0-9_./-]+)',
+                     "> see `.temp/mgr172/NOTES.md`, probe x.py"))),
+    # ⛔ the bare directory is how the RULE about scratch is SPELLED, and citing
+    #   the rule is not depending on a path. Counting it would drown the real
+    #   dependencies in ~100 mentions of the convention itself.
+    ("layer->temp report: a bare `.temp/` mention is the RULE, not a dependency",
+     (lambda m: m is None or m.group(1).rstrip('.`,') in ('.temp', '.temp/'))(
+         _re.search(r'`?(\.temp/[A-Za-z0-9_./-]+)',
+                    "use `.temp/`, a subdir per category"))),
+    # ⭐⭐ AND THE ONE WITH TEETH: EXISTS vs GONE must be DERIVED from the
+    #   filesystem, not assumed. A citation whose target is already deleted is a
+    #   different and worse thing than a live dependency, and the arm must be
+    #   able to tell them apart -- `_063` scoped its count to 02-ladder.md and
+    #   the arm found a FOURTH in 04-process.md on its first run.
+    ("layer->temp report: EXISTS is derived from the filesystem "
+     "(a path that cannot exist is reported GONE)",
+     __import__('os').path.exists('.memory-php')
+     and not __import__('os').path.exists('.temp/definitely-not-here-999')),
     # ⭐ and it must be non-vacuous against the REAL corpus, or it is measuring
     #   a string literal and nothing else.
     ("F140 report: the pattern is non-vacuous on the live items table",

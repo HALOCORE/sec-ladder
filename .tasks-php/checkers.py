@@ -542,6 +542,40 @@ REGISTRY = {
             "HISTORICAL and must not print, and striking one route must NOT "
             "mask a second live one -- or `unstruck()` would be a licence to "
             "hide."),
+    "probes/ph70_overdec.sh": dict(
+        kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
+        why="⭐ ROW 14's CRITERION-2 INSTRUMENT (`ph70`, E3, `array.c:3804` "
+            "`array_reduce`). Three cells, REPEAT=3 each: adversarial with an "
+            "ALLOCATED payload -> SIGSEGV rc=139 on all three; benign (no third "
+            "argument, the other arm of the same `if`) -> correct; and ⭐⭐⭐ THE "
+            "NEGATIVE CONTROL, an IS_LONG seed, which takes the SAME defective "
+            "arm and is ALSO correct because a long has no allocated payload to "
+            "free early. ▶ The row's blob MUST emit payload-bearing values or it "
+            "measures nothing. "
+            "⛔⛔ TWO DEFECTS IN THIS PROBE WERE FOUND BY RUNNING IT AND BOTH "
+            "WERE THE AUTHOR'S. (1) Cell A was copied from a hand-run script "
+            "FROM MEMORY and dropped the trailing read of `$seed`, so it "
+            "returned rc=0 against a hand run that faulted 3/3 -- and the "
+            "MECHANISM the author had written down was wrong: the churn only "
+            "RECYCLES the block, the fault is the READ THROUGH THE DANGLING "
+            "OWNER. (2) ⛔⛔⛔ THE HARNESS REPORTED rc=0 FOR A PROCESS THAT "
+            "SEGFAULTED, because `$?` after a pipeline is `tr`'s status -- a "
+            "criterion-2 probe whose entire claim is an exit status reported "
+            "the WRONG exit status, in the direction that kills a row. Swept "
+            "the committed probes: none has that shape."),
+    "probes/ph69_refcount.sh": dict(
+        kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
+        why="⭐ ROW 15's CRITERION-2 INSTRUMENT (`ph69`, E3, `php_pcre.c:590`). "
+            "⛔⛔ EVERY CELL EXITS 0 ON PURPOSE -- like `ph66`, the target error "
+            "is a WRONG ANSWER and the observable is the VALUE, not `rc` "
+            "(`_062` §3.1). Cell C: `$m[1]` holds an ARRAY, `unset($m['word'])` "
+            "drops the shared zval 1->0 and FREES it, and the surviving owning "
+            "slot reads back as an INTEGER. ⭐⭐ `F133`(i) IS A YES HERE WITH A "
+            "STRUCTURALLY MATCHED COMPARATOR: 5.0.0's SAME FILE already carries "
+            "`(*entry)->refcount++` at `:1533`, guarding the same operation 943 "
+            "lines away, and the correct site does the HARDER version. ⚠ Do not "
+            "add it to item139's census until `_063` §7.1's `same_construct?` "
+            "column lands -- the fourth column changes what `held` counts."),
     "probes/item125_extract.py": dict(
         kind="checker", argv=[], expect=0, negatives="none", st_expect=None,
         why="⭐ ITEM 125's POPULATION, AND IT IS PROMOTED OUT OF `.temp/` ON "

@@ -10,7 +10,7 @@ time it was noticed by eye after the commit. It is one command.
 must-fire negatives can plant a defect in a STRING rather than in the committed
 file -- `.tasks-php/probes/rule9_mustfire.py`, `PROTOCOL_PHP.md` §H.
 """
-import re, sys, glob, collections
+import re, sys, os, glob, collections
 
 # The live RULE-9 table: its header row, then every `> |` row until the first
 # bare `>` line. ⚠ Scoped deliberately -- the block also holds DATED SNAPSHOT
@@ -198,6 +198,44 @@ def main():
               if not struck and ROUTE.search(unstruck(t))]
     print(f'{"items -> a reviewer":18} {len(routed):4}  '
           f'LIVE, unscheduled: {" ".join(routed) if routed else "none"}')
+
+    # ⓘ REPORT, NEVER A GATE -- `.memory-php/` citing gitignored `.temp/`.
+    # ⚠⚠⚠ WHY THIS IS HERE: `TASK_PHP_063` §7.2 measured **114** `.temp/`
+    # citations across the four permanent document families, **10 of them in
+    # `.memory-php/`**, of which THREE are LIVE DEPENDENCIES in `02-ladder.md`
+    # on the MANAGER'S OWN SCRATCH -- the AUTHORITATIVE LAYER resting on paths
+    # `rm` is auto-permitted to delete. ⛔ And this directory family HAS already
+    # lost state once (`RECAP_PHP.md:115`: the rule-9 state lived in
+    # `.temp/mgr175/NOTES.md`).
+    # ▶ ⭐⭐⭐ IT IS AN ARM AND NOT AN OPEN ITEM ON PURPOSE. `_063` §6.3 measured
+    #   what a prose box is worth: `F123`'s repair WAS one, three rounds carried
+    #   it in capitals, and NONE DID THE WORK -- while `F140`'s printing arm
+    #   scoped the item on its first run. Registering this as item 148 would be
+    #   the losing half of that experiment, knowingly.
+    # ⛔ IT MUST NOT FAIL A RUN. A citation may legitimately be HISTORY ("+
+    #   measured at <commit> in scratch since cleaned"); what it may not do is
+    #   be a live dependency nobody can see. Print the population, leave the
+    #   judgement to a reader -- the same discipline as the router arm above.
+    mem_temp = []
+    for mf in sorted(glob.glob('.memory-php/*.md')):
+        for i, line in enumerate(open(mf, encoding='utf-8',
+                                      errors='replace'), 1):
+            for m in re.finditer(r'`?(\.temp/[A-Za-z0-9_./-]+)', line):
+                path = m.group(1).rstrip('.`,')
+                # a citation of the RULE about `.temp/` is not a dependency ON
+                # `.temp/` -- the bare directory is how the rule is spelled.
+                if path in ('.temp', '.temp/'):
+                    continue
+                mem_temp.append((f'{os.path.basename(mf)}:{i}', path,
+                                 os.path.exists(path)))
+    live = [x for x in mem_temp if x[2]]
+    print(f'{".memory-php -> .temp":18} {len(mem_temp):4}  citation(s), '
+          f'{len(live)} whose target still EXISTS (a live dependency)')
+    for where, path, _ in live:
+        print(f'{"":18} {"":4}  {where:26} {path}')
+    gone = [x for x in mem_temp if not x[2]]
+    for where, path, _ in gone:
+        print(f'{"":18} {"":4}  {where:26} {path}  ⛔ ALREADY GONE')
 
     for f in fail: print('FAIL:', f)
     return 1 if fail else 0

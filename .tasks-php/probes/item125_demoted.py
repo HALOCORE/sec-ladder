@@ -90,7 +90,16 @@ CENSUS = [
  ("051", "rebuild PHP 5.0.0 with the patch", ["obligation 5"], "TRACKED"),
  ("052", "R1h still not verified against a rebuilt PHP", ["obligation 5"], "TRACKED"),
  ("055", "the period-16 finding is ONE series, unreproduced", ["period-16"], "MEMBER"),
- ("057", "the count over landed reports (= item 125 itself)", ["| 125 |"], "TRACKED"),
+ # ⚠⚠ THIS TOKEN WAS WRONG TWICE AND N4 REFUSED BOTH. (1) It read `"| 125 |"`,
+ # which died the moment item 125 was STRUCK to `| ~~125~~ |` on completion -- a
+ # token keyed to a row's LIVE spelling expires exactly when the work finishes,
+ # which is the one moment you most want the record to hold. (2) The replacement
+ # keyed on a phrase that lives ONLY in item 125's own row, which `tracked_after`
+ # now excludes by design. ⭐ So it points at a LATER TASK FILE instead
+ # (`TASK_PHP_063.md` §6.3), which is what "somebody picked this up" actually
+ # means. ▶ Three tries, three refusals, all from one arm.
+ ("057", "the count over landed reports (= item 125 itself)",
+         ["Item 125", "item 125"], "TRACKED"),
  ("058", "ph29 controls/spellings.py docstring unrepaired", ["spellings.py"], "TRACKED"),
  ("058", "do the two inside_share definitions disagree in SIGN?", ["disagree in SIGN"], "MEMBER"),
  ("058", "'byte-identical in all four rows' is enforced by nothing", ["byte-identical in all four"], "MEMBER"),
@@ -130,6 +139,15 @@ def tracked_after(rep, tokens):
             where.append(os.path.basename(p))
     recap = _read(RECAP)
     sec = recap[recap.index("## Open items"):] if "## Open items" in recap else ""
+    # ⛔⛔⛔ EXCLUDE ITEM 125's OWN ROW, OR THIS ARM MEASURES ITSELF.
+    #   When `_063`'s census was recorded, its MEMBER LIST was written into item
+    #   125's row -- and on the next run three MEMBERS reported "token now
+    #   recurs", because the arm was finding its own report. ⭐ The act of
+    #   publishing a census contaminated the census's own tracking test, and
+    #   `N5` surfaced it within one run. ▶ A row's own write-up is not
+    #   independent evidence that anyone picked the work up.
+    sec = "\n".join(l for l in sec.split("\n")
+                    if not re.match(r"^\| (~~)?125(~~)? \|", l))
     return where, any(tok in sec for tok in tokens)
 
 
