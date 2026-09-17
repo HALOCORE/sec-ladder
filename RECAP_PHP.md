@@ -2070,7 +2070,20 @@ written*.** ⭐ **`F147` NOW APPEARS IN ITS OWN `law 11` LIST — 23 findings, n
 adjudication is *correct as written*: `F147` cites scratch as ILLUSTRATION, and
 its EVIDENCE is `.tasks-php/probes/scratchdeps.py`, committed and swept.**
 ▶ **Which is the distinction item 148 exists to make, demonstrated on the first
-member anyone will look at.** ⚠⚠ **SO DO NOT QUOTE 54/12/6 OR 58/14/8. RUN THE TOOL.** A finding
+member anyone will look at.**
+
+⭐⭐⭐ **AND A THIRD READING, WHICH EXPOSES THE TOOL'S OWN SEMANTICS: THE CENSUS
+IS A FUNCTION OF `git ls-files`, SO IT MOVES WHEN YOU *COMMIT*, NOT WHEN YOU
+WRITE.** Both readings above were taken with the six promoted probes **present
+on disk but UNTRACKED**. At `805529b`, the commit that tracked them, the same
+command reads **40 LIVE / 14 AMBIGUOUS / 13 STALE of 95** — **19 citations
+discharged**, and the LIVE→STALE shift is citations still spelling `.temp/…`
+for a probe that is now committed. ▶ **That is deliberate and it is the right
+predicate**: the question law 11 asks is *what survives a CLEAN CHECKOUT*, and
+only git knows. ⚠⚠ **It also means the two readings above describe a state that
+no longer exists and cannot be reproduced** — ⛔ **so the figures in this finding
+are HISTORY THREE TIMES OVER, and the only correct way to cite this class is to
+run `python3 .tasks-php/probes/scratchdeps.py` and name the commit.** ⚠⚠ **SO DO NOT QUOTE 54/12/6 OR 58/14/8. RUN THE TOOL.** A finding
 whose subject is *"an instrument's cardinality was consumed as a set"* has no
 business shipping a cardinality that reads as current — ⭐ **and dating it is
 necessary and not sufficient: the LABEL has to be historical too** (`F126`'s
