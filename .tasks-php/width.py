@@ -22,6 +22,23 @@
 # a result to report"* and does not fail. ✅ So the selftest degrades honestly
 # rather than lying.
 #
+# ⛔⛔⛔ AND THAT SENTENCE WAS FALSE FROM THE DAY IT WAS COMMITTED UNTIL
+# 2026-09-17. `X3` returned `False`, `selftest`'s `check()` appends every falsy
+# `cond` to `fails`, and with `.temp/mgr173/cg/` absent this file printed
+# `FAIL X3` and exited **1** -- while filed `st_expect=0`. ▶ THE STATE THAT
+# REDDENED IT IS THE ONE `CLAUDE.md` Don't #1 TELLS YOU TO CREATE, so the
+# routine sweep went red for following the rules and no `why` said so.
+# ⚠⚠ THE HEADER IS THE POINT, NOT THE RETURN VALUE: this file is the committed
+# RECORD OF law 11's founding remedy, and the record was wrong about the
+# remedy (`F147`(e)). It was believed twice -- `probes/inclusive_ir.py:269`
+# cites *"the rule .tasks-php/width.py's X3 already follows"* as precedent, and
+# I told `PROMOTE_001`'s engineer to copy this file. ⭐ THE ENGINEER REFUSED,
+# checked the behaviour against the claim, and made its own guards return 0.
+# ✅ REPAIRED at `reuse_check` (item 149), where the reasoning lives, WITH the
+# §H negative `X3d` that plants an absent cache and asserts reports-and-0.
+# ⚠ rc=0 THERE IS NOT A PASS -- it is "no verdict was reached", printed in
+# capitals. A silent 0 would be the worse of the two defects.
+#
 # WHAT IT FOUND (F92, reviewed at TASK_PHP_043 §4.3, UPHELD-NARROWED): the
 # width->spread exponent is ≈ -0.5 on both rows, so widening `probe_iters`
 # cannot buy a RELATIVE target -- ⚠ but its own TABLE 7 gives `W <= 574` for an
@@ -1091,6 +1108,33 @@ def selftest():
     for tag, cond, msg in x3:
         check(tag, cond, msg)
 
+    # ---- X3d (§H, item 149): what an UNRUNNABLE cross-session check returns -
+    # ⛔⛔ THE ARM PLANTS ITS OWN INPUT. `reuse_check({})` cannot match any
+    #   (row, cell, n), which is the SAME BRANCH an absent `.temp/mgr173/cg/`
+    #   takes -- and it reaches it without deleting a directory the rest of
+    #   this sweep is reading. ⚠ Stated plainly because an arm that is vague
+    #   about what it planted is worse than no arm.
+    # ▶ WHAT IT MUST CATCH: the `False` that stood here until 2026-09-17, which
+    #   reddened `width.py` (filed `st_expect=0`) in the exact state
+    #   `CLAUDE.md` Don't #1 invites. Re-introducing it fails X3d(a).
+    # ⚠⚠ AND THE SECOND HALF IS THE ONE THAT MATTERS MORE: returning 0 is only
+    #   right if the message SAYS NO VERDICT WAS REACHED. A silent 0 turns an
+    #   honest "could not run" into a fake pass, which is the worse defect and
+    #   the one this file exists to warn about.
+    vac = reuse_check({})
+    check("X3d(a)", len(vac) == 1 and vac[0][0] == "X3" and vac[0][1] is True,
+          f"an unrunnable cross-session check REPORTS AND RETURNS 0 -- "
+          f"{len(vac)} row(s), tag {vac[0][0] if vac else '-'}, "
+          f"cond {vac[0][1] if vac else '-'} (item 149's decision; the tree "
+          f"argues it at probes/ph66_djbx33a_collide.py -- a checker that "
+          f"reddens when a sibling cache is cleaned is reporting on the cache)")
+    _m = vac[0][2] if vac else ""
+    check("X3d(b)", "NOT A PASS" in _m and "NOT RUN" in _m,
+          f"and it says so LOUDLY rather than passing quietly: the message "
+          f"carries both 'NOT RUN' and 'NOT A PASS' "
+          f"({'yes' if 'NOT A PASS' in _m else 'NO -- a silent 0 is a fake '
+             'pass, the worse of the two defects'})")
+
     # ---- X4: the shifted-start replicate ----------------------------------
     print()
     print(" -- X4: the SHIFTED-START replicate, as a bound on the K=8 SD --")
@@ -1320,9 +1364,31 @@ def reuse_check(ir):
                         rows.append((short, cell, n, t, ir[(short, cell, n)],
                                      t - ir[(short, cell, n)]))
     if not rows:
-        return [("X3", False, "no (row, cell, n) from .temp/mgr173/cg/ matches "
-                              "this sweep's endpoints -- the check could not "
-                              "run, which is itself a result to report")]
+        # ⛔⛔⛔ THIS RETURNED `False` UNTIL 2026-09-17, AND THE HEADER TWENTY
+        #   LINES UP SAID IT DID NOT. `.temp/mgr173/cg/` is gitignored and
+        #   `CLAUDE.md` Don't #1 TELLS YOU TO DELETE IT once the gates are
+        #   green -- so the routine sweep went red for FOLLOWING THE RULES,
+        #   `width.py` is filed `st_expect=0`, and no `why` said so.
+        #   ⚠ Found by `PROMOTE_001`'s engineer when I told it to copy this
+        #   file as the precedent; it REFUSED and made its own guards return 0.
+        #   That refusal is why the promoted probes do not carry this defect.
+        #
+        # ▶ THE DECISION (item 149): AN UNRUNNABLE *CROSS-SESSION* CHECK
+        #   REPORTS AND RETURNS 0. The tree already argues it one directory
+        #   over -- `probes/ph66_djbx33a_collide.py`: *"a checker that reddens
+        #   when a sibling repo is cleaned is reporting on that repo"* -- and
+        #   `X3` is the same shape one level in: it reports on a CACHE, not on
+        #   this sweep. ⚠⚠ AND rc=0 HERE IS NOT A PASS. It is "no verdict was
+        #   reached", which is why the message says so in capitals rather than
+        #   going quiet. A silent 0 would be the worse of the two defects.
+        return [("X3", True, "⛔⛔ NOT RUN -- NO VERDICT WAS REACHED, AND THIS "
+                             "IS NOT A PASS. No (row, cell, n) under "
+                             ".temp/mgr173/cg/ matches this sweep's endpoints. "
+                             "That cache is gitignored and deletable by "
+                             "CLAUDE.md constraint 6, so its absence is the "
+                             "EXPECTED state of a clean checkout -- the check "
+                             "could not run, which is itself a result to "
+                             "report (item 149)")]
     dif = [r for r in rows if r[5] != 0]
     mx = max(abs(r[5]) for r in rows)
     # ⭐ THE QUESTION THAT DECIDES WHETHER REUSE WOULD HAVE BEEN SAFE: a delta
