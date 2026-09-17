@@ -64,6 +64,7 @@ changed, which is the way round `PROTOCOL_PHP.md` §H requires.
 """
 
 import argparse
+import glob
 import importlib.util
 import json
 import os
@@ -79,11 +80,31 @@ VALGRIND = os.path.expanduser("~/tools/valgrind/bin/valgrind")
 CELLS = ["c-gcc", "c-gcc-h", "c-clang", "c-clang-h",
          "safe_naive", "safe_tuned", "unsafe", "verus"]
 
-#: ⚠ `-O3 isolated` ONLY. Every family-B figure `patterns-php/*/NOTES.md`
-#: publishes as a performance result is that column (verified for `ph64` §8a
-#: against `results-php/gate/ph64-callback-frees-cursor.json`), and
+#: ⚠ `-O3 isolated` IS THE DEFAULT AND EVERY PUBLISHED FIGURE IS THAT COLUMN.
+#: Every family-B figure `patterns-php/*/NOTES.md` publishes as a performance
+#: result is `O3 isolated` (verified for `ph64` §8a against
+#: `results-php/gate/ph64-callback-frees-cursor.json`), and
 #: `.memory-php/03-numbers.md` forbids quoting an `O0` figure as one.
-OPT, MODE = "O3", "isolated"
+#:
+#: ⛔⛔⛔ THIS USED TO BE HARD-CODED, AND THE CONSEQUENCE WAS NOT THE ONE ANYONE
+#: INTENDED. `TASK_PHP_063` §3.4 traced it: `PROTOCOL_PHP.md` §B5 requires a
+#: figure to clear a SWEEP before publication; nothing was ever swept at `O0`;
+#: therefore no `O0` reading could clear §B5; therefore its SIGN could never be
+#: certified stable and could not be published EVEN AS A SIGN. ▶ `_062`'s
+#: engineer DID measure `ph66` at both levels and published no sign, giving the
+#: `03-numbers.md` prohibition as the reason -- but that prohibition is about
+#: FIGURES, and A SIGN IS NOT A FIGURE. What actually stopped him was this line.
+#:
+#: ⭐⭐ A SWEEP IS NOT A PERFORMANCE CLAIM; IT IS A STABILITY TEST. It separates
+#: *a difference between two programs* from *an artefact of code placement*, and
+#: that question is as meaningful at `O0` as at `O3` -- arguably more, because
+#: at `O0` the compiler does less to hide placement.
+#:
+#: ⛔⛔ WHAT `--opt O0` DOES **NOT** BUY, AND THIS IS NOT NEGOTIABLE HERE:
+#: MAGNITUDES STAY FORBIDDEN. `.memory-php/03-numbers.md` is untouched by this
+#: change. A row may publish an `O0` **SIGN**, explicitly labelled *a lowering
+#: reading, not a performance figure*, and ONLY IF IT HAS BEEN SWEPT.
+DEFAULT_OPT, MODE = "O3", "isolated"
 
 #: The pairs whose DIFFERENCE a row publishes or could publish, in family B.
 #: `R1h - R1` is the first two; the rest is the ladder and the cross-language
@@ -159,7 +180,8 @@ def build_dir(row):
     return os.path.join(BUILD, row.split("-")[0])
 
 
-def sweep_row(row, inp, pads, cells=CELLS, verbose=True):
+def sweep_row(row, inp, pads, cells=CELLS, verbose=True,
+              opt=DEFAULT_OPT):
     """`{cell: [slope at pad 0, slope at pad 1, ...]}` in Ir/call.
 
     ⭐ **THE PAD IS APPLIED TO THE argv STRING AND IS IDENTICAL FOR BOTH HALVES
@@ -178,7 +200,7 @@ def sweep_row(row, inp, pads, cells=CELLS, verbose=True):
         paths = {n: _probe(src, n, os.path.join(
             d, "p" * pad + f"probe.{inp}.{n}.bin")) for n in (100, 200)}
         for c in cells:
-            exe = os.path.join(build_dir(row), f"{c}-{OPT}-{MODE}")
+            exe = os.path.join(build_dir(row), f"{c}-{opt}-{MODE}")
             if not os.path.exists(exe):
                 problems.append(f"{row}/{c}: no binary at {exe}")
                 continue
@@ -401,6 +423,73 @@ def selftest():
             bad.append(f"{label}: fired={bool(got)} want={must_fire}  {got}")
         elif must_fire and arm and not any(g.startswith(arm) for g in got):
             bad.append(f"{label}: fired on {[g[:2] for g in got]}, want {arm}")
+    # -----------------------------------------------------------------
+    # ⛔⛔⛔ THE TWO §H NEGATIVES `TASK_PHP_063` §3.4 PRESCRIBED BY NAME for
+    #   the `--opt` change. The rule there: the change is ADDITIVE or it is a
+    #   regression, and the new capability must be TIED TO A NUMBER THAT
+    #   ALREADY EXISTS rather than to whatever it happens to print.
+    # -----------------------------------------------------------------
+    # (i) THE DEFAULT IS UNCHANGED IN EVERY OBSERVABLE THAT NAMES IT.
+    if DEFAULT_OPT != "O3" or MODE != "isolated":
+        bad.append(f"OPT-1: the default moved to {DEFAULT_OPT}/{MODE} -- every "
+                   f"published family-B figure is `O3 isolated` and this file "
+                   f"is what certifies them")
+    import inspect as _inspect
+    if _inspect.signature(sweep_row).parameters["opt"].default != DEFAULT_OPT:
+        bad.append("OPT-2: sweep_row's `opt` default is not DEFAULT_OPT, so a "
+                   "caller that omits it no longer sweeps the published column")
+    # the two strings the default run builds: the binary name and the output
+    # file. Both are spelled here EXACTLY as they were before `--opt` existed.
+    if f"c-gcc-{DEFAULT_OPT}-{MODE}" != "c-gcc-O3-isolated":
+        bad.append("OPT-3: the default binary path is no longer "
+                   "`c-gcc-O3-isolated`")
+    if ("" if DEFAULT_OPT == DEFAULT_OPT else ".x") != "":
+        bad.append("OPT-4: the default run would gain a filename suffix, so it "
+                   "would stop overwriting -- and stop being comparable to -- "
+                   "the sweeps the published figures cleared")
+
+    # (ii) ⭐⭐ TIED TO A COMMITTED NUMBER, NOT TO ITS OWN OUTPUT. `ph66`'s
+    #   `NOTES.md` §9.4 and `TASK_PHP_062_REPORT.md:172` publish the `O0`
+    #   family-B R1h-R1 differences as `+4.00`/`+6.12` (gcc small/large) and
+    #   `+5.00`/`+9.69` (clang). An `--opt O0` sweep must REPRODUCE them.
+    # ⛔ DEGRADES HONESTLY: the sweep costs minutes of callgrind and its output
+    #   is a re-derivable artefact under `.temp/`, which `CLAUDE.md` Don't #1
+    #   mandates deleting. Absent, this arm says SO and does not fail -- it
+    #   must never go red because someone followed the cleanup rule.
+    _WANT = {("small.bin", "c-gcc->c-gcc-h"): 4.00,
+             ("large.bin", "c-gcc->c-gcc-h"): 6.12,
+             ("small.bin", "c-clang->c-clang-h"): 5.00,
+             ("large.bin", "c-clang->c-clang-h"): 9.69}
+    _o0 = sorted(glob.glob(os.path.join(ROOT, ".temp", "php50", "*.O0.json")))
+    _o0 = [f for f in _o0 if "ph66" in os.path.basename(f)]
+    if not _o0:
+        print("   ⓘ OPT-5 NOT RUN -- NO VERDICT WAS REACHED, THIS IS NOT A "
+              "PASS. It needs an `O0` sweep of ph66 under `.temp/php50/`, "
+              "which is a re-derivable artefact. Re-derive it with:\n"
+              "     python3 .tasks-php/php50_align_sweep.py --opt O0 "
+              "--row ph66-hashdel-uncompared --pads 4 --tag ph66o0")
+    else:
+        # ⛔ PRINT THAT IT RAN. A silent pass and a skipped arm look identical
+        #   in a `PASS` line, which is `F138`'s defect ("I called the tool's
+        #   function" is not "I ran the tool"). Say which file, and say what
+        #   the sweep decided -- the verdict is the point, not the median.
+        d = json.load(open(_o0[-1]))
+        print(f"   ⓘ OPT-5 RAN against {os.path.relpath(_o0[-1], ROOT)}:")
+        for (inp, pair), want in sorted(_WANT.items()):
+            v = d.get(f"ph66-hashdel-uncompared/{inp}", {}).get(
+                "verdicts", {}).get(pair)
+            if v:
+                print(f"       {inp:10} {pair:22} median {v[0]:7.2f} "
+                      f"(published {want})  {v[2]:15s} {v[3]}")
+        for (inp, pair), want in sorted(_WANT.items()):
+            k = f"ph66-hashdel-uncompared/{inp}"
+            got = (d.get(k, {}).get("verdicts", {}).get(pair) or [None])[0]
+            if got is None or abs(got - want) > 0.005:
+                bad.append(f"OPT-5 {inp} {pair}: swept median {got}, but "
+                           f"`ph66` NOTES.md §9.4 and _062 publish {want}. "
+                           f"⛔ The sweep must REPRODUCE the committed number, "
+                           f"not replace it.")
+
     # step_of / sweep_completeness unit arms
     if step_of([1.0, 8.0, 1.0]) != 7.0:
         bad.append("step_of: span of [1,8,1] is not 7.0")
@@ -450,12 +539,17 @@ def main():
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--pads", type=int, default=32)
     ap.add_argument("--inputs", default="small.bin,large.bin")
+    ap.add_argument("--opt", default=DEFAULT_OPT, choices=["O0", "O3"],
+                    help="optimisation level to sweep. ⛔ O0 buys a "
+                         "SIGN, never a magnitude (TASK_PHP_063 §3.4)")
     ap.add_argument("--tag", default="sweep")
     args = ap.parse_args()
 
     bad = selftest()
     print(f"0. §H selftest {'PASS' if not bad else 'FAIL'}  "
-          f"(10 arms: 7 must-FIRE, 3 must-NOT-fire, + 9 unit arms)")
+          f"(10 verdict arms: 7 must-FIRE, 3 must-NOT-fire; + 9 unit "
+          f"arms; + 5 `--opt` arms, OPT-1..4 additive-change and OPT-5 "
+          f"tied to `ph66` NOTES.md §9.4)")
     for b in bad:
         print(f"   *** {b}")
     if args.selftest:
@@ -475,9 +569,12 @@ def main():
     result = {}
     for row in rows:
         for inp in args.inputs.split(","):
-            print(f"\n=== {row} / {inp} / {OPT} {MODE} / pads {pads}")
+            print(f"\n=== {row} / {inp} / {args.opt} {MODE} / pads {pads}"
+                  + ("" if args.opt == DEFAULT_OPT else
+                     "   ⛔ NON-DEFAULT OPT: a SIGN may be published from "
+                     "this, labelled a lowering reading; a MAGNITUDE MAY NOT"))
             print("   " + "".join(f"{c:>14s}" for c in ["pad"] + CELLS))
-            sw, probs, dc = sweep_row(row, inp, pads)
+            sw, probs, dc = sweep_row(row, inp, pads, opt=args.opt)
             v = verdicts(sw)
             steps = {c: step_of(s) for c, s in sw.items()}
             print(f"   dcalls={dc}  STEP PER CELL (Ir/call): " +
@@ -495,7 +592,12 @@ def main():
                 "pads": pads, "dcalls": dc, "sweep": sw, "steps": steps,
                 "verdicts": {k: list(x) for k, x in v.items()},
                 "problems": probs}
-    dst = os.path.join(ROOT, ".temp", "php50", f"{args.tag}.json")
+    # ⛔ THE LEVEL IS IN THE FILENAME. Without it an `--opt O0` run
+    #   silently OVERWRITES the `O3` sweep the published figures
+    #   cleared, and the two are not comparable.
+    suffix = "" if args.opt == DEFAULT_OPT else f".{args.opt}"
+    dst = os.path.join(ROOT, ".temp", "php50",
+                       f"{args.tag}{suffix}.json")
     json.dump(result, open(dst, "w"), indent=1, sort_keys=True)
     print(f"\nwrote {os.path.relpath(dst, ROOT)}")
     return 0
