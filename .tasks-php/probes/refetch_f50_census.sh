@@ -1,6 +1,6 @@
 #!/bin/sh
 # =============================================================================
-# refetch_upstream002.sh -- **F50's NAMED REGENERATOR**, and F44/F45's too
+# refetch_f50_census.sh -- **F50's NAMED REGENERATOR**, and F44/F45's too
 #
 # ⛔⛔ WHY IT IS COMMITTED. It was written as `.temp/mgr165/REFETCH.sh`, which is
 # GITIGNORED, and `RECAP_PHP.md:8335` (F50, landed 2026-09-08/09) names it in
@@ -17,8 +17,26 @@
 # F36 downloads and was itself promoted on 2026-09-08 by the commit *"Move the
 # two cited generators out of gitignored scratch"*. Promoting this one as
 # `refetch.sh` would have overwritten it. ▶ Two scripts, two findings, one
-# basename: the collision is why this is `refetch_upstream002.sh`, after the
-# document it was written for (`.tasks-php/UPSTREAM_002.md`).
+# basename: the collision is why this is `refetch_f50_census.sh`, after the
+# FINDING it regenerates -- F50, *"a fix commit is a CENSUS of its defect's
+# siblings"*.
+#
+# ⛔⛔ IT WAS PROMOTED AS `refetch_upstream002.sh` AND RENAMED BY THE MANAGER THE
+# SAME DAY -- AND THE REASON IS A NAME COLLISION NOBODY COULD HAVE SEEN COMING,
+# BECAUSE **`UPSTREAM_002` NAMES TWO DIFFERENT THINGS**:
+#   (a) this script's own body label, line ~66 below, a SCRATCH-ERA survey name
+#       from `.temp/mgr165/` written between `TASK_PHP_017` and `_018`
+#       (2026-09-08/09) -- the mb_strcut + entity-table hunt for F50/F44/F45;
+#   (b) `.tasks-php/UPSTREAM_002.md`, the manager's committed E3 upstream survey
+#       for `ph70`/`ph69`, written 2026-09-17 **while this promotion was
+#       running**.
+# The promotion header named the script *"after the document it was written
+# for, `.tasks-php/UPSTREAM_002.md`"* -- which is (b), and is nine days too
+# late to be true. ⚠ The mistake was reasonable: both fetch upstream php-src by
+# tag, and (a) really is stamped on this file.
+# ▶ A NAME IS A CITATION, and this one now names the FINDING it regenerates,
+# which neither (a) nor (b) can collide with. The label at line ~66 is left as
+# written -- it is the historical record of where the script came from.
 #
 # ⚠⚠ THREE CHANGES WERE MADE AT PROMOTION AND ALL THREE WERE FORCED:
 #  1. **It used to `cd "$(dirname "$0")"`**, i.e. write every downloaded `.c`
@@ -40,7 +58,8 @@
 # `probes/sweep_cg.sh` and `probes/rebuild_hardened_php.sh`. Cached files are
 # skipped (`[ -f ... ] ||`), so a re-run is cheap and safe.
 #
-# ✅ RE-RUN ON PROMOTION, 2026-09-17: see `.temp/mgr177/refetch-rerun.log`.
+# ✅ RE-RUN ON PROMOTION, 2026-09-17, END TO END, rc 0 (19 tags). ⚠ The run log
+# was gitignored scratch and is NOT cited here -- re-run the script instead.
 #
 # ⛔ WHAT IS STILL OWED. (1) **F50 is MANAGER, UNREVIEWED, n = 1** by its own
 # heading. (2) This script PRINTS; it does not ASSERT. Nothing in it fails if a

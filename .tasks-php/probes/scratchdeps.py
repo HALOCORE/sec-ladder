@@ -256,6 +256,19 @@ def finding_of(doc_rel, line):
 #            token that is a FILENAME IN A TABLE and not a citation of scratch.
 VERDICT_RESTS, VERDICT_HISTORY, VERDICT_NOTDEP = "RESTS", "HISTORY", "NOTDEP"
 
+# ⛔⛔ A FOURTH VERDICT, ADDED THE DAY THE RULING WAS FIRST TESTED AGAINST
+#   REALITY. `classify()` resolves `PROMOTED` by BASENAME, so a promotion that
+#   RENAMES the file is invisible to it -- `.temp/mgr176/asanfill.c` became
+#   `.tasks-php/asan_fill_byte.c` on 2026-09-13 and the census still called it
+#   LIVE four days later, and I ruled it `RESTS` on that basis.
+# ▶ The remedy for one of these is a REPOINT, which is free, and NOT a
+#   promotion, which is work already done. Telling them apart matters because
+#   the pile of "owed promotions" is what the next task is sized from.
+# ⚠ It is also the reason `AMBIGUOUS` exists one level up: this tool must never
+#   GUESS that two files with different names are the same file. A rename is
+#   found by a PERSON reading the citing sentence, which is what item 148 was.
+VERDICT_PROMOTED_STALE = "PROMOTED-RENAMED"
+
 ADJUDICATION = {
     # (finding, cited path) -> (verdict, why -- in the citing sentence's terms)
     ("F44", ".temp/mgr165/count_ent.py"): (
@@ -344,11 +357,12 @@ ADJUDICATION = {
         VERDICT_RESTS, "`all six published A1 percentages re-derive to the "
         "digit` is its output, and it drives the row's OWN verdict functions"),
     ("F102", ".temp/mgr176/asanfill.c"): (
-        VERDICT_RESTS, "⭐ THE INSTRUCTIVE ONE. The measured result CHANGES THE "
-        "ROW (a clean stack slot is `IS_NULL`), and the sentence says "
-        "`generator kept, binaries deleted` -- `CLAUDE.md` Don't #1 OBEYED. "
-        "The rule says keep the generator and never says WHERE, so obeying it "
-        "to the letter still produces a law-11 defect"),
+        VERDICT_PROMOTED_STALE,
+        "⛔⛔ I RULED THIS `RESTS` ON 2026-09-17 AND IT WAS WRONG. The "
+        "generator was promoted on 2026-09-13 as `.tasks-php/asan_fill_byte.c` "
+        "-- 85 lines, fuller header, cited as COMMITTED at "
+        "`TASK_PHP_045.md:90`. F102 needs a REPOINT, not a promotion. "
+        "▶ Caught by `TASK_PHP_064`'s engineer, against my brief"),
 
     # ⭐⭐ AND THESE FOUR ARE THE ARM CATCHING ITS OWN AUTHOR, ON THE FIRST TRY.
     # Writing F150 and F151 -- the findings that REPORT this adjudication --
@@ -448,7 +462,7 @@ def report():
     print(f"\n  {'ruling':10}     item 148, by unit text -- "
           f"{len(pfd)} citation(s) ruled on")
     for v in (VERDICT_RESTS, VERDICT_HISTORY, VERDICT_NOTDEP,
-              "⛔ UNADJUDICATED"):
+              VERDICT_PROMOTED_STALE, "⛔ UNADJUDICATED"):
         sel = tally.get(v, [])
         if not sel and v != VERDICT_RESTS:
             continue
@@ -570,9 +584,16 @@ def selftest():
         "⛔⛔ THE SAME FILE RULES DIFFERENTLY UNDER TWO FINDINGS -- if the key "
         "were the FILE the ruling would be wrong for one of them (`F131`)")
     chk("N23", sorted({v[0] for v in ADJUDICATION.values()}),
-        sorted([VERDICT_HISTORY, VERDICT_NOTDEP, VERDICT_RESTS]),
-        "all three verdicts are USED -- a table that only ever says `defect` "
+        sorted([VERDICT_HISTORY, VERDICT_NOTDEP, VERDICT_PROMOTED_STALE,
+                VERDICT_RESTS]),
+        "all four verdicts are USED -- a table that only ever says `defect` "
         "is an accusation, not an adjudication (`F21`/`F37`)")
+    chk("N26", adjudicate("F102", ".temp/mgr176/asanfill.c")[0],
+        VERDICT_PROMOTED_STALE,
+        "⛔ THE ONE I GOT WRONG: a promotion that RENAMED the file is "
+        "invisible to a basename resolver, so the census said LIVE and I "
+        "ruled `RESTS`. A repoint, not a promotion -- and the arm pins the "
+        "correction so it cannot quietly revert")
     chk("N24", all(len(w) > 40 for _, w in ADJUDICATION.values()), True,
         "every ruling carries a REASON in the citing sentence's own terms, "
         "because the verdict is the sentence and not the bucket")

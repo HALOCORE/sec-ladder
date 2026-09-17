@@ -1143,7 +1143,7 @@ REGISTRY = {
             "`ph32`'s stated R1h is wrong for two of three tables. ⛔⛔ WHAT IS "
             "NOT RE-DERIVABLE: **the NINE-COMMIT CORPUS HAS NO COMMITTED "
             "GENERATOR.** F53 names two of the nine; "
-            "`probes/refetch_upstream002.sh` fetches TAGS, not intermediate "
+            "`probes/refetch_f50_census.sh` fetches TAGS, not intermediate "
             "commits. The header carries the exact recipe; writing it as a "
             "script is OWED and was deliberately not done in a promotion pass, "
             "because *which nine* is a judgement F53's author did not record. "
@@ -1179,7 +1179,7 @@ REGISTRY = {
         kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
         why="⭐ A SECOND-ORDER LAW-11 CASE, AND THE REASON IT IS HERE IS THE "
             "SIBLING RULE. No finding cites it, so the census cannot see it -- "
-            "but `probes/refetch_upstream002.sh`, which **F50 names as the "
+            "but `probes/refetch_f50_census.sh`, which **F50 names as the "
             "script that regenerates all of its evidence**, opened with "
             "`FN=../php17/r1h/fn.py` and called it once per tag. ▶ Promoting "
             "the regenerator and leaving this in deletable scratch would have "
@@ -1196,7 +1196,7 @@ REGISTRY = {
             "a macro-generated definition or a K&R header, and every number "
             "the regenerator prints goes through it. `negatives='none'` is "
             "honest, not a pass."),
-    "probes/refetch_upstream002.sh": dict(
+    "probes/refetch_f50_census.sh": dict(
         kind="tool", argv=None, expect=None, negatives="none", st_expect=None,
         why="⭐⭐ **F50's NAMED REGENERATOR**, and F44/F45's too -- "
             "`RECAP_PHP.md:8335` names it in the finding's own sentence. "
