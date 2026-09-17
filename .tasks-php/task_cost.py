@@ -374,6 +374,36 @@ CLASS = {
                                # write the corrected figure into RECAP_PHP.md
                                # without re-running (that cell has gone stale
                                # inside a single session twice).
+    "064": "METH",             # PROMOTE the 14 files 13 published findings
+                               # rest on (item 153, the discharge of `F150`).
+                               # ⚠ WHY METH AND NOT A ROW: law 11 is a
+                               # corpus-wide property of the CLAIM LAYER, and
+                               # the 13 findings it repairs span nine rows and
+                               # several non-row axes. Charging it to any one
+                               # row would be arbitrary; charging it to all
+                               # thirteen is what `ONCE` means. Same call as
+                               # `_047`'s doc cycle.
+                               # ⭐⭐ AND THE REASON IT HAS A NUMBER AT ALL IS
+                               # OPEN ITEM 150: `PROMOTE_001` -- a dispatched
+                               # subagent with a brief, a 406-line report, ~20
+                               # minutes and 110 tool calls -- was dispatched
+                               # WITHOUT one, so this ledger prices it at ZERO
+                               # and every figure it publishes is computed
+                               # without it. `F142`'s defect in a new
+                               # spelling: there the work was misclassified
+                               # INSIDE the namespace, here it sat OUTSIDE it,
+                               # where no classification can be wrong because
+                               # none exists.
+                               # ⛔ NUMBERING THIS ONE IS NOT A RULING ON ITEM
+                               # 150. That question -- number the chore, or
+                               # teach this ledger a second namespace -- is a
+                               # REVIEWER's, because it prices the manager's
+                               # own work and `_057`'s engineer refused
+                               # exactly that. What numbering avoids is making
+                               # the defect n = 2 while the question is open.
+                               # ⓘ `PROMOTE_001` is NOT retro-numbered: moving
+                               # a denominator under a published range is
+                               # `F126`'s defect.
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them
