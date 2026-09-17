@@ -24,7 +24,7 @@
 # ⛔⛔ WHAT IS **NOT** RE-DERIVABLE, AND IT IS THE REAL GAP THIS PROMOTION
 # EXPOSES: **the NINE-COMMIT CORPUS HAS NO COMMITTED GENERATOR.** F53 says
 # *"nine PHP-5.0 commits touching `html.c` between 5.0.3 and 5.0.4"* and names
-# only two of them. `probes/refetch_upstream002.sh` fetches the 5.0.0/5.0.4/
+# only two of them. `probes/refetch_f50_census.sh` fetches the 5.0.0/5.0.4/
 # 5.0.5/5.1.0/5.2.0 TAGS, not the intermediate commits. ▶ Promoting this file
 # makes the INSTRUMENT durable and leaves the INPUT SET a recipe:
 #

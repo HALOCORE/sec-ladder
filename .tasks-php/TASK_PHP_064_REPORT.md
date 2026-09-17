@@ -4,6 +4,29 @@
 (2026-09-17). **No `git add`/`git commit` was run.** Working surface:
 `.tasks-php/` only.
 
+> ⛔⛔ **TWO THINGS IN THIS REPORT ARE STALE BY DESIGN — IT IS A HISTORICAL
+> RECORD AND ITS TEXT IS LEFT AS WRITTEN** (`CLAUDE.md`'s own precedent for the
+> `RECAP.md` → `RECAP_PAT.md` rename: citations survive in reports, and only
+> **runnable** ones are repaired).
+>
+> 1. ⚠ **`refetch_upstream002.sh` (9 mentions) IS NOW
+>    `probes/refetch_f50_census.sh`.** The manager renamed it the same day: the
+>    promoted name asserted that the script was written for
+>    `.tasks-php/UPSTREAM_002.md`, a document created nine days later and **while
+>    this task was running**. ⭐ The engineer's error was well-founded — the
+>    script carries its *own* `UPSTREAM_002` label at line ~66, a scratch-era
+>    survey name — so **`UPSTREAM_002` genuinely names two different things.**
+>    The new name is after the FINDING it regenerates. The three promoted probes
+>    that cited the old name were repaired.
+> 2. ⚠ **§7's line numbers are stale.** They were measured before `F150`–`F152`
+>    were written above them. ✅ **All 16 repoints LANDED**, by exact string and
+>    scoped to the owning finding — a whole-file replace came back with six
+>    counts high, because `F150`/`F151` quote those same paths as their SUBJECT.
+>    ▶ **Do not re-run §7 against line numbers.**
+>
+> ⭐ **§4.2's findings against the brief are the part to read**, and four of the
+> five changed something published. See `F150`'s corrected severity table.
+
 ---
 
 ## §0 ⭐ THE FIVE-LINE VERSION

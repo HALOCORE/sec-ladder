@@ -686,7 +686,27 @@ pattern `CLAUDE.md` records, one level deeper: here the row beats `.memory-php/`
   > ⚠⚠⚠ **F85 IS THE ONE THAT MATTERS: 29 of the 38 sign flips are
   > CROSS-LANGUAGE, and 28 OF THE 29 SURVIVE family C** — `ph03` 6/6, `ph07`
   > 6/6, `ph29` 16/16 survive, `ph00` 0/1 REFUTED (`TASK_PHP_038` §1.1, which
-  > adjudicated all 29 and not the 12 the manager had). ⚠⚠ **THIS SENTENCE SAID
+  > adjudicated all 29 and not the 12 the manager had).
+  >
+  > ⛔⛔⛔ **RE-MEASURED 2026-09-17 ON A 2.3× CORPUS AND THE COUNT IS GONE, SO
+  > `29 of 38` IS NOW A HISTORICAL FIGURE AND MUST CARRY ITS POPULATION**
+  > (`law 17`). `probes/callee_share.py --flips`, promoted out of scratch by
+  > `TASK_PHP_064` and re-run by the manager, over **758** comparisons at
+  > `O3/isolated`: **141 sign flips, 111 of them cross-language.**
+  >
+  > | | when F85 was written | 2026-09-17 |
+  > |---|---:|---:|
+  > | sign flips | **38** | **141** |
+  > | cross-language | **29** | **111** |
+  > | share | **76.3 %** | **78.7 %** |
+  >
+  > ⭐⭐ **THE CLAIM SURVIVES AND THE NUMBER DOES NOT, AND THAT DISTINCTION IS
+  > THE WHOLE VALUE OF THE RE-RUN**: the cross-language column really does carry
+  > the flips, on 2.3× the evidence and with the share *rising*. ▶ **So quote
+  > the SHARE, and quote `29 of 38` only as *the 6-row corpus's* number.**
+  > ⚠ **`28 of 29 survive family C` is NOT re-measured** — that adjudication was
+  > `_038` §1.1 over the old 29, and nobody has run it over the new 111.
+  > ⛔ **Do not restate it as if it covered them.** (Item 64 is the open thread.) ⚠⚠ **THIS SENTENCE SAID
   > `28 of the 38` AND `UNREVIEWED`, AND BOTH WERE STALE while the paragraph
   > above beginning *"the cross-language flip count is 29, not 28"* ALREADY
   > RECORDED THE FIX** (cited by its text, not a line number, because the

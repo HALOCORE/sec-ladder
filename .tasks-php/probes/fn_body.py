@@ -5,7 +5,7 @@
 #
 # ⛔⛔ WHY IT IS COMMITTED, AND IT IS A SECOND-ORDER LAW-11 CASE. It was written
 # as `.temp/php17/r1h/fn.py` and no finding cites it, so the law-11 census does
-# not see it. But `probes/refetch_upstream002.sh` -- which **F50 names as the
+# not see it. But `probes/refetch_f50_census.sh` -- which **F50 names as the
 # script that regenerates all of its evidence** (`RECAP_PHP.md:8335`) -- opens
 # with `FN=../php17/r1h/fn.py` and calls it once per tag. ▶ **Promoting the
 # regenerator and leaving this in deletable scratch would have produced a
@@ -21,7 +21,7 @@
 # WHAT IT DOES: given a C file and a definition token, brace-match the body and
 # print `line · bytes · sha256[:16]`; `--body` prints the body. ⭐ It is F35's
 # rule in code -- *ask about a FUNCTION, not about text* -- and the reason
-# `refetch_upstream002.sh` can hash `PHP_FUNCTION(mb_strcut)` across 19 tags
+# `refetch_f50_census.sh` can hash `PHP_FUNCTION(mb_strcut)` across 19 tags
 # when a `grep` for the guard's text MISSES 5.3.0, which spells it differently.
 #
 #   python3 .tasks-php/probes/fn_body.py <file.c> '<token>' [--body]
@@ -31,7 +31,7 @@
 # `negatives="none", kind="tool"` in `.tasks-php/checkers.py` and that is
 # honest, not a pass -- the `^token` + `\s*\{` heuristic has never been shown
 # failing on a prototype, a macro-generated definition or a K&R header, and
-# every number `refetch_upstream002.sh` prints goes through it.
+# every number `refetch_f50_census.sh` prints goes through it.
 # =============================================================================
 """Extract a C function BODY by its DEFINITION token, brace-matched.
 Ask about a FUNCTION, not about text (RECAP_PHP F35 / .memory-php/00)."""

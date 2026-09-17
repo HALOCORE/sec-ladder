@@ -35,13 +35,13 @@
 # it. The docstring below is the repaired file's own account of it.
 #
 # RUN IT:  python3 .tasks-php/probes/count_ent.py <path/to/html.c> [table ...]
-# ⓘ `refetch_upstream002.sh` calls it once per fetched `html-*.c`.
+# ⓘ `refetch_f50_census.sh` calls it once per fetched `html-*.c`.
 #
 # ✅ WHAT IT NEEDS: a `html.c` ON THE COMMAND LINE and nothing else. Pure
 # stdlib, reads one file, writes nothing, builds nothing. The 5.0.0 copy comes
 # from the PINNED tarball in `php-in-safe-rust`'s scratch (see
 # `patterns-php/SOURCES.md`); the later tags come from the network via
-# `probes/refetch_upstream002.sh`. ⛔ Neither is committed and neither should be.
+# `probes/refetch_f50_census.sh`. ⛔ Neither is committed and neither should be.
 #
 # ⛔ WHAT IS STILL OWED. (1) **It has NO must-fire negatives** -- filed
 # `negatives="none", kind="tool"` in `.tasks-php/checkers.py`, which is honest
