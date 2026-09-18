@@ -45,26 +45,24 @@ between them read `CLAUDE.md`'s top table.
 ## ▶ START HERE — the next action, in ≤ 20 lines
 
 ```
-STATE   ⭐ 13 ROWS; **9/20 fam, 24 owed** to floor 37. ⛔⛔ **BACKLOG 6** (`F147`-`F152`),
-        **ALL MINE, ALL UNREVIEWED** -- it DOUBLED today. ⭐ **`RESTS` IS `0`**: law 11's
-        14 defects are discharged. ⛔ **`0` IS NOT *"nothing owed"* -- item 155.**
-⛔ FIRST **DECIDE: A REVIEW ROUND, OR ROW 14?** I recommend **THE ROUND**, and not as a
-        preference -- **9 consecutive rounds have refuted manager claims**, and TODAY the
-        engineer filed **5 findings against my brief, 4 changing something published.**
-        ⚠ The counter is real: **a round is METH and bills no row**, and 24 are owed.
-✅ DONE  **148 ADJUDICATED · 149 SETTLED · 153 DISCHARGED** (`_064`, 15 files promoted).
-        ⛔ `F102` was ALREADY promoted under a **RENAME the census cannot see** -- I had
-        ruled it a defect. ⛔ **`F150`'s *"11 of 13 UNREVIEWED"* WAS WRONG -- it is 4/4/5
-        (reviewed / not / NO MARKER)**, by regex over prose: **`F148` in the session that
-        filed `F148`.** Corrected IN PLACE; cause is item **154**.
-        ⭐⭐ **2 FIGURES MOVED, both re-verified by me**: `F73` `0 of 6` -> **1 of 14**;
-        `F85` `29 of 38` -> **111 of 141** -- ▶ **the RATIO survives a 2.3x corpus
-        (76.3->78.7 %), the COUNT does not.**
-NEXT    ▶ **ROW 14 = `ph70`** (E3) -- ⭐ **R1h PINNED** (`UPSTREAM_002.md`): `72c6d5cbafc9`,
+STATE   ⭐ 13 ROWS; **9/20 fam, 24 owed** to floor 37. ⛔⛔ **BACKLOG 7** (`F147`-`F153`),
+        **ALL MINE, ALL UNREVIEWED.** ⭐ `RESTS` IS `0` -- ⛔ **and that is a claim about
+        what the TOOL CAN SEE** (item 157), NOT *"nothing is owed"* (item 155).
+▶ NOW   **`TASK_PHP_065` -- THE 11th REVIEW ROUND.** Scope = the 7 + items 150/154/156/
+        157/158. ⭐⭐ **I CHOSE THE ROUND OVER ROW 14, and the box no longer asks you to:**
+        9 consecutive rounds have refuted manager claims and `_064`'s engineer filed 5
+        against my brief. ⚠ **The counter is real and unchanged: a round bills NO row.**
+✅ NEW  ⛔ **`F153`: THREE COMMITTED TOOLS INSTRUCT WORK THAT IS DONE** -- and all 11
+        pointers **RESOLVE**, so no rot checker here can see it: **the axis is MOOD**,
+        imperative vs descriptive. ⛔⛔ **2 of my own exhibits were WRONG BEFORE I FILED**
+        (one is item 73 being OBEYED; one is a branch that never fires) -- **both caught
+        by READING, neither by a tool.** ⛔ Items header rotted a 2nd time (`143`/`147`
+        vs measured **`153`/`157`**) -> item **158**(c), the only half that stops it.
+NEXT    ▶ **ROW 14 = `ph70`** (E3) -- R1h PINNED (`UPSTREAM_002.md`): `72c6d5cbafc9`,
         **TWO hunks, EACH HARMFUL ALONE**, pre-image NOT 5.0.0 so it needs a BACKPORT.
         ⛔ `ROW14_001` §7 owes the kernel design + an EMPTY-INPUT probe cell.
-        ▶ ALSO **154**+**150** (reviewer's) · **155** · **156** · **151** · **152**.
-⚠ TRAPS ⛔ **NEVER INFER AN ABSENCE FROM A CLI's SHAPE, A `grep -c`, OR A REGEX OVER PROSE.**
+⚠ TRAPS ⛔ **NEVER INFER FROM A CLI's SHAPE, A `grep -c`, OR A REGEX OVER PROSE -- RUN IT.**
+        ⛔ **AN ARM PRINTS A CANDIDATE SET; ONLY A PERSON ADJUDICATES ONE.**
 ```
 
 ---
@@ -207,6 +205,7 @@ NEXT    ▶ **ROW 14 = `ph70`** (E3) -- ⭐ **R1h PINNED** (`UPSTREAM_002.md`): 
 > | ⛔⛔⛔ **F149** | ⛔ **UNREVIEWED** | ⛔ **NOTHING MAY ENTER.** ⚠⚠ **THE CONTROL IS THE PART TO CHECK FIRST**: all four of `ph66`'s published `O0` family-B numbers reproduce to the digit at BOTH pad resolutions, so `OPT-5` is pinned to a committed figure and not to its own output — **if that is wrong, everything below it is.** ▶ The falsifiable claim is the 32-pad table: re-run `python3 `.tasks-php/php50_align_sweep.py --opt O0 --row ph66-hashdel-uncompared --pads 32`. ⛔ **The `large`/gcc cell is the whole finding** — step `8.89` against an effect of `6.12`, so `|d|/step = 0.69` and the sign is not established. ⚠ **Attack (b) hardest**: I claim a 4-pad screen returned the OPPOSITE verdict on both axes for that cell, which if true means **every sparse sweep in this tree is suspect for a DIFFERENCE** and that is a much larger claim than the row it is about. ⓘ **(d) is a cost statement, not a repair**: `ph66`'s `NOTES.md` is in `source_sha256`, so the summary sentence is batched to that row's next task (item 151) rather than fixed here. |
 > | ⛔⛔ **F150** | ⛔ **UNREVIEWED** | ⛔ **NOTHING MAY ENTER.** ⚠⚠ **THE VERDICTS ARE THE CLAIM, NOT THE `17`.** Each row of `scratchdeps.ADJUDICATION` is a reading of ONE citing sentence — ▶ **re-read the sentences, not the table**, and the cheapest attack is the `HISTORY` bucket: I ruled 6 citations *not evidence* and each is a judgement I made about my own prose. ⛔ **ONE ROW WAS ALREADY WRONG** — `F102` was ruled `RESTS` and the generator had been promoted four days earlier under a NEW NAME (`asan_fill_byte.c`), which the basename resolver cannot see; caught by `_064`'s engineer, not by me. ▶ **So ask of every `RESTS`: is there a RENAMED twin?** ⚠⚠ **AND THE SEVERITY CLAUSE WAS WRONG IN PUBLIC** — *"11 of 13 UNREVIEWED"* is **4 reviewed / 4 not / 5 with no marker**, corrected in place; **`F148`'s own defect, by its own author, in its own session.** ⭐ The *"`CLAUDE.md` Don't #1 never says WHERE"* mechanism is the part I most want attacked: it is an argument about why careful people produce this defect, and its first exhibit refuted it |
 > | ⛔⛔⛔ **F151** | ⛔ **UNREVIEWED** | ⛔ **NOTHING MAY ENTER.** ⭐ **THE MEASUREMENT IS CHEAP TO REPRODUCE AND THE CLAIM IS NOT THE `118`** — run `citecheck.py` and read the new block. ▶ **The falsifiable half: *both prior repairs were scoped to the file their instance touched.*** That is a claim about `git log` and the comments at `citecheck.py:138` and `:150`, and it is checkable. ⚠ **The `ph53/verus.rs` instance is the load-bearing evidence** — if that citation were NOT the one named in the F99 repair comment, the finding is just a coverage gap. **Check that identity first.** ⛔ **What I did NOT establish**: whether any of the 118 is a real dangling claim rather than a provenance note. **I say so in the finding; verify I say it loudly enough** |
+> | ⛔⛔⛔ **F153** | ⛔ **UNREVIEWED** | ⛔ **NOTHING MAY ENTER.** ⭐ **THE THREE DEFECTS ARE CHEAP TO CHECK AND THE CLAIM IS NOT THE `139` OR THE `11`** — run the 12 tools and read their stdout; I did, and the count I would have published from a grep was `139`. ▶ **THE LOAD-BEARING CLAIM IS THE MOOD AXIS**: *every one of the eleven RESOLVES, so a rot checker passes all three defects correctly* — **attack that**, because if any existing checker can already separate imperative from descriptive then the finding is a coverage gap and not a mechanism. ⛔ **TWO OF MY OWN EXHIBITS WERE WRONG BEFORE I FILED** (`02-ladder.md:297` is item 73 being OBEYED; `spread_stat.py:255` is a branch that never fires) — ▶ **so assume the surviving three are also soft until you have read each citing sentence.** ⚠⚠ **THE FAMILY CLAIM (`F142`/`F138`/`F152`, *the check asks a neighbouring question*) IS THE PART I EXPECT TO LOSE** and I say so in the finding; `F53` is mine and forbids exactly this pattern-match. ⓘ No repair was made on purpose (`F135`) — **the exhibits are still in the tree, so verify them live rather than from `git show`** |
 > | ⛔⛔ **F152** | ⛔ **UNREVIEWED** | ⛔ **NOTHING MAY ENTER.** ⚠⚠ **THE SITE IS THE ENGINEER'S, THE CENSUS IS MINE** — `_064` found `PROTOCOL_PHP.md`'s citation while repointing; I measured the other seven documents. ▶ **Attack the `n = 3` claim**, because that is the only part that generalises: is `F147`(d) / `F151` / `F152` really **one** mechanism, or am I grouping three ordinary scope bugs under a slogan? ⛔ **`F53`'s shape is exactly this risk** — *a shared upstream fix is not evidence of a shared mechanism* — **and it is MY finding**, so I have no excuse for the pattern-match. ⚠ **The 9 dead pointers are a fact and the mechanism is an argument; score them separately** |
 >
 > #### ⭐⭐⭐ `F96`, PER GROUP — **SEVEN groups, not the four I wrote** (`_055` §1.1)
@@ -1964,6 +1963,82 @@ which pins `kernel.c:247` and `hardened:175`, one line each.
 The blanking is deliberate and documented in `exec_code`'s own docstring;
 `exec_code` is hashed into all 33 PAT gate records. **The rule this yields is a
 WRITING rule: never backtick a span containing a character literal.**
+
+### F153 — ⛔⛔⛔ **A CITATION OF A *CLOSED* ITEM IS BENIGN WHEN IT IS DESCRIPTIVE AND A DEFECT WHEN IT IS IMPERATIVE — AND EVERY ONE OF THEM *RESOLVES*, SO NO ROT CHECKER IN THIS TREE CAN SEE THE DIFFERENCE**
+
+Manager, ⛔ **UNREVIEWED** (rule 9). ⚠⚠ **DISCLOSE FIRST: this is my finding,
+about my documents, found by my method, on the day I am scoping a round about my
+findings.** Score it accordingly.
+
+**How it was found.** `boxcheck.py` prints `law 11 ruled 10 citation(s); 0 RESTS
+on scratch -> promote them: item 153` — and **item 153 was struck yesterday**,
+by me, in the session that discharged it. ▶ **A committed tool told its reader to
+go and do a job that is done.** That is the same defect I repaired in `F150`'s
+own body 24 hours ago (*"THE REMEDY IS OPEN ITEM 153"*), **in a second home I did
+not check** — item 73's shape, and `F136`'s (a tool and a document disagreeing).
+
+⭐⭐ **THE CENSUS, AND THE NARROWING IS THE FINDING.** Over 53 committed php-side
+`.py` files, `\bitems?\s+([0-9]{1,3})\b` against the struck set gives **139
+citations**. ⛔ **That number is worth nothing and I nearly published it.** A
+probe *named* `item48_decide.py` narrating *"the measurement that DECIDED item
+48"* is correct, and changing it would be vandalism.
+
+▶ **So I ran the tools instead of grepping them** (⭐ the session's own trap:
+*never infer from a regex over prose*), and scanned **real stdout** across 12
+tools. **11 struck-item citations reach a reader's terminal. Adjudicated by unit
+text, 3 are defects and 8 are benign:**
+
+| | citation, as it actually prints | verdict |
+|---|---|---|
+| `boxcheck.py` | `0 RESTS on scratch -> **promote them: item 153**` | ⛔ **DEFECT** — an imperative, and the count is `0`, so it is doubly empty |
+| `citecheck.py` | `Adjudicate by unit text -- **open item 148.**` | ⛔ **DEFECT** — item 148 *is* adjudicated; this is the ruling telling you to make the ruling |
+| `citecheck.py` | `RECAP_PHP.md **open items 55/61**, not a row's debt` | ⛔ **DEFECT, and the sharpest** — **55 is STRUCK and 61 is LIVE**, merged into one pointer, so the phrase is half-true and unsplittable by any reader |
+| `width.py` ×5 | *"WHY **ITEM 68's PUBLISHED** FALL LOOKED TOO FAST"* | ✅ **BENIGN** — item 68's table is the *subject*; its status is irrelevant |
+| `scratchdeps.py` | `ruling  **item 148**, by unit text -- 10 citation(s)` | ✅ **BENIGN** — names the ruling's provenance, which is what a provenance line is for |
+| `item125_demoted.py` | `**ITEM 125** -- 'cheapest remaining check' items…` | ✅ **BENIGN** — the probe's own title |
+| `spread_stat.py` | `**Item 52** is not a precision question -- it decides the headline` | ✅ **BENIGN** — a claim about the item's *nature*, not its status |
+
+⭐⭐⭐ **THE AXIS IS GRAMMATICAL MOOD, NOT REFERENCE.** All eleven pointers
+**resolve** — every item exists and is findable. What separates the three defects
+from the eight is that they are **imperatives addressed to the reader** (*promote
+them*, *adjudicate*, *this is still owed*) while the benign eight are
+**descriptions**. ▶ ***A rot checker that asks "does this pointer resolve?" passes
+all three, correctly, forever.*** The property that fails is *is the thing it
+points at still ACTIONABLE* — and no instrument here asks that.
+
+⛔⛔ **AND THE AUTHORITATIVE LAYER IS IN THE CANDIDATE SET.** A sweep of the six
+standing documents for the literal phrase *"open item N"* with `N` struck returns
+**21**, four of them in `.memory-php/`. ⚠⚠ **BUT I ADJUDICATED THESE TOO AND THE
+FIRST ONE I REACHED FOR WAS WRONG**: `02-ladder.md:297`'s *"open item 51 …
+**owed first**"* is followed on the very next line by *"✅ **BOTH SENTENCES ARE
+NOW HISTORY**: item 51 is **closed**"*. ▶ **That is item 73's rule being FOLLOWED,
+and I had it in my exhibit list.** `02-ladder.md:307`'s bare *"Open item 52."*
+has no such neighbour and is a real one. ⛔ **I have NOT adjudicated the other
+19 and I am not claiming them.**
+
+⚠⚠ **A SECOND THING I GOT WRONG WHILE WRITING THIS, AND IT IS THE BETTER
+LESSON.** I listed `spread_stat.py:255` — *"item 52 is **still owed**"* — as the
+sharpest defect in the tree. It is in the `else` branch, **and the `if` branch is
+the one that fires**; the line has never printed. ▶ ***I inferred "live output"
+from the presence of `print(` on a line, without asking which branch runs*** —
+`F148`'s family, in the finding about inferring from shapes. **Both errors were
+caught by reading the file, and neither by any tool.**
+
+⚠⚠⚠ **THE FAMILY CLAIM, AND I AM FLAGGING IT AS THE WEAK PART ON PURPOSE.** This
+looks like `F142` (an arm bounding a pile's SIZE where the property is
+MEMBERSHIP), `F138` (cardinality consumed where membership was the property) and
+`F152` (a scope by directory where the property is document KIND) — *the check
+asks a neighbouring question and passes*. ⛔ **`F53` IS MY OWN FINDING AND IT SAYS
+EXACTLY THIS IS HOW I GET IT WRONG**: *a shared upstream fix is not evidence of a
+shared mechanism.* ▶ **I assert the three defects. I do NOT assert the family —
+that is the reviewer's, and refuting it costs me nothing.**
+
+ⓘ **NO REPAIR IS MADE, DELIBERATELY** (`F135`: editing the input destroys the
+evidence). Whether `citecheck.py`'s `open items 55/61` should drop the `55`,
+re-ground the sentence, or stay as history **is an adjudication, not a repair**,
+and pre-empting it is what `F150` did to `F102`. → open item **158**.
+
+---
 
 ### F152 — ⛔⛔ **EIGHT STANDING CLAIM DOCUMENTS — INCLUDING `PROTOCOL_PHP.md` ITSELF — ARE IN *NEITHER* `.temp/` CENSUS, BECAUSE BOTH SCOPE BY DIRECTORY AND THE PROPERTY IS ABOUT DOCUMENT KIND**
 
@@ -9614,8 +9689,18 @@ direction.** ⚠ **The remaining `C.1` rows are NOT re-examined**; four say
 ## Open items — carried, not closed
 
 ⚠ **THE NUMBERS HAVE GAPS AND THAT IS CORRECT — DO NOT "REPAIR" THEM.**
-**143 rows present, numbered 1 → 147, with 45–47 and 106 ABSENT** and a
+**153 rows present, numbered 1 → 158, with 45–47 and 106 ABSENT** and a
 growing set retired IN PLACE as `~~N~~`; no number is ever reused.
+⛔⛔⛔ **AND IT ROTTED AGAIN — SECOND TIME FOR THIS EXACT HEADER, 2026-09-18.** It
+read *"143 rows, numbered 1 → 147"* while the check below printed **`153 rows,
+max 157`**: items 148–157 were all appended in the previous session — **by me,
+in the session that repaired this line's PREVIOUS rot** — and the header moved
+for none of them. ▶ ⭐⭐ **THE PART WORTH KEEPING IS NOT THE ARITHMETIC: the
+previous repair added a warning paragraph, a rationale and a runnable check, and
+the line still went stale ten rows later.** `F139`'s experiment, a third time —
+***a trap written where a person meets it lost to its own author.*** ⛔ **The
+durable answer is not another warning; it is that `boxcheck.py` does not assert
+this line and could.** → open item **158**.
 ⛔⛔ **THIS LINE READ *"130 rows, 1 → 134"* UNTIL 2026-09-16 while the check
 below printed `133 rows, max 137`** — items **135, 136 and 137 were appended in
 the previous session and this header was not.** ▶ **The same defect the
@@ -9844,3 +9929,4 @@ the wrong one.
 | 155 | ⚠⚠ **THREE PROMOTED PROBES CARRY NO MUST-FIRE NEGATIVES, AND ONE OF THEM IS THIS PROGRAMME'S OWN CAUTIONARY TALE** | `TASK_PHP_064` §6, the engineer's own statement of what it left undone — ⭐ **volunteered, not extracted.** `PROTOCOL_PHP.md` §H says a validator change lands **with its must-fire negatives or it does not land**; these arrived as *promotions* of pre-existing scratch, so §H never gated them. ⛔ **`count_ent.py` is the sharp one**: `F44` rests on its four-table result, and **`F50`, `F51` and `F52` each cite it as an example of a probe whose SETUP ENCODED ITS ANSWER.** ▶ ***A probe the corpus quotes three times as a cautionary tale, now committed, asserting nothing.*** ⚠ **`F53`'s nine-commit corpus has NO committed generator at all** — only two of the nine commits are named anywhere, so the measurement behind *"`ph32`'s stated R1h is wrong for two of three tables"* cannot be re-run even now that `entcount.py` is promoted. ▶ **That is a law-11 defect the promotion did not close, and it is the ONE the ruling's `RESTS → 0` does not cover** — ⛔ **so do not read `0` as *"nothing is owed"*.** ⭐ **The check that works on this class is already written down** (`F52`): **change the setup's arbitrary constant and see whether the verdict moves.** ⓘ Free — `.tasks-php/` is in no digest | ⚠ **Sizing, honestly: three probes × (one negative that must fire + one that must not) is not a task, it is an hour** — but `F53`'s generator is a re-derivation of a nine-commit sweep and **is** a task. **Do not batch them under one estimate** (item 125 sat six rounds behind an hour-shaped number) |
 | 156 | ⚠⚠ **DECIDE WHICH CENSUS OWNS THE STANDING CLAIM DOCUMENTS IN `.tasks-php/` — AND IT IS A CHOICE BETWEEN TWO HOMES, NOT A WIDENING** | `F152`. **8 documents, 35 `.temp/` citations, 9 already gone**, in neither `citecheck.py`'s `CLAIMS` nor `scratchdeps.scan_set()`. ▶ **THE TWO ROUTES ARE NOT SYMMETRIC.** (a) **`citecheck.py`** already owns *"does a cited path resolve?"* across the corpus and **already scans these files for ROT** (they are in `DOCS`); it is only `CLAIMS`, the `.temp/`-dependency hunt, that skips them. ▶ **Adding `.tasks-php/*.md` minus `TASK_PHP_*` to `CLAIMS` is a two-line change to the tool that already reads them.** (b) **`scratchdeps.py`** owns *"which PUBLISHED FINDING rests on scratch?"* and keys everything on `(finding, file)` — but these documents have **no `### F<N>` sections**, so its whole law-11 machinery would be inert on them. ⭐ **(a) is right and (b) is a category error**, which is worth writing down because *"widen the newest tool"* was my instinct and it is the one that does not fit. ⛔⛔ **BUT DO NOT LAND (a) BLIND**: `PROTOCOL_PHP.md` alone adds **18** rows to a report that is already 118 lines long, and `F151`'s repair just taught that **burying the row-specific hits under inherited noise is the failure mode** — so it needs the same INHERITED/ROW-SPECIFIC split, or a `kind=` column. ⚠ **And `citecheck.py` is filed `expect=1`**: a new warning class must not touch `rot`, which is what `N5d`/`N7f` exist to assert. ▶ **Copy `N7f`.** ⓘ Free — `.tasks-php/` is in no digest | ⚠ **The 9 dead pointers are the only part that is urgent**, and they are urgent only in the sense that nobody would ever find out. ⛔ **Do NOT "fix" them by committing artefacts** — most are `.log` files that constraint 6 says to delete. **The repair is to drop the pointer or re-ground it** |
 | 157 | ⛔⛔ **`scratchdeps.py` HAS THREE CITATION SPELLINGS AND A CODE FIX FOR ONE — SO `RESTS = 0` IS A STATEMENT ABOUT WHAT THE TOOL CAN SEE** | `F150`, and both of the new ones were found by `TASK_PHP_064`'s engineer rather than by the tool. **(a) BARE FILENAME** — ✅ repaired 2026-09-17 (`BARE_RE`), the blind spot that made the first arm print `4` for a set of 54. **(b) RENAME** — ⛔ **NOT repaired**: `classify()` resolves `PROMOTED` by BASENAME, so `.temp/mgr176/asanfill.c` → `.tasks-php/asan_fill_byte.c` reads as LIVE four days after the promotion, **and I ruled it a law-11 defect on that basis**. Patched by a hand-written `PROMOTED-RENAMED` verdict and `N26`; **the resolver is unchanged.** **(c) BRACE EXPANSION** — ⛔ **NOT repaired**: `PATH_RE` matches `.temp/mgr168/{item48_decide,enclosing_fn,spread_axis,sha_norm}.py` as a bare directory and discards it, so **four citations register as zero** — measured, and it is why the census could not find `enclosing_fn.py` (which `F69`'s published `24 of 30` rests on). ▶ **THE HONEST READING OF `RESTS = 0`: every citation the tool CAN SEE is discharged, and the tool's RECALL IS UNMEASURED.** ⛔⛔ **DO NOT "FIX" THIS BY WIDENING THE REGEX AND DECLARING VICTORY** — `F140`'s lesson is that recall measured at the only `n` the instrument has ever seen is not recall. ▶ **The measurable question**: expand every brace citation by hand, re-run, and report how many NEW law-11 rows appear. **n is small (the expansions are countable), so this is an hour, not a task.** ⚠ **(b) is the harder one and may not be worth code at all**: detecting a rename needs content comparison or a human, and **item 148's method — a person reading the citing sentence — already caught it.** ⭐ **Consider REPORTING the limit instead of closing it** (`F10`'s rule: a checker that cannot answer must say so), which is the cheapest honest option and the one `quota.py`'s `VACUOUS TODAY` already models | ⓘ Free — `.tasks-php/` is in no digest. ⚠ **This item exists because the fact was living inside a STRUCK item** (`~~153~~`), where nobody would act on it — a defect class with no live home is a defect nobody owns |
+| 158 | ⛔⛔ **THREE TOOLS INSTRUCT A READER TO DO WORK THAT IS DONE — AND THE DURABLE HALF IS THAT `boxcheck.py` ASSERTS EVERY OTHER HEADER IN THIS FILE AND NOT THE ONE ABOVE THIS TABLE** | `F153`. **(a) THE THREE, verified in real stdout and NOT repaired on purpose** (`F135` — the exhibits are the evidence): `boxcheck.py` *"`0 RESTS … -> promote them: item 153`"* (**struck**), `citecheck.py` *"`Adjudicate by unit text -- open item 148`"* (**adjudicated**), `citecheck.py` *"`open items 55/61`"* (**55 struck, 61 LIVE — one pointer, two truth values**). ▶ **Each is an ADJUDICATION, not a repair**: the `55/61` one may correctly stay as history, and deciding that for myself is what `F150` did to `F102`. **(b) 19 UNADJUDICATED** *"open item N"* citations with `N` struck across the six standing documents, **four in `.memory-php/`** — ⛔ **a candidate set, and the first two I reached for were BOTH wrong** (`02-ladder.md:297` is item 73 being obeyed; `spread_stat.py:255` never fires). **The method is item 148's: a person reads the citing sentence.** ⭐⭐ **(c) IS THE ONE THAT PAYS, AND IT IS CHEAP**: the header above this table said *"143 rows, 1 → 147"* while its own runnable check printed **`153 rows, max 157`** — ▶ **`boxcheck.py` ALREADY does exactly this for `.memory-php/`'s `F1–FNN` line** (`says F1-F{n}, actual highest is F{hi}`), so the shape is written, tested and one function away. ⛔ **§H: it lands with its must-fire negatives or it does not land** — plant a wrong count, a wrong max and a wrong gap set, and assert all three go red | ▶ **(c) FIRST, and it is not the biggest — it is the only one that stops the class recurring.** ⚠ **(a) and (b) are a reviewer's**, because I am the author of all three defects and of the finding. ⛔ **DO NOT "fix" (b) by deleting the word *open*** — half of those 19 are `✅ CLOSED`-shaped sentences where the phrase is correct history; **deleting it would destroy the record item 73 exists to protect.** ⓘ Free — `.tasks-php/` is in no digest, and `.memory-php/` edits are rule-9 gated anyway |
