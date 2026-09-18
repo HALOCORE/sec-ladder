@@ -404,6 +404,31 @@ CLASS = {
                                # ⓘ `PROMOTE_001` is NOT retro-numbered: moving
                                # a denominator under a published range is
                                # `F126`'s defect.
+    "065": "METH",             # THE ELEVENTH REVIEW ROUND -- `F147`-`F153`
+                               # plus items 150/151/154/155/156/157/158.
+                               # ⚠ WHY METH, AND IT IS THE SAME CALL EVERY
+                               # ROUND HAS HAD SINCE `_057`: a round is charged
+                               # to METHODOLOGY, not to the rows it reviews.
+                               # ⭐ AND THAT CHOICE IS ITSELF A PUBLISHED
+                               # LIMIT, not bookkeeping: it is exactly why the
+                               # per-row series CANNOT see what a row OPENS,
+                               # which is the surviving half of `F126`'s
+                               # refuted first-in-family premium. ▶ Anyone
+                               # quoting `marginal` as "what the next row
+                               # costs" is quoting a number that excludes
+                               # every round that made the next row possible.
+                               # ⛔⛔ THE ROUND MAY REFUTE ENTRIES ABOVE THIS
+                               # ONE. `_063` was told the same and did not;
+                               # `_064` refuted five things in its brief. If a
+                               # verdict moves a classification, APPLY IT HERE
+                               # AND RE-RUN -- do not write the corrected
+                               # figure into `RECAP_PHP.md` without re-running.
+                               # That cell has gone stale inside a single
+                               # session twice, and the second time the figures
+                               # were correctly DATED and still misread,
+                               # because the sentence called them "the live
+                               # figures" (`F126`, and the `tasks` cell says so
+                               # in terms).
 }
 
 # ⚠ THE SENSITIVITY LADDER. Each step moves tasks OUT of `ONCE` and charges them
